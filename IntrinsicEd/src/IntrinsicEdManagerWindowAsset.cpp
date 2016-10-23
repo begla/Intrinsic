@@ -196,16 +196,18 @@ void IntrinsicEdManagerWindowAsset::onResourceTreePopulated()
 
     if (AssetManager::_descAssetType(ref) == AssetType::kMesh)
     {
-      _assetChangeWatch->addPath(QString(Settings::Manager::_assetMeshPath.c_str()) + "/" +
-                                 AssetManager::_descAssetFileName(ref).c_str());
+      _assetChangeWatch->addPath(
+          QString(Settings::Manager::_assetMeshPath.c_str()) + "/" +
+          AssetManager::_descAssetFileName(ref).c_str());
     }
     else if (AssetManager::_descAssetType(ref) == AssetType::kColorTexture ||
              AssetManager::_descAssetType(ref) == AssetType::kAlphaTexture ||
              AssetManager::_descAssetType(ref) == AssetType::kHdrTexture ||
              AssetManager::_descAssetType(ref) == AssetType::kNormalTexture)
     {
-      _assetChangeWatch->addPath(QString(Settings::Manager::_assetTexturePath.c_str()) + "/" +
-                                 AssetManager::_descAssetFileName(ref).c_str());
+      _assetChangeWatch->addPath(
+          QString(Settings::Manager::_assetTexturePath.c_str()) + "/" +
+          AssetManager::_descAssetFileName(ref).c_str());
     }
   }
 }
