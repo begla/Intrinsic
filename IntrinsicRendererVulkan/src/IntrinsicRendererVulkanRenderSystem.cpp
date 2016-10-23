@@ -24,6 +24,8 @@ namespace Renderer
 {
 namespace Vulkan
 {
+using namespace Resources;
+
 namespace
 {
 bool _swapChainUpdatePending = false;
@@ -113,13 +115,13 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
   }
 
   {
-    Resources::GpuProgramManager::compileAllShaders();
-    Resources::GpuProgramManager::createAllResources();
-    Resources::RenderPassManager::createAllResources();
-    Resources::ImageManager::createAllResources();
-    Resources::VertexLayoutManager::createAllResources();
-    Resources::PipelineLayoutManager::createAllResources();
-    Resources::PipelineManager::createAllResources();
+    GpuProgramManager::compileAllShaders();
+    GpuProgramManager::createAllResources();
+    RenderPassManager::createAllResources();
+    ImageManager::createAllResources();
+    VertexLayoutManager::createAllResources();
+    PipelineLayoutManager::createAllResources();
+    PipelineManager::createAllResources();
   }
 
   // Init. swap chain and cmd buffers
@@ -156,8 +158,8 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
   }
 
   {
-    Resources::MaterialManager::initMaterialPasses();
-    Resources::MaterialManager::createAllResources();
+    MaterialManager::initMaterialPasses();
+    MaterialManager::createAllResources();
   }
 
   updateResolutionDependentResources();
@@ -230,7 +232,7 @@ void RenderSystem::releaseQueuedResources()
 void RenderSystem::updateResolutionDependentResources()
 {
   // Recreate all pipelines (to update the view port size)
-  Resources::PipelineManager::createAllResources();
+  PipelineManager::createAllResources();
 
   RenderPass::GBufferTransparents::updateResolutionDependentResources();
   RenderPass::GBuffer::updateResolutionDependentResources();
@@ -258,26 +260,24 @@ void RenderSystem::updateResolutionDependentResources()
 void RenderSystem::dispatchComputeCall(Dod::Ref p_ComputeCall,
                                        VkCommandBuffer p_CommandBuffer)
 {
-  Resources::PipelineRef pipelineRef =
-      Resources::ComputeCallManager::_descPipeline(p_ComputeCall);
-  Resources::PipelineLayoutRef pipelineLayoutRef =
-      Resources::PipelineManager::_descPipelineLayout(pipelineRef);
+  PipelineRef pipelineRef = ComputeCallManager::_descPipeline(p_ComputeCall);
+  PipelineLayoutRef pipelineLayoutRef =
+      PipelineManager::_descPipelineLayout(pipelineRef);
   const glm::uvec3& dimensions =
-      Resources::ComputeCallManager::_descDimensions(p_ComputeCall);
+      ComputeCallManager::_descDimensions(p_ComputeCall);
 
-  VkPipeline newPipeline = Resources::PipelineManager::_vkPipeline(pipelineRef);
+  VkPipeline newPipeline = PipelineManager::_vkPipeline(pipelineRef);
   vkCmdBindPipeline(p_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
                     newPipeline);
 
-  if (Resources::ComputeCallManager::_vkDescriptorSet(p_ComputeCall))
+  if (ComputeCallManager::_vkDescriptorSet(p_ComputeCall))
   {
     vkCmdBindDescriptorSets(
         p_CommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
-        Resources::PipelineLayoutManager::_vkPipelineLayout(pipelineLayoutRef),
-        0u, 1u, &Resources::ComputeCallManager::_vkDescriptorSet(p_ComputeCall),
-        (uint32_t)Resources::ComputeCallManager::_dynamicOffsets(p_ComputeCall)
-            .size(),
-        Resources::ComputeCallManager::_dynamicOffsets(p_ComputeCall).data());
+        PipelineLayoutManager::_vkPipelineLayout(pipelineLayoutRef), 0u, 1u,
+        &ComputeCallManager::_vkDescriptorSet(p_ComputeCall),
+        (uint32_t)ComputeCallManager::_dynamicOffsets(p_ComputeCall).size(),
+        ComputeCallManager::_dynamicOffsets(p_ComputeCall).data());
   }
 
   vkCmdDispatch(p_CommandBuffer, (uint32_t)dimensions.x, (uint32_t)dimensions.y,
@@ -289,65 +289,57 @@ void RenderSystem::dispatchComputeCall(Dod::Ref p_ComputeCall,
 void RenderSystem::dispatchDrawCall(Dod::Ref p_DrawCall,
                                     VkCommandBuffer p_CommandBuffer)
 {
-  Resources::PipelineRef pipelineRef =
-      Resources::DrawCallManager::_descPipeline(p_DrawCall);
-  Resources::PipelineLayoutRef pipelineLayoutRef =
-      Resources::PipelineManager::_descPipelineLayout(pipelineRef);
+  PipelineRef pipelineRef = DrawCallManager::_descPipeline(p_DrawCall);
+  PipelineLayoutRef pipelineLayoutRef =
+      PipelineManager::_descPipelineLayout(pipelineRef);
 
-  VkPipeline newPipeline = Resources::PipelineManager::_vkPipeline(pipelineRef);
+  VkPipeline newPipeline = PipelineManager::_vkPipeline(pipelineRef);
   vkCmdBindPipeline(p_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     newPipeline);
 
-  if (Resources::DrawCallManager::_vkDescriptorSet(p_DrawCall))
+  if (DrawCallManager::_vkDescriptorSet(p_DrawCall))
   {
     vkCmdBindDescriptorSets(
         p_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-        Resources::PipelineLayoutManager::_vkPipelineLayout(pipelineLayoutRef),
-        0u, 1u, &Resources::DrawCallManager::_vkDescriptorSet(p_DrawCall),
-        (uint32_t)Resources::DrawCallManager::_dynamicOffsets(p_DrawCall)
-            .size(),
-        Resources::DrawCallManager::_dynamicOffsets(p_DrawCall).data());
+        PipelineLayoutManager::_vkPipelineLayout(pipelineLayoutRef), 0u, 1u,
+        &DrawCallManager::_vkDescriptorSet(p_DrawCall),
+        (uint32_t)DrawCallManager::_dynamicOffsets(p_DrawCall).size(),
+        DrawCallManager::_dynamicOffsets(p_DrawCall).data());
   }
 
   // Bind vertex buffers
   {
     _INTR_ARRAY(VkBuffer)& vtxBuffers =
-        Resources::DrawCallManager::_vertexBuffers(p_DrawCall);
+        DrawCallManager::_vertexBuffers(p_DrawCall);
 
     if (!vtxBuffers.empty())
     {
       vkCmdBindVertexBuffers(
           p_CommandBuffer, 0u, (uint32_t)vtxBuffers.size(), vtxBuffers.data(),
-          Resources::DrawCallManager::_vertexBufferOffsets(p_DrawCall).data());
+          DrawCallManager::_vertexBufferOffsets(p_DrawCall).data());
     }
   }
 
   // Draw
   {
-    Resources::BufferRef indexBufferRef =
-        Resources::DrawCallManager::_descIndexBuffer(p_DrawCall);
+    BufferRef indexBufferRef = DrawCallManager::_descIndexBuffer(p_DrawCall);
     if (indexBufferRef.isValid())
     {
-      const VkIndexType indexType = Resources::BufferManager::_descBufferType(
-                                        indexBufferRef) == BufferType::kIndex16
-                                        ? VK_INDEX_TYPE_UINT16
-                                        : VK_INDEX_TYPE_UINT32;
+      const VkIndexType indexType =
+          BufferManager::_descBufferType(indexBufferRef) == BufferType::kIndex16
+              ? VK_INDEX_TYPE_UINT16
+              : VK_INDEX_TYPE_UINT32;
       vkCmdBindIndexBuffer(
-          p_CommandBuffer, Resources::BufferManager::_vkBuffer(indexBufferRef),
-          Resources::DrawCallManager::_indexBufferOffset(p_DrawCall),
-          indexType);
+          p_CommandBuffer, BufferManager::_vkBuffer(indexBufferRef),
+          DrawCallManager::_indexBufferOffset(p_DrawCall), indexType);
       vkCmdDrawIndexed(
-          p_CommandBuffer,
-          Resources::DrawCallManager::_descIndexCount(p_DrawCall),
-          Resources::DrawCallManager::_descInstanceCount(p_DrawCall), 0u, 0u,
-          0u);
+          p_CommandBuffer, DrawCallManager::_descIndexCount(p_DrawCall),
+          DrawCallManager::_descInstanceCount(p_DrawCall), 0u, 0u, 0u);
     }
     else
     {
-      vkCmdDraw(p_CommandBuffer,
-                Resources::DrawCallManager::_descVertexCount(p_DrawCall),
-                Resources::DrawCallManager::_descInstanceCount(p_DrawCall), 0u,
-                0u);
+      vkCmdDraw(p_CommandBuffer, DrawCallManager::_descVertexCount(p_DrawCall),
+                DrawCallManager::_descInstanceCount(p_DrawCall), 0u, 0u);
     }
   }
 }
@@ -364,13 +356,12 @@ void RenderSystem::beginRenderPass(Core::Dod::Ref p_RenderPass,
   {
     renderPassBegin.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassBegin.pNext = nullptr;
-    renderPassBegin.renderPass =
-        Resources::RenderPassManager::_vkRenderPass(p_RenderPass);
+    renderPassBegin.renderPass = RenderPassManager::_vkRenderPass(p_RenderPass);
     renderPassBegin.framebuffer =
-        Resources::FramebufferManager::_vkFrameBuffer(p_Framebuffer);
+        FramebufferManager::_vkFrameBuffer(p_Framebuffer);
 
     const glm::uvec2& framebufferDim =
-        Resources::FramebufferManager::_descDimensions(p_Framebuffer);
+        FramebufferManager::_descDimensions(p_Framebuffer);
     renderPassBegin.renderArea.offset.x = 0u;
     renderPassBegin.renderArea.offset.y = 0u;
     renderPassBegin.renderArea.extent.width = framebufferDim.x;
@@ -392,42 +383,39 @@ void RenderSystem::initManagers()
 
   // Init managers
   {
-    Resources::BufferManager::init();
-    Resources::GpuProgramManager::init();
-    Resources::RenderPassManager::init();
-    Resources::VertexLayoutManager::init();
-    Resources::PipelineLayoutManager::init();
-    Resources::PipelineManager::init();
-    Resources::DrawCallManager::init();
-    Resources::ComputeCallManager::init();
-    Resources::ImageManager::init();
-    Resources::FramebufferManager::init();
-    Resources::MaterialManager::init();
+    BufferManager::init();
+    GpuProgramManager::init();
+    RenderPassManager::init();
+    VertexLayoutManager::init();
+    PipelineLayoutManager::init();
+    PipelineManager::init();
+    DrawCallManager::init();
+    ComputeCallManager::init();
+    ImageManager::init();
+    FramebufferManager::init();
+    MaterialManager::init();
   }
 
   // Load managers
   {
-    Resources::GpuProgramManager::loadFromSingleFile(
-        "managers/GpuProgram.manager.json");
-    Resources::ImageManager::loadFromSingleFile("managers/Image.manager.json");
-    Resources::MaterialManager::loadFromSingleFile(
-        "managers/Material.manager.json");
+    GpuProgramManager::loadFromSingleFile("managers/GpuProgram.manager.json");
+    ImageManager::loadFromSingleFile("managers/Image.manager.json");
+    MaterialManager::loadFromSingleFile("managers/Material.manager.json");
   }
 
   // Setup default vertex layouts
   {
     // Mesh
     {
-      Resources::VertexLayoutRef meshVertexLayout =
-          Resources::VertexLayoutManager::createVertexLayout(_N(Mesh));
-      Resources::VertexLayoutManager::resetToDefault(meshVertexLayout);
+      VertexLayoutRef meshVertexLayout =
+          VertexLayoutManager::createVertexLayout(_N(Mesh));
+      VertexLayoutManager::resetToDefault(meshVertexLayout);
 
       Helper::createDefaultMeshVertexLayout(meshVertexLayout);
 
-      Resources::VertexLayoutRef debugLineVertexLayout =
-          Resources::VertexLayoutManager::createVertexLayout(
-              _N(DebugLineVertex));
-      Resources::VertexLayoutManager::resetToDefault(debugLineVertexLayout);
+      VertexLayoutRef debugLineVertexLayout =
+          VertexLayoutManager::createVertexLayout(_N(DebugLineVertex));
+      VertexLayoutManager::resetToDefault(debugLineVertexLayout);
 
       Helper::createDebugLineVertexLayout(debugLineVertexLayout);
     }
@@ -787,10 +775,10 @@ void RenderSystem::initOrUpdateVkSwapChain()
     }
   }
 
-  _INTR_ARRAY(Resources::ImageRef) imagesToCreate;
-  _INTR_ARRAY(Resources::ImageRef) imagesToDestroy;
-  _INTR_ARRAY(Resources::FramebufferRef) fbsToCreate;
-  _INTR_ARRAY(Resources::FramebufferRef) fbsToDestroy;
+  _INTR_ARRAY(ImageRef) imagesToCreate;
+  _INTR_ARRAY(ImageRef) imagesToDestroy;
+  _INTR_ARRAY(FramebufferRef) fbsToCreate;
+  _INTR_ARRAY(FramebufferRef) fbsToDestroy;
 
   // Destroy existing backbuffer GPU resources
   {
@@ -799,20 +787,19 @@ void RenderSystem::initOrUpdateVkSwapChain()
       Name bufferName =
           _INTR_STRING("Backbuffer") + StringUtil::toString<uint32_t>(i);
 
-      Resources::ImageRef imageRef =
-          Resources::ImageManager::_getResourceByName(bufferName);
+      ImageRef imageRef = ImageManager::_getResourceByName(bufferName);
       if (imageRef.isValid())
       {
         imagesToDestroy.push_back(imageRef);
       }
       else
       {
-        imageRef = Resources::ImageManager::createImage(bufferName);
+        imageRef = ImageManager::createImage(bufferName);
       }
     }
 
-    Resources::FramebufferManager::destroyResources(fbsToDestroy);
-    Resources::ImageManager::destroyResources(imagesToDestroy);
+    FramebufferManager::destroyResources(fbsToDestroy);
+    ImageManager::destroyResources(imagesToDestroy);
   }
 
   // Create backbuffer GPU resources
@@ -822,35 +809,30 @@ void RenderSystem::initOrUpdateVkSwapChain()
       Name bufferName =
           _INTR_STRING("Backbuffer") + StringUtil::toString<uint32_t>(i);
 
-      Resources::ImageRef backbufferRef =
-          Resources::ImageManager::getResourceByName(bufferName);
+      ImageRef backbufferRef = ImageManager::getResourceByName(bufferName);
       {
-        Resources::ImageManager::resetToDefault(backbufferRef);
-        Resources::ImageManager::addResourceFlags(
+        ImageManager::resetToDefault(backbufferRef);
+        ImageManager::addResourceFlags(
             backbufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
 
-        Resources::ImageManager::_vkImage(backbufferRef) =
-            _vkSwapchainImages[i];
-        Resources::ImageManager::_vkImageView(backbufferRef) =
+        ImageManager::_vkImage(backbufferRef) = _vkSwapchainImages[i];
+        ImageManager::_vkImageView(backbufferRef) = _vkSwapchainImageViews[i];
+        ImageManager::_vkSubResourceImageViews(backbufferRef).resize(1u);
+        ImageManager::_vkSubResourceImageViews(backbufferRef)[0u].resize(1u);
+        ImageManager::_vkSubResourceImageViews(backbufferRef)[0u][0u] =
             _vkSwapchainImageViews[i];
-        Resources::ImageManager::_vkSubResourceImageViews(backbufferRef)
-            .resize(1u);
-        Resources::ImageManager::_vkSubResourceImageViews(backbufferRef)[0u]
-            .resize(1u);
-        Resources::ImageManager::_vkSubResourceImageViews(
-            backbufferRef)[0u][0u] = _vkSwapchainImageViews[i];
-        Resources::ImageManager::_descDimensions(backbufferRef) =
+        ImageManager::_descDimensions(backbufferRef) =
             glm::uvec3(_backbufferDimensions.x, _backbufferDimensions.y, 1u);
-        Resources::ImageManager::addImageFlags(
-            backbufferRef, ImageFlags::kExternalImage |
-                               ImageFlags::kExternalView |
-                               ImageFlags::kExternalDeviceMemory);
+        ImageManager::addImageFlags(backbufferRef,
+                                    ImageFlags::kExternalImage |
+                                        ImageFlags::kExternalView |
+                                        ImageFlags::kExternalDeviceMemory);
 
         imagesToCreate.push_back(backbufferRef);
       }
     }
 
-    Resources::ImageManager::createResources(imagesToCreate);
+    ImageManager::createResources(imagesToCreate);
   }
 
   _INTR_LOG_POP();
