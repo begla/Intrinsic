@@ -1,0 +1,231 @@
+// Intrinsic
+// Copyright (c) 2016 Benjamin Glatzel
+//
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+#pragma once
+
+namespace Intrinsic
+{
+namespace Core
+{
+namespace Components
+{
+typedef Dod::Ref CameraRef;
+typedef _INTR_ARRAY(CameraRef) CameraRefArray;
+
+struct CameraData : Dod::Components::ComponentDataBase
+{
+  CameraData()
+      : Dod::Components::ComponentDataBase(_INTR_MAX_CAMERA_COMPONENT_COUNT)
+  {
+    descFov.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
+    descNearPlane.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
+    descFarPlane.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
+    descEulerAngles.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
+
+    frustum.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
+
+    forward.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
+    up.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
+    actualCameraOrientation.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
+  }
+
+  _INTR_ARRAY(float) descFov;
+  _INTR_ARRAY(float) descNearPlane;
+  _INTR_ARRAY(float) descFarPlane;
+  _INTR_ARRAY(glm::vec3) descEulerAngles;
+
+  _INTR_ARRAY(Resources::FrustumRef) frustum;
+  _INTR_ARRAY(glm::vec3) forward;
+  _INTR_ARRAY(glm::vec3) up;
+  _INTR_ARRAY(glm::quat) actualCameraOrientation;
+};
+
+struct CameraManager
+    : Dod::Components::ComponentManagerBase<CameraData,
+                                            _INTR_MAX_CAMERA_COMPONENT_COUNT>
+{
+  static void init();
+
+  // <-
+
+  _INTR_INLINE static CameraRef createCamera(Entity::EntityRef p_ParentEntity)
+  {
+    CameraRef ref = Dod::Components::ComponentManagerBase<
+        CameraData,
+        _INTR_MAX_CAMERA_COMPONENT_COUNT>::_createComponent(p_ParentEntity);
+
+    _frustum(ref) = Resources::FrustumManager::createFrustum(_N(CameraFrustum));
+
+    return ref;
+  }
+
+  // <-
+
+  _INTR_INLINE static void resetToDefault(MeshRef p_Ref)
+  {
+    _descFov(p_Ref) = glm::radians(75.0f);
+    _descNearPlane(p_Ref) = 1.0f;
+    _descFarPlane(p_Ref) = 10000.0f;
+    _descEulerAngles(p_Ref) = glm::vec3(0.0f);
+  }
+
+  // <-
+
+  _INTR_INLINE static void destroyCamera(CameraRef p_Camera)
+  {
+    Resources::FrustumManager::destroyFrustum(_frustum(p_Camera));
+    _frustum(p_Camera) = Dod::Ref();
+
+    Dod::Components::ComponentManagerBase<
+        CameraData,
+        _INTR_MAX_CAMERA_COMPONENT_COUNT>::_destroyComponent(p_Camera);
+  }
+
+  // <-
+
+  _INTR_INLINE static void compileDescriptor(CameraRef p_Ref,
+                                             rapidjson::Value& p_Properties,
+                                             rapidjson::Document& p_Document)
+  {
+    p_Properties.AddMember(
+        "fov", _INTR_CREATE_PROP(p_Document, _N(Camera), _N(float),
+                                 glm::degrees(_descFov(p_Ref)), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "nearPlane", _INTR_CREATE_PROP(p_Document, _N(Camera), _N(float),
+                                       _descNearPlane(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "farPlane", _INTR_CREATE_PROP(p_Document, _N(Camera), _N(float),
+                                      _descFarPlane(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "eulerAngles",
+        _INTR_CREATE_PROP(p_Document, _N(Camera), _N(rotation),
+                          glm::degrees(_descEulerAngles(p_Ref)), false, false),
+        p_Document.GetAllocator());
+  }
+
+  // <-
+
+  _INTR_INLINE static void initFromDescriptor(CameraRef p_Ref,
+                                              rapidjson::Value& p_Properties)
+  {
+    if (p_Properties.HasMember("fov"))
+      _descFov(p_Ref) =
+          glm::radians(JsonHelper::readPropertyFloat(p_Properties["fov"]));
+    if (p_Properties.HasMember("nearPlane"))
+      _descNearPlane(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["nearPlane"]);
+    if (p_Properties.HasMember("farPlane"))
+      _descFarPlane(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["farPlane"]);
+    if (p_Properties.HasMember("eulerAngles"))
+      _descEulerAngles(p_Ref) = glm::radians(
+          JsonHelper::readPropertyVec3(p_Properties["eulerAngles"]));
+  }
+
+  // <-
+
+  _INTR_INLINE static glm::quat calcActualCameraOrientation(CameraRef p_Ref)
+  {
+    Entity::EntityRef entityRef = _entity(p_Ref);
+    Components::NodeRef nodeCompRef =
+        Components::NodeManager::getComponentForEntity(entityRef);
+
+    return Components::NodeManager::_worldOrientation(nodeCompRef) *
+           glm::quat(Components::CameraManager::_descEulerAngles(p_Ref));
+  }
+
+  // <-
+
+  static void updateFrustums(const CameraRefArray& p_Cameras);
+
+  // <-
+
+  static glm::mat4 computeCustomProjMatrix(CameraRef p_Ref, float p_Near,
+                                           float p_Far);
+
+  // Getter/Setter
+  // Intrinsic
+
+  // Description
+  _INTR_INLINE static float& _descNearPlane(CameraRef p_Ref)
+  {
+    return _data.descNearPlane[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descFarPlane(CameraRef p_Ref)
+  {
+    return _data.descFarPlane[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descFov(CameraRef p_Ref)
+  {
+    return _data.descFov[p_Ref._id];
+  }
+  _INTR_INLINE static glm::vec3& _descEulerAngles(CameraRef p_Ref)
+  {
+    return _data.descEulerAngles[p_Ref._id];
+  }
+
+  // Resources
+  _INTR_INLINE static Resources::FrustumRef& _frustum(CameraRef p_Ref)
+  {
+    return _data.frustum[p_Ref._id];
+  }
+
+  _INTR_INLINE static glm::mat4x4& _viewMatrix(CameraRef p_Ref)
+  {
+    return Resources::FrustumManager::_descViewMatrix(_frustum(p_Ref));
+  }
+  _INTR_INLINE static glm::mat4x4& _inverseViewMatrix(CameraRef p_Ref)
+  {
+    return Resources::FrustumManager::_invViewMatrix(_frustum(p_Ref));
+  }
+
+  _INTR_INLINE static glm::mat4x4& _projectionMatrix(CameraRef p_Ref)
+  {
+    return Resources::FrustumManager::_descProjectionMatrix(_frustum(p_Ref));
+  }
+  _INTR_INLINE static glm::mat4x4& _inverseProjectionMatrix(CameraRef p_Ref)
+  {
+    return Resources::FrustumManager::_invProjectionMatrix(_frustum(p_Ref));
+  }
+
+  _INTR_INLINE static glm::mat4x4& _viewProjectionMatrix(CameraRef p_Ref)
+  {
+    return Resources::FrustumManager::_viewProjectionMatrix(_frustum(p_Ref));
+  }
+  _INTR_INLINE static glm::mat4x4& _inverseViewProjectionMatrix(CameraRef p_Ref)
+  {
+    return Resources::FrustumManager::_invViewProjectionMatrix(_frustum(p_Ref));
+  }
+
+  _INTR_INLINE static glm::quat& _actualCameraOrientation(CameraRef p_Ref)
+  {
+    return _data.actualCameraOrientation[p_Ref._id];
+  }
+  _INTR_INLINE static glm::vec3& _forward(CameraRef p_Ref)
+  {
+    return _data.forward[p_Ref._id];
+  }
+  _INTR_INLINE static glm::vec3& _up(CameraRef p_Ref)
+  {
+    return _data.up[p_Ref._id];
+  }
+};
+}
+}
+}

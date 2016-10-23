@@ -1,0 +1,11 @@
+{
+  "initialWorld": "Default.world.json",
+
+  "rendererValidationEnabled": false,
+
+  "targetFrameRate": 0.016,
+  
+  "windowMode": 0,
+  "screenResolutionWidth": 1280,
+  "screenResolutionHeight": 720
+}

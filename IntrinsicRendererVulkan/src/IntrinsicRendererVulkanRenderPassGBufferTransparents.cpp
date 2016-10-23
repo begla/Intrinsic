@@ -1,0 +1,281 @@
+// Intrinsic
+// Copyright (c) 2016 Benjamin Glatzel
+//
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+// Precompiled header file
+#include "stdafx_vulkan.h"
+#include "stdafx.h"
+
+namespace Intrinsic
+{
+namespace Renderer
+{
+namespace Vulkan
+{
+namespace RenderPass
+{
+namespace
+{
+Resources::ImageRef _albedoImageRef;
+Resources::ImageRef _normalImageRef;
+Resources::ImageRef _parameter0ImageRef;
+Resources::ImageRef _depthImageRef;
+Resources::FramebufferRef _framebufferRef;
+
+Resources::RenderPassRef _renderPassRef;
+}
+
+void GBufferTransparents::init()
+{
+  using namespace Resources;
+
+  RenderPassRefArray renderpassesToCreate;
+
+  // Render passes
+  {
+    _renderPassRef =
+        RenderPassManager::createRenderPass(_N(GBufferTransparents));
+    RenderPassManager::resetToDefault(_renderPassRef);
+
+    AttachmentDescription albedoAttachment = {Format::kR16G16B16A16Float,
+                                              AttachmentFlags::kClearOnLoad};
+    AttachmentDescription normalAttachment = {Format::kR16G16B16A16Float,
+                                              AttachmentFlags::kClearOnLoad};
+    AttachmentDescription parameter0Attachment = {
+        Format::kR16G16B16A16Float, AttachmentFlags::kClearOnLoad};
+    AttachmentDescription depthStencilAttachment = {
+        Format::kD24UnormS8UInt,
+        AttachmentFlags::kClearOnLoad | AttachmentFlags::kClearStencilOnLoad};
+
+    RenderPassManager::_descAttachments(_renderPassRef)
+        .push_back(albedoAttachment);
+    RenderPassManager::_descAttachments(_renderPassRef)
+        .push_back(normalAttachment);
+    RenderPassManager::_descAttachments(_renderPassRef)
+        .push_back(parameter0Attachment);
+    RenderPassManager::_descAttachments(_renderPassRef)
+        .push_back(depthStencilAttachment);
+  }
+  renderpassesToCreate.push_back(_renderPassRef);
+
+  RenderPassManager::createResources(renderpassesToCreate);
+}
+
+// <-
+
+void GBufferTransparents::updateResolutionDependentResources()
+{
+  using namespace Resources;
+
+  FramebufferRefArray fbsToDestroy;
+  FramebufferRefArray imgsToDestroy;
+  FramebufferRefArray fbsToCreate;
+  FramebufferRefArray imgsToCreate;
+
+  // Cleanup old resources
+  {
+    if (_framebufferRef.isValid())
+      fbsToDestroy.push_back(_framebufferRef);
+    if (_albedoImageRef.isValid())
+      fbsToDestroy.push_back(_albedoImageRef);
+    if (_normalImageRef.isValid())
+      fbsToDestroy.push_back(_normalImageRef);
+    if (_parameter0ImageRef.isValid())
+      fbsToDestroy.push_back(_parameter0ImageRef);
+    if (_depthImageRef.isValid())
+      fbsToDestroy.push_back(_depthImageRef);
+
+    FramebufferManager::destroyFramebuffersAndResources(fbsToDestroy);
+    ImageManager::destroyImagesAndResources(imgsToDestroy);
+  }
+
+  glm::uvec3 dim = glm::vec3(RenderSystem::_backbufferDimensions.x,
+                             RenderSystem::_backbufferDimensions.y, 1u);
+
+  // Create images
+  _albedoImageRef = ImageManager::createImage(_N(GBufferTransparentsAlbedo));
+  {
+    ImageManager::resetToDefault(_albedoImageRef);
+    ImageManager::addResourceFlags(
+        _albedoImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+
+    ImageManager::_descDimensions(_albedoImageRef) = dim;
+    ImageManager::_descImageFormat(_albedoImageRef) =
+        Format::kR16G16B16A16Float;
+    ImageManager::_descImageType(_albedoImageRef) = ImageType::kTexture;
+  }
+  imgsToCreate.push_back(_albedoImageRef);
+
+  _normalImageRef = ImageManager::createImage(_N(GBufferTransparentsNormal));
+  {
+    ImageManager::resetToDefault(_normalImageRef);
+    ImageManager::addResourceFlags(
+        _normalImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+
+    ImageManager::_descDimensions(_normalImageRef) = dim;
+    ImageManager::_descImageFormat(_normalImageRef) =
+        Format::kR16G16B16A16Float;
+    ImageManager::_descImageType(_normalImageRef) = ImageType::kTexture;
+  }
+  imgsToCreate.push_back(_normalImageRef);
+
+  _parameter0ImageRef =
+      ImageManager::createImage(_N(GBufferTransparentsParameter0));
+  {
+    ImageManager::resetToDefault(_parameter0ImageRef);
+    ImageManager::addResourceFlags(
+        _parameter0ImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+
+    ImageManager::_descDimensions(_parameter0ImageRef) = dim;
+    ImageManager::_descImageFormat(_parameter0ImageRef) =
+        Format::kR16G16B16A16Float;
+    ImageManager::_descImageType(_parameter0ImageRef) = ImageType::kTexture;
+  }
+  imgsToCreate.push_back(_parameter0ImageRef);
+
+  _depthImageRef = ImageManager::createImage(_N(GBufferTransparentsDepth));
+  {
+    ImageManager::resetToDefault(_depthImageRef);
+    ImageManager::addResourceFlags(
+        _depthImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+
+    ImageManager::_descDimensions(_depthImageRef) = dim;
+    ImageManager::_descImageFormat(_depthImageRef) = Format::kD24UnormS8UInt;
+    ImageManager::_descImageType(_depthImageRef) = ImageType::kTexture;
+  }
+  imgsToCreate.push_back(_depthImageRef);
+
+  // Create framebuffer
+  _framebufferRef =
+      FramebufferManager::createFramebuffer(_N(GBufferTransparents));
+  {
+    FramebufferManager::resetToDefault(_framebufferRef);
+    FramebufferManager::addResourceFlags(
+        _framebufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+
+    FramebufferManager::_descAttachedImages(_framebufferRef)
+        .push_back(_albedoImageRef);
+    FramebufferManager::_descAttachedImages(_framebufferRef)
+        .push_back(_normalImageRef);
+    FramebufferManager::_descAttachedImages(_framebufferRef)
+        .push_back(_parameter0ImageRef);
+    FramebufferManager::_descAttachedImages(_framebufferRef)
+        .push_back(_depthImageRef);
+    FramebufferManager::_descDimensions(_framebufferRef) = glm::vec2(dim);
+    FramebufferManager::_descRenderPass(_framebufferRef) = _renderPassRef;
+  }
+  fbsToCreate.push_back(_framebufferRef);
+
+  ImageManager::createResources(imgsToCreate);
+  FramebufferManager::createResources(fbsToCreate);
+}
+
+// <-
+
+void GBufferTransparents::destroy() {}
+
+// <-
+
+void GBufferTransparents::render(float p_DeltaT)
+{
+  using namespace Resources;
+
+  _INTR_PROFILE_CPU("Render Pass", "Render Transparents");
+  _INTR_PROFILE_GPU("Render Transparents");
+
+  static Components::MeshRefArray visibleMeshes;
+  visibleMeshes.clear();
+  visibleMeshes.insert(visibleMeshes.begin(),
+                       RenderSystem::_visibleMeshComponentsPerMaterialPass
+                           [0u][MaterialPass::kSurfaceWater]
+                               .begin(),
+                       RenderSystem::_visibleMeshComponentsPerMaterialPass
+                           [0u][MaterialPass::kSurfaceWater]
+                               .end());
+
+  static DrawCallRefArray visibleDrawCalls;
+  visibleDrawCalls.clear();
+  visibleDrawCalls.insert(visibleDrawCalls.begin(),
+                          RenderSystem::_visibleDrawCallsPerMaterialPass
+                              [0u][MaterialPass::kSurfaceWater]
+                                  .begin(),
+                          RenderSystem::_visibleDrawCallsPerMaterialPass
+                              [0u][MaterialPass::kSurfaceWater]
+                                  .end());
+
+  if (visibleDrawCalls.empty())
+  {
+    return;
+  }
+
+  DrawCallManager::sortDrawCallsBackToFront(visibleDrawCalls);
+
+  // Update per mesh uniform data
+  {
+    Core::Components::MeshManager::updateUniformData(
+        RenderSystem::_visibleDrawCallsPerMaterialPass
+            [0u][MaterialPass::kSurfaceWater]);
+  }
+
+  ImageManager::insertImageMemoryBarrier(
+      _albedoImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+  ImageManager::insertImageMemoryBarrier(
+      _normalImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+  ImageManager::insertImageMemoryBarrier(
+      _parameter0ImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+  ImageManager::insertImageMemoryBarrier(
+      _depthImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+      VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+
+  VkClearValue clearValues[4] = {};
+  {
+    clearValues[0].color.float32[0u] = 0.45f;
+    clearValues[0].color.float32[1u] = 0.93f;
+    clearValues[0].color.float32[2u] = 1.0f;
+    clearValues[0].color.float32[3u] = 1.0f;
+    clearValues[3].depthStencil.depth = 1.0f;
+  }
+
+  RenderSystem::beginRenderPass(_renderPassRef, _framebufferRef,
+                                VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS,
+                                4u, clearValues);
+  {
+    DrawCallDispatcher::queueDrawCalls(visibleDrawCalls, _renderPassRef,
+                                       _framebufferRef);
+    _INTR_PROFILE_COUNTER_SET("Dispatched Draw Calls (Transparents)",
+                              DrawCallDispatcher::_dispatchedDrawCallCount);
+  }
+  RenderSystem::endRenderPass(_renderPassRef);
+
+  ImageManager::insertImageMemoryBarrier(
+      _albedoImageRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+  ImageManager::insertImageMemoryBarrier(
+      _normalImageRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+  ImageManager::insertImageMemoryBarrier(
+      _parameter0ImageRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+  ImageManager::insertImageMemoryBarrier(
+      _depthImageRef, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
+}
+}
+}
+}

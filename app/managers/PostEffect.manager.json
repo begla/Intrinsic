@@ -1,0 +1,44 @@
+[
+    {
+        "name": "Default",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Default"
+            },
+            "volumetricLightingScattering": {
+                "cat": "VolumetricLighting",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.0
+            }
+        }
+    },
+    {
+        "name": "Foggy",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Foggy"
+            },
+            "volumetricLightingScattering": {
+                "cat": "VolumetricLighting",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.003000000026077032
+            }
+        }
+    }
+]
