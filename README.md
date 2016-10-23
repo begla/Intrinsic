@@ -12,6 +12,7 @@
 
 ## Windows
 
+```
 1. Download and install the latest Qt 5.x (open-source) distribution
 2. Create a new environment variable "INTR_QTDIR" pointing to "[...]\Qt5.7\5.7\msvc2015_64"
 
@@ -29,6 +30,7 @@
 
 12. If everything went well, you'll find the solution in the newly created "build" folder. You can also use one of the many build scripts: "Build_Release.bat", ... to get started
 13. Execute "Intrinsic.exe" or "IntrinsicEd.exe" in the "app" directory - yey!
+```
 
 ## Linux
 
