@@ -10,9 +10,6 @@ app/assets/world_machine/*.tmd.session
 distro/
 Intrinsic.7z
 
-app/shaders/cache/*
-!app/shaders/cache/KEEP_ME
-
 build
 dependencies/glslang/build
 
@@ -26,12 +23,6 @@ Intrinsic.creator
 Intrinsic.creator.user
 Intrinsic.files
 Intrinsic.includes
-
-dependencies/physx/*
-!dependencies/physx/KEEP_ME
-
-dependencies/fbx/*
-!dependencies/fbx/KEEP_ME
 
 app/assets/*
 !app/assets/shaders
