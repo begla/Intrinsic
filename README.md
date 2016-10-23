@@ -34,8 +34,6 @@
 
 ## Linux
 
-### Limitations
-
 Coming soon...
 
 ## Android
