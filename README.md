@@ -2,21 +2,37 @@
 
 # Getting started
 
+## Prerequisites
+
+* Visual Studio 2015
+* CMake >= 3.5
+* Qt 5.7
+* PhysX 3.3
+* FBX SDK 2015.1
+
 ## Windows
 
-### Prerequisites
+1. Download and install the latest Qt 5.x (open-source) distribution
+2. Create a new environment variable "INTR_QTDIR" pointing to "[...]\Qt5.7\5.7\msvc2015_64"
 
-* Qt 5.7
-* ...
+3. Get access to the latest PhysX SDK from NVIDIA: https://developer.nvidia.com/physx-sdk
+4. Follow the instructions from NVIDIA and compile the PhysX libraries for the configurations "Release", "Profile" and "Debug"
+5. Download and install the latest Autodesk FBX SDK (2015.1): http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775847
+5. Create a new directory called "Intrinsic_Dependencies" on the same level as the Intrinsic repository folder
+6. Inside, create a new folder "dependencies" containing two folders "physx" and "fbx"
+7. Copy the static/dynamic libraries and header files of both SDKs to folders named "bin" (DLLs), "lib" (LIBs) and "include" respectively
 
-Coming soon...
+8. Go to the "scripts_win32" folder in the Intrinsic repository dir
+9. Execute "ConfigAndBuildDependencies.bat" to build some of the remaining dependencies automatically
+10. Execute "CopyDllsToAppDir_Debug.bat" and "CopyDllsToAppDir_Release.bat"
+11. Execute "Config.bat" to create a Visual Studio 2015 solution file and all project configurations
+
+12. If everything went well, you'll find the solution in the newly created "build" folder. You can also use one of the many build scripts: "Build_Release.bat", ... to get started
+13. Execute "Intrinsic.exe" or "IntrinsicEd.exe" in the "app" directory - yey!
 
 ## Linux
 
 ### Limitations
-
-* Only the core library and the main standalone application are currently setup for Linux builds, IntrinsicEd support is only partially completed (nothing is speaking against supporting IntrinsicEd and the support for it will be added in the future)
-* Microprofile is currently disabled in Linux builds due to errors in the Linux path of the library
 
 Coming soon...
 
@@ -48,7 +64,7 @@ Intrinsic uses the following libraries:
 
 * Vulkan SDK (see https://lunarg.com/vulkan-sdk/)
 * PhysX 3 (see https://developer.nvidia.com/physx-sdk)
-* Qt (IntrinsicEd only, see https://www.qt.io/download/)
+* Qt (IntrinsicEd only, see https://www.qt.io/download)
 * microprofile (https://github.com/jonasmr/microprofile)
 * enkiTS (see https://github.com/dougbinks/enkiTS)
 * FBX SDK (IntrinsicEd only, see http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775847)
@@ -64,3 +80,9 @@ Intrinsic uses the following libraries:
 * SPIRV-Cross (see https://github.com/KhronosGroup/SPIRV-Cross)
 * tinydir (see https://github.com/cxong/tinydir)
 * TLSF allocator (see https://github.com/mattconte/tlsf)
+
+Intrinsic also uses the following tools in binary format:
+
+* NVTT (see https://developer.nvidia.com/gpu-accelerated-texture-compression)
+* Cloc (see http://cloc.sourceforge.net)
+* 7za (see http://www.7-zip.org/download.html)
