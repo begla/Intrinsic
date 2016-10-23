@@ -1,0 +1,147 @@
+// Intrinsic
+// Copyright (c) 2016 Benjamin Glatzel
+//
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+// Precompiled header file
+#include "stdafx.h"
+
+namespace Intrinsic
+{
+namespace Core
+{
+namespace Input
+{
+uint8_t System::_keyStates[] = {};
+float System::_axisStates[Axis::kCount] = {};
+float System::_virtualKeyStates[VirtualKey::kCount] = {};
+
+glm::vec2 System::_lastMousePos = glm::vec2(0.0f);
+glm::vec2 System::_lastMousePosViewport = glm::vec2(0.0f);
+glm::vec2 System::_lastMousePosRel = glm::vec2(0.0f);
+
+_INTR_HASH_MAP(uint32_t, uint32_t) System::_keyToVirtualKeyMapping;
+_INTR_HASH_MAP(uint32_t, uint32_t) System::_axisToVirtualKeyMapping;
+
+// <-
+
+void System::init()
+{
+  _keyToVirtualKeyMapping[Key::kW] = VirtualKey::kMoveUp;
+  _keyToVirtualKeyMapping[Key::kS] = VirtualKey::kMoveDown;
+  _keyToVirtualKeyMapping[Key::kD] = VirtualKey::kMoveRight;
+  _keyToVirtualKeyMapping[Key::kA] = VirtualKey::kMoveLeft;
+  _keyToVirtualKeyMapping[Key::kSpace] = VirtualKey::kJump;
+  _keyToVirtualKeyMapping[Key::kShift] = VirtualKey::kRun;
+
+  _keyToVirtualKeyMapping[Key::kControllerButtonX] = VirtualKey::kJump;
+  _axisToVirtualKeyMapping[Axis::kLeftX] = VirtualKey::kMoveHorizontal;
+  _axisToVirtualKeyMapping[Axis::kLeftY] = VirtualKey::kMoveVertical;
+  _axisToVirtualKeyMapping[Axis::kRightX] = VirtualKey::kMoveCameraHorizontal;
+  _axisToVirtualKeyMapping[Axis::kRightY] = VirtualKey::kMoveCameraVertical;
+  _axisToVirtualKeyMapping[Axis::kTriggerRight] = VirtualKey::kRun;
+}
+
+void System::reset() { _lastMousePosRel = glm::vec2(0.0f); }
+
+// <-
+
+void System::processAxisEvent(const AxisEvent& p_Event)
+{
+  static const float deadZone = 0.1f;
+  float axisValue = p_Event.value;
+  axisValue /= deadZone;
+  axisValue = std::trunc(axisValue);
+  axisValue *= deadZone;
+
+  if (_axisStates[p_Event.axis] != axisValue)
+  {
+    _axisStates[p_Event.axis] = axisValue;
+
+    Resources::QueuedEventData eventData;
+    eventData.axisEvent.axis = p_Event.axis;
+    eventData.axisEvent.value = axisValue;
+    Resources::EventManager::queueEvent(_N(AxisChanged), eventData);
+
+    auto virtualKey = _axisToVirtualKeyMapping.find(p_Event.axis);
+    if (virtualKey != _axisToVirtualKeyMapping.end())
+    {
+      _virtualKeyStates[virtualKey->second] = axisValue;
+    }
+  }
+}
+
+// <-
+
+void System::processKeyPressEvent(const KeyEvent& p_Event)
+{
+  if (_keyStates[p_Event.key] != KeyState::kPressed)
+  {
+    _keyStates[p_Event.key] = KeyState::kPressed;
+
+    Resources::QueuedEventData eventData;
+    eventData.keyEvent.key = p_Event.key;
+    Resources::EventManager::queueEvent(_N(KeyPressed), eventData);
+
+    auto virtualKey = _keyToVirtualKeyMapping.find(p_Event.key);
+    if (virtualKey != _keyToVirtualKeyMapping.end())
+    {
+      _virtualKeyStates[virtualKey->second] = 1.0f;
+    }
+  }
+}
+
+// <-
+
+void System::processKeyReleaseEvent(const KeyEvent& p_Event)
+{
+  if (_keyStates[p_Event.key] != KeyState::kReleased)
+  {
+    _keyStates[p_Event.key] = KeyState::kReleased;
+
+    Resources::QueuedEventData eventData;
+    eventData.keyEvent.key = p_Event.key;
+    Resources::EventManager::queueEvent(_N(KeyReleased), eventData);
+
+    auto virtualKey = _keyToVirtualKeyMapping.find(p_Event.key);
+    if (virtualKey != _keyToVirtualKeyMapping.end())
+    {
+      _virtualKeyStates[virtualKey->second] = 0.0f;
+    }
+  }
+}
+
+// <-
+
+void System::processMouseMoveEvent(const MouseMoveEvent& p_Event)
+{
+  if (_lastMousePos != p_Event.pos)
+  {
+    Resources::QueuedEventData eventData;
+    eventData.mouseEvent.pos[0] = p_Event.pos.x;
+    eventData.mouseEvent.pos[1] = p_Event.pos.y;
+    eventData.mouseEvent.posViewport[0] = p_Event.posViewport.x;
+    eventData.mouseEvent.posViewport[1] = p_Event.posViewport.y;
+    eventData.mouseEvent.posRel[0] = p_Event.posRel.x;
+    eventData.mouseEvent.posRel[1] = p_Event.posRel.y;
+    Resources::EventManager::queueEvent(_N(MouseMoved), eventData);
+
+    _lastMousePos = p_Event.pos;
+    _lastMousePosRel = p_Event.posRel;
+    _lastMousePosViewport = p_Event.posViewport;
+  }
+}
+}
+}
+}

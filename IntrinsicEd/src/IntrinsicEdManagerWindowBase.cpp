@@ -1,0 +1,291 @@
+// Intrinsic
+// Copyright (c) 2016 Benjamin Glatzel
+//
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+// Precompiled header file
+#include "stdafx.h"
+#include "stdafx_editor.h"
+
+#include "IntrinsicEdManagerWindowBase.h"
+
+// Ui
+#include "ui_IntrinsicEdManagerWindow.h"
+
+IntrinsicEdManagerWindowBase::IntrinsicEdManagerWindowBase(QWidget* parent)
+    : QWidget(parent)
+{
+  _ui.setupUi(this);
+
+  QObject::connect(_ui.resourceView, SIGNAL(customContextMenuRequested(QPoint)),
+                   this, SLOT(onShowResourceContextMenu(QPoint)));
+  QObject::connect(_ui.createResource, SIGNAL(clicked()), this,
+                   SLOT(onCreateResource()));
+  QObject::connect(_ui.saveManager, SIGNAL(clicked()), this,
+                   SLOT(onSaveManager()));
+  QObject::connect(_ui.refreshManager, SIGNAL(clicked()), this,
+                   SLOT(onPopulateResourceTree()));
+  QObject::connect(
+      _ui.resourceView,
+      SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this,
+      SLOT(onItemSelected(QTreeWidgetItem*, QTreeWidgetItem*)));
+  QObject::connect(_ui.resourceView, SIGNAL(itemChanged(QTreeWidgetItem*, int)),
+                   this, SLOT(onItemChanged(QTreeWidgetItem*, int)));
+
+  _ui.propertyView->setFeatures(0);
+  _ui.splitter->setStretchFactor(0, 1);
+  _ui.splitter->setStretchFactor(1, 2);
+  _ui.resourceView->setSortingEnabled(true);
+  _ui.resourceView->sortByColumn(0u, Qt::AscendingOrder);
+  _resourceName = "Resource";
+  setWindowFlags(Qt::WindowStaysOnTopHint);
+}
+
+void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
+{
+  _ui.resourceView->clear();
+  _resourceToItemMapping.clear();
+  _itemToResourceMapping.clear();
+
+  rapidjson::Document doc;
+
+  const uint32_t resourceCount =
+      (uint32_t)_resourceManagerEntry.getActiveResourceCountFunction();
+
+  for (uint32_t i = 0u; i < resourceCount; ++i)
+  {
+    Dod::Ref resource =
+        _resourceManagerEntry.getActiveResourceAtIndexFunction(i);
+    _INTR_ASSERT(resource.isValid());
+
+    rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
+    _propertyCompilerEntry.compileFunction(resource, properties, doc);
+
+    QTreeWidgetItem* item = new QTreeWidgetItem();
+    item->setText(0, properties["name"]["value"].GetString());
+    item->setIcon(0, _resourceIcon);
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
+
+    _itemToResourceMapping[item] = resource;
+    _resourceToItemMapping[resource] = item;
+
+    _ui.resourceView->addTopLevelItem(item);
+  }
+
+  emit resourceTreePopulated();
+}
+
+void IntrinsicEdManagerWindowBase::onShowResourceContextMenu(QPoint p_Pos)
+{
+  QMenu* contextMenu = new QMenu(this);
+  initContextMenu(contextMenu);
+  contextMenu->popup(_ui.resourceView->viewport()->mapToGlobal(p_Pos));
+}
+
+void IntrinsicEdManagerWindowBase::onItemChanged(QTreeWidgetItem* item,
+                                                 int column)
+{
+  if (item)
+  {
+    rapidjson::Document doc;
+    Dod::Ref resource = _itemToResourceMapping[item];
+
+    rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
+    _propertyCompilerEntry.compileFunction(resource, properties, doc);
+
+    if (strcmp(properties["name"]["value"].GetString(),
+               item->text(0).toStdString().c_str()) != 0)
+    {
+      _INTR_STRING newResourceName =
+          makeResourceNameUnique(item->text(0).toStdString().c_str());
+
+      properties["name"]["value"].SetString(newResourceName.c_str(),
+                                            doc.GetAllocator());
+      item->setText(0, newResourceName.c_str());
+
+      _propertyCompilerEntry.initFunction(resource, properties);
+      _ui.propertyView->clearAndUpdatePropertyView();
+    }
+  }
+}
+
+_INTR_STRING
+IntrinsicEdManagerWindowBase::makeResourceNameUnique(const char* p_Name)
+{
+  rapidjson::Document doc;
+
+  _INTR_STRING newResourceName = p_Name;
+  uint32_t resourceIndex = 1;
+
+  while (true)
+  {
+    bool found = false;
+    for (uint32_t i = 0u;
+         i < _resourceManagerEntry.getActiveResourceCountFunction(); ++i)
+    {
+      Dod::Ref resource =
+          _resourceManagerEntry.getActiveResourceAtIndexFunction(i);
+
+      rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
+      _propertyCompilerEntry.compileFunction(resource, properties, doc);
+
+      if (properties["name"]["value"].GetString() == newResourceName)
+      {
+        const _INTR_STRING nameWithoutSuffix =
+            StringUtil::stripNumberSuffix(p_Name);
+        newResourceName =
+            nameWithoutSuffix +
+            StringUtil::toString<uint32_t>(resourceIndex++).c_str();
+        found = true;
+      }
+    }
+
+    if (!found)
+    {
+      break;
+    }
+  }
+
+  return newResourceName;
+}
+
+void IntrinsicEdManagerWindowBase::onCreateResource()
+{
+  _INTR_STRING newResourceName =
+      makeResourceNameUnique(_resourceName.toStdString().c_str());
+  Dod::Ref newResourceRef =
+      _resourceManagerEntry.createFunction(newResourceName.c_str());
+  if (_resourceManagerEntry.resetToDefaultFunction)
+  {
+    _resourceManagerEntry.resetToDefaultFunction(newResourceRef);
+  }
+  onPopulateResourceTree();
+}
+
+void IntrinsicEdManagerWindowBase::onCloneResource()
+{
+  Dod::Ref templateResourceRef =
+      _itemToResourceMapping[_ui.resourceView->currentItem()];
+
+  if (templateResourceRef.isValid())
+  {
+    Dod::Ref cloneedResourceRef =
+        _resourceManagerEntry.createFunction(_N(Dummy));
+
+    if (_resourceManagerEntry.resetToDefaultFunction)
+    {
+      _resourceManagerEntry.resetToDefaultFunction(cloneedResourceRef);
+    }
+
+    rapidjson::Document doc;
+    rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
+
+    _propertyCompilerEntry.compileFunction(templateResourceRef, properties,
+                                           doc);
+    properties["name"]["value"].SetString(
+        makeResourceNameUnique(properties["name"]["value"].GetString()).c_str(),
+        doc.GetAllocator());
+    _propertyCompilerEntry.initFunction(cloneedResourceRef, properties);
+
+    if (_resourceManagerEntry.createResourcesFunction)
+    {
+      Dod::RefArray resourcesToCreate = {cloneedResourceRef};
+      _resourceManagerEntry.createResourcesFunction(resourcesToCreate);
+    }
+
+    onPopulateResourceTree();
+  }
+}
+
+void IntrinsicEdManagerWindowBase::onDestroyResource()
+{
+  Dod::Ref resource = _itemToResourceMapping[_ui.resourceView->currentItem()];
+
+  if (resource.isValid())
+  {
+    _resourceManagerEntry.destroyFunction(resource);
+
+    onPopulateResourceTree();
+
+    _ui.propertyView->clearPropertySet();
+    _ui.propertyView->clearAndUpdatePropertyView();
+  }
+}
+
+void IntrinsicEdManagerWindowBase::onSaveManager()
+{
+  if (_resourceManagerEntry.saveToSingleFileFunction)
+  {
+    _resourceManagerEntry.saveToSingleFileFunction(
+        _managerFilePath.toStdString().c_str());
+  }
+  if (_resourceManagerEntry.saveToMultipleFilesFunction)
+  {
+    _resourceManagerEntry.saveToMultipleFilesFunction(
+        _managerPath.toStdString().c_str(),
+        _managerExtension.toStdString().c_str());
+  }
+
+  new IntrinsicEdNotificationSimple(this, "Saved manager to file...");
+}
+
+void IntrinsicEdManagerWindowBase::initContextMenu(QMenu* p_ContextMenu)
+{
+  QAction* createResource =
+      new QAction(QIcon(":/Icons/plus"), "Create " + _resourceName, this);
+  p_ContextMenu->addAction(createResource);
+  QObject::connect(createResource, SIGNAL(triggered()), this,
+                   SLOT(onCreateResource()));
+
+  QTreeWidgetItem* currIt = _ui.resourceView->currentItem();
+  Dod::Ref resRef = _itemToResourceMapping[currIt];
+
+  if (resRef.isValid())
+  {
+    QAction* destroyResource =
+        new QAction(QIcon(":/Icons/minus"), "Delete " + _resourceName, this);
+    p_ContextMenu->addAction(destroyResource);
+    QObject::connect(destroyResource, SIGNAL(triggered()), this,
+                     SLOT(onDestroyResource()));
+
+    p_ContextMenu->addSeparator();
+
+    QAction* cloneResource =
+        new QAction(QIcon(":/Icons/plus"), "Clone " + _resourceName, this);
+    p_ContextMenu->addAction(cloneResource);
+    QObject::connect(cloneResource, SIGNAL(triggered()), this,
+                     SLOT(onCloneResource()));
+  }
+}
+
+void IntrinsicEdManagerWindowBase::onItemSelected(QTreeWidgetItem* current,
+                                                  QTreeWidgetItem* previous)
+{
+  if (current)
+  {
+    Dod::Ref resource = _itemToResourceMapping[current];
+
+    if (resource.isValid())
+    {
+      Dod::PropertyCompilerEntry entry;
+      entry.compileFunction = _propertyCompilerEntry.compileFunction;
+      entry.initFunction = _propertyCompilerEntry.initFunction;
+      entry.ref = resource;
+
+      _ui.propertyView->clearPropertySet();
+      _ui.propertyView->addPropertySet(entry, _resourceManagerEntry);
+      _ui.propertyView->clearAndUpdatePropertyView();
+    }
+  }
+}

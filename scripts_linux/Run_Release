@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd ../app
+
+LD_PRELOAD="`pwd`/../dependencies/lua/libluajit.so" ./Intrinsic

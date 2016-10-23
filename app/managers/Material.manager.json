@@ -1,0 +1,858 @@
+[
+    {
+        "name": "default",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "default"
+            },
+            "materialPassMask": {
+                "cat": "Material",
+                "type": "name",
+                "editor": "",
+                "readOnly": false,
+                "internal": true,
+                "value": 515
+            },
+            "albedoTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "checkerboard"
+            },
+            "uvOffsetScale": {
+                "cat": "Properties_UV",
+                "type": "vec4",
+                "editor": "vec4",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 1.0,
+                "valueW": 1.0
+            },
+            "uvAnimation": {
+                "cat": "Properties_UV",
+                "type": "vec2",
+                "editor": "vec2",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0
+            },
+            "translucencyThickness": {
+                "cat": "Properties_Translucency",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.0
+            },
+            "normalTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "default_NRM"
+            },
+            "pbrTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "default_PBR"
+            },
+            "pbrBias": {
+                "cat": "Properties_Surface",
+                "type": "vec3",
+                "editor": "vec3",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 0.0
+            }
+        }
+    },
+    {
+        "name": "water",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water"
+            },
+            "materialPassMask": {
+                "cat": "Material",
+                "type": "name",
+                "editor": "",
+                "readOnly": false,
+                "internal": true,
+                "value": 128
+            },
+            "albedoTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water"
+            },
+            "uvOffsetScale": {
+                "cat": "Properties_UV",
+                "type": "vec4",
+                "editor": "vec4",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 1.0,
+                "valueW": 1.0
+            },
+            "uvAnimation": {
+                "cat": "Properties_UV",
+                "type": "vec2",
+                "editor": "vec2",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.009999999776482582,
+                "valueY": 0.009999999776482582
+            },
+            "translucencyThickness": {
+                "cat": "Properties_Translucency",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.0
+            },
+            "normalTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_NRM"
+            },
+            "pbrTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_PBR"
+            },
+            "pbrBias": {
+                "cat": "Properties_Surface",
+                "type": "vec3",
+                "editor": "vec3",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 0.0
+            },
+            "foamTextureName": {
+                "cat": "Textures_Water",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "foam"
+            },
+            "foamFadeDistance": {
+                "cat": "Properties_Water",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 1.0
+            },
+            "refractionFactor": {
+                "cat": "Properties_Water",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.00009999999747378752
+            }
+        }
+    },
+    {
+        "name": "gizmo",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "gizmo"
+            },
+            "materialPassMask": {
+                "cat": "Material",
+                "type": "name",
+                "editor": "",
+                "readOnly": false,
+                "internal": true,
+                "value": 8
+            },
+            "albedoTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "checkerboard"
+            },
+            "uvOffsetScale": {
+                "cat": "Properties_UV",
+                "type": "vec4",
+                "editor": "vec4",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 1.0,
+                "valueW": 1.0
+            },
+            "uvAnimation": {
+                "cat": "Properties_UV",
+                "type": "vec2",
+                "editor": "vec2",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0
+            },
+            "translucencyThickness": {
+                "cat": "Properties_Translucency",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.0
+            }
+        }
+    },
+    {
+        "name": "grid",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "grid"
+            },
+            "materialPassMask": {
+                "cat": "Material",
+                "type": "name",
+                "editor": "",
+                "readOnly": false,
+                "internal": true,
+                "value": 16
+            },
+            "albedoTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "checkerboard"
+            },
+            "uvOffsetScale": {
+                "cat": "Properties_UV",
+                "type": "vec4",
+                "editor": "vec4",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 1.0,
+                "valueW": 1.0
+            },
+            "uvAnimation": {
+                "cat": "Properties_UV",
+                "type": "vec2",
+                "editor": "vec2",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0
+            },
+            "translucencyThickness": {
+                "cat": "Properties_Translucency",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.0
+            }
+        }
+    },
+    {
+        "name": "Tree_Atlas_01",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Tree_Atlas_01"
+            },
+            "materialPassMask": {
+                "cat": "Material",
+                "type": "name",
+                "editor": "",
+                "readOnly": false,
+                "internal": true,
+                "value": 608
+            },
+            "albedoTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Tree_Atlas_01"
+            },
+            "uvOffsetScale": {
+                "cat": "Properties_UV",
+                "type": "vec4",
+                "editor": "vec4",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 1.0,
+                "valueW": 1.0
+            },
+            "uvAnimation": {
+                "cat": "Properties_UV",
+                "type": "vec2",
+                "editor": "vec2",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0
+            },
+            "translucencyThickness": {
+                "cat": "Properties_Translucency",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 1.0
+            },
+            "normalTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Tree_Atlas_01_NRM"
+            },
+            "pbrTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Tree_Atlas_01_PBR"
+            },
+            "pbrBias": {
+                "cat": "Properties_Surface",
+                "type": "vec3",
+                "editor": "vec3",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 0.0
+            }
+        }
+    },
+    {
+        "name": "Prop_Atlas_01",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Prop_Atlas_01"
+            },
+            "materialPassMask": {
+                "cat": "Material",
+                "type": "name",
+                "editor": "",
+                "readOnly": false,
+                "internal": true,
+                "value": 515
+            },
+            "albedoTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Prop_Atlas_01"
+            },
+            "uvOffsetScale": {
+                "cat": "Properties_UV",
+                "type": "vec4",
+                "editor": "vec4",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 1.0,
+                "valueW": 1.0
+            },
+            "uvAnimation": {
+                "cat": "Properties_UV",
+                "type": "vec2",
+                "editor": "vec2",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0
+            },
+            "translucencyThickness": {
+                "cat": "Properties_Translucency",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.0
+            },
+            "normalTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Prop_Atlas_01_NRM"
+            },
+            "pbrTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Prop_Atlas_01_PBR"
+            },
+            "pbrBias": {
+                "cat": "Properties_Surface",
+                "type": "vec3",
+                "editor": "vec3",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 0.0
+            }
+        }
+    },
+    {
+        "name": "terrain",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "terrain"
+            },
+            "materialPassMask": {
+                "cat": "Material",
+                "type": "name",
+                "editor": "",
+                "readOnly": false,
+                "internal": true,
+                "value": 770
+            },
+            "albedoTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "grassleaves_01"
+            },
+            "uvOffsetScale": {
+                "cat": "Properties_UV",
+                "type": "vec4",
+                "editor": "vec4",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 120.0,
+                "valueW": 120.0
+            },
+            "uvAnimation": {
+                "cat": "Properties_UV",
+                "type": "vec2",
+                "editor": "vec2",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0
+            },
+            "translucencyThickness": {
+                "cat": "Properties_Translucency",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.0
+            },
+            "normalTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "grassleaves_01_NRM"
+            },
+            "pbrTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "grassleaves_01_PBR"
+            },
+            "pbrBias": {
+                "cat": "Properties_Surface",
+                "type": "vec3",
+                "editor": "vec3",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 0.0
+            },
+            "albedo1TextureName": {
+                "cat": "Textures_Layered",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "gravel_01"
+            },
+            "normal1TextureName": {
+                "cat": "Textures_Layered",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "gravel_01_NRM"
+            },
+            "pbr1TextureName": {
+                "cat": "Textures_Layered",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "gravel_01_PBR"
+            },
+            "albedo2TextureName": {
+                "cat": "Textures_Layered",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Rock_01"
+            },
+            "normal2TextureName": {
+                "cat": "Textures_Layered",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Rock_01_NRM"
+            },
+            "pbr2TextureName": {
+                "cat": "Textures_Layered",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Rock_01_PBR"
+            },
+            "blendMaskTextureName": {
+                "cat": "Textures_Layered",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "terrain_BLEND"
+            }
+        }
+    },
+    {
+        "name": "CartoonTrees",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "CartoonTrees"
+            },
+            "materialPassMask": {
+                "cat": "Material",
+                "type": "name",
+                "editor": "",
+                "readOnly": false,
+                "internal": true,
+                "value": 515
+            },
+            "albedoTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "checkerboard"
+            },
+            "uvOffsetScale": {
+                "cat": "Properties_UV",
+                "type": "vec4",
+                "editor": "vec4",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 1.0,
+                "valueW": 1.0
+            },
+            "uvAnimation": {
+                "cat": "Properties_UV",
+                "type": "vec2",
+                "editor": "vec2",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0
+            },
+            "translucencyThickness": {
+                "cat": "Properties_Translucency",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.0
+            },
+            "normalTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "default_NRM"
+            },
+            "pbrTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "default_PBR"
+            },
+            "pbrBias": {
+                "cat": "Properties_Surface",
+                "type": "vec3",
+                "editor": "vec3",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 0.0
+            }
+        }
+    },
+    {
+        "name": "sky",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "sky"
+            },
+            "materialPassMask": {
+                "cat": "Material",
+                "type": "name",
+                "editor": "",
+                "readOnly": false,
+                "internal": true,
+                "value": 4
+            },
+            "albedoTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "GCanyon_C_YumaPoint_3k_cube_radiance"
+            },
+            "uvOffsetScale": {
+                "cat": "Properties_UV",
+                "type": "vec4",
+                "editor": "vec4",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 1.0,
+                "valueW": 1.0
+            },
+            "uvAnimation": {
+                "cat": "Properties_UV",
+                "type": "vec2",
+                "editor": "vec2",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0
+            },
+            "translucencyThickness": {
+                "cat": "Properties_Translucency",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.0
+            }
+        }
+    },
+    {
+        "name": "see",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "see"
+            },
+            "materialPassMask": {
+                "cat": "Material",
+                "type": "name",
+                "editor": "",
+                "readOnly": false,
+                "internal": true,
+                "value": 128
+            },
+            "albedoTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water"
+            },
+            "uvOffsetScale": {
+                "cat": "Properties_UV",
+                "type": "vec4",
+                "editor": "vec4",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 5.0,
+                "valueW": 5.0
+            },
+            "uvAnimation": {
+                "cat": "Properties_UV",
+                "type": "vec2",
+                "editor": "vec2",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.004999999888241291,
+                "valueY": 0.004999999888241291
+            },
+            "translucencyThickness": {
+                "cat": "Properties_Translucency",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.0
+            },
+            "normalTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_NRM"
+            },
+            "pbrTextureName": {
+                "cat": "Textures",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_PBR"
+            },
+            "pbrBias": {
+                "cat": "Properties_Surface",
+                "type": "vec3",
+                "editor": "vec3",
+                "readOnly": false,
+                "internal": false,
+                "valueX": 0.0,
+                "valueY": 0.0,
+                "valueZ": 0.0
+            },
+            "foamTextureName": {
+                "cat": "Textures_Water",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "foam"
+            },
+            "foamFadeDistance": {
+                "cat": "Properties_Water",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 99.0
+            },
+            "refractionFactor": {
+                "cat": "Properties_Water",
+                "type": "float",
+                "editor": "float",
+                "readOnly": false,
+                "internal": false,
+                "value": 0.0020000000949949028
+            }
+        }
+    }
+]

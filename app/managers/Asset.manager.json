@@ -1,0 +1,1667 @@
+[
+    {
+        "name": "cartoon_trees",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "cartoon_trees"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "cartoon_trees.fbx"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 1
+            }
+        }
+    },
+    {
+        "name": "forest",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "forest"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "forest.fbx"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 1
+            }
+        }
+    },
+    {
+        "name": "checkerboard",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "checkerboard"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "checkerboard.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "plane",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "plane"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "plane.fbx"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 1
+            }
+        }
+    },
+    {
+        "name": "translate_gizmo",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "translate_gizmo"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "translate_gizmo.fbx"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 1
+            }
+        }
+    },
+    {
+        "name": "Prop_Atlas_01",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Prop_Atlas_01"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Prop_Atlas_01.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 3
+            }
+        }
+    },
+    {
+        "name": "Tree_Atlas_01",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Tree_Atlas_01"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Tree_Atlas_01.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 3
+            }
+        }
+    },
+    {
+        "name": "Prop_Atlas_01_NRM",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Prop_Atlas_01_NRM"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Prop_Atlas_01_NRM.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 4
+            }
+        }
+    },
+    {
+        "name": "Tree_Atlas_01_NRM",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Tree_Atlas_01_NRM"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Tree_Atlas_01_NRM.tga"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 4
+            }
+        }
+    },
+    {
+        "name": "terrain",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "terrain"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "terrain.fbx"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 1
+            }
+        }
+    },
+    {
+        "name": "Rock_01_NRM",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Rock_01_NRM"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Rock_01_NRM.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 4
+            }
+        }
+    },
+    {
+        "name": "Rock_01",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Rock_01"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Rock_01.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "Prop_Atlas_01_PBR",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Prop_Atlas_01_PBR"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Prop_Atlas_01_PBR.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "Tree_Atlas_01_PBR",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Tree_Atlas_01_PBR"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Tree_Atlas_01_PBR.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "sphere",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "sphere"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "sphere.fbx"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 1
+            }
+        }
+    },
+    {
+        "name": "default_NRM",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "default_NRM"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "default_NRM.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 4
+            }
+        }
+    },
+    {
+        "name": "default_PBR",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "default_PBR"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "default_PBR.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "Rock_01_PBR",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Rock_01_PBR"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Rock_01_PBR.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "sky",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "sky"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "sky.fbx"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 1
+            }
+        }
+    },
+    {
+        "name": "Mono_Lake_C_Ref_cube_specular",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Mono_Lake_C_Ref_cube_specular"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Mono_Lake_C_Ref_cube_specular.dds"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 5
+            }
+        }
+    },
+    {
+        "name": "Mono_Lake_C_Ref_cube_irradiance",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Mono_Lake_C_Ref_cube_irradiance"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Mono_Lake_C_Ref_cube_irradiance.dds"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 5
+            }
+        }
+    },
+    {
+        "name": "Mono_Lake_C_Ref_cube_radiance",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Mono_Lake_C_Ref_cube_radiance"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Mono_Lake_C_Ref_cube_radiance.dds"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 5
+            }
+        }
+    },
+    {
+        "name": "GCanyon_C_YumaPoint_3k_cube_irradiance",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "GCanyon_C_YumaPoint_3k_cube_irradiance"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "GCanyon_C_YumaPoint_3k_cube_irradiance.dds"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 5
+            }
+        }
+    },
+    {
+        "name": "GCanyon_C_YumaPoint_3k_cube_radiance",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "GCanyon_C_YumaPoint_3k_cube_radiance"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "GCanyon_C_YumaPoint_3k_cube_radiance.dds"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 5
+            }
+        }
+    },
+    {
+        "name": "GCanyon_C_YumaPoint_3k_cube_specular",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "GCanyon_C_YumaPoint_3k_cube_specular"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "GCanyon_C_YumaPoint_3k_cube_specular.dds"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 5
+            }
+        }
+    },
+    {
+        "name": "water_plane",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_plane"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_plane.fbx"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 1
+            }
+        }
+    },
+    {
+        "name": "water_NRM",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_NRM"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_NRM.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 4
+            }
+        }
+    },
+    {
+        "name": "water",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "water_PBR",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_PBR"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_PBR.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "water_sphere",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_sphere"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "water_sphere.fbx"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 1
+            }
+        }
+    },
+    {
+        "name": "terrain_BLEND",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "terrain_BLEND"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "terrain_BLEND.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "grassleaves_01_NRM",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "grassleaves_01_NRM"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "grassleaves_01_NRM.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 4
+            }
+        }
+    },
+    {
+        "name": "grassleaves_01_PBR",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "grassleaves_01_PBR"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "grassleaves_01_PBR.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "gravel_01",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "gravel_01"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "gravel_01.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "gravel_01_NRM",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "gravel_01_NRM"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "gravel_01_NRM.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 4
+            }
+        }
+    },
+    {
+        "name": "gravel_01_PBR",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "gravel_01_PBR"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "gravel_01_PBR.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "Moss_01",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Moss_01"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Moss_01.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "Moss_01_NRM",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Moss_01_NRM"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Moss_01_NRM.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 4
+            }
+        }
+    },
+    {
+        "name": "Moss_01_PBR",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Moss_01_PBR"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "Moss_01_PBR.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "grassleaves_01",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "grassleaves_01"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "grassleaves_01.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "foam",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "foam"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "foam.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "house",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "house"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "house.fbx"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 1
+            }
+        }
+    },
+    {
+        "name": "lens_dirt",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "lens_dirt"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "lens_dirt.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "film_grain_noise",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "film_grain_noise"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "film_grain_noise.TGA"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    },
+    {
+        "name": "lens_flare",
+        "properties": {
+            "name": {
+                "cat": "Resource",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "lens_flare"
+            },
+            "assetFileName": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "string",
+                "readOnly": false,
+                "internal": false,
+                "value": "lens_flare.tga"
+            },
+            "assetType": {
+                "cat": "Asset",
+                "type": "name",
+                "editor": "enum",
+                "readOnly": false,
+                "internal": false,
+                "enumItems": [
+                    "None",
+                    "Mesh",
+                    "ColorTexture",
+                    "AlphaTexture",
+                    "NormalTexture",
+                    "HdrTexture"
+                ],
+                "value": 2
+            }
+        }
+    }
+]

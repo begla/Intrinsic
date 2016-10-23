@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>IntrinsicEdClass</class>
+ <widget class="QMainWindow" name="IntrinsicEdClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1600</width>
+    <height>720</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>IntrinsicEd</string>
+  </property>
+  <widget class="IntrinsicEdViewport" name="centralWidget"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1600</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionLoad_World"/>
+    <addaction name="actionSave_World"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoad_Editor_Settings"/>
+    <addaction name="actionSave_Editor_Settings"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionProperty_View"/>
+    <addaction name="actionNode_View"/>
+    <addaction name="separator"/>
+    <addaction name="actionFullscreen"/>
+   </widget>
+   <widget class="QMenu" name="menuManagers">
+    <property name="title">
+     <string>Managers</string>
+    </property>
+    <addaction name="actionGPU_Programs"/>
+    <addaction name="actionImages"/>
+    <addaction name="actionMeshes"/>
+    <addaction name="actionMaterials"/>
+    <addaction name="actionPostEffects"/>
+    <addaction name="separator"/>
+    <addaction name="actionScripts"/>
+    <addaction name="separator"/>
+    <addaction name="actionAssets"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+   <addaction name="menuManagers"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="windowTitle">
+    <string>Main Toolbar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionExit"/>
+   <addaction name="separator"/>
+   <addaction name="actionLoad_World"/>
+   <addaction name="actionSave_World"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QToolBar" name="editingToolBar">
+   <property name="windowTitle">
+    <string>Transformation Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionEditingModeDefault"/>
+   <addaction name="actionEditingModeSelection"/>
+   <addaction name="actionEditingModeTranslation"/>
+   <addaction name="actionEditingModeRotation"/>
+   <addaction name="actionEditingModeScale"/>
+  </widget>
+  <widget class="QToolBar" name="gridToolBar">
+   <property name="windowTitle">
+    <string>Editing Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QToolBar" name="creationToolBar">
+   <property name="windowTitle">
+    <string>Creation Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionShow_Create_Context_Menu"/>
+  </widget>
+  <widget class="QToolBar" name="devToolBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="windowTitle">
+    <string>Development Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionShow_Debug_Context_Menu"/>
+   <addaction name="separator"/>
+   <addaction name="actionShow_Debug_Geometry_Context_Menu"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>Game State Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionEditingGameState"/>
+   <addaction name="actionMainGameState"/>
+  </widget>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/eject</normaloff>:/Icons/eject</iconset>
+   </property>
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionSave_World">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/save</normaloff>:/Icons/save</iconset>
+   </property>
+   <property name="text">
+    <string>Save World</string>
+   </property>
+  </action>
+  <action name="actionLoad_World">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/arrowUp</normaloff>:/Icons/arrowUp</iconset>
+   </property>
+   <property name="text">
+    <string>Load World</string>
+   </property>
+  </action>
+  <action name="actionNode_View">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/target</normaloff>:/Icons/target</iconset>
+   </property>
+   <property name="text">
+    <string>Node View</string>
+   </property>
+   <property name="toolTip">
+    <string>Node View</string>
+   </property>
+  </action>
+  <action name="actionSave_Editor_Settings">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/save</normaloff>:/Icons/save</iconset>
+   </property>
+   <property name="text">
+    <string>Save Editor Settings</string>
+   </property>
+  </action>
+  <action name="actionLoad_Editor_Settings">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/arrowUp</normaloff>:/Icons/arrowUp</iconset>
+   </property>
+   <property name="text">
+    <string>Load Editor Settings</string>
+   </property>
+  </action>
+  <action name="actionProperty_View">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/grid</normaloff>:/Icons/grid</iconset>
+   </property>
+   <property name="text">
+    <string>Property View</string>
+   </property>
+  </action>
+  <action name="actionGPU_Programs">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/calendar</normaloff>:/Icons/calendar</iconset>
+   </property>
+   <property name="text">
+    <string>GPU Programs</string>
+   </property>
+  </action>
+  <action name="actionFullscreen">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/fullscreen</normaloff>:/Icons/fullscreen</iconset>
+   </property>
+   <property name="text">
+    <string>Fullscreen</string>
+   </property>
+  </action>
+  <action name="actionEditingModeSelection">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/wand</normaloff>:/Icons/wand</iconset>
+   </property>
+   <property name="text">
+    <string>editingModeSelection</string>
+   </property>
+   <property name="toolTip">
+    <string>Editing Mode: Selection</string>
+   </property>
+  </action>
+  <action name="actionEditingModeTranslation">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/drawArrow</normaloff>:/Icons/drawArrow</iconset>
+   </property>
+   <property name="text">
+    <string>editingModeTranslation</string>
+   </property>
+   <property name="toolTip">
+    <string>Editing Mode: Translation</string>
+   </property>
+  </action>
+  <action name="actionEditingModeScale">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/scale</normaloff>:/Icons/scale</iconset>
+   </property>
+   <property name="text">
+    <string>editingModeScale</string>
+   </property>
+   <property name="toolTip">
+    <string>Editing Mode: Scale</string>
+   </property>
+  </action>
+  <action name="actionEditingModeRotation">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/rotate</normaloff>:/Icons/rotate</iconset>
+   </property>
+   <property name="text">
+    <string>EditingModeRotation</string>
+   </property>
+   <property name="toolTip">
+    <string>Editing Mode: Rotation</string>
+   </property>
+  </action>
+  <action name="actionScripts">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/script</normaloff>:/Icons/script</iconset>
+   </property>
+   <property name="text">
+    <string>Scripts</string>
+   </property>
+  </action>
+  <action name="actionAssets">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/asset</normaloff>:/Icons/asset</iconset>
+   </property>
+   <property name="text">
+    <string>Assets</string>
+   </property>
+  </action>
+  <action name="actionImages">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/picture</normaloff>:/Icons/picture</iconset>
+   </property>
+   <property name="text">
+    <string>Images</string>
+   </property>
+  </action>
+  <action name="actionMeshes">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/truck</normaloff>:/Icons/truck</iconset>
+   </property>
+   <property name="text">
+    <string>Meshes</string>
+   </property>
+  </action>
+  <action name="actionMaterials">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/brush</normaloff>:/Icons/brush</iconset>
+   </property>
+   <property name="text">
+    <string>Materials</string>
+   </property>
+  </action>
+  <action name="actionCreateCube">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/cube</normaloff>:/Icons/cube</iconset>
+   </property>
+   <property name="text">
+    <string>Create Cube</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Cube</string>
+   </property>
+  </action>
+  <action name="actionCreateSphere">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/globe</normaloff>:/Icons/globe</iconset>
+   </property>
+   <property name="text">
+    <string>Create Sphere</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Sphere</string>
+   </property>
+  </action>
+  <action name="actionSpawn_Vegetation">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/target</normaloff>:/Icons/target</iconset>
+   </property>
+   <property name="text">
+    <string>Spawn Vegetation</string>
+   </property>
+  </action>
+  <action name="actionSpawn_Grass">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/target</normaloff>:/Icons/target</iconset>
+   </property>
+   <property name="text">
+    <string>Spawn Grass</string>
+   </property>
+  </action>
+  <action name="actionEditingModeDefault">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/cursor</normaloff>:/Icons/cursor</iconset>
+   </property>
+   <property name="text">
+    <string>editingModeDefault</string>
+   </property>
+   <property name="toolTip">
+    <string>Editing Mode: Default</string>
+   </property>
+  </action>
+  <action name="actionCreateRigidBody">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/cube</normaloff>:/Icons/cube</iconset>
+   </property>
+   <property name="text">
+    <string>Create Rigid Body (Dyn. Cube)</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Rigid Body (Dyn. Cube)</string>
+   </property>
+  </action>
+  <action name="actionEditingGameState">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/wrench</normaloff>:/Icons/wrench</iconset>
+   </property>
+   <property name="text">
+    <string>Editing Game State</string>
+   </property>
+   <property name="toolTip">
+    <string>Editing Game State</string>
+   </property>
+  </action>
+  <action name="actionMainGameState">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/gamepad</normaloff>:/Icons/gamepad</iconset>
+   </property>
+   <property name="text">
+    <string>Main Game State</string>
+   </property>
+   <property name="toolTip">
+    <string>Main Game State</string>
+   </property>
+  </action>
+  <action name="actionShow_Create_Context_Menu">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/cube</normaloff>:/Icons/cube</iconset>
+   </property>
+   <property name="text">
+    <string>Show Create Context Menu</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Create Context Menu</string>
+   </property>
+  </action>
+  <action name="actionShow_Debug_Context_Menu">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/lightbulb</normaloff>:/Icons/lightbulb</iconset>
+   </property>
+   <property name="text">
+    <string>Show Debug Context Menu</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Debug Context Menu</string>
+   </property>
+  </action>
+  <action name="actionCreateRigidBody_Sphere">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/globe</normaloff>:/Icons/globe</iconset>
+   </property>
+   <property name="text">
+    <string>Create Rigid Body (Dyn. Sphere)</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Rigid Body (Dyn. Sphere)</string>
+   </property>
+  </action>
+  <action name="actionShow_Debug_Geometry_Context_Menu">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/tacho</normaloff>:/Icons/tacho</iconset>
+   </property>
+   <property name="text">
+    <string>Show Debug Geometry Context Menu</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Debug Geometry Context Menu</string>
+   </property>
+  </action>
+  <action name="actionShow_PhysX_Debug_Geometry">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show PhysX Debug Geometry</string>
+   </property>
+   <property name="toolTip">
+    <string>Show PhysX Debug Geometry</string>
+   </property>
+  </action>
+  <action name="actionShow_World_Bounding_Spheres">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show World Bounding Spheres</string>
+   </property>
+   <property name="toolTip">
+    <string>Show World Bounding Spheres</string>
+   </property>
+  </action>
+  <action name="actionPostEffects">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/picture</normaloff>:/Icons/picture</iconset>
+   </property>
+   <property name="text">
+    <string>Post Effects</string>
+   </property>
+   <property name="toolTip">
+    <string>Post Effects</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>IntrinsicEdViewport</class>
+   <extends>QWidget</extends>
+   <header>IntrinsicEdViewport.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../IntrinsicEd.qrc"/>
+ </resources>
+ <connections/>
+</ui>
