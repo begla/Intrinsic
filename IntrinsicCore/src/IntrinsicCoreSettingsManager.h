@@ -46,6 +46,8 @@ struct Manager
   static void loadSettings();
 
   static _INTR_STRING _initialWorld;
+  static _INTR_STRING _assetMeshPath;
+  static _INTR_STRING _assetTexturePath;
 
   static uint32_t _rendererFlags;
   static float _targetFrameRate;

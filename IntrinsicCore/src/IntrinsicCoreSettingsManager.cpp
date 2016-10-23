@@ -27,6 +27,8 @@ namespace Settings
 {
 // Static members
 _INTR_STRING Manager::_initialWorld = "Default.world.json";
+_INTR_STRING Manager::_assetMeshPath = "../../Intrinsic_Assets/app/assets/meshes";
+_INTR_STRING Manager::_assetTexturePath = "../../Intrinsic_Assets/app/assets/textures";
 
 uint32_t Manager::_rendererFlags = 0u;
 float Manager::_targetFrameRate = 0.016f;
@@ -91,6 +93,14 @@ void Manager::loadSettings()
     if (doc.HasMember("initialWorld"))
     {
       _initialWorld = doc["initialWorld"].GetString();
+    }
+    if (doc.HasMember("assetMeshPath"))
+    {
+      _assetMeshPath = doc["assetMeshPath"].GetString();
+    }
+    if (doc.HasMember("assetTexturePath"))
+    {
+      _assetTexturePath = doc["assetTexturePath"].GetString();
     }
   }
 }

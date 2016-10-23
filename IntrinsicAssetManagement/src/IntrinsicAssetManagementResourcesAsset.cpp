@@ -72,7 +72,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     if (_descAssetType(assetRef) == AssetType::kMesh)
     {
       ImporterFbx::init();
-      ImporterFbx::importMeshesFromFile("assets/meshes/" +
+      ImporterFbx::importMeshesFromFile(Settings::Manager::_assetMeshPath + "/" +
                                         _descAssetFileName(assetRef));
       ImporterFbx::destroy();
 
@@ -84,7 +84,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     else if (_descAssetType(assetRef) == AssetType::kColorTexture)
     {
       ImporterTexture::init();
-      ImporterTexture::importTextureFromFile("assets/textures/" +
+      ImporterTexture::importTextureFromFile(Settings::Manager::_assetTexturePath + "/" +
                                              _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
@@ -94,7 +94,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     else if (_descAssetType(assetRef) == AssetType::kAlphaTexture)
     {
       ImporterTexture::init();
-      ImporterTexture::importAlphaTextureFromFile("assets/textures/" +
+      ImporterTexture::importAlphaTextureFromFile(Settings::Manager::_assetTexturePath + "/" +
                                                   _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
@@ -105,7 +105,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     {
       ImporterTexture::init();
       ImporterTexture::importNormalMapTextureFromFile(
-          "assets/textures/" + _descAssetFileName(assetRef));
+        Settings::Manager::_assetTexturePath + "/" + _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
       Renderer::Vulkan::Resources::ImageManager::saveToSingleFile(
@@ -114,7 +114,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     else if (_descAssetType(assetRef) == AssetType::kHdrTexture)
     {
       ImporterTexture::init();
-      ImporterTexture::importHdrCubemapFromFile("assets/textures/" +
+      ImporterTexture::importHdrCubemapFromFile(Settings::Manager::_assetTexturePath + "/" +
                                                 _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
