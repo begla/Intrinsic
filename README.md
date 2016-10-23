@@ -7,6 +7,7 @@
 * Visual Studio 2015
 * CMake >= 3.5
 * Qt 5.7
+* Vulkan SDK 1.0.26.0
 * PhysX 3.3
 * FBX SDK 2015.1
 
@@ -16,21 +17,23 @@
 1. Download and install the latest Qt 5.x (open-source) distribution
 2. Create a new environment variable "INTR_QTDIR" pointing to "[...]\Qt5.7\5.7\msvc2015_64"
 
-3. Get access to the latest PhysX SDK from NVIDIA: https://developer.nvidia.com/physx-sdk
-4. Follow the instructions from NVIDIA and compile the PhysX libraries for the configurations "Release", "Profile" and "Debug"
+3. Download an install Vulkan SDK 1.0.26.0: https://vulkan.lunarg.com/
+
+4. Get access to the latest PhysX SDK from NVIDIA: https://developer.nvidia.com/physx-sdk
+5. Follow the instructions from NVIDIA and compile the PhysX libraries for the configurations "Release", "Profile" and "Debug"
    NOTE: Make sure that PhysX links the Runtime Library dynamically as Intrinsic does!
-5. Download and install the latest Autodesk FBX SDK (2015.1): http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775847
-5. Create a new directory called "Intrinsic_Dependencies" on the same level as the Intrinsic repository folder
-6. Inside, create a new folder "dependencies" containing two folders "physx" and "fbx"
-7. Copy the static/dynamic libraries and header files of both SDKs to folders named "bin" (DLLs), "lib" (LIBs) and "include" respectively
+6. Download and install the latest Autodesk FBX SDK (2015.1): http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775847
+7. Create a new directory called "Intrinsic_Dependencies" on the same level as the Intrinsic repository folder
+8. Inside, create a new folder "dependencies" containing two folders "physx" and "fbx"
+9. Copy the static/dynamic libraries and header files of both SDKs to folders named "bin" (DLLs), "lib" (LIBs) and "include" respectively
 
-8. Go to the "scripts_win32" folder in the Intrinsic repository dir
-9. Execute "ConfigAndBuildDependencies.bat" to build some of the remaining dependencies automatically
-10. Execute "CopyDllsToAppDir_Debug.bat" and "CopyDllsToAppDir_Release.bat"
-11. Execute "Config.bat" to create a Visual Studio 2015 solution file and all project configurations
+10. Go to the "scripts_win32" folder in the Intrinsic repository dir
+11. Execute "ConfigAndBuildDependencies.bat" to build some of the remaining dependencies automatically
+12. Execute "CopyDllsToAppDir_Debug.bat" and "CopyDllsToAppDir_Release.bat"
+13. Execute "Config.bat" to create a Visual Studio 2015 solution file and all project configurations
 
-12. If everything went well, you'll find the solution in the newly created "build" folder. You can also use one of the many build scripts: "Build_Release.bat", ... to get started
-13. Execute "Intrinsic.exe" or "IntrinsicEd.exe" in the "app" directory - yey!
+14. If everything went well, you'll find the solution in the newly created "build" folder. You can also use one of the many build scripts: "Build_Release.bat", ... to get started
+15. Execute "Intrinsic.exe" or "IntrinsicEd.exe" in the "app" directory - yey!
 ```
 
 ## Linux
