@@ -7,5 +7,8 @@
   
   "windowMode": 0,
   "screenResolutionWidth": 1280,
-  "screenResolutionHeight": 720
+  "screenResolutionHeight": 720,
+
+  "assetMeshPath": "../../Intrinsic_Assets/app/assets/meshes",
+  "assetTexturePath": "../../Intrinsic_Assets/app/assets/textures"
 }
