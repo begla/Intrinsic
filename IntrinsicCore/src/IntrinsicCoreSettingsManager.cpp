@@ -27,8 +27,10 @@ namespace Settings
 {
 // Static members
 _INTR_STRING Manager::_initialWorld = "Default.world.json";
-_INTR_STRING Manager::_assetMeshPath = "../../Intrinsic_Assets/app/assets/meshes";
-_INTR_STRING Manager::_assetTexturePath = "../../Intrinsic_Assets/app/assets/textures";
+_INTR_STRING Manager::_assetMeshPath =
+    "../../Intrinsic_Assets/app/assets/meshes";
+_INTR_STRING Manager::_assetTexturePath =
+    "../../Intrinsic_Assets/app/assets/textures";
 
 uint32_t Manager::_rendererFlags = 0u;
 float Manager::_targetFrameRate = 0.016f;
