@@ -25,4 +25,6 @@ copy dependencies\\fbx\\bin\\release\\libfbxsdk.dll app\\libfbxsdk.dll
 copy dependencies\\lua\\lua51.dll app\\lua51.dll
 copy dependencies\\sdl\\lib\\x64\\SDL2.dll app\\SDL2.dll
 
+cd scripts_win32
+
 timeout 2

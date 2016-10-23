@@ -15,4 +15,6 @@ robocopy app/scripts distro/scripts /E
 robocopy app/tools distro/tools /E
 robocopy app/worlds distro/worlds /E
 
+cd scripts_win32
+
 timeout 2
