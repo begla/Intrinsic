@@ -18,6 +18,7 @@
 
 3. Get access to the latest PhysX SDK from NVIDIA: https://developer.nvidia.com/physx-sdk
 4. Follow the instructions from NVIDIA and compile the PhysX libraries for the configurations "Release", "Profile" and "Debug"
+   NOTE: Make sure that PhysX links the Runtime Library dynamically as Intrinsic does!
 5. Download and install the latest Autodesk FBX SDK (2015.1): http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775847
 5. Create a new directory called "Intrinsic_Dependencies" on the same level as the Intrinsic repository folder
 6. Inside, create a new folder "dependencies" containing two folders "physx" and "fbx"

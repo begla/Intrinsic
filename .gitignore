@@ -8,7 +8,7 @@ app/platforms
 app/assets/world_machine/*.tmd.session
 
 distro/
-Intrinsic.7z
+*.7z
 
 build
 dependencies/glslang/build
