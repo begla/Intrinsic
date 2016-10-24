@@ -105,10 +105,10 @@ extern "C" {
 // Threading
 #include "TaskScheduler.h"
 
-#if (_WIN32)
+#if defined(_WIN32)
 #include "IntrinsicCoreThreadingWin32.h"
 #else
-#error Implement threading for Unix/Linux
+#include "IntrinsicCoreThreadingUnix.h"
 #endif // _WIN32
 
 // Some shortcuts
