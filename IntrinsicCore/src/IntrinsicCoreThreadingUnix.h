@@ -26,12 +26,12 @@ typedef volatile int64_t Atomic;
 
 _INTR_INLINE Atomic interlockedAdd(Atomic& p_Value, Atomic p_Add)
 {
-  return InterlockedAddNoFence64(&p_Value, p_Add) - p_Add;
+  return __sync_add_and_fetch(&p_Value, p_Add) - p_Add;
 }
 
 _INTR_INLINE Atomic interlockedSub(Atomic& p_Value, Atomic p_Sub)
 {
-  return InterlockedAddNoFence64(&p_Value, -p_Sub) + p_Sub;
+  return __sync_add_and_fetch(&p_Value, -p_Sub) + p_Sub;
 }
 }
 }

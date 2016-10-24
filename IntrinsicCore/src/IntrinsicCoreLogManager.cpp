@@ -80,7 +80,7 @@ void Manager::log(LogLevel::Enum p_LogLevel, const char* p_Message, ...)
   vsprintf(_messageBuffer, message.c_str(), args);
   va_end(args);
 
-  printf(_messageBuffer);
+  printf("%s", _messageBuffer);
 
   rlutil::setColor(rlutil::DARKGREY);
 
