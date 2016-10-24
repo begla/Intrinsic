@@ -8,5 +8,5 @@ cd build
 
 #export CC=/usr/bin/clang
 #export CXX=/usr/bin/clang++
-cmake -DCMAKE_BUILD_TYPE=Release  ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 
