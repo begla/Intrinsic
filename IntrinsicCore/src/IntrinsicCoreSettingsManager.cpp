@@ -27,13 +27,34 @@ _INTR_STRING Manager::_assetMeshPath =
     "../../Intrinsic_Assets/app/assets/meshes";
 _INTR_STRING Manager::_assetTexturePath =
     "../../Intrinsic_Assets/app/assets/textures";
-
 uint32_t Manager::_rendererFlags = 0u;
 float Manager::_targetFrameRate = 0.016f;
-
 WindowMode::Enum Manager::_windowMode = WindowMode::kWindowed;
 uint32_t Manager::_screenResolutionWidth = 1280u;
 uint32_t Manager::_screenResolutionHeight = 720u;
+
+namespace
+{
+  template<typename T>
+  _INTR_INLINE void readSetting(rapidjson::Document& p_Doc, Name& p_Name, T& p_Target)
+  {
+    if (p_Doc.HasMember(p_Name._string.c_str()))
+    {
+      p_Target = p_Doc[p_Name._string.c_str()].Get<T>();
+      _INTR_LOG_INFO("%s = '%s'", p_Name._string.c_str(), StringUtil::toString(p_Target).c_str());
+    }
+  }
+
+  template<>
+  _INTR_INLINE void readSetting(rapidjson::Document& p_Doc, Name& p_Name, _INTR_STRING& p_Target)
+  {
+    if (p_Doc.HasMember(p_Name._string.c_str()))
+    {
+      p_Target = p_Doc[p_Name._string.c_str()].GetString();
+      _INTR_LOG_INFO("%s = '%s'", p_Name._string.c_str(), StringUtil::toString(p_Target).c_str());
+    }
+  }
+}
 
 // <-
 
@@ -47,6 +68,9 @@ void Manager::loadSettings()
     return;
   }
 
+  _INTR_LOG_INFO("Reading settings file...");
+  _INTR_LOG_PUSH();
+
   rapidjson::Document doc;
 
   char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
@@ -58,49 +82,22 @@ void Manager::loadSettings()
   Tlsf::MainAllocator::free(readBuffer);
 
   {
-    if (doc.HasMember("rendererValidationEnabled"))
-    {
-      if (doc["rendererValidationEnabled"].GetBool())
-      {
-        _rendererFlags |= RendererFlags::kValidationEnabled;
-      }
-      else
-      {
-        _rendererFlags &= ~RendererFlags::kValidationEnabled;
-      }
-    }
-    if (doc.HasMember("targetFrameRate"))
-    {
-      _targetFrameRate = doc["targetFrameRate"].GetFloat();
-    }
-
-    if (doc.HasMember("windowMode"))
-    {
-      _windowMode = (WindowMode::Enum)doc["windowMode"].GetUint();
-    }
-    if (doc.HasMember("screenResolutionWidth"))
-    {
-      _screenResolutionWidth =
-          (WindowMode::Enum)doc["screenResolutionWidth"].GetUint();
-    }
-    if (doc.HasMember("screenResolutionHeight"))
-    {
-      _screenResolutionHeight =
-          (WindowMode::Enum)doc["screenResolutionHeight"].GetUint();
-    }
-    if (doc.HasMember("initialWorld"))
-    {
-      _initialWorld = doc["initialWorld"].GetString();
-    }
-    if (doc.HasMember("assetMeshPath"))
-    {
-      _assetMeshPath = doc["assetMeshPath"].GetString();
-    }
-    if (doc.HasMember("assetTexturePath"))
-    {
-      _assetTexturePath = doc["assetTexturePath"].GetString();
-    }
+    bool rendererValidationEnabled = (_rendererFlags & RendererFlags::kValidationEnabled) > 0u;
+    readSetting(doc, _N(rendererValidationEnabled), rendererValidationEnabled);
+    if (rendererValidationEnabled)
+      _rendererFlags |= RendererFlags::kValidationEnabled;
+    else
+      _rendererFlags &= ~RendererFlags::kValidationEnabled;
+    readSetting(doc, _N(targetFrameRate), _targetFrameRate);
+    readSetting(doc, _N(windowMode), (uint32_t&)_windowMode);
+    readSetting(doc, _N(screenResolutionWidth), _screenResolutionWidth);
+    readSetting(doc, _N(screenResolutionHeight), _screenResolutionHeight);
+    readSetting(doc, _N(initialWorld), _initialWorld);
+    readSetting(doc, _N(assetMeshPath), _assetMeshPath);
+    readSetting(doc, _N(assetTexturePath), _assetTexturePath);
   }
+
+  _INTR_LOG_POP();
 }
 }
 }
