@@ -46,12 +46,16 @@ endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+if (INTR_FINAL_BUILD)
+else()
+  set(PhysX_PROFILE ON)
+endif()
+
 find_package(FBX REQUIRED)
+find_package(GLSLang REQUIRED)
 find_package(LuaJIT REQUIRED)
 find_package(PhysX REQUIRED Common Cooking CharacterKinematic Extensions VisualDebuggerSDK)
 find_package(Qt5 REQUIRED)
-
-set(CMAKE_PREFIX_PATH ${Qt5_ROOT_DIR})
 
 file(GLOB INTR_RENDERER_VULKAN_SOURCE_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.cpp)
 file(GLOB INTR_RENDERER_VULKAN_HEADER_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.h)
@@ -98,6 +102,7 @@ set(INTDEP_SOURCE_FILES
 endif()
 
 # Qt5
+set(CMAKE_PREFIX_PATH ${Qt5_ROOT_DIR})
 find_package(Qt5Widgets REQUIRED)
 include_directories(${Qt5Widgets_INCLUDES})
 add_definitions(${Qt5Widgets_DEFINITIONS})
