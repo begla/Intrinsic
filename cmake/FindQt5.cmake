@@ -12,6 +12,8 @@ IF(NOT Qt5_QMAKE_EXECUTABLE)
     NAMES qmake qmake5 qmake-qt5
     PATH_SUFFIXES bin
     PATHS
+      ${INTR_QTDIR}
+      $ENV{INTR_QTDIR}
       ${QT_SEARCH_PATH}
       $ENV{QTDIR}
       ~/Library/Frameworks
