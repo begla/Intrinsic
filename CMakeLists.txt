@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.1)
 
 project(Intrinsic)
 
@@ -22,8 +22,6 @@ set(INTR_GENERAL_COMPILE_FLAGS " ")
 add_definitions("-DMICROPROFILE_GPU_TIMERS_VULKAN")
 
 if(WIN32)
-  set(CMAKE_PREFIX_PATH "$ENV{INTR_QTDIR}")
-
   set(INTR_GENERAL_COMPILE_FLAGS "/Zm256 /EHa /W3")
 
   add_definitions("-D_SCL_SECURE_NO_WARNINGS")
@@ -36,7 +34,6 @@ if(WIN32)
     set(INTR_GENERAL_LINK_FLAGS "${INTR_GENERAL_LINK_FLAGS} /LTCG")
   endif()
 else()
-  set(CMAKE_PREFIX_PATH "$ENV{HOME}/Qt/5.7/gcc_64")
 
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG")
@@ -46,6 +43,15 @@ else()
 
   set(VULKAN_INCLUDE_DIR "$ENV{HOME}/VulkanSDK/1.0.30.0/x86_64/include")
 endif()
+
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+find_package(FBX REQUIRED)
+find_package(LuaJIT REQUIRED)
+find_package(PhysX REQUIRED Common Cooking CharacterKinematic Extensions VisualDebuggerSDK)
+find_package(Qt5 REQUIRED)
+
+set(CMAKE_PREFIX_PATH ${Qt5_ROOT_DIR})
 
 file(GLOB INTR_RENDERER_VULKAN_SOURCE_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.cpp)
 file(GLOB INTR_RENDERER_VULKAN_HEADER_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.h)
@@ -162,7 +168,7 @@ endif()
 # Library includes
 set(INTR_DEPENDENCIES
   "dependencies/gli"
-  "../Intrinsic_Dependencies/dependencies/fbx/include"
+  "${FBX_INCLUDE_DIR}"
   "dependencies/glm"
   "dependencies/glslang"
   "dependencies/rapidjson"
@@ -170,7 +176,7 @@ set(INTR_DEPENDENCIES
   "dependencies/enkits"
   "dependencies/lua/include"
   "dependencies/sol"
-  "../Intrinsic_Dependencies/dependencies/physx/include"
+  "${PHYSX_INCLUDE_DIR}"
   "dependencies/spirvcross/"
   "${VULKAN_INCLUDE_DIR}"
 )
