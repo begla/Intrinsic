@@ -88,6 +88,7 @@ void Manager::loadSettings()
       _rendererFlags |= RendererFlags::kValidationEnabled;
     else
       _rendererFlags &= ~RendererFlags::kValidationEnabled;
+
     readSetting(doc, _N(targetFrameRate), _targetFrameRate);
     readSetting(doc, _N(windowMode), (uint32_t&)_windowMode);
     readSetting(doc, _N(screenResolutionWidth), _screenResolutionWidth);
