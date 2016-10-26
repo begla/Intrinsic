@@ -22,16 +22,17 @@ namespace Core
 namespace Log
 {
 // Static members
-// Intrinsic
-
 uint32_t Manager::_currentIndent = 0u;
-_INTR_STRING Manager::_lastLoggedLine = "";
 _INTR_ARRAY(LogListenerEntry) Manager::_logListeners;
 
 // <-
 
 void Manager::log(LogLevel::Enum p_LogLevel, const char* p_Message, ...)
 {
+  static _INTR_OFSTREAM logFile = _INTR_OFSTREAM("Intrinsic.log", std::ios_base::out);
+  static const uint32_t messageBufferSizeInByte = 4096u;
+  static char messageBuffer[messageBufferSizeInByte];
+
   if (!p_Message || *p_Message == '\0')
   {
     return;
@@ -64,37 +65,36 @@ void Manager::log(LogLevel::Enum p_LogLevel, const char* p_Message, ...)
 
   // Indent
   for (uint32_t i = 0u; i < _currentIndent; ++i)
-  {
     printf(" ");
-  }
 
   rlutil::setColor(logLevelToColorMapping[p_LogLevel]);
 
-  static const uint32_t messageBufferSizeInByte = 4096u;
-  static char _messageBuffer[messageBufferSizeInByte];
-
   va_list args;
   va_start(args, p_Message);
-  vsprintf(_messageBuffer, message.c_str(), args);
+  vsprintf(messageBuffer, message.c_str(), args);
   va_end(args);
 
-  printf("%s", _messageBuffer);
-
+  printf("%s\n", messageBuffer);
   rlutil::setColor(rlutil::DARKGREY);
 
-  printf("\n");
+  // Log to file
+  {
+    logFile << logLevelToLogLevelNameMapping[p_LogLevel] << " (" << timeStr << "): ";
+    for (uint32_t i = 0u; i < _currentIndent; ++i)
+      logFile << " ";
+    logFile << messageBuffer << "\n";
+    logFile.flush();
+  }
 
   if (p_LogLevel == Intrinsic::Core::Log::LogLevel::kError)
   {
-    _INTR_ERROR_DIALOG(_messageBuffer);
+    _INTR_ERROR_DIALOG(messageBuffer);
   }
-
-  _lastLoggedLine = message;
 
   // Call listeners
   for (uint32_t i = 0u; i < _logListeners.size(); ++i)
   {
-    _logListeners[i].callbackFunction(_INTR_STRING(_messageBuffer), p_LogLevel);
+    _logListeners[i].callbackFunction(_INTR_STRING(messageBuffer), p_LogLevel);
   }
 }
 }

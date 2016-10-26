@@ -64,7 +64,6 @@ struct Manager
   }
 
   static uint32_t _currentIndent;
-  static _INTR_STRING _lastLoggedLine;
   static _INTR_ARRAY(LogListenerEntry) _logListeners;
 };
 }

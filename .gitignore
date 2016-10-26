@@ -26,3 +26,5 @@ Intrinsic.includes
 
 app/assets/*
 !app/assets/shaders
+
+app/Intrinsic.log
