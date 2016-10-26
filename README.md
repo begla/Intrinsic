@@ -70,26 +70,26 @@ IntrinsicEd is neither configured for nor tested with Android - but the support 
 
 Intrinsic uses the following open-source libraries:
 
+* Qt (IntrinsicEd only, see https://www.qt.io/download)
+* SDL 2.0 (see https://www.libsdl.org/download-2.0.php)
 * Vulkan SDK (see https://lunarg.com/vulkan-sdk/)
+* tlsf (see https://github.com/mattconte/tlsf)
 * microprofile (https://github.com/jonasmr/microprofile)
 * enkiTS (see https://github.com/dougbinks/enkiTS)
 * gli (see http://gli.g-truc.net/0.8.1/index.html)
 * glm (see http://glm.g-truc.net/0.9.8/index.html)
 * glslang (see https://github.com/KhronosGroup/glslang)
+* SPIRV-Cross (see https://github.com/KhronosGroup/SPIRV-Cross)
 * LuaJIT (see http://luajit.org/)
 * rapidjson (see https://github.com/miloyip/rapidjson)
 * rlutil (see https://github.com/tapio/rlutil)
-* SDL 2.0 (see https://www.libsdl.org/download-2.0.php)
-* SOL v2.0 (see https://github.com/ThePhD/sol2)
+* SOL 2 (see https://github.com/ThePhD/sol2)
 * sparsepp (see https://github.com/greg7mdp/sparsepp)
-* SPIRV-Cross (see https://github.com/KhronosGroup/SPIRV-Cross)
 * tinydir (see https://github.com/cxong/tinydir)
-* TLSF allocator (see https://github.com/mattconte/tlsf)
 
 Intrinsic uses the following proprietary libraries:
 
 * PhysX 3 (see https://developer.nvidia.com/physx-sdk)
-* Qt (IntrinsicEd only, see https://www.qt.io/download)
 * FBX SDK (IntrinsicEd only, see http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775847)
 
 Intrinsic also uses the following tools in binary format:
