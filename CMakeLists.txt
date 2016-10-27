@@ -203,9 +203,6 @@ set(INTR_INCLUDES
 )
 include_directories(${INTR_INCLUDES})
 
-# PThread
-find_library(LIB_PTHREAD NAMES pthread)
-
 # Libraries
 set(INTR_ED_EXTERNAL_LIBS
   Qt5::Widgets
@@ -227,8 +224,10 @@ set(INTR_EXTERNAL_LIBS
 )
 
 if(UNIX)
+  set(THREADS_PREFER_PTHREAD_FLAG ON)
+  find_package(Threads REQUIRED)
   set(INTR_EXTERNAL_LIBS "${INTR_EXTERNAL_LIBS}" 
-    ${LIB_PTHREAD}
+    Threads::Threads
 
     # GLSLang
     ${GLSLang_LIBRARIES}
