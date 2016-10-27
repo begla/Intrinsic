@@ -34,7 +34,6 @@ FIND_PATH(LuaJIT_INCLUDE_DIR lua.h
   $ENV{LuaJIT_DIR}
   PATH_SUFFIXES include/luajit-2.0 include/luajit2.0 include/luajit include
   PATHS
-  ${CMAKE_SOURCE_DIR}/dependencies/lua
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -43,6 +42,7 @@ FIND_PATH(LuaJIT_INCLUDE_DIR lua.h
   /opt/local # DarwinPorts
   /opt/csw # Blastwave
   /opt
+  ${CMAKE_SOURCE_DIR}/dependencies/lua
 )
 
 FIND_LIBRARY(LuaJIT_LIBRARY 
@@ -51,7 +51,6 @@ FIND_LIBRARY(LuaJIT_LIBRARY
   $ENV{LuaJIT_DIR}
   PATH_SUFFIXES lib64 lib
   PATHS
-  ${CMAKE_SOURCE_DIR}/dependencies/lua
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -60,6 +59,7 @@ FIND_LIBRARY(LuaJIT_LIBRARY
   /opt/local
   /opt/csw
   /opt
+  ${CMAKE_SOURCE_DIR}/dependencies/lua
 )
 
 IF(LuaJIT_LIBRARY)
