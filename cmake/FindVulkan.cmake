@@ -1,6 +1,6 @@
 # Locate the Vulkan SDK
 # This module defines
-#  Vulkan_FOUND, if false, do not try to link to Lua 
+#  Vulkan_FOUND
 #  Vulkan_INCLUDE_DIR
 #  Vulkan_LIBRARY
 #
