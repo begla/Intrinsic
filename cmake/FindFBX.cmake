@@ -7,6 +7,8 @@
 FIND_PATH(FBX_INCLUDE_DIR fbxsdk.h
   PATH_SUFFIXES include
   PATHS
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/fbx
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -15,13 +17,14 @@ FIND_PATH(FBX_INCLUDE_DIR fbxsdk.h
   /opt/local # DarwinPorts
   /opt/csw # Blastwave
   /opt
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/fbx
 )
 
 FIND_LIBRARY(FBX_LIBRARY_DEBUG 
   NAMES fbxsdk
   PATH_SUFFIXES lib64 lib
   PATHS
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/fbx
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -30,13 +33,14 @@ FIND_LIBRARY(FBX_LIBRARY_DEBUG
   /opt/local
   /opt/csw
   /opt
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/fbx
 )
 
 FIND_LIBRARY(FBX_LIBRARY_RELEASE 
   NAMES fbxsdk
   PATH_SUFFIXES lib64 lib
   PATHS
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/fbx
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -45,7 +49,6 @@ FIND_LIBRARY(FBX_LIBRARY_RELEASE
   /opt/local
   /opt/csw
   /opt
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/fbx
 )
 
 SET(FBX_LIBRARIES

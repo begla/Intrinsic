@@ -10,9 +10,12 @@
 #  PhysX_PROFILE
 
 FIND_PATH(PhysX_INCLUDE_DIR PxPhysicsAPI.h
+  PATH_SUFFIXES include
   PATHS
-  $ENV{PHYSX_HOME}/include
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/include
+  ${PHYSX_HOME}
+  $ENV{PHYSX_HOME}
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -53,13 +56,13 @@ IF (NOT PhysX_LIBRARY_DIR)
 ENDIF()
 
 FIND_LIBRARY(PhysX_LIBRARY_RELEASE PhysX3${PHYSXPREFIX}
-  PATH_SUFFIXES lib lib64
+  PATH_SUFFIXES lib64 lib Lib/${LIBFOLDERSUFFIX}
   PATHS
   ${PhysX_LIBRARY_DIR}
-  $ENV{PHYSX_HOME}/Lib/${LIBFOLDERSUFFIX}
-  $ENV{PHYSX_HOME}/
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/Lib/${LIBFOLDERSUFFIX}
+  ${PHYSX_HOME}
+  $ENV{PHYSX_HOME}
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -70,13 +73,13 @@ FIND_LIBRARY(PhysX_LIBRARY_RELEASE PhysX3${PHYSXPREFIX}
   /opt
 )
 FIND_LIBRARY(PhysX_LIBRARY_PROFILE PhysX3PROFILE${PHYSXPREFIX}
-  PATH_SUFFIXES lib lib64
+  PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
   PATHS
   ${PhysX_LIBRARY_DIR}
-  $ENV{PHYSX_HOME}/Lib/${LIBFOLDERSUFFIX}
-  $ENV{PHYSX_HOME}/
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/Lib/${LIBFOLDERSUFFIX}
+  ${PHYSX_HOME}
+  $ENV{PHYSX_HOME}
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -87,13 +90,13 @@ FIND_LIBRARY(PhysX_LIBRARY_PROFILE PhysX3PROFILE${PHYSXPREFIX}
   /opt
 )
 FIND_LIBRARY(PhysX_LIBRARY_DEBUG PhysX3DEBUG${PHYSXPREFIX}
-  PATH_SUFFIXES lib lib64
+  PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
   PATHS
   ${PhysX_LIBRARY_DIR}
-  $ENV{PHYSX_HOME}/Lib/${LIBFOLDERSUFFIX}
-  $ENV{PHYSX_HOME}/
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/Lib/${LIBFOLDERSUFFIX}
+  ${PHYSX_HOME}
+  $ENV{PHYSX_HOME}
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -116,13 +119,13 @@ ENDIF()
 SET(NECESSARY_COMPONENTS "")
 FOREACH(component ${PhysX_FIND_COMPONENTS})
   FIND_LIBRARY(PhysX_LIBRARY_COMPONENT_${component}_DEBUG PhysX3${component}DEBUG${PHYSXPREFIX} PhysX3${component}DEBUG PhysX${component}DEBUG ${component}DEBUG
-    PATH_SUFFIXES lib lib64
+    PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
     PATHS
     ${PhysX_LIBRARY_DIR}
-    $ENV{PHYSX_HOME}/Lib/${LIBFOLDERSUFFIX}
-    $ENV{PHYSX_HOME}/
-    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/Lib/${LIBFOLDERSUFFIX}
+    ${PHYSX_HOME}
+    $ENV{PHYSX_HOME}
     ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
     ~/Library/Frameworks
     /Library/Frameworks
     /usr/local
@@ -140,13 +143,13 @@ FOREACH(component ${PhysX_FIND_COMPONENTS})
   ENDIF()
 
   FIND_LIBRARY(PhysX_LIBRARY_COMPONENT_${component}_PROFILE PhysX3${component}PROFILE${PHYSXPREFIX} PhysX3${component}PROFILE PhysX${component}PROFILE ${component}PROFILE
-    PATH_SUFFIXES lib lib64
+    PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
     PATHS
     ${PhysX_LIBRARY_DIR}
-    $ENV{PHYSX_HOME}/Lib/${LIBFOLDERSUFFIX}
-    $ENV{PHYSX_HOME}/
-    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/Lib/${LIBFOLDERSUFFIX}
+    ${PHYSX_HOME}
+    $ENV{PHYSX_HOME}
     ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
     ~/Library/Frameworks
     /Library/Frameworks
     /usr/local
@@ -158,13 +161,13 @@ FOREACH(component ${PhysX_FIND_COMPONENTS})
   )
 
   FIND_LIBRARY(PhysX_LIBRARY_COMPONENT_${component}_RELEASE PhysX3${component}${PHYSXPREFIX} PhysX3${component} PhysX${component} ${component}
-    PATH_SUFFIXES lib lib64
+    PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
     PATHS
     ${PhysX_LIBRARY_DIR}
-    $ENV{PHYSX_HOME}/Lib/${LIBFOLDERSUFFIX}
-    $ENV{PHYSX_HOME}/
-    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/Lib/${LIBFOLDERSUFFIX}
+    ${PHYSX_HOME}
+    $ENV{PHYSX_HOME}
     ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
     ~/Library/Frameworks
     /Library/Frameworks
     /usr/local
