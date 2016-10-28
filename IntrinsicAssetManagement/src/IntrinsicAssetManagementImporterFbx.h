@@ -24,11 +24,6 @@ struct ImporterFbx
   static void destroy();
 
   static bool importMeshesFromFile(const _INTR_STRING& p_FilePath);
-  static void importMeshesFromNode(FbxNode* p_Node);
-  static void importMesh(FbxMesh* p_Mesh);
-  static void stripDuplicateVertices(Dod::Ref p_MeshRef);
-
-  static FbxManager* _fbxManager;
 };
 }
 }
