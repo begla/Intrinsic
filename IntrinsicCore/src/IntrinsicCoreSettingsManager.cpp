@@ -35,25 +35,29 @@ uint32_t Manager::_screenResolutionHeight = 720u;
 
 namespace
 {
-  template<typename T>
-  _INTR_INLINE void readSetting(rapidjson::Document& p_Doc, Name& p_Name, T& p_Target)
+template <typename T>
+_INTR_INLINE void readSetting(rapidjson::Document& p_Doc, Name& p_Name,
+                              T& p_Target)
+{
+  if (p_Doc.HasMember(p_Name._string.c_str()))
   {
-    if (p_Doc.HasMember(p_Name._string.c_str()))
-    {
-      p_Target = p_Doc[p_Name._string.c_str()].Get<T>();
-      _INTR_LOG_INFO("%s = '%s'", p_Name._string.c_str(), StringUtil::toString(p_Target).c_str());
-    }
+    p_Target = p_Doc[p_Name._string.c_str()].Get<T>();
+    _INTR_LOG_INFO("%s = '%s'", p_Name._string.c_str(),
+                   StringUtil::toString(p_Target).c_str());
   }
+}
 
-  template<>
-  _INTR_INLINE void readSetting(rapidjson::Document& p_Doc, Name& p_Name, _INTR_STRING& p_Target)
+template <>
+_INTR_INLINE void readSetting(rapidjson::Document& p_Doc, Name& p_Name,
+                              _INTR_STRING& p_Target)
+{
+  if (p_Doc.HasMember(p_Name._string.c_str()))
   {
-    if (p_Doc.HasMember(p_Name._string.c_str()))
-    {
-      p_Target = p_Doc[p_Name._string.c_str()].GetString();
-      _INTR_LOG_INFO("%s = '%s'", p_Name._string.c_str(), StringUtil::toString(p_Target).c_str());
-    }
+    p_Target = p_Doc[p_Name._string.c_str()].GetString();
+    _INTR_LOG_INFO("%s = '%s'", p_Name._string.c_str(),
+                   StringUtil::toString(p_Target).c_str());
   }
+}
 }
 
 // <-
@@ -82,7 +86,8 @@ void Manager::loadSettings()
   Tlsf::MainAllocator::free(readBuffer);
 
   {
-    bool rendererValidationEnabled = (_rendererFlags & RendererFlags::kValidationEnabled) > 0u;
+    bool rendererValidationEnabled =
+        (_rendererFlags & RendererFlags::kValidationEnabled) > 0u;
     readSetting(doc, _N(rendererValidationEnabled), rendererValidationEnabled);
     if (rendererValidationEnabled)
       _rendererFlags |= RendererFlags::kValidationEnabled;
