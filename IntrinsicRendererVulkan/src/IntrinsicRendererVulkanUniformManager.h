@@ -14,8 +14,6 @@
 
 #pragma once
 
-#define PER_INSTANCE_DATA_BUFFER_COUNT 2u
-
 namespace Intrinsic
 {
 namespace Renderer
@@ -39,7 +37,7 @@ struct UniformManager
   {
     const uint32_t bufferIdx =
         Renderer::Vulkan::RenderSystem::_backbufferIndex %
-        PER_INSTANCE_DATA_BUFFER_COUNT;
+        _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
     UniformDataMemoryPage page;
 
     if (p_Size < _INTR_VK_PER_INSTANCE_PAGE_SMALL_SIZE_IN_BYTES)
@@ -126,10 +124,10 @@ struct UniformManager
 private:
   static LockFreeStack<UniformDataMemoryPage,
                        _INTR_VK_PER_INSTANCE_PAGE_SMALL_COUNT>
-      _perInstanceMemoryPagesSmall[PER_INSTANCE_DATA_BUFFER_COUNT];
+      _perInstanceMemoryPagesSmall[_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
   static LockFreeStack<UniformDataMemoryPage,
                        _INTR_VK_PER_INSTANCE_PAGE_LARGE_COUNT>
-      _perInstanceMemoryPagesLarge[PER_INSTANCE_DATA_BUFFER_COUNT];
+      _perInstanceMemoryPagesLarge[_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
 
   static _INTR_ARRAY(UniformManager::UniformDataMemoryPage)
       _perMaterialMemoryPages;

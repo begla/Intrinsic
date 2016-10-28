@@ -630,6 +630,20 @@ _INTR_INLINE uint32_t convertColorToBGRA(const glm::vec4& p_Color)
   color |= ((uint8_t)(p_Color.a * 255.0f)) << 24u;
   return color;
 }
+
+// <-
+
+_INTR_INLINE float bytesToMegaBytes(uint32_t p_Bytes)
+{
+  return p_Bytes * 0.00000095367431640625f;
+}
+
+// <-
+
+_INTR_INLINE uint32_t megaBytesToBytes(float p_MegaBytes)
+{
+  return (uint32_t)(p_MegaBytes * 1024.0f * 1024.0f);
+}
 }
 }
 }
