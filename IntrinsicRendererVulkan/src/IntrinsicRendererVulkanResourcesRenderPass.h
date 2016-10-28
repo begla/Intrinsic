@@ -136,7 +136,7 @@ struct RenderPassManager
   }
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   // Description
   _INTR_INLINE static _INTR_ARRAY(AttachmentDescription) &

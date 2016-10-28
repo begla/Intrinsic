@@ -125,7 +125,7 @@ struct ResourceManagerBase : Dod::ManagerBase<IdCount, DataType>
   }
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   _INTR_INLINE static Name& _name(Ref p_Ref) { return _data.name[p_Ref._id]; }
   _INTR_INLINE static uint8_t& _resourceFlags(Ref p_Ref)

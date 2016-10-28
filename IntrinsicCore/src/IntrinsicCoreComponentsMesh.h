@@ -132,7 +132,7 @@ struct MeshManager
   static void collectDrawCallsAndMeshComponents();
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   _INTR_INLINE static const Name& getMeshName(MeshRef p_Ref)
   {
@@ -146,7 +146,7 @@ struct MeshManager
   // <-
 
   // Member refs
-  // Intrinsic
+  // ->
 
   // Description
   _INTR_INLINE static Name& _descMeshName(MeshRef p_Ref)

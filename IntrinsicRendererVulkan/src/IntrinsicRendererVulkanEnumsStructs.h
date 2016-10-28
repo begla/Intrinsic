@@ -138,7 +138,7 @@ namespace MemoryUsage
 enum Enum
 {
   kOptimal,
-  kHostVisibleAndCoherent
+  kStaging
 };
 }
 

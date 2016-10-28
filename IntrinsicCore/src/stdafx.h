@@ -71,7 +71,7 @@
 #include "glm/gtx/quaternion.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 
-// Intrinsic::Core related includes
+// ->::Core related includes
 #include "IntrinsicCorePrerequisites.h"
 
 // STL allocator include
@@ -122,6 +122,7 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreTriangleOptimizer.h"
 #include "IntrinsicCoreSettingsManager.h"
 #include "IntrinsicCoreLogManager.h"
+#include "IntrinsicCoreLinearOffsetAllocator.h"
 #include "IntrinsicCoreLockFreeStack.h"
 #include "IntrinsicStringUtil.h"
 #include "IntrinsicCoreSimd.h"

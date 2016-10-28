@@ -105,6 +105,7 @@ void updateDrawCalls(ImageRef p_ImageRef)
       if (bindInfo.resource == p_ImageRef)
       {
         drawCallsToUpdate.push_back(dcRef);
+        break;
       }
     }
   }

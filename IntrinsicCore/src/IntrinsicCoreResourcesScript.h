@@ -156,7 +156,7 @@ struct ScriptManager
   // <-
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   // <-
 

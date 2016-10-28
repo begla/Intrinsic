@@ -180,7 +180,6 @@ void Debug::updateResolutionDependentResources()
       framebuffersToDestroy.push_back(_framebufferRef);
     if (_debugLineVertexBufferRef.isValid())
     {
-      BufferManager::unmapBuffer(_debugLineVertexBufferRef);
       buffersToDestroy.push_back(_debugLineVertexBufferRef);
     }
     if (_debugLinePipelineRef.isValid())
@@ -234,7 +233,7 @@ void Debug::updateResolutionDependentResources()
     BufferManager::_descSizeInBytes(lineVertexBuffer) =
         MAX_LINE_COUNT * sizeof(DebugLineVertex) * 2u;
     BufferManager::_descBufferMemoryUsage(lineVertexBuffer) =
-        MemoryUsage::kHostVisibleAndCoherent;
+        MemoryUsage::kStaging;
 
     buffersToCreate.push_back(lineVertexBuffer);
   }
@@ -266,7 +265,7 @@ void Debug::updateResolutionDependentResources()
   DrawCallManager::createResources(drawCallsToCreate);
 
   // Map line buffer memory
-  _mappedLineMemory = (DebugLineVertex*)Resources::BufferManager::mapBuffer(
+  _mappedLineMemory = (DebugLineVertex*)Resources::BufferManager::getGpuMemory(
       _debugLineVertexBufferRef);
 
   _albedoImageRef = ImageManager::getResourceByName(_N(GBufferAlbedo));

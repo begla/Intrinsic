@@ -132,7 +132,7 @@ struct FrustumManager
   // <-
 
   // Member refs.
-  // Intrinsic
+  // ->
 
   _INTR_INLINE static uint8_t& _descProjectionType(FrustumRef p_Ref)
   {

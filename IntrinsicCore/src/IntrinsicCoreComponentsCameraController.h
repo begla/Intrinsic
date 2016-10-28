@@ -174,7 +174,7 @@ struct CameraControllerManager
   // <-
 
   // Members refs
-  // Intrinsic
+  // ->
 
   // Description
 

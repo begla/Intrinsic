@@ -25,7 +25,7 @@ struct DefaultRenderProcess
   static void renderFrame(float p_DeltaT);
 
   // Static members
-  // Intrinsic
+  // ->
 
   static Core::Dod::RefArray _activeFrustums;
 

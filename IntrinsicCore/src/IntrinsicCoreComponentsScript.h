@@ -137,7 +137,7 @@ struct ScriptManager
   static void tickScripts(ScriptRefArray& p_Scripts, float p_DeltaT);
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   // Description
   _INTR_INLINE static Name& _descScriptName(ScriptRef p_Ref)

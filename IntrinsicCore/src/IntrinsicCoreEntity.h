@@ -100,14 +100,14 @@ struct EntityManager : Dod::ManagerBase<_INTR_MAX_ENTITY_COUNT, EntityData>
   }
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   _INTR_INLINE static Name& _name(EntityRef p_Ref)
   {
     return _data.name[p_Ref._id];
   }
 
-  // Intrinsic
+  // ->
 
   static EntityData _data;
   static _INTR_HASH_MAP(Name, Dod::Ref) _nameResourceMap;

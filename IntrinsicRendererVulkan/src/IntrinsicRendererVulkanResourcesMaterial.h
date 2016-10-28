@@ -375,7 +375,7 @@ struct MaterialManager
   static void destroyResources(const MaterialRefArray& p_Materials);
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   // Description
   _INTR_INLINE static Name& _descAlbedoTextureName(MaterialRef p_Ref)

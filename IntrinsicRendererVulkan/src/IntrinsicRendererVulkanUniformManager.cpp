@@ -62,7 +62,7 @@ void UniformManager::init()
         Dod::Resources::ResourceFlags::kResourceVolatile);
 
     Resources::BufferManager::_descBufferMemoryUsage(
-        _perInstanceUniformBuffer) = MemoryUsage::kHostVisibleAndCoherent;
+        _perInstanceUniformBuffer) = MemoryUsage::kStaging;
     Resources::BufferManager::_descBufferType(_perInstanceUniformBuffer) =
         BufferType::kUniform;
     Resources::BufferManager::_descSizeInBytes(_perInstanceUniformBuffer) =
@@ -89,7 +89,7 @@ void UniformManager::init()
 
   // Map host memory
   _mappedPerInstanceMemory =
-      Resources::BufferManager::mapBuffer(_perInstanceUniformBuffer);
+      Resources::BufferManager::getGpuMemory(_perInstanceUniformBuffer);
 
   // Init. per instance data memory pages
   {

@@ -137,8 +137,7 @@ void PerPixelPicking::updateResolutionDependentResources()
       BufferManager::addResourceFlags(
           bufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
 
-      BufferManager::_descBufferMemoryUsage(bufferRef) =
-          MemoryUsage::kHostVisibleAndCoherent;
+      BufferManager::_descBufferMemoryUsage(bufferRef) = MemoryUsage::kStaging;
       BufferManager::_descBufferType(bufferRef) = BufferType::kStorage;
       BufferManager::_descSizeInBytes(bufferRef) =
           (uint32_t)_perPixelPickingSize.x * (uint32_t)_perPixelPickingSize.y *
@@ -285,7 +284,7 @@ Components::NodeRef PerPixelPicking::pickNode(const glm::vec2& p_UV)
       _pickingReadBackBufferRefs[RenderSystem::_backbufferIndex];
 
   uint32_t* bufferMem =
-      (uint32_t*)Resources::BufferManager::mapBuffer(readBackBufferToUse);
+      (uint32_t*)Resources::BufferManager::getGpuMemory(readBackBufferToUse);
 
   const uint32_t x = (uint32_t)(p_UV.x * (_perPixelPickingSize.x - 1.0f) +
                                 (0.5f / _perPixelPickingSize.x));
@@ -294,8 +293,6 @@ Components::NodeRef PerPixelPicking::pickNode(const glm::vec2& p_UV)
 
   const uint32_t bufferIndex = x + y * (uint32_t)_perPixelPickingSize.x;
   const uint32_t refId = bufferMem[bufferIndex];
-
-  BufferManager::unmapBuffer(readBackBufferToUse);
 
   if (refId != (uint32_t)-1)
   {
