@@ -14,7 +14,6 @@ FIND_PATH(PhysX_INCLUDE_DIR PxPhysicsAPI.h
   PATHS
   ${PHYSX_HOME}
   $ENV{PHYSX_HOME}
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
   ~/Library/Frameworks
   /Library/Frameworks
