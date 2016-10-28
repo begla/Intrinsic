@@ -151,7 +151,7 @@ struct FramebufferManager
   }
 
   // Getter/Setter
-  // Intrinsic
+  // ->
   _INTR_INLINE static Resources::RenderPassRef&
   _descRenderPass(FramebufferRef p_Ref)
   {

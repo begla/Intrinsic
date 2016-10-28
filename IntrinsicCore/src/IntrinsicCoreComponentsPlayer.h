@@ -91,7 +91,7 @@ struct PlayerManager
   // <-
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   // Description
   _INTR_INLINE static uint32_t& _descPlayerId(PlayerRef p_Ref)

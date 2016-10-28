@@ -142,7 +142,7 @@ struct VertexLayoutManager
   }
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   _INTR_INLINE static _INTR_ARRAY(VertexAttribute) &
       _descVertexAttributes(VertexLayoutRef p_Ref)

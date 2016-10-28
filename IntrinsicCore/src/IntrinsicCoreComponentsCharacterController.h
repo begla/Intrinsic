@@ -153,7 +153,7 @@ struct CharacterControllerManager
   // <-
 
   // Members refs
-  // Intrinsic
+  // ->
 
   // Resources
   _INTR_INLINE static glm::vec3&

@@ -66,6 +66,8 @@ void ImageManager::init()
 
 // <-
 
+namespace
+{
 void createTexture(ImageRef p_Ref)
 {
   VkImage& vkImage = ImageManager::_vkImage(p_Ref);
@@ -185,28 +187,20 @@ void createTexture(ImageRef p_Ref)
 
   imageCreateInfo.flags = 0u;
 
-  VkMemoryRequirements memReqs;
   VkResult result = vkCreateImage(RenderSystem::_vkDevice, &imageCreateInfo,
                                   nullptr, &vkImage);
   _INTR_VK_CHECK_RESULT(result);
 
+  VkMemoryRequirements memReqs;
   vkGetImageMemoryRequirements(RenderSystem::_vkDevice, vkImage, &memReqs);
 
-  VkMemoryAllocateInfo memAllocInfo = {};
-  {
-    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memAllocInfo.pNext = nullptr;
-    memAllocInfo.allocationSize = memReqs.size;
-    memAllocInfo.memoryTypeIndex =
-        Helper::computeGpuMemoryTypeIdx(memReqs.memoryTypeBits, 0);
-  }
+  vkDeviceMemory = GpuMemoryManager::_vkDeviceLocalMemory;
+  const uint32_t memOffset =
+      GpuMemoryManager::_staticImageMemoryAllocator.allocate(
+          (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
 
-  result = vkAllocateMemory(RenderSystem::_vkDevice, &memAllocInfo, nullptr,
-                            &vkDeviceMemory);
-  _INTR_VK_CHECK_RESULT(result);
-
-  result =
-      vkBindImageMemory(RenderSystem::_vkDevice, vkImage, vkDeviceMemory, 0u);
+  result = vkBindImageMemory(RenderSystem::_vkDevice, vkImage, vkDeviceMemory,
+                             memOffset);
   _INTR_VK_CHECK_RESULT(result);
 
   VkImageViewCreateInfo imageViewCreateInfo = {};
@@ -295,15 +289,7 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
   ImageManager::_descArrayLayerCount(p_Ref) = 1u;
   ImageManager::_descImageFlags(p_Ref) = ImageFlags::kUsageSampled;
 
-  VkMemoryAllocateInfo memAllocInfo = {};
-  {
-    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memAllocInfo.pNext = nullptr;
-  }
-  VkMemoryRequirements memReqs = {};
-
   VkBuffer stagingBuffer;
-  VkDeviceMemory stagingMemory;
 
   VkBufferCreateInfo bufferCreateInfo = {};
   {
@@ -317,27 +303,24 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
   VkResult result = vkCreateBuffer(RenderSystem::_vkDevice, &bufferCreateInfo,
                                    nullptr, &stagingBuffer);
   _INTR_VK_CHECK_RESULT(result);
+  VkMemoryRequirements memReqs;
   vkGetBufferMemoryRequirements(RenderSystem::_vkDevice, stagingBuffer,
                                 &memReqs);
 
-  memAllocInfo.allocationSize = memReqs.size;
-  memAllocInfo.memoryTypeIndex = Helper::computeGpuMemoryTypeIdx(
-      memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
-  result = vkAllocateMemory(RenderSystem::_vkDevice, &memAllocInfo, nullptr,
-                            &stagingMemory);
-  _INTR_VK_CHECK_RESULT(result);
+  const uint32_t stagingMemOffset =
+      GpuMemoryManager::_volatileStagingBufferMemoryAllocator.allocate(
+          (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
 
   result = vkBindBufferMemory(RenderSystem::_vkDevice, stagingBuffer,
-                              stagingMemory, 0);
+                              GpuMemoryManager::_vkHostVisibleMemory,
+                              stagingMemOffset);
   _INTR_VK_CHECK_RESULT(result);
 
-  uint8_t* data;
-  result = vkMapMemory(RenderSystem::_vkDevice, stagingMemory, 0, memReqs.size,
-                       0, (void**)&data);
-  _INTR_VK_CHECK_RESULT(result);
-  memcpy(data, texCube.data(), texCube.size());
-  vkUnmapMemory(RenderSystem::_vkDevice, stagingMemory);
+  uint8_t* data =
+      GpuMemoryManager::getHostVisibleMemoryForOffset(stagingMemOffset);
+  {
+    memcpy(data, texCube.data(), texCube.size());
+  }
 
   _INTR_ARRAY(VkBufferImageCopy) bufferCopyRegions;
   uint32_t offset = 0;
@@ -388,17 +371,15 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
 
   vkGetImageMemoryRequirements(RenderSystem::_vkDevice, vkImage, &memReqs);
 
-  memAllocInfo.allocationSize = memReqs.size;
-  memAllocInfo.memoryTypeIndex = Helper::computeGpuMemoryTypeIdx(
-      memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+  const uint32_t memOffset =
+      GpuMemoryManager::_staticImageMemoryAllocator.allocate(
+          (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
 
   VkDeviceMemory& vkDeviceMemory = ImageManager::_vkDeviceMemory(p_Ref);
-  result = vkAllocateMemory(RenderSystem::_vkDevice, &memAllocInfo, nullptr,
-                            &vkDeviceMemory);
-  _INTR_VK_CHECK_RESULT(result);
+  vkDeviceMemory = GpuMemoryManager::_vkDeviceLocalMemory;
 
-  result =
-      vkBindImageMemory(RenderSystem::_vkDevice, vkImage, vkDeviceMemory, 0);
+  result = vkBindImageMemory(RenderSystem::_vkDevice, vkImage, vkDeviceMemory,
+                             memOffset);
   _INTR_VK_CHECK_RESULT(result);
 
   VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
@@ -424,8 +405,8 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
 
   RenderSystem::flushTemporaryCommandBuffer();
 
-  vkFreeMemory(RenderSystem::_vkDevice, stagingMemory, nullptr);
   vkDestroyBuffer(RenderSystem::_vkDevice, stagingBuffer, nullptr);
+  GpuMemoryManager::_volatileStagingBufferMemoryAllocator.reset();
 
   VkImageViewCreateInfo view = {};
   {
@@ -470,15 +451,7 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
   ImageManager::_descArrayLayerCount(p_Ref) = 1u;
   ImageManager::_descImageFlags(p_Ref) = ImageFlags::kUsageSampled;
 
-  VkMemoryAllocateInfo memAllocInfo = {};
-  {
-    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memAllocInfo.pNext = nullptr;
-  }
-  VkMemoryRequirements memReqs = {};
-
   VkBuffer stagingBuffer;
-  VkDeviceMemory stagingMemory;
 
   VkBufferCreateInfo bufferCreateInfo = {};
   {
@@ -492,27 +465,25 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
   VkResult result = vkCreateBuffer(RenderSystem::_vkDevice, &bufferCreateInfo,
                                    nullptr, &stagingBuffer);
   _INTR_VK_CHECK_RESULT(result);
+
+  VkMemoryRequirements memReqs;
   vkGetBufferMemoryRequirements(RenderSystem::_vkDevice, stagingBuffer,
                                 &memReqs);
 
-  memAllocInfo.allocationSize = memReqs.size;
-  memAllocInfo.memoryTypeIndex = Helper::computeGpuMemoryTypeIdx(
-      memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
-  result = vkAllocateMemory(RenderSystem::_vkDevice, &memAllocInfo, nullptr,
-                            &stagingMemory);
-  _INTR_VK_CHECK_RESULT(result);
+  const uint32_t stagingMemOffset =
+      GpuMemoryManager::_volatileStagingBufferMemoryAllocator.allocate(
+          (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
 
   result = vkBindBufferMemory(RenderSystem::_vkDevice, stagingBuffer,
-                              stagingMemory, 0);
+                              GpuMemoryManager::_vkHostVisibleMemory,
+                              stagingMemOffset);
   _INTR_VK_CHECK_RESULT(result);
 
-  uint8_t* data;
-  result = vkMapMemory(RenderSystem::_vkDevice, stagingMemory, 0, memReqs.size,
-                       0, (void**)&data);
-  _INTR_VK_CHECK_RESULT(result);
-  memcpy(data, tex2D.data(), tex2D.size());
-  vkUnmapMemory(RenderSystem::_vkDevice, stagingMemory);
+  uint8_t* data =
+      GpuMemoryManager::getHostVisibleMemoryForOffset(stagingMemOffset);
+  {
+    memcpy(data, tex2D.data(), tex2D.size());
+  }
 
   _INTR_ARRAY(VkBufferImageCopy) bufferCopyRegions;
   uint32_t offset = 0;
@@ -560,17 +531,15 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
 
   vkGetImageMemoryRequirements(RenderSystem::_vkDevice, vkImage, &memReqs);
 
-  memAllocInfo.allocationSize = memReqs.size;
-  memAllocInfo.memoryTypeIndex = Helper::computeGpuMemoryTypeIdx(
-      memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+  const uint32_t memOffset =
+      GpuMemoryManager::_staticImageMemoryAllocator.allocate(
+          (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
 
   VkDeviceMemory& vkDeviceMemory = ImageManager::_vkDeviceMemory(p_Ref);
-  result = vkAllocateMemory(RenderSystem::_vkDevice, &memAllocInfo, nullptr,
-                            &vkDeviceMemory);
-  _INTR_VK_CHECK_RESULT(result);
+  vkDeviceMemory = GpuMemoryManager::_vkDeviceLocalMemory;
 
-  result =
-      vkBindImageMemory(RenderSystem::_vkDevice, vkImage, vkDeviceMemory, 0);
+  result = vkBindImageMemory(RenderSystem::_vkDevice, vkImage, vkDeviceMemory,
+                             memOffset);
   _INTR_VK_CHECK_RESULT(result);
 
   VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
@@ -596,8 +565,8 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
 
   RenderSystem::flushTemporaryCommandBuffer();
 
-  vkFreeMemory(RenderSystem::_vkDevice, stagingMemory, nullptr);
   vkDestroyBuffer(RenderSystem::_vkDevice, stagingBuffer, nullptr);
+  GpuMemoryManager::_volatileStagingBufferMemoryAllocator.reset();
 
   VkImageViewCreateInfo view = {};
   {
@@ -642,6 +611,7 @@ void createTextureFromFile(ImageRef p_Ref)
   {
     _INTR_ASSERT(false);
   }
+}
 }
 
 // <-

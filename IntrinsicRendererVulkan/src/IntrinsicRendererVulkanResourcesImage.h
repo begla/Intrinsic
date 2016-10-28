@@ -234,14 +234,6 @@ struct ImageManager
       }
       vkImageViews.clear();
 
-      if (!hasImageFlags(ref, ImageFlags::kExternalDeviceMemory))
-      {
-        if (vkDeviceMemory != VK_NULL_HANDLE)
-        {
-          RenderSystem::releaseResource(_N(VkDeviceMemory),
-                                        (void*)vkDeviceMemory, nullptr);
-        }
-      }
       vkDeviceMemory = VK_NULL_HANDLE;
     }
   }
@@ -322,7 +314,7 @@ struct ImageManager
   }
 
   // Member refs.
-  // Intrinsic
+  // ->
 
   // Description
   _INTR_INLINE static ImageType::Enum& _descImageType(ImageRef p_Ref)

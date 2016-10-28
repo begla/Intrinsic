@@ -90,7 +90,7 @@ struct EventListenerManager
   }
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   _INTR_INLINE static EventCallbackFunction&
   _descEventCallbackFunction(EventListenerRef p_Ref)
@@ -98,7 +98,7 @@ struct EventListenerManager
     return _data.descEventCallbackFunction[p_Ref._id];
   }
 
-  // Intrinsic
+  // ->
 
   static _INTR_HASH_MAP(Name, EventListenerRefArray) _eventListenerMapping;
 };

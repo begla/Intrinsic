@@ -164,7 +164,7 @@ struct EventManager
   }
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   _INTR_INLINE static QueuedEventData& _queuedEventData(EventRef p_EventRef)
   {

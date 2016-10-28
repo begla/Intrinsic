@@ -63,7 +63,7 @@ template <class T, uint64_t Capacity> struct LockFreeStack
 
   // <-
 
-  _INTR_INLINE bool empty() { return _size == 0u; }
+  _INTR_INLINE bool empty() const { return _size == 0u; }
 
   // <-
 
@@ -75,15 +75,27 @@ template <class T, uint64_t Capacity> struct LockFreeStack
 
   // <-
 
-  _INTR_INLINE uint64_t capacity() { return _capacity; }
+  _INTR_INLINE const T& back() const
+  {
+    _INTR_ASSERT(!empty());
+    return _data[_size - 1u];
+  }
 
   // <-
 
-  _INTR_INLINE uint64_t size() { return _size; }
+  _INTR_INLINE uint64_t capacity() const { return _capacity; }
+
+  // <-
+
+  _INTR_INLINE uint64_t size() const { return _size; }
 
   // <-
 
   _INTR_INLINE T& operator[](uint64_t p_Idx) { return _data[p_Idx]; }
+
+  // <-
+
+  _INTR_INLINE T& operator[](uint64_t p_Idx) const { return _data[p_Idx]; }
 
   // <-
 
@@ -99,7 +111,7 @@ template <class T, uint64_t Capacity> struct LockFreeStack
 
   // <-
 
-  _INTR_INLINE void copy(_INTR_ARRAY(T) & p_Array)
+  _INTR_INLINE void copy(_INTR_ARRAY(T) & p_Array) const
   {
     for (uint64_t i = 0u; i < _size; ++i)
     {

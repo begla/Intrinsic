@@ -134,7 +134,7 @@ struct PostEffectManager
   // <-
 
   // Members refs.
-  // Intrinsic
+  // ->
 
   // Description
   _INTR_INLINE static float&

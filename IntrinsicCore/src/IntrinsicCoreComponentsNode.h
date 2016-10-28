@@ -423,7 +423,7 @@ struct NodeManager
   }
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   /// Gets the total amount of available sorted nodes.
   _INTR_INLINE static uint32_t getSortedNodeCount()
@@ -474,7 +474,7 @@ struct NodeManager
   // <-
 
   // Member refs
-  // Intrinsic
+  // ->
 
   /// The parent Node of this Node. If any.
   _INTR_INLINE static NodeRef& _parent(NodeRef p_Ref)

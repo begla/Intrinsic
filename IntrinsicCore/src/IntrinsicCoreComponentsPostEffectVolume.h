@@ -124,7 +124,7 @@ struct PostEffectVolumeManager
   // <-
 
   // Members refs.
-  // Intrinsic
+  // ->
 
   // Description
 

@@ -146,7 +146,7 @@ struct RigidBodyManager
   static void updateActorsFromNodes(const RigidBodyRefArray& p_RigidBodies);
 
   // Member refs
-  // Intrinsic
+  // ->
 
   // Description
   _INTR_INLINE static RigidBodyType::Enum&

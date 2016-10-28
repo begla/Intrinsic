@@ -31,13 +31,19 @@ struct Allocator
 {
   _INTR_INLINE Allocator() {}
 
+  // <-
+
   _INTR_INLINE Allocator(uint32_t p_Size)
   {
     void* mem = malloc(p_Size);
     init(mem, p_Size);
   }
 
+  // <-
+
   _INTR_INLINE Allocator(void* p_Mem, uint32_t p_Size) { init(p_Mem, p_Size); }
+
+  // <-
 
   _INTR_INLINE void init(void* p_Mem, uint32_t p_Size)
   {
@@ -46,6 +52,8 @@ struct Allocator
     _INTR_ASSERT(_memoryPool && "Tlsf init. failed");
   }
 
+  // <-
+
   _INTR_INLINE void* allocate(uint32_t p_Size)
   {
     void* mem = tlsf_malloc(_memoryPool, p_Size);
@@ -53,10 +61,14 @@ struct Allocator
     return mem;
   }
 
+  // <-
+
   _INTR_INLINE void* allocateAligned(uint32_t p_Size, uint32_t p_Alignment)
   {
     return tlsf_memalign(_memoryPool, p_Alignment, p_Size);
   }
+
+  // <-
 
   _INTR_INLINE void free(void* p_Mem)
   {
@@ -79,6 +91,7 @@ struct MainAllocator
 
   static void free(void* p_Mem) { _allocator->free(p_Mem); }
 
+private:
   static Allocator* _allocator;
 };
 }

@@ -14,7 +14,7 @@
 
 #pragma once
 
-// Intrinsic::Renderer related includes
+// ->::Renderer related includes
 #include "IntrinsicRendererVulkanPrerequisites.h"
 
 // Vulkan related includes
@@ -38,6 +38,7 @@
 #include "IntrinsicRendererVulkanEnumsStructs.h"
 #include "IntrinsicRendererVulkanRenderStates.h"
 #include "IntrinsicRendererVulkanSamplers.h"
+#include "IntrinsicRendererVulkanGpuMemoryManager.h"
 #include "IntrinsicRendererVulkanRenderSystem.h"
 #include "IntrinsicRendererVulkanRenderProcess.h"
 #include "IntrinsicRendererVulkanDebugging.h"

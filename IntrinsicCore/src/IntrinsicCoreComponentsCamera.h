@@ -158,7 +158,7 @@ struct CameraManager
                                            float p_Far);
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   // Description
   _INTR_INLINE static float& _descNearPlane(CameraRef p_Ref)

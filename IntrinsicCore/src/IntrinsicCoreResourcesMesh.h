@@ -347,7 +347,7 @@ struct MeshManager
   static void destroyResources(const MeshRefArray& p_Meshes);
 
   // Getter/Setter
-  // Intrinsic
+  // ->
 
   // Description
   _INTR_INLINE static PositionsPerSubMeshArray&

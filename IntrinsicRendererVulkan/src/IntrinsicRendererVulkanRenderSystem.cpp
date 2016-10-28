@@ -106,8 +106,8 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     initVkTempCommandBuffer();
   }
 
-  // Init. samplers and managers
   {
+    GpuMemoryManager::init();
     Samplers::init();
     initManagers();
   }

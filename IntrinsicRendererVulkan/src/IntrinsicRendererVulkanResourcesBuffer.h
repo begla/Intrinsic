@@ -37,6 +37,12 @@ struct BufferData : Dod::Resources::ResourceDataBase
     vkDescriptorBufferInfo.resize(_INTR_MAX_BUFFER_COUNT);
     vkBuffer.resize(_INTR_MAX_BUFFER_COUNT);
     vkDeviceMemory.resize(_INTR_MAX_BUFFER_COUNT);
+    memoryOffset.resize(_INTR_MAX_BUFFER_COUNT);
+
+    for (uint32_t i = 0u; i < _INTR_MAX_BUFFER_COUNT; ++i)
+    {
+      memoryOffset[i] = (uint32_t)-1;
+    }
   }
 
   // <-
@@ -49,6 +55,7 @@ struct BufferData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(VkDescriptorBufferInfo) vkDescriptorBufferInfo;
   _INTR_ARRAY(VkBuffer) vkBuffer;
   _INTR_ARRAY(VkDeviceMemory) vkDeviceMemory;
+  _INTR_ARRAY(uint32_t) memoryOffset;
 };
 
 struct BufferManager
@@ -154,13 +161,8 @@ struct BufferManager
         buffer = VK_NULL_HANDLE;
       }
 
-      VkDeviceMemory& deviceMemory = _vkDeviceMemory(ref);
-      if (deviceMemory != VK_NULL_HANDLE)
-      {
-        RenderSystem::releaseResource(_N(VkDeviceMemory), (void*)deviceMemory,
-                                      nullptr);
-        deviceMemory = VK_NULL_HANDLE;
-      }
+      _vkDeviceMemory(ref) = VK_NULL_HANDLE;
+      _memoryOffset(ref) = (uint32_t)-1;
     }
   }
 
@@ -179,24 +181,11 @@ struct BufferManager
 
   // <-
 
-  _INTR_INLINE static uint8_t* mapBuffer(BufferRef p_Ref)
+  _INTR_INLINE static uint8_t* getGpuMemory(BufferRef p_Ref)
   {
-    const uint32_t& sizeInBytes = _descSizeInBytes(p_Ref);
-
-    uint8_t* data;
-    VkResult result =
-        vkMapMemory(RenderSystem::_vkDevice, _vkDeviceMemory(p_Ref), 0u,
-                    sizeInBytes, 0u, (void**)&data);
-    _INTR_VK_CHECK_RESULT(result);
-
-    return data;
-  }
-
-  // <-
-
-  _INTR_INLINE static void unmapBuffer(BufferRef p_Ref)
-  {
-    vkUnmapMemory(RenderSystem::_vkDevice, _vkDeviceMemory(p_Ref));
+    _INTR_ASSERT(_descBufferMemoryUsage(p_Ref) == MemoryUsage::kStaging);
+    return GpuMemoryManager::getHostVisibleMemoryForOffset(
+        _memoryOffset(p_Ref));
   }
 
   // <-
@@ -214,7 +203,7 @@ struct BufferManager
   }
 
   // Members refs.
-  // Intrinsic
+  // ->
 
   _INTR_INLINE static BufferType::Enum& _descBufferType(BufferRef p_Ref)
   {
@@ -241,6 +230,10 @@ struct BufferManager
   _INTR_INLINE static VkDeviceMemory& _vkDeviceMemory(BufferRef p_Ref)
   {
     return _data.vkDeviceMemory[p_Ref._id];
+  }
+  _INTR_INLINE static uint32_t& _memoryOffset(BufferRef p_Ref)
+  {
+    return _data.memoryOffset[p_Ref._id];
   }
 };
 }

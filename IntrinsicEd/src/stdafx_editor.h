@@ -21,7 +21,7 @@
 // Core related includes
 #include "stdafx.h"
 
-// IntrinsicEd related includes
+// ->Ed related includes
 #include "IntrinsicEdViewport.h"
 #include "IntrinsicEd.h"
 #include "IntrinsicEdNodeViewTreeWidget.h"
