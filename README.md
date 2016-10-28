@@ -44,10 +44,6 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 
 Coming soon...
 
-## Android
-
-IntrinsicEd is neither configured for nor tested with Android - but the support is planned for the future.
-
 # License
 
 ```
