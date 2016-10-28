@@ -41,7 +41,6 @@ void TaskManager::executeTasks()
     _lastDeltaT = std::min(TimingHelper::timerEnd() * 0.001f, 0.3f);
     _totalTimePassed += _lastDeltaT;
 
-
     if (_lastDeltaT < Settings::Manager::_targetFrameRate)
     {
       TimingHelper::timerStart();

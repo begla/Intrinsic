@@ -29,7 +29,8 @@ _INTR_ARRAY(LogListenerEntry) Manager::_logListeners;
 
 void Manager::log(LogLevel::Enum p_LogLevel, const char* p_Message, ...)
 {
-  static _INTR_OFSTREAM logFile = _INTR_OFSTREAM("Intrinsic.log", std::ios_base::out);
+  static _INTR_OFSTREAM logFile =
+      _INTR_OFSTREAM("Intrinsic.log", std::ios_base::out);
   static const uint32_t messageBufferSizeInByte = 4096u;
   static char messageBuffer[messageBufferSizeInByte];
 
@@ -79,7 +80,8 @@ void Manager::log(LogLevel::Enum p_LogLevel, const char* p_Message, ...)
 
   // Log to file
   {
-    logFile << logLevelToLogLevelNameMapping[p_LogLevel] << " (" << timeStr << "): ";
+    logFile << logLevelToLogLevelNameMapping[p_LogLevel] << " (" << timeStr
+            << "): ";
     for (uint32_t i = 0u; i < _currentIndent; ++i)
       logFile << " ";
     logFile << messageBuffer << "\n";
