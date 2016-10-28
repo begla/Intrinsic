@@ -13,6 +13,7 @@
 // limitations under the License.
 
 // Precompiled header file
+#define FBXSDK_NAMESPACE_USING 1
 #include "stdafx_assets.h"
 #include "stdafx.h"
 #include "stdafx_vulkan.h"
@@ -122,8 +123,8 @@ void ImporterFbx::importMesh(FbxMesh* p_Mesh)
   {
     _INTR_LOG_INFO("Conversion to triangle mesh necessary...");
 
-    fbxsdk::FbxGeometryConverter cnvt =
-        fbxsdk::FbxGeometryConverter(_fbxManager);
+    FbxGeometryConverter cnvt =
+        FbxGeometryConverter(_fbxManager);
     triangleMesh =
         (FbxMesh*)cnvt.Triangulate((FbxNodeAttribute*)triangleMesh, false);
     _INTR_ASSERT(triangleMesh);
@@ -183,7 +184,7 @@ void ImporterFbx::importMesh(FbxMesh* p_Mesh)
       Core::Resources::MeshManager::_descMaterialNamesPerSubMesh(meshRef);
   uint32_t subMeshCount = 0u;
 
-  fbxsdk::FbxGeometryElementMaterial* elementMat =
+  FbxGeometryElementMaterial* elementMat =
       triangleMesh->GetElementMaterial();
   FbxGeometryElement::EMappingMode matMappingMode =
       elementMat->GetMappingMode();
@@ -290,7 +291,7 @@ void ImporterFbx::importMesh(FbxMesh* p_Mesh)
 
       // Position
       {
-        fbxsdk::FbxVector4 pos =
+        FbxVector4 pos =
             nodeTransform.MultT(triangleMesh->GetControlPointAt(pVertex));
         posArray[matIdx].push_back(
             glm::vec3((float)pos[0], (float)pos[1], (float)pos[2]));
@@ -299,7 +300,7 @@ void ImporterFbx::importMesh(FbxMesh* p_Mesh)
       // UV0
       if (hasUv0)
       {
-        fbxsdk::FbxVector2 uv0 = HelperFbx::getElement(
+        FbxVector2 uv0 = HelperFbx::getElement(
             triangleMesh->GetElementUV(0), triangleMesh, pIdx, vIdx, vtxId);
         uv0Array[matIdx].push_back(glm::vec2((float)uv0[0], (float)uv0[1]));
       }
@@ -311,10 +312,10 @@ void ImporterFbx::importMesh(FbxMesh* p_Mesh)
       // Normals
       if (hasNormals)
       {
-        fbxsdk::FbxVector4 normal = HelperFbx::getElement(
+        FbxVector4 normal = HelperFbx::getElement(
             triangleMesh->GetElementNormal(), triangleMesh, pIdx, vIdx, vtxId);
 
-        fbxsdk::FbxVector4 finalNormal = normal;
+        FbxVector4 finalNormal = normal;
         finalNormal = normalTransform.MultT(finalNormal);
 
         normalArray[matIdx].push_back(glm::vec3((float)finalNormal[0],
@@ -329,10 +330,10 @@ void ImporterFbx::importMesh(FbxMesh* p_Mesh)
       // Tangents
       if (hasTangents)
       {
-        fbxsdk::FbxVector4 tangent = HelperFbx::getElement(
+        FbxVector4 tangent = HelperFbx::getElement(
             triangleMesh->GetElementTangent(), triangleMesh, pIdx, vIdx, vtxId);
 
-        fbxsdk::FbxVector4 finalTangent = tangent;
+        FbxVector4 finalTangent = tangent;
         finalTangent = normalTransform.MultT(finalTangent);
 
         tangentArray[matIdx].push_back(glm::vec3((float)finalTangent[0],
@@ -347,11 +348,11 @@ void ImporterFbx::importMesh(FbxMesh* p_Mesh)
       // Binormals
       if (hasBinormals)
       {
-        fbxsdk::FbxVector4 binormal =
+        FbxVector4 binormal =
             HelperFbx::getElement(triangleMesh->GetElementBinormal(),
                                   triangleMesh, pIdx, vIdx, vtxId);
 
-        fbxsdk::FbxVector4 finalBinormal = binormal;
+        FbxVector4 finalBinormal = binormal;
         finalBinormal = normalTransform.MultT(finalBinormal);
 
         binormalArray[matIdx].push_back(glm::vec3((float)finalBinormal[0],
@@ -366,7 +367,7 @@ void ImporterFbx::importMesh(FbxMesh* p_Mesh)
       // Color
       if (hasVertexColor)
       {
-        fbxsdk::FbxColor color =
+        FbxColor color =
             HelperFbx::getElement(triangleMesh->GetElementVertexColor(),
                                   triangleMesh, pIdx, vIdx, vtxId);
         vertexColorArray[matIdx].push_back(
