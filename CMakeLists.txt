@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.1)
 
 project(Intrinsic)
 
@@ -22,13 +22,10 @@ set(INTR_GENERAL_COMPILE_FLAGS " ")
 add_definitions("-DMICROPROFILE_GPU_TIMERS_VULKAN")
 
 if(WIN32)
-  set(CMAKE_PREFIX_PATH "$ENV{INTR_QTDIR}")
-
   set(INTR_GENERAL_COMPILE_FLAGS "/Zm256 /EHa /W3")
 
   add_definitions("-D_SCL_SECURE_NO_WARNINGS")
   add_definitions("-D_CRT_SECURE_NO_WARNINGS")
-  set(VULKAN_INCLUDE_DIR "$ENV{VK_SDK_PATH}/Include")
 
   if(INTR_FINAL_BUILD)
     add_definitions("-D_INTR_FINAL_BUILD -D_HAS_EXCEPTIONS=0")
@@ -36,16 +33,28 @@ if(WIN32)
     set(INTR_GENERAL_LINK_FLAGS "${INTR_GENERAL_LINK_FLAGS} /LTCG")
   endif()
 else()
-  set(CMAKE_PREFIX_PATH "$ENV{HOME}/Qt/5.7/gcc_64")
 
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG")
   set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
-
-  set(VULKAN_INCLUDE_DIR "$ENV{HOME}/VulkanSDK/1.0.30.0/x86_64/include")
 endif()
+
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+if (INTR_FINAL_BUILD)
+else()
+  set(PhysX_PROFILE ON)
+endif()
+
+find_package(FBX REQUIRED)
+find_package(GLSLang REQUIRED)
+find_package(LuaJIT REQUIRED)
+find_package(PhysX REQUIRED Common Cooking CharacterKinematic Extensions VisualDebuggerSDK)
+find_package(Qt5 REQUIRED)
+find_package(SDL2 REQUIRED)
+find_package(Vulkan REQUIRED)
 
 file(GLOB INTR_RENDERER_VULKAN_SOURCE_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.cpp)
 file(GLOB INTR_RENDERER_VULKAN_HEADER_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.h)
@@ -92,6 +101,7 @@ set(INTDEP_SOURCE_FILES
 endif()
 
 # Qt5
+set(CMAKE_PREFIX_PATH ${Qt5_ROOT_DIR})
 find_package(Qt5Widgets REQUIRED)
 include_directories(${Qt5Widgets_INCLUDES})
 add_definitions(${Qt5Widgets_DEFINITIONS})
@@ -162,30 +172,23 @@ endif()
 # Library includes
 set(INTR_DEPENDENCIES
   "dependencies/gli"
-  "../Intrinsic_Dependencies/dependencies/fbx/include"
+  "${FBX_INCLUDE_DIR}"
   "dependencies/glm"
-  "dependencies/glslang"
+  "${GLSLang_INCLUDE_DIR}"
   "dependencies/rapidjson"
   "dependencies/"
   "dependencies/enkits"
-  "dependencies/lua/include"
+  "${LuaJIT_INCLUDE_DIR}"
   "dependencies/sol"
-  "../Intrinsic_Dependencies/dependencies/physx/include"
+  "${PhysX_INCLUDE_DIR}"
+  "${SDL2_INCLUDE_DIR}"
   "dependencies/spirvcross/"
-  "${VULKAN_INCLUDE_DIR}"
+  "${Vulkan_INCLUDE_DIR}"
 )
 
 if(WIN32)
-  set(INTR_DEPENDENCIES ${INTR_DEPENDENCIES}
-    "dependencies/sdl/include"
-  )
   add_definitions("-DVK_USE_PLATFORM_WIN32_KHR")
 elseif(UNIX)
-  INCLUDE(FindPkgConfig)
-  PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-  set(INTR_DEPENDENCIES ${INTR_DEPENDENCIES}
-    "${SDL2_INCLUDE_DIRS}"
-  )
   add_definitions("-DVK_USE_PLATFORM_XLIB_KHR")
 endif()
 
@@ -200,175 +203,39 @@ set(INTR_INCLUDES
 )
 include_directories(${INTR_INCLUDES})
 
-set(PHYSX_LIBRARY_DIRS ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx/lib)
-set(LUAJIT_LIBRARY_DIRS ${CMAKE_SOURCE_DIR}/dependencies/lua)
-
-if(WIN32)
-  set(VULKAN_LIBRARY_DIRS $ENV{VK_SDK_PATH}/Bin)
-  set(SDL2_LIBRARY_DIRS "${CMAKE_SOURCE_DIR}/dependencies/sdl/lib/x64")
-else()
-  set(VULKAN_LIBRARY_DIRS "$ENV{HOME}/VulkanSDK/1.0.30.0/x86_64/lib")
-endif()
-
-set(FBX_LIBRARY_DEBUG_DIRS ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx/lib/debug)
-set(FBX_LIBRARY_DIRS ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx/lib/release)
-
-set(GLSLANG_LIBRARY_DIRS
-  # Windows
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang/Release"
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/hlsl/Release"
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/OGLCompilersDLL/Release"
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/SPIRV/Release"
-
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang/Debug"
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/hlsl/Debug"
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/OGLCompilersDLL/Debug"
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/SPIRV/Debug"
-
-  # Unix
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/install/lib"
-)
-
-if(WIN32)
-set(GLSLANG_LIBRARY_DIRS ${GLSLANG_LIBRARY_DIRS}
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang/OSDependent/Windows/Release"
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang/OSDependent/Windows/Debug"
-)
-else()
-set(GLSLANG_LIBRARY_DIRS ${GLSLANG_LIBRARY_DIRS}
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang/OSDependent/Unix/Release"
-  "${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang/OSDependent/Unix/Debug"
-)
-endif()
-
-# GLSLang
-find_library(LIB_GLSLANG NAMES glslang HINTS ${GLSLANG_LIBRARY_DIRS})
-find_library(LIB_GLSLANG_HLSL NAMES HLSL HINTS ${GLSLANG_LIBRARY_DIRS})
-find_library(LIB_GLSLANG_OGL NAMES OGLCompiler HINTS ${GLSLANG_LIBRARY_DIRS})
-find_library(LIB_GLSLANG_OSDEP NAMES OSDependent HINTS ${GLSLANG_LIBRARY_DIRS})
-find_library(LIB_GLSLANG_SPIRV NAMES SPIRV HINTS ${GLSLANG_LIBRARY_DIRS})
-
-find_library(LIB_GLSLANG_DEBUG NAMES glslangd HINTS ${GLSLANG_LIBRARY_DIRS})
-find_library(LIB_GLSLANG_HLSL_DEBUG NAMES HLSLd HINTS ${GLSLANG_LIBRARY_DIRS})
-find_library(LIB_GLSLANG_OGL_DEBUG NAMES OGLCompilerd HINTS ${GLSLANG_LIBRARY_DIRS})
-find_library(LIB_GLSLANG_OSDEP_DEBUG NAMES OSDependentd HINTS ${GLSLANG_LIBRARY_DIRS})
-find_library(LIB_GLSLANG_SPIRV_DEBUG NAMES SPIRVd HINTS ${GLSLANG_LIBRARY_DIRS})
-
-# FBX
-find_library(LIB_FBX_RELEASE NAMES libfbxsdk HINTS ${FBX_LIBRARY_DEBUG_DIRS})
-find_library(LIB_FBX_DEBUG NAMES libfbxsdk HINTS ${FBX_LIBRARY_DIRS})
-
-# SDL
-find_library(LIB_SDL2 NAMES SDL2 HINTS ${SDL2_LIBRARY_DIRS})
-find_library(LIB_SDL2_MAIN NAMES SDL2main HINTS ${SDL2_LIBRARY_DIRS})
-
-# Vulkan
-find_library(LIB_VULKAN NAMES vulkan-1 vulkan HINTS ${VULKAN_LIBRARY_DIRS})
-
-# Lua
-find_library(LIB_LUAJIT NAMES lua51 luajit HINTS ${LUAJIT_LIBRARY_DIRS})
-
-# PhysX Release
-find_library(LIB_PHYSX3_RELEASE NAMES PhysX3_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_COOKING_RELEASE NAMES PhysX3Cooking_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_CHAR_KINEMATIC_RELEASE NAMES PhysX3CharacterKinematic_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_EXTENSIONS_RELEASE NAMES PhysX3Extensions HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_COMMON_RELEASE NAMES PhysX3Common_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-
-# PhysX Profile
-find_library(LIB_PHYSX3_PROFILE NAMES PhysX3PROFILE_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_COOKING_PROFILE NAMES PhysX3CookingPROFILE_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_CHAR_KINEMATIC_PROFILE NAMES PhysX3CharacterKinematicPROFILE_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_EXTENSIONS_PROFILE NAMES PhysX3ExtensionsPROFILE HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_COMMON_PROFILE NAMES PhysX3CommonPROFILE_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_VIS_DEBUGGER_PROFILE NAMES PhysXVisualDebuggerSDKPROFILE HINTS ${PHYSX_LIBRARY_DIRS})
-
-# PhysX Debug
-find_library(LIB_PHYSX3_DEBUG NAMES PhysX3DEBUG_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_COOKING_DEBUG NAMES PhysX3CookingDEBUG_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_CHAR_KINEMATIC_DEBUG NAMES PhysX3CharacterKinematicDEBUG_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_EXTENSIONS_DEBUG NAMES PhysX3ExtensionsDEBUG HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_COMMON_DEBUG NAMES PhysX3CommonDEBUG_x64 HINTS ${PHYSX_LIBRARY_DIRS})
-find_library(LIB_PHYSX3_VIS_DEBUGGER_DEBUG NAMES PhysXVisualDebuggerSDKDEBUG HINTS ${PHYSX_LIBRARY_DIRS})
-
-# PThread
-find_library(LIB_PTHREAD NAMES pthread)
-
 # Libraries
 set(INTR_ED_EXTERNAL_LIBS
   Qt5::Widgets
-  optimized "${LIB_FBX_RELEASE}"
-  debug "${LIB_FBX_DEBUG}"
+  ${FBX_LIBRARIES}
 )
-
-if(INTR_FINAL_BUILD)
-  set(PHYSX_RELEASE_LIBS
-    optimized "${LIB_PHYSX3_RELEASE}"
-    optimized "${LIB_PHYSX3_COOKING_RELEASE}"
-    optimized "${LIB_PHYSX3_CHAR_KINEMATIC_RELEASE}"
-    optimized "${LIB_PHYSX3_EXTENSIONS_RELEASE}"
-    optimized "${LIB_PHYSX3_COMMON_RELEASE}"
-  )
-else()
-  set(PHYSX_RELEASE_LIBS
-    optimized "${LIB_PHYSX3_PROFILE}"
-    optimized "${LIB_PHYSX3_COOKING_PROFILE}"
-    optimized "${LIB_PHYSX3_CHAR_KINEMATIC_PROFILE}"
-    optimized "${LIB_PHYSX3_EXTENSIONS_PROFILE}"
-    optimized "${LIB_PHYSX3_COMMON_PROFILE}"
-    optimized "${LIB_PHYSX3_VIS_DEBUGGER_PROFILE}"
-  )
-endif()
 
 set(INTR_EXTERNAL_LIBS
   # Vulkan
-  "${LIB_VULKAN}"
+  ${Vulkan_LIBRARIES}
 
   # Lua
-  "${LIB_LUAJIT}"
+  ${LuaJIT_LIBRARIES}
 
   # SDL2
-  "${LIB_SDL2}"
-  "${LIB_SDL2_MAIN}"
+  ${SDL2_LIBRARIES}
 
   # PhysX
-  ${PHYSX_RELEASE_LIBS}
-
-  debug "${LIB_PHYSX3_DEBUG}"
-  debug "${LIB_PHYSX3_COOKING_DEBUG}"
-  debug "${LIB_PHYSX3_CHAR_KINEMATIC_DEBUG}"
-  debug "${LIB_PHYSX3_EXTENSIONS_DEBUG}"
-  debug "${LIB_PHYSX3_COMMON_DEBUG}"
-  debug "${LIB_PHYSX3_VIS_DEBUGGER_DEBUG}"
+  ${PhysX_LIBRARIES}
 )
 
 if(UNIX)
+  set(THREADS_PREFER_PTHREAD_FLAG ON)
+  find_package(Threads REQUIRED)
   set(INTR_EXTERNAL_LIBS "${INTR_EXTERNAL_LIBS}" 
-    "${LIB_PTHREAD}"
+    Threads::Threads
 
     # GLSLang
-    "${LIB_GLSLANG}"
-    "${LIB_GLSLANG_HLSL}"
-    "${LIB_GLSLANG_OGL}"
-    "${LIB_GLSLANG_OSDEP}"
-    "${LIB_GLSLANG_SPIRV}"
+    ${GLSLang_LIBRARIES}
   )
 else()
   set(INTR_EXTERNAL_LIBS "${INTR_EXTERNAL_LIBS}" 
-    "${LIB_WINSOCKS}"
-
     # GLSLang
-    optimized "${LIB_GLSLANG}"
-    optimized "${LIB_GLSLANG_HLSL}"
-    optimized "${LIB_GLSLANG_OGL}"
-    optimized "${LIB_GLSLANG_OSDEP}"
-    optimized "${LIB_GLSLANG_SPIRV}"
-
-    debug "${LIB_GLSLANG_DEBUG}"
-    debug "${LIB_GLSLANG_HLSL_DEBUG}"
-    debug "${LIB_GLSLANG_OGL_DEBUG}"
-    debug "${LIB_GLSLANG_OSDEP_DEBUG}"
-    debug "${LIB_GLSLANG_SPIRV_DEBUG}"
+    ${GLSLang_LIBRARIES}
   )
 endif()
 
