@@ -24,6 +24,7 @@ struct GpuMemoryManager
 {
   static void init();
   static void destroy();
+  static void updateMemoryStats();
 
   _INTR_INLINE static uint8_t* getHostVisibleMemoryForOffset(uint32_t p_Offset)
   {
