@@ -61,6 +61,16 @@ void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
   const uint32_t resourceCount =
       (uint32_t)_resourceManagerEntry.getActiveResourceCountFunction();
 
+  QTreeWidgetItem* volatileResourcesItem = new QTreeWidgetItem();
+  volatileResourcesItem->setText(0, "Volatile");
+  volatileResourcesItem->setIcon(0, QIcon(":/Icons/folder"));
+  _ui.resourceView->addTopLevelItem(volatileResourcesItem);
+
+  QTreeWidgetItem* storedResourcesItem = new QTreeWidgetItem();
+  storedResourcesItem->setText(0, "Stored");
+  storedResourcesItem->setIcon(0, QIcon(":/Icons/folder"));
+  _ui.resourceView->addTopLevelItem(storedResourcesItem);
+
   for (uint32_t i = 0u; i < resourceCount; ++i)
   {
     Dod::Ref resource =
@@ -78,9 +88,19 @@ void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
     _itemToResourceMapping[item] = resource;
     _resourceToItemMapping[resource] = item;
 
-    _ui.resourceView->addTopLevelItem(item);
+    _INTR_ASSERT(_resourceManagerEntry.getResourceFlagsFunction);
+    if ((_resourceManagerEntry.getResourceFlagsFunction(resource) &
+         Dod::Resources::ResourceFlags::kResourceVolatile) > 0u)
+    {
+      volatileResourcesItem->addChild(item);
+    }
+    else
+    {
+      storedResourcesItem->addChild(item);
+    }
   }
 
+  storedResourcesItem->setExpanded(true);
   emit resourceTreePopulated();
 }
 

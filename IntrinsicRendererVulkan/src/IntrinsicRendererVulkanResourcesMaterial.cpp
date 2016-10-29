@@ -50,6 +50,7 @@ void MaterialManager::init()
     managerEntry.loadFromSingleFileFunction =
         MaterialManager::loadFromSingleFile;
     managerEntry.saveToSingleFileFunction = MaterialManager::saveToSingleFile;
+    managerEntry.getResourceFlagsFunction = MaterialManager::_resourceFlags;
     Application::_resourceManagerMapping[_N(Material)] = managerEntry;
   }
 

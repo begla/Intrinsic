@@ -32,26 +32,23 @@ void AssetManager::init()
 
   Dod::Resources::ResourceManagerEntry assetEntry;
   {
-    assetEntry.createFunction = Resources::AssetManager::createAsset;
-    assetEntry.destroyFunction = Resources::AssetManager::destroyAsset;
+    assetEntry.createFunction = AssetManager::createAsset;
+    assetEntry.destroyFunction = AssetManager::destroyAsset;
     assetEntry.getActiveResourceAtIndexFunction =
-        Resources::AssetManager::getActiveResourceAtIndex;
+        AssetManager::getActiveResourceAtIndex;
     assetEntry.getActiveResourceCountFunction =
-        Resources::AssetManager::getActiveResourceCount;
-    assetEntry.loadFromSingleFileFunction =
-        Resources::AssetManager::loadFromSingleFile;
-    assetEntry.saveToSingleFileFunction =
-        Resources::AssetManager::saveToSingleFile;
+        AssetManager::getActiveResourceCount;
+    assetEntry.loadFromSingleFileFunction = AssetManager::loadFromSingleFile;
+    assetEntry.saveToSingleFileFunction = AssetManager::saveToSingleFile;
+    assetEntry.getResourceFlagsFunction = AssetManager::_resourceFlags;
 
     Application::_resourceManagerMapping[_N(Asset)] = assetEntry;
   }
 
   Dod::PropertyCompilerEntry assetPropertyEntry;
   {
-    assetPropertyEntry.compileFunction =
-        Resources::AssetManager::compileDescriptor;
-    assetPropertyEntry.initFunction =
-        Resources::AssetManager::initFromDescriptor;
+    assetPropertyEntry.compileFunction = AssetManager::compileDescriptor;
+    assetPropertyEntry.initFunction = AssetManager::initFromDescriptor;
     assetPropertyEntry.ref = Dod::Ref();
 
     Application::_resourcePropertyCompilerMapping[_N(Asset)] =

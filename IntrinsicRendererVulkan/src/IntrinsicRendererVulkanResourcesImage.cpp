@@ -50,6 +50,7 @@ void ImageManager::init()
         Resources::ImageManager::loadFromSingleFile;
     managerEntry.saveToSingleFileFunction =
         Resources::ImageManager::saveToSingleFile;
+    managerEntry.getResourceFlagsFunction = ImageManager::_resourceFlags;
     Application::_resourceManagerMapping[_N(Image)] = managerEntry;
   }
 

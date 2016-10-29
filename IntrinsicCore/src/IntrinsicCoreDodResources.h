@@ -28,6 +28,7 @@ typedef void (*SaveToSingleFileFunction)(const char*);
 typedef void (*SaveToMultipleFilesFunction)(const char*, const char*);
 typedef void (*LoadFromSingleFileFunction)(const char*);
 typedef void (*LoadFromMultipleFilesFunction)(const char*, const char*);
+typedef uint8_t& (*GetResourceFlagsFunction)(Ref);
 
 // <-
 
@@ -62,7 +63,8 @@ struct ResourceManagerEntry : ManagerEntry
       : ManagerEntry(), createFunction(nullptr),
         saveToSingleFileFunction(nullptr), loadFromSingleFileFunction(nullptr),
         saveToMultipleFilesFunction(nullptr),
-        loadFromMultipleFilesFunction(nullptr)
+        loadFromMultipleFilesFunction(nullptr),
+        getResourceFlagsFunction(nullptr)
   {
   }
 
@@ -71,6 +73,7 @@ struct ResourceManagerEntry : ManagerEntry
   SaveToMultipleFilesFunction saveToMultipleFilesFunction;
   LoadFromSingleFileFunction loadFromSingleFileFunction;
   LoadFromMultipleFilesFunction loadFromMultipleFilesFunction;
+  GetResourceFlagsFunction getResourceFlagsFunction;
 };
 
 // <-

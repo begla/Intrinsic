@@ -496,7 +496,7 @@
         <file>icons/cc/white/png/folder_minus_icon&amp;24.png</file>
         <file>icons/cc/white/png/folder_minus_icon&amp;32.png</file>
         <file>icons/cc/white/png/folder_minus_icon&amp;48.png</file>
-        <file>icons/cc/white/png/folder_open_icon&amp;16.png</file>
+        <file alias="folder">icons/cc/white/png/folder_open_icon&amp;16.png</file>
         <file>icons/cc/white/png/folder_open_icon&amp;24.png</file>
         <file>icons/cc/white/png/folder_open_icon&amp;32.png</file>
         <file>icons/cc/white/png/folder_open_icon&amp;48.png</file>
