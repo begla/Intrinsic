@@ -1170,7 +1170,7 @@ void RenderSystem::endFrame()
     // Wait for any remaining tasks
     Application::_scheduler.WaitforAll();
 
-    // Instert pre-present barrier and end primary command buffer
+    // Insert pre-present barrier and end primary command buffer
     insertPrePresentBarrier();
     endPrimaryCommandBuffer();
   }
