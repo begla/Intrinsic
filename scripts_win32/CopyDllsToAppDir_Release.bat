@@ -21,7 +21,7 @@ copy ..\\Intrinsic_Dependencies\\dependencies\\physx\\bin\\PhysX3CommonPROFILE_x
 
 copy ..\\Intrinsic_Dependencies\\dependencies\\physx\\bin\\nvToolsExt64_1.dll app\\nvToolsExt64_1.dll
 
-copy dependencies\\vulkansdk\\bin\\vulkan-1.dll app\\vulkan-1.dll
+copy %VK_SDK_PATH%\\Source\\lib\\vulkan-1.dll app\\vulkan-1.dll
 copy dependencies\\fbx\\bin\\release\\libfbxsdk.dll app\\libfbxsdk.dll
 copy dependencies\\lua\\lua51.dll app\\lua51.dll
 copy dependencies\\sdl\\lib\\x64\\SDL2.dll app\\SDL2.dll
