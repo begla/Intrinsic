@@ -658,25 +658,62 @@ void RenderSystem::initOrUpdateVkSwapChain()
       _vkPhysicalDevice, _vkSurface, &surfaceCapabilities);
   _INTR_VK_CHECK_RESULT(result);
 
-  // Get surface formats
-  _INTR_ARRAY(VkSurfaceFormatKHR) surfaceFormats;
-  uint32_t formatCount = 0u;
+  static VkFormat surfaceFormatToUse = VK_FORMAT_B8G8R8A8_SRGB;
+  static VkColorSpaceKHR surfaceColorSpaceToUse = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+  static VkPresentModeKHR presentModeToUse = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
+
+  // Check if present mode is supported
   {
+    uint32_t presentModeCount = 0u;
+    result = vkGetPhysicalDeviceSurfacePresentModesKHR(_vkPhysicalDevice, _vkSurface, &presentModeCount, nullptr);
+    _INTR_VK_CHECK_RESULT(result);
+
+    _INTR_ASSERT(presentModeCount > 0u);
+    _INTR_ARRAY(VkPresentModeKHR) presentModes;
+    presentModes.resize(presentModeCount);
+
+    result = vkGetPhysicalDeviceSurfacePresentModesKHR(_vkPhysicalDevice, _vkSurface, &presentModeCount, presentModes.data());
+    _INTR_VK_CHECK_RESULT(result);
+
+    bool found = false;
+    for (uint32_t i = 0u; i < presentModeCount; ++i)
+    {
+      if (presentModes[i] == presentModeToUse)
+      {
+        found = true;
+        break;
+      }
+    }
+    _INTR_ASSERT(found && "Present mode not supported");
+  }
+
+  // Check if surface format is supported
+  {
+    uint32_t formatCount = 0u;
     result = vkGetPhysicalDeviceSurfaceFormatsKHR(_vkPhysicalDevice, _vkSurface,
                                                   &formatCount, nullptr);
     _INTR_VK_CHECK_RESULT(result);
 
     _INTR_ASSERT(formatCount > 0u);
+    _INTR_ARRAY(VkSurfaceFormatKHR) surfaceFormats;
     surfaceFormats.resize(formatCount);
 
     result = vkGetPhysicalDeviceSurfaceFormatsKHR(
         _vkPhysicalDevice, _vkSurface, &formatCount, surfaceFormats.data());
     _INTR_VK_CHECK_RESULT(result);
-  }
 
-  _INTR_ASSERT(surfaceFormats[0].format == VK_FORMAT_B8G8R8A8_UNORM);
-  _INTR_ASSERT(surfaceFormats[0].colorSpace ==
-               VK_COLOR_SPACE_SRGB_NONLINEAR_KHR);
+    bool found = false;
+    for (uint32_t i = 0u; i < formatCount; ++i)
+    {
+      if (surfaceFormats[i].colorSpace ==
+        surfaceColorSpaceToUse && surfaceFormats[i].format == surfaceFormatToUse)
+      {
+        found = true;
+        break;
+      }
+    }
+    _INTR_ASSERT(found && "Surface format and/or surface color space not supported");
+  }
 
   // Create swapchain
   VkSwapchainCreateInfoKHR swapchainCreationInfo = {};
@@ -686,8 +723,8 @@ void RenderSystem::initOrUpdateVkSwapChain()
     swapchainCreationInfo.surface = _vkSurface;
     swapchainCreationInfo.minImageCount =
         std::min(2u, surfaceCapabilities.maxImageCount);
-    swapchainCreationInfo.imageFormat = VK_FORMAT_B8G8R8A8_SRGB;
-    swapchainCreationInfo.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+    swapchainCreationInfo.imageFormat = surfaceFormatToUse;
+    swapchainCreationInfo.imageColorSpace = surfaceColorSpaceToUse;
     swapchainCreationInfo.imageExtent = surfaceCapabilities.currentExtent;
     swapchainCreationInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     swapchainCreationInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
@@ -695,7 +732,7 @@ void RenderSystem::initOrUpdateVkSwapChain()
     swapchainCreationInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     swapchainCreationInfo.queueFamilyIndexCount = 0u;
     swapchainCreationInfo.pQueueFamilyIndices = nullptr;
-    swapchainCreationInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    swapchainCreationInfo.presentMode = presentModeToUse;
     swapchainCreationInfo.oldSwapchain = _vkSwapchain;
     swapchainCreationInfo.clipped = true;
     swapchainCreationInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
