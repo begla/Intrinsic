@@ -50,19 +50,15 @@ struct MaterialBuffer
   updateMaterialBufferEntry(const uint32_t p_Index,
                             const MaterialBufferEntry& p_MaterialBufferEntry)
   {
+    using namespace Resources;
+
+    // Update staging buffer
     {
-      void* stagingMemMapped;
-      VkResult result =
-          vkMapMemory(RenderSystem::_vkDevice, _materialStagingBufferMemory, 0u,
-                      sizeof(MaterialBufferEntry), 0u, &stagingMemMapped);
-      _INTR_VK_CHECK_RESULT(result);
-
-      memcpy(stagingMemMapped, &p_MaterialBufferEntry,
-             sizeof(MaterialBufferEntry));
-
-      vkUnmapMemory(RenderSystem::_vkDevice, _materialStagingBufferMemory);
+      memcpy(BufferManager::getGpuMemory(_materialStagingBuffer),
+             &p_MaterialBufferEntry, sizeof(MaterialBufferEntry));
     }
 
+    // ... and copy to device
     VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
 
     VkBufferCopy bufferCopy = {};
@@ -72,9 +68,8 @@ struct MaterialBuffer
       bufferCopy.size = sizeof(MaterialBufferEntry);
     }
 
-    vkCmdCopyBuffer(copyCmd, _materialStagingBuffer,
-                    Resources::BufferManager::_vkBuffer(_materialBuffer), 1u,
-                    &bufferCopy);
+    vkCmdCopyBuffer(copyCmd, BufferManager::_vkBuffer(_materialStagingBuffer),
+                    BufferManager::_vkBuffer(_materialBuffer), 1u, &bufferCopy);
 
     RenderSystem::flushTemporaryCommandBuffer();
   }
@@ -83,8 +78,7 @@ struct MaterialBuffer
 
 private:
   static _INTR_ARRAY(uint32_t) _materialBufferEntries;
-  static VkBuffer _materialStagingBuffer;
-  static VkDeviceMemory _materialStagingBufferMemory;
+  static Resources::BufferRef _materialStagingBuffer;
 };
 }
 }

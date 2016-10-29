@@ -29,8 +29,7 @@ struct UniformManager
   };
 
   static void init();
-  static void beginFrame();
-  static void endFrame();
+  static void resetPerInstanceMemoryPages();
 
   _INTR_INLINE static uint8_t* allocatePerInstanceDataMemory(uint32_t p_Size,
                                                              uint32_t& p_Offset)
@@ -54,7 +53,7 @@ struct UniformManager
     }
 
     p_Offset = page.memoryOffset;
-    return &_mappedPerInstanceMemory[page.memoryOffset];
+    return &_perInstanceMemory[page.memoryOffset];
   }
 
   // <-
@@ -73,20 +72,15 @@ struct UniformManager
   _INTR_INLINE static void
   updatePerMaterialDataMemory(void* p_Data, uint32_t p_Size, uint32_t p_Offset)
   {
-    // Update per material data memory using the staging buffer
+    using namespace Resources;
+
+    // Update staging memory
     {
-      void* stagingMemMapped;
-      VkResult result = vkMapMemory(
-          RenderSystem::_vkDevice, _perMaterialUpdateStagingBufferMemory, 0u,
-          _INTR_VK_PER_MATERIAL_PAGE_SIZE_IN_BYTES, 0u, &stagingMemMapped);
-      _INTR_VK_CHECK_RESULT(result);
-
-      memcpy(stagingMemMapped, p_Data, p_Size);
-
-      vkUnmapMemory(RenderSystem::_vkDevice,
-                    _perMaterialUpdateStagingBufferMemory);
+      memcpy(BufferManager::getGpuMemory(_perMaterialStagingUniformBuffer),
+             p_Data, p_Size);
     }
 
+    // ... and copy to device
     VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
 
     VkBufferCopy bufferCopy = {};
@@ -97,9 +91,8 @@ struct UniformManager
     }
 
     vkCmdCopyBuffer(
-        copyCmd, _perMaterialUpdateStagingBuffer,
-        Resources::BufferManager::_vkBuffer(_perMaterialUniformBuffer), 1u,
-        &bufferCopy);
+        copyCmd, BufferManager::_vkBuffer(_perMaterialStagingUniformBuffer),
+        BufferManager::_vkBuffer(_perMaterialUniformBuffer), 1u, &bufferCopy);
 
     RenderSystem::flushTemporaryCommandBuffer();
   }
@@ -116,7 +109,7 @@ struct UniformManager
   // <-
 
   // Static members
-  static uint8_t* _mappedPerInstanceMemory;
+  static uint8_t* _perInstanceMemory;
 
   static Resources::BufferRef _perInstanceUniformBuffer;
   static Resources::BufferRef _perMaterialUniformBuffer;
@@ -129,10 +122,9 @@ private:
                        _INTR_VK_PER_INSTANCE_PAGE_LARGE_COUNT>
       _perInstanceMemoryPagesLarge[_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
 
+  static Resources::BufferRef _perMaterialStagingUniformBuffer;
   static _INTR_ARRAY(UniformManager::UniformDataMemoryPage)
       _perMaterialMemoryPages;
-  static VkBuffer _perMaterialUpdateStagingBuffer;
-  static VkDeviceMemory _perMaterialUpdateStagingBufferMemory;
 };
 }
 }

@@ -1156,7 +1156,7 @@ void RenderSystem::beginFrame()
     insertPostPresentBarrier();
   }
 
-  UniformManager::beginFrame();
+  UniformManager::resetPerInstanceMemoryPages();
   DrawCallDispatcher::reset();
 }
 
@@ -1167,11 +1167,11 @@ void RenderSystem::endFrame()
   _INTR_PROFILE_CPU("Render System", "End Frame");
 
   {
+    // Wait for any remaining tasks
     Application::_scheduler.WaitforAll();
-    UniformManager::endFrame();
 
+    // Instert pre-present barrier and end primary command buffer
     insertPrePresentBarrier();
-
     endPrimaryCommandBuffer();
   }
 

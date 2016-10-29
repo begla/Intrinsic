@@ -23,7 +23,6 @@ namespace Vulkan
 struct RenderSystem
 {
   static void init(void* p_PlatformHandle, void* p_PlatformWindow);
-  static void onViewportChanged();
 
   // <-
 
@@ -32,6 +31,7 @@ struct RenderSystem
 
   // <-
 
+  static void onViewportChanged();
   static void resizeSwapChain();
 
   // <-
@@ -383,7 +383,7 @@ private:
     bool waited = false;
     for (uint32_t idx = 0u; idx < (uint32_t)_vkSwapchainImages.size(); ++idx)
     {
-      waited |= waitForFrame(idx);
+      waited = waited || waitForFrame(idx);
     }
   }
 

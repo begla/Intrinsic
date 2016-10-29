@@ -24,70 +24,46 @@ namespace Vulkan
 {
 // Static members
 Resources::BufferRef MaterialBuffer::_materialBuffer;
+Resources::BufferRef MaterialBuffer::_materialStagingBuffer;
 
 _INTR_ARRAY(uint32_t) MaterialBuffer::_materialBufferEntries;
-VkBuffer MaterialBuffer::_materialStagingBuffer;
-VkDeviceMemory MaterialBuffer::_materialStagingBufferMemory;
 
 void MaterialBuffer::init()
 {
-  Resources::BufferRefArray buffersToCreate;
+  using namespace Resources;
 
-  _materialBuffer = Resources::BufferManager::createBuffer(_N(_MaterialBuffer));
+  BufferRefArray buffersToCreate;
+
+  _materialBuffer = BufferManager::createBuffer(_N(_MaterialBuffer));
   {
-    Resources::BufferManager::resetToDefault(_materialBuffer);
-    Resources::BufferManager::addResourceFlags(
+    BufferManager::resetToDefault(_materialBuffer);
+    BufferManager::addResourceFlags(
         _materialBuffer, Dod::Resources::ResourceFlags::kResourceVolatile);
 
-    Resources::BufferManager::_descBufferType(_materialBuffer) =
-        BufferType::kStorage;
-    Resources::BufferManager::_descSizeInBytes(_materialBuffer) =
+    BufferManager::_descBufferType(_materialBuffer) = BufferType::kStorage;
+    BufferManager::_descSizeInBytes(_materialBuffer) =
         sizeof(MaterialBufferEntry) * _INTR_MAX_MATERIAL_COUNT;
     buffersToCreate.push_back(_materialBuffer);
   }
 
-  Resources::BufferManager::createResources(buffersToCreate);
-
-  // Create staging buffer
+  _materialStagingBuffer =
+      BufferManager::createBuffer(_N(_MaterialStagingBuffer));
   {
-    VkBufferCreateInfo bufferCreateInfo = {};
-    {
-      bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-      bufferCreateInfo.pNext = nullptr;
-      bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-      bufferCreateInfo.size = sizeof(MaterialBufferEntry);
-      bufferCreateInfo.queueFamilyIndexCount = 0;
-      bufferCreateInfo.pQueueFamilyIndices = nullptr;
-      bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-      bufferCreateInfo.flags = 0u;
-    }
+    BufferManager::resetToDefault(_materialStagingBuffer);
+    BufferManager::addResourceFlags(
+        _materialStagingBuffer,
+        Dod::Resources::ResourceFlags::kResourceVolatile);
 
-    VkResult result = vkCreateBuffer(RenderSystem::_vkDevice, &bufferCreateInfo,
-                                     nullptr, &_materialStagingBuffer);
-    _INTR_VK_CHECK_RESULT(result);
-
-    VkMemoryRequirements memReqs;
-    vkGetBufferMemoryRequirements(RenderSystem::_vkDevice,
-                                  _materialStagingBuffer, &memReqs);
-
-    VkMemoryAllocateInfo stagingBufferAllocInfo = {};
-    {
-      stagingBufferAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-      stagingBufferAllocInfo.pNext = nullptr;
-      stagingBufferAllocInfo.memoryTypeIndex = Helper::computeGpuMemoryTypeIdx(
-          memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                      VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-      stagingBufferAllocInfo.allocationSize = memReqs.size;
-    }
-
-    result = vkAllocateMemory(RenderSystem::_vkDevice, &stagingBufferAllocInfo,
-                              nullptr, &_materialStagingBufferMemory);
-    _INTR_VK_CHECK_RESULT(result);
-
-    result = vkBindBufferMemory(RenderSystem::_vkDevice, _materialStagingBuffer,
-                                _materialStagingBufferMemory, 0u);
-    _INTR_VK_CHECK_RESULT(result);
+    BufferManager::_descBufferType(_materialStagingBuffer) =
+        BufferType::kStorage;
+    BufferManager::_descBufferMemoryUsage(_materialStagingBuffer) =
+        MemoryUsage::kStaging;
+    BufferManager::_descSizeInBytes(_materialStagingBuffer) =
+        sizeof(MaterialBufferEntry);
+    buffersToCreate.push_back(_materialStagingBuffer);
   }
+
+  BufferManager::createResources(buffersToCreate);
 
   _materialBufferEntries.clear();
   for (uint32_t i = 0u; i < _INTR_MAX_MATERIAL_COUNT; ++i)

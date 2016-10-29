@@ -25,7 +25,7 @@ namespace Vulkan
 // Static members
 Resources::BufferRef _perInstanceUniformBuffer;
 Resources::BufferRef _perMaterialUniformBuffer;
-uint8_t* UniformManager::_mappedPerInstanceMemory = nullptr;
+uint8_t* UniformManager::_perInstanceMemory = nullptr;
 Tlsf::Allocator _perMaterialAllocator;
 LockFreeStack<UniformManager::UniformDataMemoryPage,
               _INTR_VK_PER_INSTANCE_PAGE_SMALL_COUNT>
@@ -40,56 +40,73 @@ UniformManager::_perMaterialMemoryPages;
 
 Resources::BufferRef UniformManager::_perInstanceUniformBuffer;
 Resources::BufferRef UniformManager::_perMaterialUniformBuffer;
-
-VkBuffer UniformManager::_perMaterialUpdateStagingBuffer;
-VkDeviceMemory UniformManager::_perMaterialUpdateStagingBufferMemory;
+Resources::BufferRef UniformManager::_perMaterialStagingUniformBuffer;
 
 // <-
 
 void UniformManager::init()
 {
+  using namespace Resources;
+
   _INTR_LOG_INFO("Initializing Uniform Manager...");
   _INTR_LOG_PUSH();
 
-  Resources::BufferRefArray buffersToCreate;
+  BufferRefArray buffersToCreate;
 
   _perInstanceUniformBuffer =
-      Resources::BufferManager::createBuffer(_N(_PerInstanceConstantBuffer));
+      BufferManager::createBuffer(_N(_PerInstanceConstantBuffer));
   {
-    Resources::BufferManager::resetToDefault(_perInstanceUniformBuffer);
-    Resources::BufferManager::addResourceFlags(
+    BufferManager::resetToDefault(_perInstanceUniformBuffer);
+    BufferManager::addResourceFlags(
         _perInstanceUniformBuffer,
         Dod::Resources::ResourceFlags::kResourceVolatile);
 
-    Resources::BufferManager::_descBufferMemoryUsage(
-        _perInstanceUniformBuffer) = MemoryUsage::kStaging;
-    Resources::BufferManager::_descBufferType(_perInstanceUniformBuffer) =
+    BufferManager::_descBufferMemoryUsage(_perInstanceUniformBuffer) =
+        MemoryUsage::kStaging;
+    BufferManager::_descBufferType(_perInstanceUniformBuffer) =
         BufferType::kUniform;
-    Resources::BufferManager::_descSizeInBytes(_perInstanceUniformBuffer) =
+    BufferManager::_descSizeInBytes(_perInstanceUniformBuffer) =
         _INTR_VK_PER_INSTANCE_UNIFORM_MEMORY_IN_BYTES;
     buffersToCreate.push_back(_perInstanceUniformBuffer);
   }
 
   _perMaterialUniformBuffer =
-      Resources::BufferManager::createBuffer(_N(_PerMaterialConstantBuffer));
+      BufferManager::createBuffer(_N(_PerMaterialConstantBuffer));
   {
-    Resources::BufferManager::resetToDefault(_perMaterialUniformBuffer);
-    Resources::BufferManager::addResourceFlags(
+    BufferManager::resetToDefault(_perMaterialUniformBuffer);
+    BufferManager::addResourceFlags(
         _perMaterialUniformBuffer,
         Dod::Resources::ResourceFlags::kResourceVolatile);
 
-    Resources::BufferManager::_descBufferType(_perMaterialUniformBuffer) =
+    BufferManager::_descBufferType(_perMaterialUniformBuffer) =
         BufferType::kUniform;
-    Resources::BufferManager::_descSizeInBytes(_perMaterialUniformBuffer) =
+    BufferManager::_descSizeInBytes(_perMaterialUniformBuffer) =
         _INTR_VK_PER_MATERIAL_UNIFORM_MEMORY_IN_BYTES;
     buffersToCreate.push_back(_perMaterialUniformBuffer);
   }
 
-  Resources::BufferManager::createResources(buffersToCreate);
+  // Staging buffer used to update the per material buffer data
+  _perMaterialStagingUniformBuffer =
+      BufferManager::createBuffer(_N(_PerMaterialStagingConstantBuffer));
+  {
+    BufferManager::resetToDefault(_perMaterialStagingUniformBuffer);
+    BufferManager::addResourceFlags(
+        _perMaterialStagingUniformBuffer,
+        Dod::Resources::ResourceFlags::kResourceVolatile);
 
-  // Map host memory
-  _mappedPerInstanceMemory =
-      Resources::BufferManager::getGpuMemory(_perInstanceUniformBuffer);
+    BufferManager::_descBufferType(_perMaterialStagingUniformBuffer) =
+        BufferType::kUniform;
+    BufferManager::_descBufferMemoryUsage(_perMaterialStagingUniformBuffer) =
+        MemoryUsage::kStaging;
+    BufferManager::_descSizeInBytes(_perMaterialStagingUniformBuffer) =
+        _INTR_VK_PER_MATERIAL_PAGE_SIZE_IN_BYTES;
+    buffersToCreate.push_back(_perMaterialStagingUniformBuffer);
+  }
+
+  BufferManager::createResources(buffersToCreate);
+
+  // Get host memory
+  _perInstanceMemory = BufferManager::getGpuMemory(_perInstanceUniformBuffer);
 
   // Init. per instance data memory pages
   {
@@ -154,61 +171,19 @@ void UniformManager::init()
 
     _INTR_LOG_POP();
   }
-
-  // Create staging buffer for updating material uniform data
-  {
-    VkBufferCreateInfo bufferCreateInfo = {};
-    {
-      bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-      bufferCreateInfo.pNext = nullptr;
-      bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-      bufferCreateInfo.size = _INTR_VK_PER_MATERIAL_PAGE_SIZE_IN_BYTES;
-      bufferCreateInfo.queueFamilyIndexCount = 0;
-      bufferCreateInfo.pQueueFamilyIndices = nullptr;
-      bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-      bufferCreateInfo.flags = 0u;
-    }
-
-    VkResult result = vkCreateBuffer(RenderSystem::_vkDevice, &bufferCreateInfo,
-                                     nullptr, &_perMaterialUpdateStagingBuffer);
-    _INTR_VK_CHECK_RESULT(result);
-
-    VkMemoryRequirements memReqs;
-    vkGetBufferMemoryRequirements(RenderSystem::_vkDevice,
-                                  _perMaterialUpdateStagingBuffer, &memReqs);
-
-    VkMemoryAllocateInfo stagingBufferAllocInfo = {};
-    {
-      stagingBufferAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-      stagingBufferAllocInfo.pNext = nullptr;
-      stagingBufferAllocInfo.memoryTypeIndex = Helper::computeGpuMemoryTypeIdx(
-          memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                      VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-      stagingBufferAllocInfo.allocationSize = memReqs.size;
-    }
-
-    result = vkAllocateMemory(RenderSystem::_vkDevice, &stagingBufferAllocInfo,
-                              nullptr, &_perMaterialUpdateStagingBufferMemory);
-    _INTR_VK_CHECK_RESULT(result);
-
-    result = vkBindBufferMemory(RenderSystem::_vkDevice,
-                                _perMaterialUpdateStagingBuffer,
-                                _perMaterialUpdateStagingBufferMemory, 0u);
-    _INTR_VK_CHECK_RESULT(result);
-  }
 }
 
-void UniformManager::beginFrame()
+// <-
+
+void UniformManager::resetPerInstanceMemoryPages()
 {
-  const uint32_t bufferIdx = Renderer::Vulkan::RenderSystem::_backbufferIndex %
-                             _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
+  const uint32_t bufferIdx =
+      RenderSystem::_backbufferIndex % _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
   _perInstanceMemoryPagesSmall[bufferIdx].resize(
       _INTR_VK_PER_INSTANCE_PAGE_SMALL_COUNT);
   _perInstanceMemoryPagesLarge[bufferIdx].resize(
       _INTR_VK_PER_INSTANCE_PAGE_LARGE_COUNT);
 }
-
-void UniformManager::endFrame() {}
 }
 }
 }
