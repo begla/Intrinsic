@@ -183,6 +183,7 @@ void GpuProgramManager::init()
         Resources::GpuProgramManager::loadFromSingleFile;
     managerEntry.saveToSingleFileFunction =
         Resources::GpuProgramManager::saveToSingleFile;
+    managerEntry.getResourceFlagsFunction = GpuProgramManager::_resourceFlags;
     Application::_resourceManagerMapping[_N(GpuProgram)] = managerEntry;
   }
 

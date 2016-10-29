@@ -180,30 +180,26 @@ void ScriptManager::init()
 
   Dod::Resources::ResourceManagerEntry managerEntry;
   {
-    managerEntry.createFunction = Resources::ScriptManager::createScript;
-    managerEntry.destroyFunction = Resources::ScriptManager::destroyScript;
-    managerEntry.createResourcesFunction =
-        Resources::ScriptManager::createResources;
-    managerEntry.destroyResourcesFunction =
-        Resources::ScriptManager::destroyResources;
+    managerEntry.createFunction = ScriptManager::createScript;
+    managerEntry.destroyFunction = ScriptManager::destroyScript;
+    managerEntry.createResourcesFunction = ScriptManager::createResources;
+    managerEntry.destroyResourcesFunction = ScriptManager::destroyResources;
     managerEntry.getActiveResourceAtIndexFunction =
-        Resources::ScriptManager::getActiveResourceAtIndex;
+        ScriptManager::getActiveResourceAtIndex;
     managerEntry.getActiveResourceCountFunction =
-        Resources::ScriptManager::getActiveResourceCount;
-    managerEntry.loadFromSingleFileFunction =
-        Resources::ScriptManager::loadFromSingleFile;
-    managerEntry.saveToSingleFileFunction =
-        Resources::ScriptManager::saveToSingleFile;
-    managerEntry.resetToDefaultFunction =
-        Resources::ScriptManager::resetToDefault;
+        ScriptManager::getActiveResourceCount;
+    managerEntry.loadFromSingleFileFunction = ScriptManager::loadFromSingleFile;
+    managerEntry.saveToSingleFileFunction = ScriptManager::saveToSingleFile;
+    managerEntry.resetToDefaultFunction = ScriptManager::resetToDefault;
+    managerEntry.getResourceFlagsFunction = ScriptManager::_resourceFlags;
 
     Application::_resourceManagerMapping[_N(Script)] = managerEntry;
   }
 
   Dod::PropertyCompilerEntry propertyEntry;
   {
-    propertyEntry.compileFunction = Resources::ScriptManager::compileDescriptor;
-    propertyEntry.initFunction = Resources::ScriptManager::initFromDescriptor;
+    propertyEntry.compileFunction = ScriptManager::compileDescriptor;
+    propertyEntry.initFunction = ScriptManager::initFromDescriptor;
     propertyEntry.ref = Dod::Ref();
 
     Application::_resourcePropertyCompilerMapping[_N(Script)] = propertyEntry;

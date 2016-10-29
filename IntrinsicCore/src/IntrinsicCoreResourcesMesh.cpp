@@ -76,28 +76,26 @@ void MeshManager::init()
 
   Dod::Resources::ResourceManagerEntry managerEntry;
   {
-    managerEntry.createFunction = Resources::MeshManager::createMesh;
-    managerEntry.destroyFunction = Resources::MeshManager::destroyMesh;
-    managerEntry.createResourcesFunction =
-        Resources::MeshManager::createResources;
-    managerEntry.destroyResourcesFunction =
-        Resources::MeshManager::destroyResources;
+    managerEntry.createFunction = MeshManager::createMesh;
+    managerEntry.destroyFunction = MeshManager::destroyMesh;
+    managerEntry.createResourcesFunction = MeshManager::createResources;
+    managerEntry.destroyResourcesFunction = MeshManager::destroyResources;
     managerEntry.getActiveResourceAtIndexFunction =
-        Resources::MeshManager::getActiveResourceAtIndex;
+        MeshManager::getActiveResourceAtIndex;
     managerEntry.getActiveResourceCountFunction =
-        Resources::MeshManager::getActiveResourceCount;
+        MeshManager::getActiveResourceCount;
     managerEntry.loadFromMultipleFilesFunction =
-        Resources::MeshManager::loadFromMultipleFiles;
-    managerEntry.saveToMultipleFilesFunction =
-        Resources::MeshManager::saveToMultipleFiles;
+        MeshManager::loadFromMultipleFiles;
+    managerEntry.saveToMultipleFilesFunction = MeshManager::saveToMultipleFiles;
+    managerEntry.getResourceFlagsFunction = MeshManager::_resourceFlags;
 
     Application::_resourceManagerMapping[_N(Mesh)] = managerEntry;
   }
 
   Dod::PropertyCompilerEntry propertyEntry;
   {
-    propertyEntry.compileFunction = Resources::MeshManager::compileDescriptor;
-    propertyEntry.initFunction = Resources::MeshManager::initFromDescriptor;
+    propertyEntry.compileFunction = MeshManager::compileDescriptor;
+    propertyEntry.initFunction = MeshManager::initFromDescriptor;
     propertyEntry.ref = Dod::Ref();
 
     Application::_resourcePropertyCompilerMapping[_N(Mesh)] = propertyEntry;

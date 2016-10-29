@@ -47,6 +47,7 @@ void PostEffectManager::init()
         Resources::PostEffectManager::saveToSingleFile;
     managerEntry.resetToDefaultFunction =
         Resources::PostEffectManager::resetToDefault;
+    managerEntry.getResourceFlagsFunction = PostEffectManager::_resourceFlags;
 
     Application::_resourceManagerMapping[_N(PostEffect)] = managerEntry;
   }
