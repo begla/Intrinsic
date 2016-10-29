@@ -1157,6 +1157,8 @@ void RenderSystem::endFrame()
     VkResult result = vkQueuePresentKHR(_vkQueue, &present);
     _INTR_VK_CHECK_RESULT(result);
   }
+
+  GpuMemoryManager::updateMemoryStats();
 }
 }
 }

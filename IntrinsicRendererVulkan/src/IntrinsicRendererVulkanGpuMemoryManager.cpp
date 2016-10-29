@@ -159,6 +159,43 @@ void GpuMemoryManager::init()
 
 // <-
 
+void GpuMemoryManager::updateMemoryStats()
+{
+  _INTR_PROFILE_COUNTER_SET(
+      "Total Static Image Memory (MB)",
+      (uint64_t)Math::bytesToMegaBytes(_staticImageMemoryAllocator.size()));
+  _INTR_PROFILE_COUNTER_SET(
+      "Available Static Image Memory (MB)",
+      (uint64_t)Math::bytesToMegaBytes(
+          _staticImageMemoryAllocator.calcAvailableMemoryInBytes()));
+
+  _INTR_PROFILE_COUNTER_SET(
+      "Total Static Buffer Memory (MB)",
+      (uint64_t)Math::bytesToMegaBytes(_staticBufferMemoryAllocator.size()));
+  _INTR_PROFILE_COUNTER_SET(
+      "Available Static Buffer Memory (MB)",
+      (uint64_t)Math::bytesToMegaBytes(
+          _staticBufferMemoryAllocator.calcAvailableMemoryInBytes()));
+
+  _INTR_PROFILE_COUNTER_SET("Total Static Staging Buffer Memory (MB)",
+                            (uint64_t)Math::bytesToMegaBytes(
+                                _staticStagingBufferMemoryAllocator.size()));
+  _INTR_PROFILE_COUNTER_SET(
+      "Available Static Staging Buffer Memory (MB)",
+      (uint64_t)Math::bytesToMegaBytes(
+          _staticStagingBufferMemoryAllocator.calcAvailableMemoryInBytes()));
+
+  _INTR_PROFILE_COUNTER_SET("Total Volatile Staging Buffer Memory (MB)",
+                            (uint64_t)Math::bytesToMegaBytes(
+                                _volatileStagingBufferMemoryAllocator.size()));
+  _INTR_PROFILE_COUNTER_SET(
+      "Available Volatile Staging Buffer Memory (MB)",
+      (uint64_t)Math::bytesToMegaBytes(
+          _volatileStagingBufferMemoryAllocator.calcAvailableMemoryInBytes()));
+}
+
+// <-
+
 void GpuMemoryManager::destroy() {}
 }
 }
