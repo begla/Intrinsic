@@ -69,7 +69,8 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
         &Renderer::Vulkan::RenderSystem::_vkDevice,
         &Renderer::Vulkan::RenderSystem::_vkPhysicalDevice,
         &Renderer::Vulkan::RenderSystem::_vkQueue,
-        &Renderer::Vulkan::RenderSystem::_vkGraphicsQueueFamilyIndex, 1u);
+        &Renderer::Vulkan::RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex,
+        1u);
 #endif // MICROPROFILE_GPU_TIMERS_VULKAN
   }
 #endif // _INTR_PROFILING_ENABLED

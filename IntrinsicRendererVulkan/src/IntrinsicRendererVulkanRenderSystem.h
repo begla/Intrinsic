@@ -258,8 +258,7 @@ struct RenderSystem
 
   static VkQueue _vkQueue;
 
-  static uint32_t _vkGraphicsQueueFamilyIndex;
-  static uint32_t _vkComputeQueueFamilyIndex;
+  static uint32_t _vkGraphicsAndComputeQueueFamilyIndex;
 
   // <-
 
