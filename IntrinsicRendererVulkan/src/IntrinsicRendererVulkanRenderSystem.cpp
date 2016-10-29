@@ -49,8 +49,7 @@ glm::uvec2 RenderSystem::_backbufferDimensions = glm::uvec2(0u, 0u);
 
 VkQueue RenderSystem::_vkQueue = nullptr;
 
-uint32_t RenderSystem::_vkGraphicsQueueFamilyIndex = (uint32_t)-1;
-uint32_t RenderSystem::_vkComputeQueueFamilyIndex = (uint32_t)-1;
+uint32_t RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex = (uint32_t)-1;
 
 // <-
 
@@ -480,79 +479,86 @@ void RenderSystem::initVkDevice()
   _INTR_LOG_INFO("Creating Vulkan device...");
   _INTR_LOG_PUSH();
 
-  uint32_t deviceCount;
-  VkResult result =
-      vkEnumeratePhysicalDevices(_vkInstance, &deviceCount, nullptr);
-  _INTR_VK_CHECK_RESULT(result);
-  _INTR_ASSERT(deviceCount >= 1u && "No Vulkan capable Device found");
-
-  _INTR_LOG_INFO("Found %u available physical devices...", deviceCount);
-
-  _INTR_ARRAY(VkPhysicalDevice) physDevs;
-  physDevs.resize(deviceCount);
-
-  result =
-      vkEnumeratePhysicalDevices(_vkInstance, &deviceCount, physDevs.data());
-  _INTR_VK_CHECK_RESULT(result);
-
-  // Always use the first device found
-  _vkPhysicalDevice = physDevs[0];
-
+  // Retrieve the physical device and its features
   VkPhysicalDeviceProperties physDeviceProps;
-  vkGetPhysicalDeviceProperties(_vkPhysicalDevice, &physDeviceProps);
   VkPhysicalDeviceFeatures physDevFeatures;
-  vkGetPhysicalDeviceFeatures(_vkPhysicalDevice, &physDevFeatures);
+  {
+    uint32_t deviceCount;
+    VkResult result =
+        vkEnumeratePhysicalDevices(_vkInstance, &deviceCount, nullptr);
+    _INTR_VK_CHECK_RESULT(result);
+    _INTR_ASSERT(deviceCount >= 1u && "No Vulkan capable Device found");
 
-  // Queue memory properties
-  vkGetPhysicalDeviceMemoryProperties(_vkPhysicalDevice,
-                                      &_vkPhysicalDeviceMemoryProperties);
+    _INTR_LOG_INFO("Found %u available physical devices...", deviceCount);
 
-  _INTR_LOG_INFO("Using physical device %s (Driver %u)...",
-                 physDeviceProps.deviceName, physDeviceProps.driverVersion);
+    _INTR_ARRAY(VkPhysicalDevice) physDevs;
+    physDevs.resize(deviceCount);
+
+    result =
+        vkEnumeratePhysicalDevices(_vkInstance, &deviceCount, physDevs.data());
+    _INTR_VK_CHECK_RESULT(result);
+
+    // Always use the first device found
+    _vkPhysicalDevice = physDevs[0];
+
+    vkGetPhysicalDeviceProperties(_vkPhysicalDevice, &physDeviceProps);
+    vkGetPhysicalDeviceFeatures(_vkPhysicalDevice, &physDevFeatures);
+
+    // Queue memory properties
+    vkGetPhysicalDeviceMemoryProperties(_vkPhysicalDevice,
+                                        &_vkPhysicalDeviceMemoryProperties);
+
+    _INTR_LOG_INFO("Using physical device %s (Driver %u)...",
+                   physDeviceProps.deviceName, physDeviceProps.driverVersion);
+  }
 
   // Find graphics _AND_ compute queue
-  _INTR_LOG_INFO("Retrieving compute and graphics queues...");
-
-  uint32_t queueCount;
-  vkGetPhysicalDeviceQueueFamilyProperties(_vkPhysicalDevice, &queueCount,
-                                           nullptr);
-  _INTR_ASSERT(queueCount >= 1u);
-
-  _INTR_LOG_INFO("Found %u available queues...", queueCount);
-
-  _INTR_ARRAY(VkQueueFamilyProperties) queueProps;
-  queueProps.resize(queueCount);
-  vkGetPhysicalDeviceQueueFamilyProperties(_vkPhysicalDevice, &queueCount,
-                                           queueProps.data());
-
-  uint32_t graphicsComputeQueue;
-  for (graphicsComputeQueue = 0; graphicsComputeQueue < queueCount;
-       graphicsComputeQueue++)
   {
-    if ((queueProps[graphicsComputeQueue].queueFlags & VK_QUEUE_GRAPHICS_BIT) >
-            0u &&
-        (queueProps[graphicsComputeQueue].queueFlags & VK_QUEUE_COMPUTE_BIT) >
-            0u)
+    _INTR_LOG_INFO("Retrieving compute and graphics queues...");
+
+    uint32_t queueCount;
+    vkGetPhysicalDeviceQueueFamilyProperties(_vkPhysicalDevice, &queueCount,
+                                             nullptr);
+    _INTR_ASSERT(queueCount >= 1u);
+
+    _INTR_LOG_INFO("Found %u available queues...", queueCount);
+
+    _INTR_ARRAY(VkQueueFamilyProperties) queueProps;
+    queueProps.resize(queueCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(_vkPhysicalDevice, &queueCount,
+                                             queueProps.data());
+
+    uint32_t graphicsComputeQueue;
+    for (graphicsComputeQueue = 0; graphicsComputeQueue < queueCount;
+         graphicsComputeQueue++)
     {
-      _INTR_LOG_INFO("Using queue #%u for graphics and compute...",
-                     graphicsComputeQueue);
-      break;
+      if ((queueProps[graphicsComputeQueue].queueFlags &
+           VK_QUEUE_GRAPHICS_BIT) > 0u &&
+          (queueProps[graphicsComputeQueue].queueFlags & VK_QUEUE_COMPUTE_BIT) >
+              0u)
+      {
+        _INTR_LOG_INFO("Using queue #%u for graphics and compute...",
+                       graphicsComputeQueue);
+        break;
+      }
     }
+    _INTR_ASSERT(graphicsComputeQueue < queueCount &&
+                 "Unable to locate a matching queue");
+
+    _vkGraphicsAndComputeQueueFamilyIndex = graphicsComputeQueue;
   }
-  _INTR_ASSERT(graphicsComputeQueue < queueCount &&
-               "Unable to locate a matching queue");
 
-  _vkGraphicsQueueFamilyIndex = graphicsComputeQueue;
-  _vkComputeQueueFamilyIndex = graphicsComputeQueue;
-
-  float queuePriorities[1] = {0.0f};
-
+  // Setup device queue
+  const float queuePriorities[1] = {0.0f};
   VkDeviceQueueCreateInfo queueCreateInfo = {};
-  queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-  queueCreateInfo.queueFamilyIndex = graphicsComputeQueue;
-  queueCreateInfo.queueCount = 1;
-  queueCreateInfo.pQueuePriorities = queuePriorities;
+  {
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = _vkGraphicsAndComputeQueueFamilyIndex;
+    queueCreateInfo.queueCount = 1u;
+    queueCreateInfo.pQueuePriorities = queuePriorities;
+  }
 
+  // Check if debug marker extension is supported
   bool debugMarkerExtPresent = false;
   {
     uint32_t extensionCount;
@@ -583,32 +589,39 @@ void RenderSystem::initVkDevice()
 
   _INTR_ARRAY(const char*) enabledLayers;
   {
+    // None yet
   }
 
+  // Create device
   VkDeviceCreateInfo deviceCreateInfo = {};
-  deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-  deviceCreateInfo.pNext = nullptr;
-  deviceCreateInfo.queueCreateInfoCount = 1u;
-  deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-  deviceCreateInfo.pEnabledFeatures = &physDevFeatures;
-
-  if (enabledExtensions.size() > 0)
   {
-    deviceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
-    deviceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
+    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.pNext = nullptr;
+    deviceCreateInfo.queueCreateInfoCount = 1u;
+    deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+    deviceCreateInfo.pEnabledFeatures = &physDevFeatures;
+
+    if (enabledExtensions.size() > 0)
+    {
+      deviceCreateInfo.enabledExtensionCount =
+          (uint32_t)enabledExtensions.size();
+      deviceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
+    }
+
+    if (enabledLayers.size() > 0)
+    {
+      deviceCreateInfo.enabledLayerCount = (uint32_t)enabledLayers.size();
+      deviceCreateInfo.ppEnabledLayerNames = enabledLayers.data();
+    }
+
+    VkResult result = vkCreateDevice(_vkPhysicalDevice, &deviceCreateInfo,
+                                     nullptr, &_vkDevice);
+    _INTR_VK_CHECK_RESULT(result);
   }
 
-  if (enabledLayers.size() > 0)
-  {
-    deviceCreateInfo.enabledLayerCount = (uint32_t)enabledLayers.size();
-    deviceCreateInfo.ppEnabledLayerNames = enabledLayers.data();
-  }
-
-  result =
-      vkCreateDevice(_vkPhysicalDevice, &deviceCreateInfo, nullptr, &_vkDevice);
-  _INTR_VK_CHECK_RESULT(result);
-
-  vkGetDeviceQueue(_vkDevice, graphicsComputeQueue, 0u, &_vkQueue);
+  // Retrieve device queue
+  vkGetDeviceQueue(_vkDevice, _vkGraphicsAndComputeQueueFamilyIndex, 0u,
+                   &_vkQueue);
 
   _INTR_LOG_POP();
 }
@@ -907,7 +920,8 @@ void RenderSystem::initVkCommandPools()
     {
       commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
       commandPoolCreateInfo.pNext = nullptr;
-      commandPoolCreateInfo.queueFamilyIndex = _vkGraphicsQueueFamilyIndex;
+      commandPoolCreateInfo.queueFamilyIndex =
+          _vkGraphicsAndComputeQueueFamilyIndex;
       commandPoolCreateInfo.flags =
           VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     }
@@ -930,7 +944,8 @@ void RenderSystem::initVkCommandPools()
         commandPoolCreateInfo.sType =
             VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         commandPoolCreateInfo.pNext = nullptr;
-        commandPoolCreateInfo.queueFamilyIndex = _vkGraphicsQueueFamilyIndex;
+        commandPoolCreateInfo.queueFamilyIndex =
+            _vkGraphicsAndComputeQueueFamilyIndex;
         commandPoolCreateInfo.flags =
             VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
       }
