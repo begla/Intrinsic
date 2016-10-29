@@ -86,8 +86,7 @@ void ComputeCallManager::updateUniformMemory(
           const uint32_t dynamicOffset =
               _dynamicOffsets(computeCallRef)[dynamicOffsetIndex];
 
-          uint8_t* gpuMem =
-              &UniformManager::_mappedPerInstanceMemory[dynamicOffset];
+          uint8_t* gpuMem = &UniformManager::_perInstanceMemory[dynamicOffset];
           memcpy(gpuMem, p_PerInstanceDataCompute,
                  p_PerInstanceDataComputeSize);
         }
@@ -172,13 +171,15 @@ void ComputeCallManager::bindBuffer(ComputeCallRef p_DrawCallRef,
         bindingInfos.resize(desc.binding + 1u);
       }
 
-      BindingInfo bindingInfo;
-      bindingInfo.binding = desc.binding;
-      bindingInfo.bindingType = desc.bindingType;
-      bindingInfo.resource = p_BufferRef;
-      bindingInfo.bufferData.offsetInBytes = p_OffsetInBytes;
-      bindingInfo.bufferData.rangeInBytes = p_RangeInBytes;
-      bindingInfo.bufferData.uboType = p_UboType;
+      BindingInfo bindingInfo = {};
+      {
+        bindingInfo.binding = desc.binding;
+        bindingInfo.bindingType = desc.bindingType;
+        bindingInfo.resource = p_BufferRef;
+        bindingInfo.bufferData.offsetInBytes = p_OffsetInBytes;
+        bindingInfo.bufferData.rangeInBytes = p_RangeInBytes;
+        bindingInfo.bufferData.uboType = p_UboType;
+      }
 
       bindingInfos[desc.binding] = bindingInfo;
 

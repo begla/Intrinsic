@@ -183,7 +183,8 @@ struct BufferManager
 
   _INTR_INLINE static uint8_t* getGpuMemory(BufferRef p_Ref)
   {
-    _INTR_ASSERT(_descBufferMemoryUsage(p_Ref) == MemoryUsage::kStaging);
+    _INTR_ASSERT(_descBufferMemoryUsage(p_Ref) == MemoryUsage::kStaging &&
+                 "Memory access not available for non-staging buffers");
     return GpuMemoryManager::getHostVisibleMemoryForOffset(
         _memoryOffset(p_Ref));
   }

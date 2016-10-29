@@ -169,14 +169,12 @@ struct DrawCallManager
 
         if (bindInfo.bufferData.uboType == UboType::kPerInstanceVertex)
         {
-          uint8_t* gpuMem =
-              &UniformManager::_mappedPerInstanceMemory[dynamicOffset];
+          uint8_t* gpuMem = &UniformManager::_perInstanceMemory[dynamicOffset];
           memcpy(gpuMem, p_PerInstanceDataVertex, p_PerInstanceDataVertexSize);
         }
         else if (bindInfo.bufferData.uboType == UboType::kPerInstanceFragment)
         {
-          uint8_t* gpuMem =
-              &UniformManager::_mappedPerInstanceMemory[dynamicOffset];
+          uint8_t* gpuMem = &UniformManager::_perInstanceMemory[dynamicOffset];
           memcpy(gpuMem, p_PerInstanceDataFragment,
                  p_PerInstanceDataFragmentSize);
         }
