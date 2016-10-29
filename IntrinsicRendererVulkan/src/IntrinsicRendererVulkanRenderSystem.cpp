@@ -804,22 +804,24 @@ void RenderSystem::initOrUpdateVkSwapChain()
     for (uint32_t i = 0u; i < swapchainImageCount; ++i)
     {
       VkImageViewCreateInfo colorAttachmentView = {};
-      colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-      colorAttachmentView.pNext = nullptr;
-      colorAttachmentView.format = VK_FORMAT_B8G8R8A8_SRGB;
-      colorAttachmentView.components.r = VK_COMPONENT_SWIZZLE_R;
-      colorAttachmentView.components.g = VK_COMPONENT_SWIZZLE_G;
-      colorAttachmentView.components.b = VK_COMPONENT_SWIZZLE_B;
-      colorAttachmentView.components.a = VK_COMPONENT_SWIZZLE_A;
-      colorAttachmentView.subresourceRange.aspectMask =
-          VK_IMAGE_ASPECT_COLOR_BIT;
-      colorAttachmentView.subresourceRange.baseMipLevel = 0u;
-      colorAttachmentView.subresourceRange.levelCount = 1u;
-      colorAttachmentView.subresourceRange.baseArrayLayer = 0u;
-      colorAttachmentView.subresourceRange.layerCount = 1u;
-      colorAttachmentView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-      colorAttachmentView.flags = 0u;
-      colorAttachmentView.image = _vkSwapchainImages[i];
+      {
+        colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        colorAttachmentView.pNext = nullptr;
+        colorAttachmentView.format = VK_FORMAT_B8G8R8A8_SRGB;
+        colorAttachmentView.components.r = VK_COMPONENT_SWIZZLE_R;
+        colorAttachmentView.components.g = VK_COMPONENT_SWIZZLE_G;
+        colorAttachmentView.components.b = VK_COMPONENT_SWIZZLE_B;
+        colorAttachmentView.components.a = VK_COMPONENT_SWIZZLE_A;
+        colorAttachmentView.subresourceRange.aspectMask =
+            VK_IMAGE_ASPECT_COLOR_BIT;
+        colorAttachmentView.subresourceRange.baseMipLevel = 0u;
+        colorAttachmentView.subresourceRange.levelCount = 1u;
+        colorAttachmentView.subresourceRange.baseArrayLayer = 0u;
+        colorAttachmentView.subresourceRange.layerCount = 1u;
+        colorAttachmentView.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        colorAttachmentView.flags = 0u;
+        colorAttachmentView.image = _vkSwapchainImages[i];
+      }
 
       result = vkCreateImageView(_vkDevice, &colorAttachmentView, nullptr,
                                  &_vkSwapchainImageViews[i]);
@@ -896,12 +898,14 @@ void RenderSystem::initVkPipelineCache()
 {
   _INTR_LOG_INFO("Creating Vulkan cache...");
 
-  VkPipelineCacheCreateInfo pipelineCache;
-  pipelineCache.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-  pipelineCache.pNext = nullptr;
-  pipelineCache.initialDataSize = 0;
-  pipelineCache.pInitialData = nullptr;
-  pipelineCache.flags = 0;
+  VkPipelineCacheCreateInfo pipelineCache = {};
+  {
+    pipelineCache.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+    pipelineCache.pNext = nullptr;
+    pipelineCache.initialDataSize = 0;
+    pipelineCache.pInitialData = nullptr;
+    pipelineCache.flags = 0u;
+  }
 
   VkResult result = vkCreatePipelineCache(_vkDevice, &pipelineCache, nullptr,
                                           &_vkPipelineCache);
