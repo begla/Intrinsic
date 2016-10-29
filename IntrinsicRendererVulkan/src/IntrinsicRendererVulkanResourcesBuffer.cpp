@@ -101,6 +101,7 @@ void BufferManager::createResources(const BufferRefArray& p_Buffers)
       {
         RenderSystem::flushTemporaryCommandBuffer();
         GpuMemoryManager::_volatileStagingBufferMemoryAllocator.reset();
+        copyCmd = RenderSystem::beginTemporaryCommandBuffer();
       }
 
       const uint32_t stagingMemOffset =
