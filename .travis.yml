@@ -1,23 +1,38 @@
 language: cpp
+sudo: required
 
 addons:
   apt:
     sources:
       - george-edison55-precise-backports
+      - ubuntu-toolchain-r-test
     packages:
       - cmake
       - cmake-data
+      - ninja-build
+      - gcc-6
+      - g++-6
 
 compiler:
   - gcc
-  
+
 before_install:
+# Setup GCC 6 as the default compiler
+  - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-6 /usr/bin/gcc
+  - sudo unlink /usr/bin/g++ && sudo ln -s /usr/bin/g++-6 /usr/bin/g++
+  - gcc --version
+# Clone private dependencies which are not part of the main repository
   - cd ..
   - git clone https://$INTR_GIT_TOKEN@github.com/begla/Intrinsic_Dependencies.git
-  - pwd
   - cd Intrinsic
 
 script:
-  - mkdir build
-  - cd build
-  - cmake .. && make
+  - cd scripts_linux
+  - chmod +x Config_Release ConfigAndBuildDependencies Build
+# Build dependencies
+  - ./ConfigAndBuildDependencies
+# Config via CMake
+  - ./Config_Release
+  - ./Build
+  - cd ..
+  
