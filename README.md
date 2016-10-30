@@ -28,8 +28,10 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 4. Get access to the latest PhysX SDK from NVIDIA: https://developer.nvidia.com/physx-sdk
 5. Follow the instructions from NVIDIA and compile the PhysX libraries for the configurations "Release", "Profile" and "Debug"
    NOTE: Make sure that PhysX links the Runtime Library dynamically as Intrinsic does!
+   
 6. Download and install the Autodesk FBX SDK
-7. Create a new directory called "Intrinsic_Dependencies" on the same level as the Intrinsic repository folder
+
+7. Create a new directory called "Intrinsic_Dependencies" on the _same level_ as the Intrinsic repository folder
 8. Inside, create a new folder "dependencies" containing two folders "physx" and "fbx"
 9. Copy the static/dynamic libraries and header files of both SDKs to folders named "bin" (DLLs), "lib" (LIBs) and "include" respectively
 
