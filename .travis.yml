@@ -1,5 +1,13 @@
 language: cpp
 
+addons:
+  apt:
+    sources:
+      - george-edison55-precise-backports
+    packages:
+      - cmake
+      - cmake-data
+
 compiler:
   - gcc
 
