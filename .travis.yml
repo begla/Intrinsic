@@ -25,14 +25,27 @@ before_install:
   - cd ..
   - git clone https://$INTR_GIT_TOKEN@github.com/begla/Intrinsic_Dependencies.git
   - cd Intrinsic
-
-script:
-  - cd scripts_linux
-  - chmod +x Config_Release ConfigAndBuildDependencies Build
+  
+install:
+# SDL2
+  - curl -O http://libsdl.org/release/SDL2-2.0.5.tar.gz
+  - tar -xzvf SDL2-2.0.5.tar.gz
+  - (cd SDL2-2.0.5 && ./configure && make && sudo make install)
+  
+# Vulkan SDK
+  - curl https://vulkan.lunarg.com/pub/sdks/linux/latest -L -o vulkan.run
+  - chmod +x vulkan.run
+  - ./vulkan.run
+  - export VK_SDK_PATH=$(pwd)/VulkanSDK/
+  
 # Build dependencies
+  - cd scripts_linux
+  - chmod +x ConfigAndBuildDependencies
   - ./ConfigAndBuildDependencies
+  
+script:
 # Config via CMake
+  - chmod +x Config_Release Build
   - ./Config_Release
   - ./Build
   - cd ..
-  
