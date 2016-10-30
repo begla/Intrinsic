@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.1)
 
 project(Intrinsic)
 
+set(BUILD_STANDALONE ON)
+# TODO: Microprofile and IntrinsicEd are currently disabled for Linux builds
+if(WIN32)
+  set(BUILD_INTRINSICED ON)
+  set(USE_MICROPROFILE ON)
+endif()
+
 if(!CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RELEASE)
 endif()
@@ -23,22 +30,29 @@ add_definitions("-DMICROPROFILE_GPU_TIMERS_VULKAN")
 
 if(WIN32)
   set(INTR_GENERAL_COMPILE_FLAGS "/Zm256 /EHa /W3")
-
   add_definitions("-D_SCL_SECURE_NO_WARNINGS")
   add_definitions("-D_CRT_SECURE_NO_WARNINGS")
 
   if(INTR_FINAL_BUILD)
-    add_definitions("-D_INTR_FINAL_BUILD -D_HAS_EXCEPTIONS=0")
+    add_definitions("-D_HAS_EXCEPTIONS=0")
     set(INTR_GENERAL_COMPILE_FLAGS "${INTR_GENERAL_COMPILE_FLAGS} /GL")
     set(INTR_GENERAL_LINK_FLAGS "${INTR_GENERAL_LINK_FLAGS} /LTCG")
   endif()
 else()
-
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG")
   set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+endif()
+
+if(INTR_FINAL_BUILD)
+  add_definitions("-D_INTR_FINAL_BUILD")
+else()
+  if(USE_MICROPROFILE)
+    add_definitions("-D_INTR_PROFILING_ENABLED")
+  endif()
+  add_definitions("-D_INTR_LOGGING_ENABLED -D_INTR_ASSERTS_ENABLED")
 endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
@@ -48,13 +62,15 @@ else()
   set(PhysX_PROFILE ON)
 endif()
 
-find_package(FBX REQUIRED)
 find_package(GLSLang REQUIRED)
 find_package(LuaJIT REQUIRED)
 find_package(PhysX REQUIRED Common Cooking CharacterKinematic Extensions VisualDebuggerSDK)
-find_package(Qt5 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(Vulkan REQUIRED)
+if (BUILD_INTRINSICED)
+  find_package(Qt5 REQUIRED)
+  find_package(FBX REQUIRED)
+endif()
 
 file(GLOB INTR_RENDERER_VULKAN_SOURCE_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.cpp)
 file(GLOB INTR_RENDERER_VULKAN_HEADER_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.h)
@@ -93,11 +109,11 @@ set(INTASSET_SOURCE_FILES IntrinsicAssetManagement/src/stdafx.cpp IntrinsicAsset
 set(INTDEP_SOURCE_FILES
   "dependencies/enkits/TaskScheduler.cpp")
 
-if(WIN32)
-set(INTDEP_SOURCE_FILES
-  ${INTDEP_SOURCE_FILES} 
-  IntrinsicCore/src/microprofile.cpp
-)
+if(USE_MICROPROFILE)
+  set(INTDEP_SOURCE_FILES
+    ${INTDEP_SOURCE_FILES} 
+    IntrinsicCore/src/microprofile.cpp
+  )
 endif()
 
 # Qt5
@@ -113,7 +129,7 @@ foreach (srcFile ${MOC_SOURCES})
 endforeach()
 
 # Executables
-if(WIN32)
+if (BUILD_INTRINSICED)
 add_executable(IntrinsicEd ${INTR_ED_SOURCE_FILES} ${MOC_SOURCES} ${INTR_ED_HEADER_FILES} IntrinsicEd/IntrinsicEd.qrc IntrinsicEd/IntrinsicEd.rc)
 set_target_properties(IntrinsicEd PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/app
@@ -123,6 +139,7 @@ set_target_properties(IntrinsicEd PROPERTIES
 )
 endif()
 
+if (BUILD_STANDALONE)
 add_executable(Intrinsic ${INTR_SOURCE_FILES} ${INTR_HEADER_FILES} Intrinsic/Intrinsic.rc)
 set_target_properties(Intrinsic PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/app
@@ -130,24 +147,29 @@ set_target_properties(Intrinsic PROPERTIES
   RUNTIME_OUTPUT_NAME_RELEASE "Intrinsic"
   RUNTIME_OUTPUT_NAME_DEBUG "IntrinsicDebug"
 )
+endif()
 
 # Libs
 add_library(IntrinsicCore ${INTR_CORE_SOURCE_FILES} ${INTR_CORE_C_SOURCE_FILES} ${INTDEP_SOURCE_FILES} ${INTR_CORE_HEADER_FILES})
 add_library(IntrinsicRendererVulkan ${INTR_RENDERER_VULKAN_SOURCE_FILES} ${INTR_RENDERER_VULKAN_HEADER_FILES} ${INTR_RENDERER_VULKAN_DEP_SOURCE_FILES})
-add_library(IntrinsicAssetManagement ${INTASSET_SOURCE_FILES} ${INTASSET_HEADER_FILES})
-
-if (WIN32)
-set_target_properties(IntrinsicEd PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
-set_target_properties(IntrinsicEd PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
-set_target_properties(IntrinsicRendererVulkan PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
-set_target_properties(IntrinsicAssetManagement PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
-set_target_properties(IntrinsicAssetManagement PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
+if (BUILD_INTRINSICED)
+  add_library(IntrinsicAssetManagement ${INTASSET_SOURCE_FILES} ${INTASSET_HEADER_FILES})
 endif()
-set_target_properties(Intrinsic PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
-set_target_properties(Intrinsic PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
+
+set_target_properties(IntrinsicRendererVulkan PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
+set_target_properties(IntrinsicRendererVulkan PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 set_target_properties(IntrinsicCore PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
 set_target_properties(IntrinsicCore PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
-set_target_properties(IntrinsicRendererVulkan PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
+if (BUILD_INTRINSICED)
+  set_target_properties(IntrinsicEd PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
+  set_target_properties(IntrinsicEd PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
+  set_target_properties(IntrinsicAssetManagement PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
+  set_target_properties(IntrinsicAssetManagement PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
+endif()
+if (BUILD_STANDALONE)
+  set_target_properties(Intrinsic PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
+  set_target_properties(Intrinsic PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
+endif()
 
 # Precompiled header files
 
@@ -245,10 +267,13 @@ target_link_libraries(IntrinsicCore IntrinsicRendererVulkan)
 target_link_libraries(IntrinsicCore ${INTR_EXTERNAL_LIBS})
 
 # Intrinsic standalone
-target_link_libraries(Intrinsic IntrinsicCore)
+if (BUILD_STANDALONE)
+  target_link_libraries(Intrinsic IntrinsicCore)
+endif()
 
 # IntrinsicEd
-target_link_libraries(IntrinsicEd IntrinsicCore)
-target_link_libraries(IntrinsicEd IntrinsicAssetManagement)
-target_link_libraries(IntrinsicEd ${INTR_ED_EXTERNAL_LIBS})
-
+if (BUILD_INTRINSICED)
+  target_link_libraries(IntrinsicEd IntrinsicCore)
+  target_link_libraries(IntrinsicEd IntrinsicAssetManagement)
+  target_link_libraries(IntrinsicEd ${INTR_ED_EXTERNAL_LIBS})
+endif()
