@@ -22,6 +22,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOMOC_MOC_OPTIONS "-fstdafx_editor.h")
 
 set(INTR_FINAL_BUILD OFF CACHE BOOL "Final build setting")
+set(COMPILE_ONLY OFF CACHE BOOL "Compile without linking")
 
 set(INTR_GENERAL_LINK_FLAGS " ")
 set(INTR_GENERAL_COMPILE_FLAGS " ")
@@ -131,7 +132,7 @@ if(BUILD_INTRINSICED)
 endif()
 
 # Executables
-if (BUILD_INTRINSICED)
+if (BUILD_INTRINSICED AND NOT COMPILE_ONLY)
 add_executable(IntrinsicEd ${INTR_ED_SOURCE_FILES} ${MOC_SOURCES} ${INTR_ED_HEADER_FILES} IntrinsicEd/IntrinsicEd.qrc IntrinsicEd/IntrinsicEd.rc)
 set_target_properties(IntrinsicEd PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/app
@@ -141,7 +142,7 @@ set_target_properties(IntrinsicEd PROPERTIES
 )
 endif()
 
-if (BUILD_STANDALONE)
+if (BUILD_STANDALONE AND NOT COMPILE_ONLY)
 add_executable(Intrinsic ${INTR_SOURCE_FILES} ${INTR_HEADER_FILES} Intrinsic/Intrinsic.rc)
 set_target_properties(Intrinsic PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/app
@@ -163,12 +164,14 @@ set_target_properties(IntrinsicRendererVulkan PROPERTIES LINK_FLAGS ${INTR_GENER
 set_target_properties(IntrinsicCore PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
 set_target_properties(IntrinsicCore PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 if (BUILD_INTRINSICED)
-  set_target_properties(IntrinsicEd PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
-  set_target_properties(IntrinsicEd PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
+  if (NOT COMPILE_ONLY)
+    set_target_properties(IntrinsicEd PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
+    set_target_properties(IntrinsicEd PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
+  endif()
   set_target_properties(IntrinsicAssetManagement PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
   set_target_properties(IntrinsicAssetManagement PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 endif()
-if (BUILD_STANDALONE)
+if (BUILD_STANDALONE AND NOT COMPILE_ONLY)
   set_target_properties(Intrinsic PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
   set_target_properties(Intrinsic PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 endif()
@@ -263,21 +266,23 @@ else()
 endif()
 
 # Link libraries
-# Core
-if (WIN32)
-  target_link_libraries(IntrinsicCore wsock32 ws2_32)
-endif()
-target_link_libraries(IntrinsicCore IntrinsicRendererVulkan)
-target_link_libraries(IntrinsicCore ${INTR_EXTERNAL_LIBS})
+if (NOT COMPILE_ONLY)
+  # Core
+  if (WIN32)
+    target_link_libraries(IntrinsicCore wsock32 ws2_32)
+  endif()
+  target_link_libraries(IntrinsicCore IntrinsicRendererVulkan)
+  target_link_libraries(IntrinsicCore ${INTR_EXTERNAL_LIBS})
 
-# Intrinsic standalone
-if (BUILD_STANDALONE)
-  target_link_libraries(Intrinsic IntrinsicCore)
-endif()
+  # Intrinsic standalone
+  if (BUILD_STANDALONE)
+    target_link_libraries(Intrinsic IntrinsicCore)
+  endif()
 
-# IntrinsicEd
-if (BUILD_INTRINSICED)
-  target_link_libraries(IntrinsicEd IntrinsicCore)
-  target_link_libraries(IntrinsicEd IntrinsicAssetManagement)
-  target_link_libraries(IntrinsicEd ${INTR_ED_EXTERNAL_LIBS})
+  # IntrinsicEd
+  if (BUILD_INTRINSICED)
+    target_link_libraries(IntrinsicEd IntrinsicCore)
+    target_link_libraries(IntrinsicEd IntrinsicAssetManagement)
+    target_link_libraries(IntrinsicEd ${INTR_ED_EXTERNAL_LIBS})
+  endif()
 endif()
