@@ -26,8 +26,6 @@ before_install:
   - git clone https://$INTR_GIT_TOKEN@github.com/begla/Intrinsic_Dependencies.git
   - cd Intrinsic
   
-  - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
-  
 install:
 # SDL2
   - curl -O http://libsdl.org/release/SDL2-2.0.5.tar.gz
@@ -53,7 +51,8 @@ script:
 
 # Config via CMake
   - cd scripts_linux
-  - chmod +x Config_Release Build
+  - chmod +x Config_Release_CompileOnly Build
   - ./Config_Release
   - ./Build
   - cd ..
+  
