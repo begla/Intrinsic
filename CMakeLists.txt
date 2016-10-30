@@ -117,16 +117,18 @@ if(USE_MICROPROFILE)
 endif()
 
 # Qt5
-set(CMAKE_PREFIX_PATH ${Qt5_ROOT_DIR})
-find_package(Qt5Widgets REQUIRED)
-include_directories(${Qt5Widgets_INCLUDES})
-add_definitions(${Qt5Widgets_DEFINITIONS})
+if(BUILD_INTRINSICED)
+  set(CMAKE_PREFIX_PATH ${Qt5_ROOT_DIR})
+  find_package(Qt5Widgets REQUIRED)
+  include_directories(${Qt5Widgets_INCLUDES})
+  add_definitions(${Qt5Widgets_DEFINITIONS})
 
-foreach (srcFile ${MOC_SOURCES})
-  set_source_files_properties (${srcFile} 
-  PROPERTIES COMPILE_FLAGS "/Yustdafx_editor.h /FIstdafx_editor.h"
-)
-endforeach()
+  foreach (srcFile ${MOC_SOURCES})
+    set_source_files_properties (${srcFile} 
+    PROPERTIES COMPILE_FLAGS "/Yustdafx_editor.h /FIstdafx_editor.h"
+  )
+  endforeach()
+endif()
 
 # Executables
 if (BUILD_INTRINSICED)
@@ -223,10 +225,12 @@ set(INTR_INCLUDES
 include_directories(${INTR_INCLUDES})
 
 # Libraries
-set(INTR_ED_EXTERNAL_LIBS
-  Qt5::Widgets
-  ${FBX_LIBRARIES}
-)
+if(BUILD_INTRINSICED)
+  set(INTR_ED_EXTERNAL_LIBS
+    Qt5::Widgets
+    ${FBX_LIBRARIES}
+  )
+endif()
 
 set(INTR_EXTERNAL_LIBS
   # Vulkan
