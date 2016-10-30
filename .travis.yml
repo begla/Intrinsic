@@ -1,17 +1,20 @@
 language: cpp
 sudo: required
+dist: trusty
 
 addons:
   apt:
     sources:
       - george-edison55-precise-backports
       - ubuntu-toolchain-r-test
+      - beineri/opt-qt57-trusty
     packages:
       - cmake
       - cmake-data
       - ninja-build
       - gcc-6
       - g++-6
+      - qt57base
 
 compiler:
   - gcc
@@ -25,6 +28,8 @@ before_install:
   - cd ..
   - git clone https://$INTR_GIT_TOKEN@github.com/begla/Intrinsic_Dependencies.git
   - cd Intrinsic
+  
+  - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
   
 install:
 # SDL2
