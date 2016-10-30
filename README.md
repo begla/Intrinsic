@@ -8,16 +8,16 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 
 # Getting started
 
-## Prerequisites
+## Windows
+
+### Prerequisites
 
 * Visual Studio 2015
-* CMake >= 3.5
+* CMake >= 3.2
 * Qt 5.7
-* Vulkan SDK 1.0.26.0
+* Vulkan SDK 1.0.30.0
 * PhysX 3.3
 * FBX SDK 2015.1
-
-## Windows
 
 ```
 1. Download and install the latest Qt 5.x (open-source) distribution
