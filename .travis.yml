@@ -13,7 +13,7 @@ addons:
       - g++-6
 
 compiler:
-  - gcc
+  - gcc-6
   
 before_install:
 # Clone private dependencies which are not part of the main repository
