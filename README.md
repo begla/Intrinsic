@@ -1,5 +1,7 @@
 # Intrinsic
 
+[![](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/begla/Intrinsic/issues) [![](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Intrinsic-Engiune/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Intrinsic is a Vulkan based cross-platform game and rendering engine. The project is currently in an early stage of development but evolves rapidly from day to day.
 
 ![Intrinsic](media/screenshot3.jpg)
