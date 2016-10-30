@@ -12,7 +12,7 @@ addons:
       - ninja-build
       - gcc-6
       - g++-6
-      - libc-6
+      - libc6
 
 compiler:
   - gcc
