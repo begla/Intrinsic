@@ -36,7 +36,7 @@ uint32_t Manager::_screenResolutionHeight = 720u;
 namespace
 {
 template <typename T>
-_INTR_INLINE void readSetting(rapidjson::Document& p_Doc, Name& p_Name,
+_INTR_INLINE void readSetting(rapidjson::Document& p_Doc, const Name& p_Name,
                               T& p_Target)
 {
   if (p_Doc.HasMember(p_Name._string.c_str()))
@@ -48,7 +48,7 @@ _INTR_INLINE void readSetting(rapidjson::Document& p_Doc, Name& p_Name,
 }
 
 template <>
-_INTR_INLINE void readSetting(rapidjson::Document& p_Doc, Name& p_Name,
+_INTR_INLINE void readSetting(rapidjson::Document& p_Doc, const Name& p_Name,
                               _INTR_STRING& p_Target)
 {
   if (p_Doc.HasMember(p_Name._string.c_str()))
