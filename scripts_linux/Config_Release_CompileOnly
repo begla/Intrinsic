@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd ..
+
+mkdir build
+
+cd build
+
+cmake -DCOMPILE_ONLY:BOOL=ON -DCMAKE_BUILD_TYPE=Release ..
