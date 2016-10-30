@@ -19,7 +19,7 @@ FIND_PATH(FBX_INCLUDE_DIR fbxsdk.h
 )
 
 FIND_LIBRARY(FBX_LIBRARY_DEBUG 
-  NAMES libfbxsdkd
+  NAMES libfbxsdkd fbxsdkd
   PATH_SUFFIXES lib64 lib
   PATHS
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx
@@ -34,7 +34,7 @@ FIND_LIBRARY(FBX_LIBRARY_DEBUG
 )
 
 FIND_LIBRARY(FBX_LIBRARY_RELEASE 
-  NAMES libfbxsdk
+  NAMES libfbxsdk fbxsdk
   PATH_SUFFIXES lib64 lib
   PATHS
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx
