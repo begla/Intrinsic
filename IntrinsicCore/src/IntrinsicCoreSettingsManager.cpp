@@ -54,8 +54,7 @@ _INTR_INLINE void readSetting(rapidjson::Document& p_Doc, const Name& p_Name,
   if (p_Doc.HasMember(p_Name._string.c_str()))
   {
     p_Target = p_Doc[p_Name._string.c_str()].GetString();
-    _INTR_LOG_INFO("%s = '%s'", p_Name._string.c_str(),
-                   StringUtil::toString(p_Target).c_str());
+    _INTR_LOG_INFO("%s = '%s'", p_Name._string.c_str(), p_Target.c_str());
   }
 }
 }
