@@ -5,10 +5,11 @@
 #  SDL2_INCLUDE_DIR
 
 FIND_PATH(SDL2_INCLUDE_DIR SDL.h
-  PATH_SUFFIXES include
+  PATH_SUFFIXES include SDL2
   PATHS
   ~/Library/Frameworks
   /Library/Frameworks
+  /usr/local/include
   /usr/local
   /usr
   /sw # Fink
@@ -55,8 +56,8 @@ FIND_LIBRARY(SDL2_LIBRARY_SDL2MAIN
 )
 
 SET(SDL2_LIBRARIES
-    ${SDL2_LIBRARY}
-    ${SDL2_LIBRARY_SDL2MAIN}
+  ${SDL2_LIBRARY}
+  ${SDL2_LIBRARY_SDL2MAIN}
 )
 
 INCLUDE(FindPackageHandleStandardArgs)
