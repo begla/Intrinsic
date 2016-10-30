@@ -4,10 +4,13 @@ addons:
   apt:
     sources:
       - george-edison55-precise-backports
+      - ubuntu-toolchain-r-test
     packages:
       - cmake
       - cmake-data
       - ninja-build
+      - gcc-6
+      - g++-6
 
 compiler:
   - gcc
