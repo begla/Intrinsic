@@ -26,6 +26,8 @@ before_install:
   - git clone https://$INTR_GIT_TOKEN@github.com/begla/Intrinsic_Dependencies.git
   - cd Intrinsic
   
+  - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
+  
 install:
 # SDL2
   - curl -O http://libsdl.org/release/SDL2-2.0.5.tar.gz
@@ -33,18 +35,24 @@ install:
   - (cd SDL2-2.0.5 && ./configure && make && sudo make install)
   
 # Vulkan SDK
-  - curl https://vulkan.lunarg.com/pub/sdks/linux/latest -L -o vulkan.run
+  - curl https://vulkan.lunarg.com/sdk/download/1.0.30.0/linux/vulkansdk-linux-x86_64-1.0.30.0.run -L -o vulkan.run
   - chmod +x vulkan.run
   - ./vulkan.run
-  - export VK_SDK_PATH=$(pwd)/VulkanSDK/
   
 # Build dependencies
   - cd scripts_linux
   - chmod +x ConfigAndBuildDependencies
   - ./ConfigAndBuildDependencies
+  - cd ..
   
 script:
+  - export VK_SDK_PATH=$(pwd)/VulkanSDK/1.0.30.0/x86_64/
+  
+# Check all env. variables
+  - printenv
+
 # Config via CMake
+  - cd scripts_linux
   - chmod +x Config_Release Build
   - ./Config_Release
   - ./Build
