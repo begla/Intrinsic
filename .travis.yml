@@ -12,7 +12,6 @@ addons:
       - ninja-build
       - gcc-6
       - g++-6
-      - libc6
 
 compiler:
   - gcc
@@ -26,8 +25,6 @@ before_install:
   - cd ..
   - git clone https://$INTR_GIT_TOKEN@github.com/begla/Intrinsic_Dependencies.git
   - cd Intrinsic
-  
-  - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
   
 install:
 # SDL2
