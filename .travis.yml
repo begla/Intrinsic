@@ -10,19 +10,17 @@ addons:
       - cmake
       - cmake-data
       - ninja-build
+      - gcc-6
+      - g++-6
+      - libc6
 
 compiler:
   - gcc
 
 before_install:
 # Setup GCC 6 as the default compiler
-  - sudo apt-get update
-  - sudo apt-get install gcc-6
-  - sudo apt-get install g++-6
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 20
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 20
-  - sudo update-alternatives --config gcc
-  - sudo update-alternatives --config g++
+  - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-6 /usr/bin/gcc
+  - sudo unlink /usr/bin/g++ && sudo ln -s /usr/bin/g++-6 /usr/bin/g++
   - gcc --version
 # Clone private dependencies which are not part of the main repository
   - cd ..
@@ -60,3 +58,4 @@ script:
   - ./Config_Release
   - ./Build
   - cd ..
+  
