@@ -14,15 +14,6 @@
 
 #pragma once
 
-// Settings
-#if !defined(_INTR_FINAL_BUILD)
-#if (_WIN32)
-#define _INTR_PROFILING_ENABLED
-#endif // _WIN32
-#define _INTR_LOGGING_ENABLED
-#define _INTR_ASSERTS_ENABLED
-#endif // _INTR_FINAL_BUILD
-
 // Object counts
 #define _INTR_MAX_ENTITY_COUNT 32768
 #define _INTR_MAX_NODE_COMPONENT_COUNT 32768
