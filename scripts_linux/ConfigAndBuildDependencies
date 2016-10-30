@@ -8,3 +8,11 @@ cd build
 cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
 ninja install
 
+cd ..
+
+mkdir build_debug
+
+cd build_debug
+
+cmake -GNinja -DCMAKE_BUILD_TYPE=Debug ..
+ninja install

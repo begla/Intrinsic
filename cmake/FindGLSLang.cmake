@@ -19,11 +19,11 @@ FIND_PATH(GLSLang_ROOT_DIR glslang/Include/Common.h
   /opt
 )
 
-FIND_LIBRARY(GLSLang_LIBRARY_DEBUG glslangd
+FIND_LIBRARY(GLSLang_LIBRARY_DEBUG glslangd glslang
   PATH_SUFFIXES lib64 lib Debug
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang
-  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/install
+  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build_debug/install
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -49,11 +49,11 @@ FIND_LIBRARY(GLSLang_LIBRARY_RELEASE glslang
   /opt
 )
 
-FIND_LIBRARY(GLSLang_LIBRARY_HLSL_DEBUG HLSLd
+FIND_LIBRARY(GLSLang_LIBRARY_HLSL_DEBUG HLSLd HLSL
   PATH_SUFFIXES lib64 lib Debug
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/hlsl
-  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/install
+  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build_debug/install
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -79,11 +79,11 @@ FIND_LIBRARY(GLSLang_LIBRARY_HLSL_RELEASE HLSL
   /opt
 )
 
-FIND_LIBRARY(GLSLang_LIBRARY_OGL_DEBUG OGLCompilerd
+FIND_LIBRARY(GLSLang_LIBRARY_OGL_DEBUG OGLCompilerd OGLCompiler
   PATH_SUFFIXES lib64 lib Debug
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/OGLCompilersDLL
-  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/install
+  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build_debug/install
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -109,11 +109,11 @@ FIND_LIBRARY(GLSLang_LIBRARY_OGL_RELEASE OGLCompiler
   /opt
 )
 
-FIND_LIBRARY(GLSLang_LIBRARY_OSDEP_DEBUG OSDependentd
+FIND_LIBRARY(GLSLang_LIBRARY_OSDEP_DEBUG OSDependentd OSDependent
   PATH_SUFFIXES lib64 lib Debug
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang/OSDependent/Windows
-  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang/OSDependent/Unix
+  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build_debug/glslang/OSDependent/Unix
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -139,11 +139,11 @@ FIND_LIBRARY(GLSLang_LIBRARY_OSDEP_RELEASE OSDependent
   /opt
 )
 
-FIND_LIBRARY(GLSLang_LIBRARY_SPIRV_DEBUG SPIRVd
+FIND_LIBRARY(GLSLang_LIBRARY_SPIRV_DEBUG SPIRVd SPIRV
   PATH_SUFFIXES lib64 lib Debug
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/SPIRV
-  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/install
+  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build_debug/install
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local

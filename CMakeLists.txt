@@ -134,9 +134,7 @@ set_target_properties(Intrinsic PROPERTIES
 # Libs
 add_library(IntrinsicCore ${INTR_CORE_SOURCE_FILES} ${INTR_CORE_C_SOURCE_FILES} ${INTDEP_SOURCE_FILES} ${INTR_CORE_HEADER_FILES})
 add_library(IntrinsicRendererVulkan ${INTR_RENDERER_VULKAN_SOURCE_FILES} ${INTR_RENDERER_VULKAN_HEADER_FILES} ${INTR_RENDERER_VULKAN_DEP_SOURCE_FILES})
-if(WIN32)
 add_library(IntrinsicAssetManagement ${INTASSET_SOURCE_FILES} ${INTASSET_HEADER_FILES})
-endif(WIN32)
 
 if (WIN32)
 set_target_properties(IntrinsicEd PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
@@ -157,7 +155,6 @@ set_target_properties(IntrinsicRendererVulkan PROPERTIES COMPILE_FLAGS ${INTR_GE
 if(WIN32)
   set_source_files_properties(IntrinsicEd ${INTR_ED_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "/Yustdafx_editor.h")
   set_source_files_properties(IntrinsicEd IntrinsicEd/src/stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx_editor.h")
-# Standalone
 # Core
   set_source_files_properties(${INTR_CORE_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "/Yustdafx.h")
   set_source_files_properties(IntrinsicCore/src/stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx.h")
@@ -251,8 +248,7 @@ target_link_libraries(IntrinsicCore ${INTR_EXTERNAL_LIBS})
 target_link_libraries(Intrinsic IntrinsicCore)
 
 # IntrinsicEd
-if(WIN32)
 target_link_libraries(IntrinsicEd IntrinsicCore)
 target_link_libraries(IntrinsicEd IntrinsicAssetManagement)
 target_link_libraries(IntrinsicEd ${INTR_ED_EXTERNAL_LIBS})
-endif()
+
