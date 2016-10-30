@@ -32,7 +32,6 @@ install:
   - tar -xzvf SDL2-2.0.5.tar.gz
   - (cd SDL2-2.0.5 && ./configure && make && sudo make install)
   
-  - cd ..
   - cd scripts_linux
   - chmod +x Config_Release ConfigAndBuildDependencies Build
 
