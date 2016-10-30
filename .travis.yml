@@ -36,15 +36,21 @@ install:
   - curl https://vulkan.lunarg.com/sdk/download/1.0.30.0/linux/vulkansdk-linux-x86_64-1.0.30.0.run -L -o vulkan.run
   - chmod +x vulkan.run
   - ./vulkan.run
-  - export VK_SDK_PATH=$(pwd)/VulkanSDK/1.0.30.0/
   
 # Build dependencies
   - cd scripts_linux
   - chmod +x ConfigAndBuildDependencies
   - ./ConfigAndBuildDependencies
+  - cd ..
   
 script:
+  - export VK_SDK_PATH=$(pwd)/VulkanSDK/1.0.30.0/x86_64/
+  
+# Check all env. variables
+  - printenv
+
 # Config via CMake
+  - cd scripts_linux
   - chmod +x Config_Release Build
   - ./Config_Release
   - ./Build
