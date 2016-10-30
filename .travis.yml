@@ -1,20 +1,17 @@
 language: cpp
 sudo: required
-dist: trusty
 
 addons:
   apt:
     sources:
       - george-edison55-precise-backports
       - ubuntu-toolchain-r-test
-      - beineri/opt-qt57-trusty
     packages:
       - cmake
       - cmake-data
       - ninja-build
       - gcc-6
       - g++-6
-      - qt57base
 
 compiler:
   - gcc
