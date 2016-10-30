@@ -14,6 +14,8 @@ compiler:
 before_install:
   - cd ..
   - git clone https://$INTR_GIT_TOKEN@github.com/begla/Intrinsic_Dependencies.git
+  - pwd
+  - cd Intrinsic
 
 script:
   - mkdir build
