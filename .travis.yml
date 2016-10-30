@@ -52,7 +52,7 @@ script:
 # Config via CMake
   - cd scripts_linux
   - chmod +x Config_Release_CompileOnly Build
-  - ./Config_Release
+  - ./Config_Release_CompileOnly
   - ./Build
   - cd ..
   
