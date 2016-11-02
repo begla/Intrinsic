@@ -17,8 +17,14 @@ install:
   - cd Intrinsic
   - cd scripts_win32
   - call ConfigAndBuildDependencies.bat
+  - cd ..
+  
+# Download and install Vulkan SDK
+  - curl -fsS -o vulkan.exe  https://vulkan.lunarg.com/sdk/download/1.0.30.0/windows/VulkanSDK-1.0.30.0-Installer.exe
+  - vulkan.exe /S
 
 build_script:
+  - dir
   - cd scripts_win32
   - call Config.bat
   - cd ../build
