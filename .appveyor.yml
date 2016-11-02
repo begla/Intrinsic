@@ -50,9 +50,9 @@ build_script:
   - cd ..
 # Create artifacts only for tags and release configuration
   - ps: |
-  if ($env:APPVEYOR_REPO_TAG -eq $true -And $env:CONFIGURATION -eq "Release")
-  {
-    cd scripts_win32
-    call CopyDllsToAppDir_Release.bat
-    call DistroCreateAndZip.bat
-  }
+        if ($env:APPVEYOR_REPO_TAG -eq $true -And $env:CONFIGURATION -eq "Release")
+        {
+          cd scripts_win32
+          call CopyDllsToAppDir_Release.bat
+          call DistroCreateAndZip.bat
+        }
