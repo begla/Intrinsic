@@ -50,6 +50,6 @@ build_script:
   - cd ../build
   - cmake --build . --config %CONFIGURATION%
   - cd ..
-   - cd scripts_win32
+  - cd scripts_win32
   - call CopyDllsToAppDir_Release.bat
   - call DistroCreateAndZip.bat
