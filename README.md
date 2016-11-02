@@ -6,7 +6,7 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 
 ![Intrinsic](media/screenshot3.jpg)
 
-# Getting started
+# Getting Started
 
 ## Windows
 
@@ -19,7 +19,8 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 * PhysX 3.3
 * FBX SDK 2015.1
 
-```
+### Setup Instructions
+
 1. Download and install the Qt (open-source) distribution
 2. Create a new environment variable "INTR_QTDIR" pointing to "[...]\Qtx.x\x.x\msvc2015_64"
 
@@ -42,7 +43,6 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 
 14. If everything went well, you'll find the solution in the newly created "build" folder. You can also use one of the many build scripts: "Build_Release.bat", ... to get started
 15. Execute "Intrinsic.exe" or "IntrinsicEd.exe" in the "app" directory - yey!
-```
 
 ## Linux
 
