@@ -49,10 +49,9 @@ build_script:
   - call Config.bat
   - cd ../build
   - cmake --build . --config %CONFIGURATION%
-  . cd ..
+  - cd ..
   
 deploy_script:
   - cd scripts_win32
   - call CopyDllsToAppDir_Release.bat
   - call DistroCreateAndZip.bat
-  
