@@ -20,12 +20,12 @@ deploy:
   release: $(APPVEYOR_REPO_TAG_NAME)
   description: ''
   provider: GitHub
-  auth_token:
-    secure: $(INTR_GIT_TOKEN)
+  auth_token: $(INTR_GIT_TOKEN)
   artifact: Intrinsic_Win32
   draft: false
   prerelease: false
   on:
+    configuration: Release
     branch: master
     appveyor_repo_tag: true
 
