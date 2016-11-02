@@ -11,6 +11,10 @@ environment:
   INTR_GIT_TOKEN: 
     secure: 7D4rb81yGcTOgpizeKD1m3vlSDc7tU9SNQdW4/LVdHzou7gMaKK01esf7/v/3ccB
   VK_SDK_PATH: "C:\\VulkanSDK\\1.0.30.0\\"
+  
+artifacts:
+  - path: Intrinsic_Win32.7z
+    name: Intrinsic
 
 install:
   - cd ..
@@ -30,3 +34,24 @@ build_script:
   - call Config.bat
   - cd ../build
   - cmake --build . --config %CONFIGURATION%
+  . cd ..
+  
+before_deploy:
+  - cd scripts_win32
+  - call CopyDllsToAppDir_Release.bat
+  - call DistroCreateAndZip.bat
+
+deploy:
+  release: $(APPVEYOR_REPO_TAG_NAME)
+  description: ''
+  provider: GitHub
+  auth_token:
+    secure: $(INTR_GIT_TOKEN)
+  artifact: Intrinsic_Win32.7z
+  draft: false
+  prerelease: false
+  on:
+    configuration: Release
+    platform: x64
+    branch: master
+    appveyor_repo_tag: true
