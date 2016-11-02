@@ -16,7 +16,7 @@ environment:
 
 install:
   - cd ..
-  - git clone https://$INTR_GIT_TOKEN@github.com/begla/Intrinsic_Dependencies.git
+  - git clone https://$(INTR_GIT_TOKEN)@github.com/begla/Intrinsic_Dependencies.git
   - cd Intrinsic
   - cd scripts_win32
   - call ConfigAndBuildDependencies.bat
