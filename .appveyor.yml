@@ -15,6 +15,21 @@ environment:
 artifacts:
   - path: Intrinsic_Win32.7z
     name: Intrinsic
+    
+deploy:
+  release: $(APPVEYOR_REPO_TAG_NAME)
+  description: ''
+  provider: GitHub
+  auth_token:
+    secure: $(INTR_GIT_TOKEN)
+  artifact: Intrinsic_Win32.7z
+  draft: false
+  prerelease: false
+  on:
+    configuration: Release
+    platform: x64
+    branch: master
+    appveyor_repo_tag: true
 
 install:
   - cd ..
@@ -36,22 +51,8 @@ build_script:
   - cmake --build . --config %CONFIGURATION%
   . cd ..
   
-before_deploy:
+deploy_script:
   - cd scripts_win32
   - call CopyDllsToAppDir_Release.bat
   - call DistroCreateAndZip.bat
-
-deploy:
-  release: $(APPVEYOR_REPO_TAG_NAME)
-  description: ''
-  provider: GitHub
-  auth_token:
-    secure: $(INTR_GIT_TOKEN)
-  artifact: Intrinsic_Win32.7z
-  draft: false
-  prerelease: false
-  on:
-    configuration: Release
-    platform: x64
-    branch: master
-    appveyor_repo_tag: true
+  
