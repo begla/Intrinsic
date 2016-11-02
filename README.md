@@ -52,7 +52,8 @@ Coming soon...
 
 | Platform | Build Status |
 |:--------:|:------------:|
-| Windows  | Coming soon... |
+| Windows  | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/eevcf6gfm77309ud?svg=true)](https://ci.appveyor.com/project/begla/intrinsic)
+ |
 | Linux    |  [![Linux Build Status](https://travis-ci.org/begla/Intrinsic.svg?branch=master)](https://travis-ci.org/begla/Intrinsic) |
 | Android  | Coming soon... |
 
