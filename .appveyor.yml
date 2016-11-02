@@ -53,6 +53,6 @@ build_script:
         if ($env:APPVEYOR_REPO_TAG -eq $true -And $env:CONFIGURATION -eq "Release")
         {
           cd scripts_win32
-          CopyDllsToAppDir_Release.bat
-          DistroCreateAndZip.bat
+          & .\CopyDllsToAppDir_Release.bat
+          & .\DistroCreateAndZip.bat
         }
