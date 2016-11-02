@@ -26,8 +26,6 @@ deploy:
   draft: false
   prerelease: false
   on:
-    configuration: Release
-    platform: x64
     branch: master
     appveyor_repo_tag: true
 
@@ -50,6 +48,11 @@ build_script:
   - cd ../build
   - cmake --build . --config %CONFIGURATION%
   - cd ..
-  - cd scripts_win32
-  - call CopyDllsToAppDir_Release.bat
-  - call DistroCreateAndZip.bat
+# Create artifacts only for tags and release configuration
+  - ps: |
+  if ($env:APPVEYOR_REPO_TAG -eq $true -And $env:CONFIGURATION -eq "Release")
+  {
+    cd scripts_win32
+    call CopyDllsToAppDir_Release.bat
+    call DistroCreateAndZip.bat
+  }
