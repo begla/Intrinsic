@@ -10,8 +10,8 @@ configuration:
   - Release
   
 environment:
-  - INTR_QTDIR: C:\Qt\5.7\msvc2015_64\
-  - INTR_GIT_TOKEN: secure: 7D4rb81yGcTOgpizeKD1m3vlSDc7tU9SNQdW4/LVdHzou7gMaKK01esf7/v/3ccB
+  INTR_QTDIR: C:\Qt\5.7\msvc2015_64\
+  INTR_GIT_TOKEN: secure: 7D4rb81yGcTOgpizeKD1m3vlSDc7tU9SNQdW4/LVdHzou7gMaKK01esf7/v/3ccB
 
 install:
   - cd ..
