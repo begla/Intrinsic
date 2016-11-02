@@ -20,7 +20,6 @@ install:
   - cd Intrinsic
   - cd scripts_win32
   - call ConfigAndBuildDependencies.bat
-  - cd ..
 
 build_script:
   - cd scripts_win32
