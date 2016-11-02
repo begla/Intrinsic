@@ -1,6 +1,3 @@
-call CopyDllsToAppDir_Release.bat
-call Build_Release.bat
-
 cd ..
 
 mkdir distro
