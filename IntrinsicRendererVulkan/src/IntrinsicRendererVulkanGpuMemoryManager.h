@@ -20,21 +20,71 @@ namespace Renderer
 {
 namespace Vulkan
 {
+namespace MemoryPoolType
+{
+enum Enum
+{
+  kStaticImages,
+  kStaticBuffers,
+  kStaticStagingBuffers,
+
+  kResolutionDependentImages,
+  kResolutionDependentBuffers,
+  kResolutionDependentStagingBuffers,
+
+  kVolatileStagingBuffers,
+
+  kCount,
+
+  kRangeStartStatic = kStaticImages,
+  kRangeEndStatic = kStaticStagingBuffers,
+  kRangeStartResolutionDependent = kResolutionDependentImages,
+  kRangeEndResolutionDependent = kResolutionDependentStagingBuffers,
+  kRangeStartVolatile = kVolatileStagingBuffers,
+  kRangeEndVolatile = kVolatileStagingBuffers
+};
+}
+
 struct GpuMemoryManager
 {
   static void init();
   static void destroy();
   static void updateMemoryStats();
 
+  // <-
+
   _INTR_INLINE static uint8_t* getHostVisibleMemoryForOffset(uint32_t p_Offset)
   {
     return &_mappedHostVisibleMemory[p_Offset];
   }
 
-  static Core::LinearOffsetAllocator _staticImageMemoryAllocator;
-  static Core::LinearOffsetAllocator _staticBufferMemoryAllocator;
-  static Core::LinearOffsetAllocator _staticStagingBufferMemoryAllocator;
-  static Core::LinearOffsetAllocator _volatileStagingBufferMemoryAllocator;
+  // <-
+
+  _INTR_INLINE static uint32_t
+  allocateOffset(MemoryPoolType::Enum p_MemoryPoolType, uint32_t p_Size,
+                 uint32_t p_Alignment)
+  {
+    return _memoryAllocators[p_MemoryPoolType].allocate(p_Size, p_Alignment);
+  }
+
+  // <-
+
+  _INTR_INLINE static void resetAllocator(MemoryPoolType::Enum p_MemoryPoolType)
+  {
+    _memoryAllocators[p_MemoryPoolType].reset();
+  }
+
+  // <-
+
+  _INTR_INLINE static uint32_t
+  calcAvailableMemoryInBytes(MemoryPoolType::Enum p_MemoryPoolType)
+  {
+    return _memoryAllocators[p_MemoryPoolType].calcAvailableMemoryInBytes();
+  }
+
+  // <-
+
+  static Core::LinearOffsetAllocator _memoryAllocators[MemoryPoolType::kCount];
 
   static uint32_t _deviceLocalMemorySizeInBytes;
   static uint32_t _hostVisibleMemorySizeInBytes;

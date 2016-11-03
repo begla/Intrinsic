@@ -37,6 +37,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
     descArrayLayerCount.resize(_INTR_MAX_IMAGE_COUNT);
     descMipLevelCount.resize(_INTR_MAX_IMAGE_COUNT);
     descFileName.resize(_INTR_MAX_IMAGE_COUNT);
+    descMemoryPoolType.resize(_INTR_MAX_IMAGE_COUNT);
 
     vkImage.resize(_INTR_MAX_IMAGE_COUNT);
     vkImageView.resize(_INTR_MAX_IMAGE_COUNT);
@@ -46,6 +47,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
 
   // Description
   _INTR_ARRAY(ImageType::Enum) descImageType;
+  _INTR_ARRAY(MemoryPoolType::Enum) descMemoryPoolType;
   _INTR_ARRAY(Format::Enum) descImageFormat;
   _INTR_ARRAY(uint8_t) descImageFlags;
   _INTR_ARRAY(glm::uvec3) descDimensions;
@@ -74,6 +76,7 @@ struct ImageManager
 
   _INTR_INLINE static void resetToDefault(ImageRef p_Ref)
   {
+    _descMemoryPoolType(p_Ref) = MemoryPoolType::kStaticImages;
     _descImageType(p_Ref) = ImageType::kExternal;
     _descImageFormat(p_Ref) = Format::kR32G32B32A32SFloat;
     _descImageFlags(p_Ref) =
@@ -317,6 +320,10 @@ struct ImageManager
   // ->
 
   // Description
+  _INTR_INLINE static MemoryPoolType::Enum& _descMemoryPoolType(ImageRef p_Ref)
+  {
+    return _data.descMemoryPoolType[p_Ref._id];
+  }
   _INTR_INLINE static ImageType::Enum& _descImageType(ImageRef p_Ref)
   {
     return _data.descImageType[p_Ref._id];

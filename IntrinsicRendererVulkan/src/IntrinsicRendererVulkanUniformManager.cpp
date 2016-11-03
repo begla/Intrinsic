@@ -65,6 +65,8 @@ void UniformManager::init()
 
     BufferManager::_descBufferMemoryUsage(_perInstanceUniformBuffer) =
         MemoryUsage::kStaging;
+    BufferManager::_descMemoryPoolType(_perInstanceUniformBuffer) =
+        MemoryPoolType::kStaticStagingBuffers;
     BufferManager::_descBufferType(_perInstanceUniformBuffer) =
         BufferType::kUniform;
     BufferManager::_descSizeInBytes(_perInstanceUniformBuffer) =
@@ -96,6 +98,8 @@ void UniformManager::init()
         _perMaterialStagingUniformBuffer,
         Dod::Resources::ResourceFlags::kResourceVolatile);
 
+    BufferManager::_descMemoryPoolType(_perMaterialStagingUniformBuffer) =
+        MemoryPoolType::kStaticStagingBuffers;
     BufferManager::_descBufferType(_perMaterialStagingUniformBuffer) =
         BufferType::kUniform;
     BufferManager::_descBufferMemoryUsage(_perMaterialStagingUniformBuffer) =

@@ -231,6 +231,10 @@ void RenderSystem::updateResolutionDependentResources()
   // Recreate all pipelines (to update the view port size)
   PipelineManager::createAllResources();
 
+  // Reset allocators
+  GpuMemoryManager::resetAllocator(MemoryPoolType::kResolutionDependentBuffers);
+  GpuMemoryManager::resetAllocator(MemoryPoolType::kResolutionDependentImages);
+
   RenderPass::GBufferTransparents::updateResolutionDependentResources();
   RenderPass::GBuffer::updateResolutionDependentResources();
   RenderPass::Debug::updateResolutionDependentResources();

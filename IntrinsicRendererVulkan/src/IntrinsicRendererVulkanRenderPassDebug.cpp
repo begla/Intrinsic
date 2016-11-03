@@ -117,6 +117,7 @@ void Debug::init()
 
   RenderPassRefArray renderpassesToCreate;
   PipelineLayoutRefArray pipelineLayoutsToCreate;
+  BufferRefArray buffersToCreate;
 
   // Pipeline layouts
   {
@@ -155,8 +156,32 @@ void Debug::init()
   }
   renderpassesToCreate.push_back(_renderPassRef);
 
+  {
+    BufferRef& lineVertexBuffer = _debugLineVertexBufferRef;
+    lineVertexBuffer = BufferManager::createBuffer(_N(LineDebug));
+
+    BufferManager::resetToDefault(lineVertexBuffer);
+
+    BufferManager::addResourceFlags(
+        lineVertexBuffer, Dod::Resources::ResourceFlags::kResourceVolatile);
+    BufferManager::_descBufferType(lineVertexBuffer) = BufferType::kVertex;
+    BufferManager::_descSizeInBytes(lineVertexBuffer) =
+        MAX_LINE_COUNT * sizeof(DebugLineVertex) * 2u;
+    BufferManager::_descBufferMemoryUsage(lineVertexBuffer) =
+        MemoryUsage::kStaging;
+    BufferManager::_descMemoryPoolType(lineVertexBuffer) =
+        MemoryPoolType::kStaticStagingBuffers;
+
+    buffersToCreate.push_back(lineVertexBuffer);
+  }
+
   PipelineLayoutManager::createResources(pipelineLayoutsToCreate);
   RenderPassManager::createResources(renderpassesToCreate);
+  BufferManager::createResources(buffersToCreate);
+
+  // Map line buffer memory
+  _mappedLineMemory = (DebugLineVertex*)Resources::BufferManager::getGpuMemory(
+      _debugLineVertexBufferRef);
 }
 
 // <-
@@ -171,17 +196,11 @@ void Debug::updateResolutionDependentResources()
   PipelineRefArray pipelinesToCreate;
   DrawCallRefArray drawCallsToDestroy;
   DrawCallRefArray drawCallsToCreate;
-  BufferRefArray buffersToDestroy;
-  BufferRefArray buffersToCreate;
 
   // Cleanup old resources
   {
     if (_framebufferRef.isValid())
       framebuffersToDestroy.push_back(_framebufferRef);
-    if (_debugLineVertexBufferRef.isValid())
-    {
-      buffersToDestroy.push_back(_debugLineVertexBufferRef);
-    }
     if (_debugLinePipelineRef.isValid())
       pipelinesToDestroy.push_back(_debugLinePipelineRef);
     if (_debugLineDrawCallRef.isValid())
@@ -190,7 +209,6 @@ void Debug::updateResolutionDependentResources()
     DrawCallManager::destroyDrawCallsAndResources(drawCallsToDestroy);
     FramebufferManager::destroyFramebuffersAndResources(framebuffersToDestroy);
     PipelineManager::destroyPipelinesAndResources(pipelinesToDestroy);
-    BufferManager::destroyBuffersAndResources(buffersToDestroy);
   }
 
   // Line debugging
@@ -222,23 +240,6 @@ void Debug::updateResolutionDependentResources()
   }
 
   {
-    BufferRef& lineVertexBuffer = _debugLineVertexBufferRef;
-    lineVertexBuffer = BufferManager::createBuffer(_N(LineDebug));
-
-    BufferManager::resetToDefault(lineVertexBuffer);
-
-    BufferManager::addResourceFlags(
-        lineVertexBuffer, Dod::Resources::ResourceFlags::kResourceVolatile);
-    BufferManager::_descBufferType(lineVertexBuffer) = BufferType::kVertex;
-    BufferManager::_descSizeInBytes(lineVertexBuffer) =
-        MAX_LINE_COUNT * sizeof(DebugLineVertex) * 2u;
-    BufferManager::_descBufferMemoryUsage(lineVertexBuffer) =
-        MemoryUsage::kStaging;
-
-    buffersToCreate.push_back(lineVertexBuffer);
-  }
-
-  {
     DrawCallRef& drawCallLine = _debugLineDrawCallRef;
     drawCallLine = DrawCallManager::createDrawCall(_N(DebugLineVertex));
     DrawCallManager::resetToDefault(drawCallLine);
@@ -260,13 +261,8 @@ void Debug::updateResolutionDependentResources()
     drawCallsToCreate.push_back(drawCallLine);
   }
 
-  BufferManager::createResources(buffersToCreate);
   PipelineManager::createResources(pipelinesToCreate);
   DrawCallManager::createResources(drawCallsToCreate);
-
-  // Map line buffer memory
-  _mappedLineMemory = (DebugLineVertex*)Resources::BufferManager::getGpuMemory(
-      _debugLineVertexBufferRef);
 
   _albedoImageRef = ImageManager::getResourceByName(_N(GBufferAlbedo));
   _normalImageRef = ImageManager::getResourceByName(_N(GBufferNormal));

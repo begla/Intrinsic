@@ -103,6 +103,8 @@ void PerPixelPicking::updateResolutionDependentResources()
     ImageManager::resetToDefault(_pickingImageRef);
     ImageManager::addResourceFlags(
         _pickingImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_pickingImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_pickingImageRef) =
         glm::uvec3(_perPixelPickingSize, 1u);
@@ -117,6 +119,8 @@ void PerPixelPicking::updateResolutionDependentResources()
     ImageManager::addResourceFlags(
         _pickingDepthImageRef,
         Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_pickingDepthImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_pickingDepthImageRef) =
         glm::uvec3(_perPixelPickingSize, 1u);
@@ -136,6 +140,8 @@ void PerPixelPicking::updateResolutionDependentResources()
       BufferManager::resetToDefault(bufferRef);
       BufferManager::addResourceFlags(
           bufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+      BufferManager::_descMemoryPoolType(bufferRef) =
+          MemoryPoolType::kResolutionDependentStagingBuffers;
 
       BufferManager::_descBufferMemoryUsage(bufferRef) = MemoryUsage::kStaging;
       BufferManager::_descBufferType(bufferRef) = BufferType::kStorage;

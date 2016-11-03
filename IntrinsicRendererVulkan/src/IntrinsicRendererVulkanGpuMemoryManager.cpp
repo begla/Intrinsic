@@ -16,11 +16,6 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
-#define STATIC_TEXTURE_MEMORY_SIZE_IN_BYTES 1024u * 1024u * 1024u
-#define STATIC_BUFFER_MEMORY_SIZE_IN_BYTES 512u * 1024 * 1024u
-#define STATIC_STAGING_BUFFER_MEMORY_SIZE_IN_BYTES 256u * 1024u * 1024u
-#define VOLATILE_STAGING_BUFFER_MEMORY_SIZE_IN_BYTES 128u * 1024u * 1024u
-
 namespace Intrinsic
 {
 namespace Renderer
@@ -28,12 +23,8 @@ namespace Renderer
 namespace Vulkan
 {
 // Static members
-Core::LinearOffsetAllocator GpuMemoryManager::_staticImageMemoryAllocator;
-Core::LinearOffsetAllocator GpuMemoryManager::_staticBufferMemoryAllocator;
 Core::LinearOffsetAllocator
-    GpuMemoryManager::_staticStagingBufferMemoryAllocator;
-Core::LinearOffsetAllocator
-    GpuMemoryManager::_volatileStagingBufferMemoryAllocator;
+    GpuMemoryManager::_memoryAllocators[MemoryPoolType::kCount];
 
 uint32_t GpuMemoryManager::_deviceLocalMemorySizeInBytes = 0u;
 uint32_t GpuMemoryManager::_hostVisibleMemorySizeInBytes = 0u;
@@ -41,10 +32,66 @@ VkDeviceMemory GpuMemoryManager::_vkDeviceLocalMemory = VK_NULL_HANDLE;
 VkDeviceMemory GpuMemoryManager::_vkHostVisibleMemory = VK_NULL_HANDLE;
 uint8_t* GpuMemoryManager::_mappedHostVisibleMemory = nullptr;
 
+namespace
+{
+uint32_t _memoryPoolSizesInBytes[MemoryPoolType::kCount] = {};
+MemoryUsage::Enum _memoryPoolUsages[MemoryPoolType::kCount] = {};
+const char* _memoryPoolNames[MemoryPoolType::kCount] = {};
+}
+
 void GpuMemoryManager::init()
 {
   _INTR_LOG_INFO("Initializing GPU Memory Manager...");
   _INTR_LOG_PUSH();
+
+  // Setup memory pools
+  {
+    _memoryPoolSizesInBytes[MemoryPoolType::kStaticImages] =
+        512u * 1024u * 1024u;
+    _memoryPoolUsages[MemoryPoolType::kStaticImages] = MemoryUsage::kOptimal;
+    _memoryPoolNames[MemoryPoolType::kStaticImages] = "Static Images";
+
+    _memoryPoolSizesInBytes[MemoryPoolType::kStaticBuffers] =
+        64u * 1024u * 1024u;
+    _memoryPoolUsages[MemoryPoolType::kStaticBuffers] = MemoryUsage::kOptimal;
+    _memoryPoolNames[MemoryPoolType::kStaticBuffers] = "Static Buffers";
+
+    _memoryPoolSizesInBytes[MemoryPoolType::kStaticStagingBuffers] =
+        64u * 1024u * 1024u;
+    _memoryPoolUsages[MemoryPoolType::kStaticStagingBuffers] =
+        MemoryUsage::kStaging;
+    _memoryPoolNames[MemoryPoolType::kStaticStagingBuffers] =
+        "Static Staging Buffers";
+
+    _memoryPoolSizesInBytes[MemoryPoolType::kResolutionDependentImages] =
+        512u * 1024u * 1024u;
+    _memoryPoolUsages[MemoryPoolType::kResolutionDependentImages] =
+        MemoryUsage::kOptimal;
+    _memoryPoolNames[MemoryPoolType::kResolutionDependentImages] =
+        "Resolution Dependent Images";
+
+    _memoryPoolSizesInBytes[MemoryPoolType::kResolutionDependentBuffers] =
+        64u * 1024u * 1024u;
+    _memoryPoolUsages[MemoryPoolType::kResolutionDependentBuffers] =
+        MemoryUsage::kOptimal;
+    _memoryPoolNames[MemoryPoolType::kResolutionDependentBuffers] =
+        "Resolution Dependent Buffers";
+
+    _memoryPoolSizesInBytes
+        [MemoryPoolType::kResolutionDependentStagingBuffers] =
+            64u * 1024u * 1024u;
+    _memoryPoolUsages[MemoryPoolType::kResolutionDependentStagingBuffers] =
+        MemoryUsage::kStaging;
+    _memoryPoolNames[MemoryPoolType::kResolutionDependentStagingBuffers] =
+        "Resolution Dependent Staging Buffers";
+
+    _memoryPoolSizesInBytes[MemoryPoolType::kVolatileStagingBuffers] =
+        64u * 1024u * 1024u;
+    _memoryPoolUsages[MemoryPoolType::kVolatileStagingBuffers] =
+        MemoryUsage::kStaging;
+    _memoryPoolNames[MemoryPoolType::kVolatileStagingBuffers] =
+        "Volatile Staging Buffers";
+  }
 
   static const uint32_t deviceLocalMemoryPropertyFlags =
       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
@@ -84,8 +131,15 @@ void GpuMemoryManager::init()
 
   // Allocate device local memory
   {
-    _deviceLocalMemorySizeInBytes = STATIC_TEXTURE_MEMORY_SIZE_IN_BYTES +
-                                    STATIC_BUFFER_MEMORY_SIZE_IN_BYTES;
+    _deviceLocalMemorySizeInBytes = 0u;
+
+    for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
+    {
+      if (_memoryPoolUsages[i] == MemoryUsage::kOptimal)
+      {
+        _deviceLocalMemorySizeInBytes += _memoryPoolSizesInBytes[i];
+      }
+    }
 
     VkMemoryAllocateInfo memAllocInfo = {};
     {
@@ -105,9 +159,13 @@ void GpuMemoryManager::init()
 
   // Allocate host visible memory
   {
-    _hostVisibleMemorySizeInBytes =
-        STATIC_STAGING_BUFFER_MEMORY_SIZE_IN_BYTES +
-        VOLATILE_STAGING_BUFFER_MEMORY_SIZE_IN_BYTES;
+    for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
+    {
+      if (_memoryPoolUsages[i] == MemoryUsage::kStaging)
+      {
+        _hostVisibleMemorySizeInBytes += _memoryPoolSizesInBytes[i];
+      }
+    }
 
     VkMemoryAllocateInfo memAllocInfo = {};
     {
@@ -128,20 +186,27 @@ void GpuMemoryManager::init()
   // Setup allocators
   {
     uint32_t deviceLocalOffset = 0u;
-    _staticImageMemoryAllocator.init(STATIC_TEXTURE_MEMORY_SIZE_IN_BYTES,
-                                     deviceLocalOffset);
-    deviceLocalOffset += STATIC_TEXTURE_MEMORY_SIZE_IN_BYTES;
-    _staticBufferMemoryAllocator.init(STATIC_BUFFER_MEMORY_SIZE_IN_BYTES,
-                                      deviceLocalOffset);
-    deviceLocalOffset += STATIC_BUFFER_MEMORY_SIZE_IN_BYTES;
-
     uint32_t hostVisibleOffset = 0u;
-    _staticStagingBufferMemoryAllocator.init(
-        STATIC_STAGING_BUFFER_MEMORY_SIZE_IN_BYTES, hostVisibleOffset);
-    hostVisibleOffset += STATIC_STAGING_BUFFER_MEMORY_SIZE_IN_BYTES;
-    _volatileStagingBufferMemoryAllocator.init(
-        VOLATILE_STAGING_BUFFER_MEMORY_SIZE_IN_BYTES, hostVisibleOffset);
-    hostVisibleOffset += VOLATILE_STAGING_BUFFER_MEMORY_SIZE_IN_BYTES;
+
+    for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
+    {
+      if (_memoryPoolUsages[i] == MemoryUsage::kOptimal)
+      {
+        _memoryAllocators[i].init(_memoryPoolSizesInBytes[i],
+                                  deviceLocalOffset);
+        deviceLocalOffset += _memoryPoolSizesInBytes[i];
+      }
+      else if (_memoryPoolUsages[i] == MemoryUsage::kStaging)
+      {
+        _memoryAllocators[i].init(_memoryPoolSizesInBytes[i],
+                                  hostVisibleOffset);
+        hostVisibleOffset += _memoryPoolSizesInBytes[i];
+      }
+      else
+      {
+        _INTR_ASSERT(false);
+      }
+    }
   }
 
   // Map host visible memory
@@ -159,37 +224,34 @@ void GpuMemoryManager::init()
 
 void GpuMemoryManager::updateMemoryStats()
 {
-  _INTR_PROFILE_COUNTER_SET(
-      "Total Static Image Memory (MB)",
-      (uint64_t)Math::bytesToMegaBytes(_staticImageMemoryAllocator.size()));
-  _INTR_PROFILE_COUNTER_SET(
-      "Available Static Image Memory (MB)",
-      (uint64_t)Math::bytesToMegaBytes(
-          _staticImageMemoryAllocator.calcAvailableMemoryInBytes()));
+#if defined(_INTR_PROFILING_ENABLED)
+  static MicroProfileToken tokens[MemoryPoolType::kCount][2u];
+  static bool init = false;
 
-  _INTR_PROFILE_COUNTER_SET(
-      "Total Static Buffer Memory (MB)",
-      (uint64_t)Math::bytesToMegaBytes(_staticBufferMemoryAllocator.size()));
-  _INTR_PROFILE_COUNTER_SET(
-      "Available Static Buffer Memory (MB)",
-      (uint64_t)Math::bytesToMegaBytes(
-          _staticBufferMemoryAllocator.calcAvailableMemoryInBytes()));
+  if (!init)
+  {
+    for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
+    {
+      static char charBuffer[128];
+      sprintf(charBuffer, "Total %s Memory (MB)", _memoryPoolNames[i]);
+      tokens[i][0] = MicroProfileGetCounterToken(charBuffer);
 
-  _INTR_PROFILE_COUNTER_SET("Total Static Staging Buffer Memory (MB)",
-                            (uint64_t)Math::bytesToMegaBytes(
-                                _staticStagingBufferMemoryAllocator.size()));
-  _INTR_PROFILE_COUNTER_SET(
-      "Available Static Staging Buffer Memory (MB)",
-      (uint64_t)Math::bytesToMegaBytes(
-          _staticStagingBufferMemoryAllocator.calcAvailableMemoryInBytes()));
+      sprintf(charBuffer, "Available %s Memory (MB)", _memoryPoolNames[i]);
+      tokens[i][1] = MicroProfileGetCounterToken(charBuffer);
+    }
 
-  _INTR_PROFILE_COUNTER_SET("Total Volatile Staging Buffer Memory (MB)",
-                            (uint64_t)Math::bytesToMegaBytes(
-                                _volatileStagingBufferMemoryAllocator.size()));
-  _INTR_PROFILE_COUNTER_SET(
-      "Available Volatile Staging Buffer Memory (MB)",
-      (uint64_t)Math::bytesToMegaBytes(
-          _volatileStagingBufferMemoryAllocator.calcAvailableMemoryInBytes()));
+    init = true;
+  }
+
+  for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
+  {
+    MicroProfileCounterSet(tokens[i][0], (uint64_t)Math::bytesToMegaBytes(
+                                             _memoryAllocators[i].size()));
+    MicroProfileCounterSet(
+        tokens[i][1], (uint64_t)Math::bytesToMegaBytes(
+                          _memoryAllocators[i].calcAvailableMemoryInBytes()));
+  }
+#endif // _INTR_PROFILING_ENABLED
 }
 
 // <-

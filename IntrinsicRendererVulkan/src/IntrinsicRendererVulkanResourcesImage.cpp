@@ -196,9 +196,9 @@ void createTexture(ImageRef p_Ref)
   vkGetImageMemoryRequirements(RenderSystem::_vkDevice, vkImage, &memReqs);
 
   vkDeviceMemory = GpuMemoryManager::_vkDeviceLocalMemory;
-  const uint32_t memOffset =
-      GpuMemoryManager::_staticImageMemoryAllocator.allocate(
-          (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
+  const uint32_t memOffset = GpuMemoryManager::allocateOffset(
+      ImageManager::_descMemoryPoolType(p_Ref), (uint32_t)memReqs.size,
+      (uint32_t)memReqs.alignment);
 
   result = vkBindImageMemory(RenderSystem::_vkDevice, vkImage, vkDeviceMemory,
                              memOffset);
@@ -308,9 +308,9 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
   vkGetBufferMemoryRequirements(RenderSystem::_vkDevice, stagingBuffer,
                                 &memReqs);
 
-  const uint32_t stagingMemOffset =
-      GpuMemoryManager::_volatileStagingBufferMemoryAllocator.allocate(
-          (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
+  const uint32_t stagingMemOffset = GpuMemoryManager::allocateOffset(
+      MemoryPoolType::kVolatileStagingBuffers, (uint32_t)memReqs.size,
+      (uint32_t)memReqs.alignment);
 
   result = vkBindBufferMemory(RenderSystem::_vkDevice, stagingBuffer,
                               GpuMemoryManager::_vkHostVisibleMemory,
@@ -372,9 +372,9 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
 
   vkGetImageMemoryRequirements(RenderSystem::_vkDevice, vkImage, &memReqs);
 
-  const uint32_t memOffset =
-      GpuMemoryManager::_staticImageMemoryAllocator.allocate(
-          (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
+  const uint32_t memOffset = GpuMemoryManager::allocateOffset(
+      ImageManager::_descMemoryPoolType(p_Ref), (uint32_t)memReqs.size,
+      (uint32_t)memReqs.alignment);
 
   VkDeviceMemory& vkDeviceMemory = ImageManager::_vkDeviceMemory(p_Ref);
   vkDeviceMemory = GpuMemoryManager::_vkDeviceLocalMemory;
@@ -407,7 +407,7 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
   RenderSystem::flushTemporaryCommandBuffer();
 
   vkDestroyBuffer(RenderSystem::_vkDevice, stagingBuffer, nullptr);
-  GpuMemoryManager::_volatileStagingBufferMemoryAllocator.reset();
+  GpuMemoryManager::resetAllocator(MemoryPoolType::kVolatileStagingBuffers);
 
   VkImageViewCreateInfo view = {};
   {
@@ -471,9 +471,9 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
   vkGetBufferMemoryRequirements(RenderSystem::_vkDevice, stagingBuffer,
                                 &memReqs);
 
-  const uint32_t stagingMemOffset =
-      GpuMemoryManager::_volatileStagingBufferMemoryAllocator.allocate(
-          (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
+  const uint32_t stagingMemOffset = GpuMemoryManager::allocateOffset(
+      MemoryPoolType::kVolatileStagingBuffers, (uint32_t)memReqs.size,
+      (uint32_t)memReqs.alignment);
 
   result = vkBindBufferMemory(RenderSystem::_vkDevice, stagingBuffer,
                               GpuMemoryManager::_vkHostVisibleMemory,
@@ -532,9 +532,9 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
 
   vkGetImageMemoryRequirements(RenderSystem::_vkDevice, vkImage, &memReqs);
 
-  const uint32_t memOffset =
-      GpuMemoryManager::_staticImageMemoryAllocator.allocate(
-          (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
+  const uint32_t memOffset = GpuMemoryManager::allocateOffset(
+      ImageManager::_descMemoryPoolType(p_Ref), (uint32_t)memReqs.size,
+      (uint32_t)memReqs.alignment);
 
   VkDeviceMemory& vkDeviceMemory = ImageManager::_vkDeviceMemory(p_Ref);
   vkDeviceMemory = GpuMemoryManager::_vkDeviceLocalMemory;
@@ -567,7 +567,7 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
   RenderSystem::flushTemporaryCommandBuffer();
 
   vkDestroyBuffer(RenderSystem::_vkDevice, stagingBuffer, nullptr);
-  GpuMemoryManager::_volatileStagingBufferMemoryAllocator.reset();
+  GpuMemoryManager::resetAllocator(MemoryPoolType::kVolatileStagingBuffers);
 
   VkImageViewCreateInfo view = {};
   {
