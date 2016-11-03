@@ -478,11 +478,10 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
   {
     MaterialRef matRef = p_Materiales[i];
 
-    UniformManager::allocatePerMaterialDataMemory(
-        sizeof(PerMaterialDataVertex), _perMaterialDataVertexOffset(matRef));
-    UniformManager::allocatePerMaterialDataMemory(
-        sizeof(PerMaterialDataFragment),
-        _perMaterialDataFragmentOffset(matRef));
+    _perMaterialDataVertexOffset(matRef) =
+        UniformManager::allocatePerMaterialDataMemory();
+    _perMaterialDataFragmentOffset(matRef) =
+        UniformManager::allocatePerMaterialDataMemory();
 
     uint32_t& materialBufferEntryIdx = _materialBufferEntryIndex(matRef);
     {

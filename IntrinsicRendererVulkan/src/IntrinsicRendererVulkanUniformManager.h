@@ -22,14 +22,8 @@ namespace Vulkan
 {
 struct UniformManager
 {
-  struct UniformDataMemoryPage
-  {
-    uint32_t pageSize;
-    uint32_t memoryOffset;
-  };
-
   static void init();
-  static void resetPerInstanceMemoryPages();
+  static void resetPerInstanceAllocators();
 
   _INTR_INLINE static uint8_t* allocatePerInstanceDataMemory(uint32_t p_Size,
                                                              uint32_t& p_Offset)
@@ -37,34 +31,38 @@ struct UniformManager
     const uint32_t bufferIdx =
         Renderer::Vulkan::RenderSystem::_backbufferIndex %
         _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
-    UniformDataMemoryPage page;
 
-    if (p_Size < _INTR_VK_PER_INSTANCE_PAGE_SMALL_SIZE_IN_BYTES)
+    MemoryBlock block;
+
+    if (p_Size < _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES)
     {
-      page = _perInstanceMemoryPagesSmall[bufferIdx].pop_back();
+      block = _perInstanceAllocatorSmall[bufferIdx].allocate();
     }
-    else if (p_Size < _INTR_VK_PER_INSTANCE_PAGE_LARGE_SIZE_IN_BYTES)
+    else if (p_Size < _INTR_VK_PER_INSTANCE_BLOCK_LARGE_SIZE_IN_BYTES)
     {
-      page = _perInstanceMemoryPagesLarge[bufferIdx].pop_back();
+      block = _perInstanceAllocatorLarge[bufferIdx].allocate();
     }
     else
     {
       _INTR_ASSERT(false);
     }
 
-    p_Offset = page.memoryOffset;
-    return &_perInstanceMemory[page.memoryOffset];
+    p_Offset = block.memoryOffset;
+    return block.memory;
   }
 
   // <-
 
-  _INTR_INLINE static void allocatePerMaterialDataMemory(uint32_t p_Size,
-                                                         uint32_t& p_Offset)
+  _INTR_INLINE static uint32_t allocatePerMaterialDataMemory()
   {
-    UniformDataMemoryPage page = _perMaterialMemoryPages.back();
-    _perMaterialMemoryPages.pop_back();
+    return _perMaterialAllocator.allocate().memoryOffset;
+  }
 
-    p_Offset = page.memoryOffset;
+  // <-
+
+  _INTR_INLINE static void freePerMaterialDataMemory(uint32_t p_Offset)
+  {
+    _perMaterialAllocator.free({nullptr, p_Offset});
   }
 
   // <-
@@ -99,15 +97,6 @@ struct UniformManager
 
   // <-
 
-  _INTR_INLINE static void freePerMaterialDataMemory(uint32_t p_Offset)
-  {
-    UniformDataMemoryPage page = {_INTR_VK_PER_MATERIAL_PAGE_SIZE_IN_BYTES,
-                                  p_Offset};
-    _perMaterialMemoryPages.push_back(page);
-  }
-
-  // <-
-
   // Static members
   static uint8_t* _perInstanceMemory;
 
@@ -115,16 +104,19 @@ struct UniformManager
   static Resources::BufferRef _perMaterialUniformBuffer;
 
 private:
-  static LockFreeStack<UniformDataMemoryPage,
-                       _INTR_VK_PER_INSTANCE_PAGE_SMALL_COUNT>
-      _perInstanceMemoryPagesSmall[_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
-  static LockFreeStack<UniformDataMemoryPage,
-                       _INTR_VK_PER_INSTANCE_PAGE_LARGE_COUNT>
-      _perInstanceMemoryPagesLarge[_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
+  static LockFreeFixedBlockAllocator<
+      _INTR_VK_PER_INSTANCE_BLOCK_SMALL_COUNT,
+      _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES>
+      _perInstanceAllocatorSmall[_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
+  static LockFreeFixedBlockAllocator<
+      _INTR_VK_PER_INSTANCE_BLOCK_LARGE_COUNT,
+      _INTR_VK_PER_INSTANCE_BLOCK_LARGE_SIZE_IN_BYTES>
+      _perInstanceAllocatorLarge[_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
+  static LockFreeFixedBlockAllocator<_INTR_VK_PER_MATERIAL_BLOCK_COUNT,
+                                     _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES>
+      _perMaterialAllocator;
 
   static Resources::BufferRef _perMaterialStagingUniformBuffer;
-  static _INTR_ARRAY(UniformManager::UniformDataMemoryPage)
-      _perMaterialMemoryPages;
 };
 }
 }
