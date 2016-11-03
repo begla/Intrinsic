@@ -31,33 +31,24 @@ struct BufferData : Dod::Resources::ResourceDataBase
   {
     descBufferType.resize(_INTR_MAX_BUFFER_COUNT);
     descMemoryPoolType.resize(_INTR_MAX_BUFFER_COUNT);
-    descBufferMemoryUsage.resize(_INTR_MAX_BUFFER_COUNT);
     descSizeInBytes.resize(_INTR_MAX_BUFFER_COUNT);
     descInitialData.resize(_INTR_MAX_BUFFER_COUNT);
 
     vkDescriptorBufferInfo.resize(_INTR_MAX_BUFFER_COUNT);
     vkBuffer.resize(_INTR_MAX_BUFFER_COUNT);
-    vkDeviceMemory.resize(_INTR_MAX_BUFFER_COUNT);
-    memoryOffset.resize(_INTR_MAX_BUFFER_COUNT);
-
-    for (uint32_t i = 0u; i < _INTR_MAX_BUFFER_COUNT; ++i)
-    {
-      memoryOffset[i] = (uint32_t)-1;
-    }
+    memoryAllocationInfo.resize(_INTR_MAX_BUFFER_COUNT);
   }
 
   // <-
 
   _INTR_ARRAY(BufferType::Enum) descBufferType;
   _INTR_ARRAY(MemoryPoolType::Enum) descMemoryPoolType;
-  _INTR_ARRAY(MemoryUsage::Enum) descBufferMemoryUsage;
   _INTR_ARRAY(uint32_t) descSizeInBytes;
   _INTR_ARRAY(void*) descInitialData;
 
   _INTR_ARRAY(VkDescriptorBufferInfo) vkDescriptorBufferInfo;
   _INTR_ARRAY(VkBuffer) vkBuffer;
-  _INTR_ARRAY(VkDeviceMemory) vkDeviceMemory;
-  _INTR_ARRAY(uint32_t) memoryOffset;
+  _INTR_ARRAY(MemoryAllocationInfo) memoryAllocationInfo;
 };
 
 struct BufferManager
@@ -87,7 +78,6 @@ struct BufferManager
     _descMemoryPoolType(p_Ref) = MemoryPoolType::kStaticBuffers;
     _descBufferType(p_Ref) = BufferType::kVertex;
     _descSizeInBytes(p_Ref) = 0u;
-    _descBufferMemoryUsage(p_Ref) = MemoryUsage::kOptimal;
     _descInitialData(p_Ref) = nullptr;
   }
 
@@ -163,9 +153,6 @@ struct BufferManager
         RenderSystem::releaseResource(_N(VkBuffer), (void*)buffer, nullptr);
         buffer = VK_NULL_HANDLE;
       }
-
-      _vkDeviceMemory(ref) = VK_NULL_HANDLE;
-      _memoryOffset(ref) = (uint32_t)-1;
     }
   }
 
@@ -186,10 +173,11 @@ struct BufferManager
 
   _INTR_INLINE static uint8_t* getGpuMemory(BufferRef p_Ref)
   {
-    _INTR_ASSERT(_descBufferMemoryUsage(p_Ref) == MemoryUsage::kStaging &&
-                 "Memory access not available for non-staging buffers");
+    _INTR_ASSERT(GpuMemoryManager::getMemoryUsage(
+                     (MemoryPoolType::Enum)_memoryAllocationInfo(p_Ref)
+                         .memoryPoolType) == MemoryUsage::kStaging);
     return GpuMemoryManager::getHostVisibleMemoryForOffset(
-        _memoryOffset(p_Ref));
+        _memoryAllocationInfo(p_Ref).offsetInBytes);
   }
 
   // <-
@@ -221,10 +209,6 @@ struct BufferManager
   {
     return _data.descMemoryPoolType[p_Ref._id];
   }
-  _INTR_INLINE static MemoryUsage::Enum& _descBufferMemoryUsage(BufferRef p_Ref)
-  {
-    return _data.descBufferMemoryUsage[p_Ref._id];
-  }
   _INTR_INLINE static uint32_t& _descSizeInBytes(BufferRef p_Ref)
   {
     return _data.descSizeInBytes[p_Ref._id];
@@ -235,13 +219,10 @@ struct BufferManager
   {
     return _data.vkBuffer[p_Ref._id];
   }
-  _INTR_INLINE static VkDeviceMemory& _vkDeviceMemory(BufferRef p_Ref)
+  _INTR_INLINE static MemoryAllocationInfo&
+  _memoryAllocationInfo(BufferRef p_Ref)
   {
-    return _data.vkDeviceMemory[p_Ref._id];
-  }
-  _INTR_INLINE static uint32_t& _memoryOffset(BufferRef p_Ref)
-  {
-    return _data.memoryOffset[p_Ref._id];
+    return _data.memoryAllocationInfo[p_Ref._id];
   }
 };
 }

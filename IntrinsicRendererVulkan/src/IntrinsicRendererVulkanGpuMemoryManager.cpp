@@ -32,11 +32,13 @@ VkDeviceMemory GpuMemoryManager::_vkDeviceLocalMemory = VK_NULL_HANDLE;
 VkDeviceMemory GpuMemoryManager::_vkHostVisibleMemory = VK_NULL_HANDLE;
 uint8_t* GpuMemoryManager::_mappedHostVisibleMemory = nullptr;
 
+uint32_t GpuMemoryManager::_memoryPoolSizesInBytes[MemoryPoolType::kCount] = {};
+MemoryUsage::Enum GpuMemoryManager::_memoryPoolUsages[MemoryPoolType::kCount] =
+    {};
+const char* GpuMemoryManager::_memoryPoolNames[MemoryPoolType::kCount] = {};
+
 namespace
 {
-uint32_t _memoryPoolSizesInBytes[MemoryPoolType::kCount] = {};
-MemoryUsage::Enum _memoryPoolUsages[MemoryPoolType::kCount] = {};
-const char* _memoryPoolNames[MemoryPoolType::kCount] = {};
 }
 
 void GpuMemoryManager::init()

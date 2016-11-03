@@ -84,6 +84,23 @@ struct GpuMemoryManager
 
   // <-
 
+  _INTR_INLINE static VkDeviceMemory
+  getDeviceMemory(MemoryPoolType::Enum p_MemoryPoolType)
+  {
+    return _memoryPoolUsages[p_MemoryPoolType] == MemoryUsage::kOptimal
+               ? _vkDeviceLocalMemory
+               : _vkHostVisibleMemory;
+  }
+
+  // <-
+
+  _INTR_INLINE static MemoryUsage::Enum
+  getMemoryUsage(MemoryPoolType::Enum p_MemoryPoolType)
+  {
+    return _memoryPoolUsages[p_MemoryPoolType];
+  }
+
+private:
   static Core::LinearOffsetAllocator _memoryAllocators[MemoryPoolType::kCount];
 
   static uint32_t _deviceLocalMemorySizeInBytes;
@@ -92,6 +109,10 @@ struct GpuMemoryManager
   static VkDeviceMemory _vkHostVisibleMemory;
 
   static uint8_t* _mappedHostVisibleMemory;
+
+  static uint32_t _memoryPoolSizesInBytes[MemoryPoolType::kCount];
+  static MemoryUsage::Enum _memoryPoolUsages[MemoryPoolType::kCount];
+  static const char* _memoryPoolNames[MemoryPoolType::kCount];
 };
 }
 }

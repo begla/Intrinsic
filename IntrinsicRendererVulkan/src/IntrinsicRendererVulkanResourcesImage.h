@@ -42,7 +42,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
     vkImage.resize(_INTR_MAX_IMAGE_COUNT);
     vkImageView.resize(_INTR_MAX_IMAGE_COUNT);
     vkSubResourceImageViews.resize(_INTR_MAX_IMAGE_COUNT);
-    vkDeviceMemory.resize(_INTR_MAX_IMAGE_COUNT);
+    memoryAllocationInfo.resize(_INTR_MAX_IMAGE_COUNT);
   }
 
   // Description
@@ -59,7 +59,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(VkImage) vkImage;
   _INTR_ARRAY(VkImageView) vkImageView;
   _INTR_ARRAY(ImageViewArray) vkSubResourceImageViews;
-  _INTR_ARRAY(VkDeviceMemory) vkDeviceMemory;
+  _INTR_ARRAY(MemoryAllocationInfo) memoryAllocationInfo;
 };
 
 struct ImageManager
@@ -201,7 +201,6 @@ struct ImageManager
       VkImage& vkImage = _vkImage(ref);
       ImageViewArray& vkImageViews = _vkSubResourceImageViews(ref);
       VkImageView& vkImageView = _vkImageView(ref);
-      VkDeviceMemory& vkDeviceMemory = _vkDeviceMemory(ref);
 
       if (!hasImageFlags(ref, ImageFlags::kExternalImage))
       {
@@ -236,8 +235,6 @@ struct ImageManager
         }
       }
       vkImageViews.clear();
-
-      vkDeviceMemory = VK_NULL_HANDLE;
     }
   }
 
@@ -373,9 +370,10 @@ struct ImageManager
   {
     return _data.vkSubResourceImageViews[p_Ref._id];
   }
-  _INTR_INLINE static VkDeviceMemory& _vkDeviceMemory(ImageRef p_Ref)
+  _INTR_INLINE static MemoryAllocationInfo&
+  _memoryAllocationInfo(ImageRef p_Ref)
   {
-    return _data.vkDeviceMemory[p_Ref._id];
+    return _data.memoryAllocationInfo[p_Ref._id];
   }
 };
 }
