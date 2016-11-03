@@ -424,6 +424,8 @@ void Bloom::updateResolutionDependentResources()
     ImageManager::resetToDefault(_lumImageRef);
     ImageManager::addResourceFlags(
         _lumImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_lumImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_lumImageRef) = glm::uvec3(
         calculateThreadGroups(dim.x / 2u, LUM_AND_BRIGHT_THREADS),
@@ -442,6 +444,8 @@ void Bloom::updateResolutionDependentResources()
     ImageManager::resetToDefault(_blurImageRef);
     ImageManager::addResourceFlags(
         _blurImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_blurImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_blurImageRef) = dim;
     ImageManager::_descImageFormat(_blurImageRef) = Format::kR16G16B16A16Float;
@@ -460,6 +464,8 @@ void Bloom::updateResolutionDependentResources()
     ImageManager::addResourceFlags(
         _blurPingPongImageRef,
         Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_blurPingPongImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_blurPingPongImageRef) = dim;
     ImageManager::_descImageFormat(_blurPingPongImageRef) =
@@ -479,6 +485,8 @@ void Bloom::updateResolutionDependentResources()
     ImageManager::resetToDefault(_summedImageRef);
     ImageManager::addResourceFlags(
         _summedImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_summedImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_summedImageRef) = dim;
     ImageManager::_descImageFormat(_summedImageRef) =
@@ -497,6 +505,8 @@ void Bloom::updateResolutionDependentResources()
     ImageManager::resetToDefault(_brightImageRef);
     ImageManager::addResourceFlags(
         _brightImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_brightImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_brightImageRef) = dim;
     ImageManager::_descImageFormat(_brightImageRef) =

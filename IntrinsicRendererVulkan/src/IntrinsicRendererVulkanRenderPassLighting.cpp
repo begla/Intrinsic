@@ -199,6 +199,8 @@ void Lighting::updateResolutionDependentResources()
     ImageManager::addResourceFlags(
         _lightingBufferImageRef,
         Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_lightingBufferImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_lightingBufferImageRef) = dim;
     ImageManager::_descImageFormat(_lightingBufferImageRef) =
@@ -214,6 +216,8 @@ void Lighting::updateResolutionDependentResources()
     ImageManager::addResourceFlags(
         _lightingBufferTransparentsImageRef,
         Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_lightingBufferTransparentsImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_lightingBufferTransparentsImageRef) = dim;
     ImageManager::_descImageFormat(_lightingBufferTransparentsImageRef) =

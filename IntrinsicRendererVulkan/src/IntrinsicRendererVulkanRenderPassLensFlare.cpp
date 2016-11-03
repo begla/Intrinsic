@@ -173,6 +173,8 @@ void LensFlare::updateResolutionDependentResources()
     ImageManager::resetToDefault(_imageRef);
     ImageManager::addResourceFlags(
         _imageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_imageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_imageRef) = dim;
     ImageManager::_descImageFormat(_imageRef) = Format::kR16G16B16A16Float;
@@ -187,6 +189,8 @@ void LensFlare::updateResolutionDependentResources()
     ImageManager::resetToDefault(_pingPongImageRef);
     ImageManager::addResourceFlags(
         _pingPongImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_pingPongImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_pingPongImageRef) = dim;
     ImageManager::_descImageFormat(_pingPongImageRef) =

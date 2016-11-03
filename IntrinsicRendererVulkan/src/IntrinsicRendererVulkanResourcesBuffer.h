@@ -30,6 +30,7 @@ struct BufferData : Dod::Resources::ResourceDataBase
   BufferData() : Dod::Resources::ResourceDataBase(_INTR_MAX_BUFFER_COUNT)
   {
     descBufferType.resize(_INTR_MAX_BUFFER_COUNT);
+    descMemoryPoolType.resize(_INTR_MAX_BUFFER_COUNT);
     descBufferMemoryUsage.resize(_INTR_MAX_BUFFER_COUNT);
     descSizeInBytes.resize(_INTR_MAX_BUFFER_COUNT);
     descInitialData.resize(_INTR_MAX_BUFFER_COUNT);
@@ -48,6 +49,7 @@ struct BufferData : Dod::Resources::ResourceDataBase
   // <-
 
   _INTR_ARRAY(BufferType::Enum) descBufferType;
+  _INTR_ARRAY(MemoryPoolType::Enum) descMemoryPoolType;
   _INTR_ARRAY(MemoryUsage::Enum) descBufferMemoryUsage;
   _INTR_ARRAY(uint32_t) descSizeInBytes;
   _INTR_ARRAY(void*) descInitialData;
@@ -82,6 +84,7 @@ struct BufferManager
 
   _INTR_INLINE static void resetToDefault(BufferRef p_Ref)
   {
+    _descMemoryPoolType(p_Ref) = MemoryPoolType::kStaticBuffers;
     _descBufferType(p_Ref) = BufferType::kVertex;
     _descSizeInBytes(p_Ref) = 0u;
     _descBufferMemoryUsage(p_Ref) = MemoryUsage::kOptimal;
@@ -213,6 +216,10 @@ struct BufferManager
   _INTR_INLINE static void*& _descInitialData(BufferRef p_Ref)
   {
     return _data.descInitialData[p_Ref._id];
+  }
+  _INTR_INLINE static MemoryPoolType::Enum& _descMemoryPoolType(BufferRef p_Ref)
+  {
+    return _data.descMemoryPoolType[p_Ref._id];
   }
   _INTR_INLINE static MemoryUsage::Enum& _descBufferMemoryUsage(BufferRef p_Ref)
   {

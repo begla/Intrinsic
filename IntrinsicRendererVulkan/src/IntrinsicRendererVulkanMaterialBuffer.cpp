@@ -58,6 +58,8 @@ void MaterialBuffer::init()
         BufferType::kStorage;
     BufferManager::_descBufferMemoryUsage(_materialStagingBuffer) =
         MemoryUsage::kStaging;
+    BufferManager::_descMemoryPoolType(_materialStagingBuffer) =
+        MemoryPoolType::kStaticStagingBuffers;
     BufferManager::_descSizeInBytes(_materialStagingBuffer) =
         sizeof(MaterialBufferEntry);
     buffersToCreate.push_back(_materialStagingBuffer);

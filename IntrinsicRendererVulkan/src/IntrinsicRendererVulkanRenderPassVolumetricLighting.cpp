@@ -119,38 +119,9 @@ void VolumetricLighting::init()
 
   PipelineLayoutManager::createResources(pipelineLayoutsToCreate);
   PipelineManager::createResources(pipelinesToCreate);
-}
 
-// <-
-
-void VolumetricLighting::updateResolutionDependentResources()
-{
-  using namespace Resources;
-
-  ImageRefArray imgsToDestroy;
   ImageRefArray imgsToCreate;
-  ComputeCallRefArray computeCallsToDestroy;
   ComputeCallRefArray computeCallsToCreate;
-
-  // Cleanup old resources
-  {
-    if (_computeCallRef.isValid())
-      computeCallsToDestroy.push_back(_computeCallRef);
-    if (_computeCallPrevFrameRef.isValid())
-      computeCallsToDestroy.push_back(_computeCallPrevFrameRef);
-    if (_computeCallScatteringRef.isValid())
-      computeCallsToDestroy.push_back(_computeCallScatteringRef);
-
-    if (_volLightingBufferImageRef.isValid())
-      imgsToDestroy.push_back(_volLightingBufferImageRef);
-    if (_volLightingBufferPrevFrameImageRef.isValid())
-      imgsToDestroy.push_back(_volLightingBufferPrevFrameImageRef);
-    if (_volLightingScatteringBufferImageRef.isValid())
-      imgsToDestroy.push_back(_volLightingScatteringBufferImageRef);
-
-    ComputeCallManager::destroyComputeCallsAndResources(computeCallsToDestroy);
-    ImageManager::destroyImagesAndResources(imgsToDestroy);
-  }
 
   glm::uvec3 dim = glm::uvec3(160u, 90u, 128u);
 
@@ -303,6 +274,10 @@ void VolumetricLighting::updateResolutionDependentResources()
 
   ComputeCallManager::createResources(computeCallsToCreate);
 }
+
+// <-
+
+void VolumetricLighting::updateResolutionDependentResources() {}
 
 // <-
 

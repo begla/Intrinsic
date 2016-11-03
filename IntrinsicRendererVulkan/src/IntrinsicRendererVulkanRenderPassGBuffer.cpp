@@ -107,6 +107,8 @@ void GBuffer::updateResolutionDependentResources()
     ImageManager::resetToDefault(_albedoImageRef);
     ImageManager::addResourceFlags(
         _albedoImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_albedoImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_albedoImageRef) = dim;
     ImageManager::_descImageFormat(_albedoImageRef) =
@@ -120,6 +122,8 @@ void GBuffer::updateResolutionDependentResources()
     ImageManager::resetToDefault(_normalImageRef);
     ImageManager::addResourceFlags(
         _normalImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_normalImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_normalImageRef) = dim;
     ImageManager::_descImageFormat(_normalImageRef) =
@@ -133,6 +137,8 @@ void GBuffer::updateResolutionDependentResources()
     ImageManager::resetToDefault(_parameter0ImageRef);
     ImageManager::addResourceFlags(
         _parameter0ImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_parameter0ImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_parameter0ImageRef) = dim;
     ImageManager::_descImageFormat(_parameter0ImageRef) =
@@ -146,6 +152,8 @@ void GBuffer::updateResolutionDependentResources()
     ImageManager::resetToDefault(_depthImageRef);
     ImageManager::addResourceFlags(
         _depthImageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    ImageManager::_descMemoryPoolType(_depthImageRef) =
+        MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_depthImageRef) = dim;
     ImageManager::_descImageFormat(_depthImageRef) = Format::kD24UnormS8UInt;
