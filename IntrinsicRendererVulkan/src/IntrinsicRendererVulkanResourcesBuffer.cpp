@@ -59,27 +59,40 @@ void BufferManager::createResources(const BufferRefArray& p_Buffers)
     VkMemoryRequirements memReqs;
     vkGetBufferMemoryRequirements(RenderSystem::_vkDevice, buffer, &memReqs);
 
-    VkDeviceMemory& deviceMemory = _vkDeviceMemory(bufferRef);
-    uint32_t& memoryOffset = _memoryOffset(bufferRef);
+    MemoryPoolType::Enum memoryPoolType = _descMemoryPoolType(bufferRef);
+    MemoryAllocationInfo& memoryAllocationInfo =
+        _memoryAllocationInfo(bufferRef);
+    VkDeviceMemory deviceMemory =
+        GpuMemoryManager::getDeviceMemory(memoryPoolType);
 
-    if (_descBufferMemoryUsage(bufferRef) == MemoryUsage::kOptimal)
-    {
-      deviceMemory = GpuMemoryManager::_vkDeviceLocalMemory;
-      memoryOffset = GpuMemoryManager::allocateOffset(
-          _descMemoryPoolType(bufferRef), (uint32_t)memReqs.size,
-          (uint32_t)memReqs.alignment);
-    }
-    else if (_descBufferMemoryUsage(bufferRef) == MemoryUsage::kStaging)
-    {
-      deviceMemory = GpuMemoryManager::_vkHostVisibleMemory;
-      memoryOffset = GpuMemoryManager::allocateOffset(
-          _descMemoryPoolType(bufferRef), (uint32_t)memReqs.size,
-          (uint32_t)memReqs.alignment);
-    }
-    _INTR_ASSERT(deviceMemory && memoryOffset != (uint32_t)-1);
+    bool needsAlloc = true;
 
-    result = vkBindBufferMemory(RenderSystem::_vkDevice, buffer, deviceMemory,
-                                memoryOffset);
+    // Try to keep memory for static buffers
+    if (memoryPoolType >= MemoryPoolType::kRangeStartStatic &&
+        memoryPoolType <= MemoryPoolType::kRangeEndStatic)
+    {
+      if (memoryAllocationInfo.memoryPoolType == memoryPoolType &&
+          memReqs.size <= memoryAllocationInfo.sizeInBytes &&
+          memReqs.alignment == memoryAllocationInfo.alignmentInBytes &&
+          deviceMemory == memoryAllocationInfo.vkDeviceMemory)
+      {
+        needsAlloc = false;
+      }
+    }
+
+    if (needsAlloc)
+    {
+      memoryAllocationInfo.sizeInBytes = (uint32_t)memReqs.size;
+      memoryAllocationInfo.alignmentInBytes = (uint32_t)memReqs.alignment;
+      memoryAllocationInfo.memoryPoolType = memoryPoolType;
+      memoryAllocationInfo.vkDeviceMemory = deviceMemory;
+      memoryAllocationInfo.offsetInBytes = GpuMemoryManager::allocateOffset(
+          memoryPoolType, (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
+    }
+
+    result = vkBindBufferMemory(RenderSystem::_vkDevice, buffer,
+                                memoryAllocationInfo.vkDeviceMemory,
+                                memoryAllocationInfo.offsetInBytes);
     _INTR_VK_CHECK_RESULT(result);
 
     void* initialData = _descInitialData(bufferRef);
@@ -111,7 +124,8 @@ void BufferManager::createResources(const BufferRefArray& p_Buffers)
           (uint32_t)memReqs.alignment);
 
       result = vkBindBufferMemory(RenderSystem::_vkDevice, stagingBuffer,
-                                  GpuMemoryManager::_vkHostVisibleMemory,
+                                  GpuMemoryManager::getDeviceMemory(
+                                      MemoryPoolType::kVolatileStagingBuffers),
                                   stagingMemOffset);
       _INTR_VK_CHECK_RESULT(result);
 

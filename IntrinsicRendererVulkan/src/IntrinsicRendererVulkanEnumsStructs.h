@@ -20,6 +20,15 @@ namespace Renderer
 {
 namespace Vulkan
 {
+struct MemoryAllocationInfo
+{
+  VkDeviceMemory vkDeviceMemory;
+  uint32_t sizeInBytes;
+  uint32_t alignmentInBytes;
+  uint32_t offsetInBytes;
+  uint8_t memoryPoolType;
+};
+
 namespace RenderSize
 {
 enum Enum

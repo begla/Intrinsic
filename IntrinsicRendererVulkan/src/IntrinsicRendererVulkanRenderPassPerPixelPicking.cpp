@@ -143,7 +143,6 @@ void PerPixelPicking::updateResolutionDependentResources()
       BufferManager::_descMemoryPoolType(bufferRef) =
           MemoryPoolType::kResolutionDependentStagingBuffers;
 
-      BufferManager::_descBufferMemoryUsage(bufferRef) = MemoryUsage::kStaging;
       BufferManager::_descBufferType(bufferRef) = BufferType::kStorage;
       BufferManager::_descSizeInBytes(bufferRef) =
           (uint32_t)_perPixelPickingSize.x * (uint32_t)_perPixelPickingSize.y *

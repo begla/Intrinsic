@@ -167,8 +167,6 @@ void Debug::init()
     BufferManager::_descBufferType(lineVertexBuffer) = BufferType::kVertex;
     BufferManager::_descSizeInBytes(lineVertexBuffer) =
         MAX_LINE_COUNT * sizeof(DebugLineVertex) * 2u;
-    BufferManager::_descBufferMemoryUsage(lineVertexBuffer) =
-        MemoryUsage::kStaging;
     BufferManager::_descMemoryPoolType(lineVertexBuffer) =
         MemoryPoolType::kStaticStagingBuffers;
 
