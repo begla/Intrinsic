@@ -27,16 +27,18 @@ Resources::BufferRef _perInstanceUniformBuffer;
 Resources::BufferRef _perMaterialUniformBuffer;
 uint8_t* UniformManager::_perInstanceMemory = nullptr;
 Tlsf::Allocator _perMaterialAllocator;
-LockFreeStack<UniformManager::UniformDataMemoryPage,
-              _INTR_VK_PER_INSTANCE_PAGE_SMALL_COUNT>
-    UniformManager::_perInstanceMemoryPagesSmall
+
+LockFreeFixedBlockAllocator<_INTR_VK_PER_INSTANCE_BLOCK_SMALL_COUNT,
+                            _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES>
+    UniformManager::_perInstanceAllocatorSmall
         [_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
-LockFreeStack<UniformManager::UniformDataMemoryPage,
-              _INTR_VK_PER_INSTANCE_PAGE_LARGE_COUNT>
-    UniformManager::_perInstanceMemoryPagesLarge
+LockFreeFixedBlockAllocator<_INTR_VK_PER_INSTANCE_BLOCK_LARGE_COUNT,
+                            _INTR_VK_PER_INSTANCE_BLOCK_LARGE_SIZE_IN_BYTES>
+    UniformManager::_perInstanceAllocatorLarge
         [_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
-_INTR_ARRAY(UniformManager::UniformDataMemoryPage)
-UniformManager::_perMaterialMemoryPages;
+LockFreeFixedBlockAllocator<_INTR_VK_PER_MATERIAL_BLOCK_COUNT,
+                            _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES>
+    UniformManager::_perMaterialAllocator;
 
 Resources::BufferRef UniformManager::_perInstanceUniformBuffer;
 Resources::BufferRef UniformManager::_perMaterialUniformBuffer;
@@ -99,7 +101,7 @@ void UniformManager::init()
     BufferManager::_descBufferMemoryUsage(_perMaterialStagingUniformBuffer) =
         MemoryUsage::kStaging;
     BufferManager::_descSizeInBytes(_perMaterialStagingUniformBuffer) =
-        _INTR_VK_PER_MATERIAL_PAGE_SIZE_IN_BYTES;
+        _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES;
     buffersToCreate.push_back(_perMaterialStagingUniformBuffer);
   }
 
@@ -108,41 +110,20 @@ void UniformManager::init()
   // Get host memory
   _perInstanceMemory = BufferManager::getGpuMemory(_perInstanceUniformBuffer);
 
-  // Init. per instance data memory pages
+  // Init. per instance data memory blocks
   {
-    uint32_t offset = 0u;
+    uint32_t currentOffset = 0u;
     for (uint32_t bufferIdx = 0u;
          bufferIdx < _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT; ++bufferIdx)
     {
-      _perInstanceMemoryPagesSmall[bufferIdx].resize(
-          _INTR_VK_PER_INSTANCE_PAGE_SMALL_COUNT);
-      _perInstanceMemoryPagesLarge[bufferIdx].resize(
-          _INTR_VK_PER_INSTANCE_PAGE_LARGE_COUNT);
-
-      for (uint32_t pageIdx = 0u;
-           pageIdx < _perInstanceMemoryPagesSmall[bufferIdx].size(); ++pageIdx)
-      {
-        _INTR_ASSERT(
-            (offset + _INTR_VK_PER_INSTANCE_PAGE_SMALL_SIZE_IN_BYTES) <=
-                _INTR_VK_PER_INSTANCE_UNIFORM_MEMORY_IN_BYTES &&
-            "Instance uniform memory exhausted");
-
-        _perInstanceMemoryPagesSmall[bufferIdx][pageIdx] = {
-            _INTR_VK_PER_INSTANCE_PAGE_SMALL_SIZE_IN_BYTES, offset};
-        offset += _INTR_VK_PER_INSTANCE_PAGE_SMALL_SIZE_IN_BYTES;
-      }
-      for (uint32_t pageIdx = 0u;
-           pageIdx < _perInstanceMemoryPagesLarge[bufferIdx].size(); ++pageIdx)
-      {
-        _INTR_ASSERT(
-            (offset + _INTR_VK_PER_INSTANCE_PAGE_LARGE_SIZE_IN_BYTES) <=
-                _INTR_VK_PER_INSTANCE_UNIFORM_MEMORY_IN_BYTES &&
-            "Instance uniform memory exhausted");
-
-        _perInstanceMemoryPagesLarge[bufferIdx][pageIdx] = {
-            _INTR_VK_PER_INSTANCE_PAGE_LARGE_SIZE_IN_BYTES, offset};
-        offset += _INTR_VK_PER_INSTANCE_PAGE_LARGE_SIZE_IN_BYTES;
-      }
+      _perInstanceAllocatorSmall[bufferIdx].init(_perInstanceMemory,
+                                                 currentOffset);
+      currentOffset += _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES *
+                       _INTR_VK_PER_INSTANCE_BLOCK_SMALL_COUNT;
+      _perInstanceAllocatorLarge[bufferIdx].init(_perInstanceMemory,
+                                                 currentOffset);
+      currentOffset += _INTR_VK_PER_INSTANCE_BLOCK_LARGE_SIZE_IN_BYTES *
+                       _INTR_VK_PER_INSTANCE_BLOCK_LARGE_COUNT;
     }
   }
   _INTR_LOG_INFO(
@@ -151,38 +132,24 @@ void UniformManager::init()
 
   // ... and the per material ones
   {
-    _perMaterialMemoryPages.resize(_INTR_VK_PER_MATERIAL_PAGE_COUNT);
-
-    uint32_t offset = 0u;
-    for (uint32_t pageIdx = 0u; pageIdx < _perMaterialMemoryPages.size();
-         ++pageIdx)
-    {
-      _INTR_ASSERT((offset + _INTR_VK_PER_MATERIAL_PAGE_SIZE_IN_BYTES) <=
-                       _INTR_VK_PER_MATERIAL_UNIFORM_MEMORY_IN_BYTES &&
-                   "Per material uniform memory exhausted");
-
-      _perMaterialMemoryPages[pageIdx] = {
-          _INTR_VK_PER_MATERIAL_PAGE_SIZE_IN_BYTES, offset};
-      offset += _INTR_VK_PER_MATERIAL_PAGE_SIZE_IN_BYTES;
-    }
-    _INTR_LOG_INFO(
-        "Allocated %.2f MB of per material uniform memory...",
-        Math::bytesToMegaBytes(_INTR_VK_PER_MATERIAL_UNIFORM_MEMORY_IN_BYTES));
-
-    _INTR_LOG_POP();
+    _perMaterialAllocator.init();
   }
+  _INTR_LOG_INFO(
+      "Allocated %.2f MB of per material uniform memory...",
+      Math::bytesToMegaBytes(_INTR_VK_PER_MATERIAL_UNIFORM_MEMORY_IN_BYTES));
+
+  _INTR_LOG_POP();
 }
 
 // <-
 
-void UniformManager::resetPerInstanceMemoryPages()
+void UniformManager::resetPerInstanceAllocators()
 {
   const uint32_t bufferIdx =
       RenderSystem::_backbufferIndex % _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
-  _perInstanceMemoryPagesSmall[bufferIdx].resize(
-      _INTR_VK_PER_INSTANCE_PAGE_SMALL_COUNT);
-  _perInstanceMemoryPagesLarge[bufferIdx].resize(
-      _INTR_VK_PER_INSTANCE_PAGE_LARGE_COUNT);
+
+  _perInstanceAllocatorSmall[bufferIdx].reset();
+  _perInstanceAllocatorLarge[bufferIdx].reset();
 }
 }
 }
