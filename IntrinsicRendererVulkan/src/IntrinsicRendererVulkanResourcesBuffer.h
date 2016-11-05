@@ -175,7 +175,7 @@ struct BufferManager
   {
     _INTR_ASSERT(GpuMemoryManager::getMemoryUsage(
                      (MemoryPoolType::Enum)_memoryAllocationInfo(p_Ref)
-                         .memoryPoolType) == MemoryUsage::kStaging);
+                         .memoryPoolType) == MemoryLocation::kHostVisible);
     return GpuMemoryManager::getHostVisibleMemoryForOffset(
         _memoryAllocationInfo(p_Ref).offsetInBytes);
   }

@@ -20,6 +20,31 @@ namespace Renderer
 {
 namespace Vulkan
 {
+namespace MemoryPoolType
+{
+enum Enum
+{
+  kStaticImages,
+  kStaticBuffers,
+  kStaticStagingBuffers,
+
+  kResolutionDependentImages,
+  kResolutionDependentBuffers,
+  kResolutionDependentStagingBuffers,
+
+  kVolatileStagingBuffers,
+
+  kCount,
+
+  kRangeStartStatic = kStaticImages,
+  kRangeEndStatic = kStaticStagingBuffers,
+  kRangeStartResolutionDependent = kResolutionDependentImages,
+  kRangeEndResolutionDependent = kResolutionDependentStagingBuffers,
+  kRangeStartVolatile = kVolatileStagingBuffers,
+  kRangeEndVolatile = kVolatileStagingBuffers
+};
+}
+
 struct MemoryAllocationInfo
 {
   VkDeviceMemory vkDeviceMemory;
@@ -142,12 +167,12 @@ enum Enum
 };
 }
 
-namespace MemoryUsage
+namespace MemoryLocation
 {
 enum Enum
 {
-  kOptimal,
-  kStaging
+  kDeviceLocal,
+  kHostVisible
 };
 }
 

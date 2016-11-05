@@ -20,31 +20,6 @@ namespace Renderer
 {
 namespace Vulkan
 {
-namespace MemoryPoolType
-{
-enum Enum
-{
-  kStaticImages,
-  kStaticBuffers,
-  kStaticStagingBuffers,
-
-  kResolutionDependentImages,
-  kResolutionDependentBuffers,
-  kResolutionDependentStagingBuffers,
-
-  kVolatileStagingBuffers,
-
-  kCount,
-
-  kRangeStartStatic = kStaticImages,
-  kRangeEndStatic = kStaticStagingBuffers,
-  kRangeStartResolutionDependent = kResolutionDependentImages,
-  kRangeEndResolutionDependent = kResolutionDependentStagingBuffers,
-  kRangeStartVolatile = kVolatileStagingBuffers,
-  kRangeEndVolatile = kVolatileStagingBuffers
-};
-}
-
 struct GpuMemoryManager
 {
   static void init();
@@ -87,14 +62,14 @@ struct GpuMemoryManager
   _INTR_INLINE static VkDeviceMemory
   getDeviceMemory(MemoryPoolType::Enum p_MemoryPoolType)
   {
-    return _memoryPoolUsages[p_MemoryPoolType] == MemoryUsage::kOptimal
+    return _memoryPoolUsages[p_MemoryPoolType] == MemoryLocation::kDeviceLocal
                ? _vkDeviceLocalMemory
                : _vkHostVisibleMemory;
   }
 
   // <-
 
-  _INTR_INLINE static MemoryUsage::Enum
+  _INTR_INLINE static MemoryLocation::Enum
   getMemoryUsage(MemoryPoolType::Enum p_MemoryPoolType)
   {
     return _memoryPoolUsages[p_MemoryPoolType];
@@ -111,7 +86,7 @@ private:
   static uint8_t* _mappedHostVisibleMemory;
 
   static uint32_t _memoryPoolSizesInBytes[MemoryPoolType::kCount];
-  static MemoryUsage::Enum _memoryPoolUsages[MemoryPoolType::kCount];
+  static MemoryLocation::Enum _memoryPoolUsages[MemoryPoolType::kCount];
   static const char* _memoryPoolNames[MemoryPoolType::kCount];
 };
 }
