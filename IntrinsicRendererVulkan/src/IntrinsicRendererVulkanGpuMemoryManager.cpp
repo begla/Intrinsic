@@ -33,8 +33,8 @@ VkDeviceMemory GpuMemoryManager::_vkHostVisibleMemory = VK_NULL_HANDLE;
 uint8_t* GpuMemoryManager::_mappedHostVisibleMemory = nullptr;
 
 uint32_t GpuMemoryManager::_memoryPoolSizesInBytes[MemoryPoolType::kCount] = {};
-MemoryUsage::Enum GpuMemoryManager::_memoryPoolUsages[MemoryPoolType::kCount] =
-    {};
+MemoryLocation::Enum
+    GpuMemoryManager::_memoryPoolUsages[MemoryPoolType::kCount] = {};
 const char* GpuMemoryManager::_memoryPoolNames[MemoryPoolType::kCount] = {};
 
 namespace
@@ -50,32 +50,34 @@ void GpuMemoryManager::init()
   {
     _memoryPoolSizesInBytes[MemoryPoolType::kStaticImages] =
         512u * 1024u * 1024u;
-    _memoryPoolUsages[MemoryPoolType::kStaticImages] = MemoryUsage::kOptimal;
+    _memoryPoolUsages[MemoryPoolType::kStaticImages] =
+        MemoryLocation::kDeviceLocal;
     _memoryPoolNames[MemoryPoolType::kStaticImages] = "Static Images";
 
     _memoryPoolSizesInBytes[MemoryPoolType::kStaticBuffers] =
         64u * 1024u * 1024u;
-    _memoryPoolUsages[MemoryPoolType::kStaticBuffers] = MemoryUsage::kOptimal;
+    _memoryPoolUsages[MemoryPoolType::kStaticBuffers] =
+        MemoryLocation::kDeviceLocal;
     _memoryPoolNames[MemoryPoolType::kStaticBuffers] = "Static Buffers";
 
     _memoryPoolSizesInBytes[MemoryPoolType::kStaticStagingBuffers] =
         64u * 1024u * 1024u;
     _memoryPoolUsages[MemoryPoolType::kStaticStagingBuffers] =
-        MemoryUsage::kStaging;
+        MemoryLocation::kHostVisible;
     _memoryPoolNames[MemoryPoolType::kStaticStagingBuffers] =
         "Static Staging Buffers";
 
     _memoryPoolSizesInBytes[MemoryPoolType::kResolutionDependentImages] =
         512u * 1024u * 1024u;
     _memoryPoolUsages[MemoryPoolType::kResolutionDependentImages] =
-        MemoryUsage::kOptimal;
+        MemoryLocation::kDeviceLocal;
     _memoryPoolNames[MemoryPoolType::kResolutionDependentImages] =
         "Resolution Dependent Images";
 
     _memoryPoolSizesInBytes[MemoryPoolType::kResolutionDependentBuffers] =
         64u * 1024u * 1024u;
     _memoryPoolUsages[MemoryPoolType::kResolutionDependentBuffers] =
-        MemoryUsage::kOptimal;
+        MemoryLocation::kDeviceLocal;
     _memoryPoolNames[MemoryPoolType::kResolutionDependentBuffers] =
         "Resolution Dependent Buffers";
 
@@ -83,14 +85,14 @@ void GpuMemoryManager::init()
         [MemoryPoolType::kResolutionDependentStagingBuffers] =
             64u * 1024u * 1024u;
     _memoryPoolUsages[MemoryPoolType::kResolutionDependentStagingBuffers] =
-        MemoryUsage::kStaging;
+        MemoryLocation::kHostVisible;
     _memoryPoolNames[MemoryPoolType::kResolutionDependentStagingBuffers] =
         "Resolution Dependent Staging Buffers";
 
     _memoryPoolSizesInBytes[MemoryPoolType::kVolatileStagingBuffers] =
         64u * 1024u * 1024u;
     _memoryPoolUsages[MemoryPoolType::kVolatileStagingBuffers] =
-        MemoryUsage::kStaging;
+        MemoryLocation::kHostVisible;
     _memoryPoolNames[MemoryPoolType::kVolatileStagingBuffers] =
         "Volatile Staging Buffers";
   }
@@ -137,7 +139,7 @@ void GpuMemoryManager::init()
 
     for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
     {
-      if (_memoryPoolUsages[i] == MemoryUsage::kOptimal)
+      if (_memoryPoolUsages[i] == MemoryLocation::kDeviceLocal)
       {
         _deviceLocalMemorySizeInBytes += _memoryPoolSizesInBytes[i];
       }
@@ -163,7 +165,7 @@ void GpuMemoryManager::init()
   {
     for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
     {
-      if (_memoryPoolUsages[i] == MemoryUsage::kStaging)
+      if (_memoryPoolUsages[i] == MemoryLocation::kHostVisible)
       {
         _hostVisibleMemorySizeInBytes += _memoryPoolSizesInBytes[i];
       }
@@ -192,13 +194,13 @@ void GpuMemoryManager::init()
 
     for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
     {
-      if (_memoryPoolUsages[i] == MemoryUsage::kOptimal)
+      if (_memoryPoolUsages[i] == MemoryLocation::kDeviceLocal)
       {
         _memoryAllocators[i].init(_memoryPoolSizesInBytes[i],
                                   deviceLocalOffset);
         deviceLocalOffset += _memoryPoolSizesInBytes[i];
       }
-      else if (_memoryPoolUsages[i] == MemoryUsage::kStaging)
+      else if (_memoryPoolUsages[i] == MemoryLocation::kHostVisible)
       {
         _memoryAllocators[i].init(_memoryPoolSizesInBytes[i],
                                   hostVisibleOffset);
