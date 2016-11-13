@@ -267,13 +267,10 @@ struct RenderSystem
 
   // <-
 
-  static _INTR_ARRAY(Core::Dod::Ref)
+  static LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>
       _visibleDrawCallsPerMaterialPass[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT]
                                       [MaterialPass::kCount];
-  static _INTR_ARRAY(Core::Dod::Ref)
-      _visibleMeshComponentsPerMaterialPass[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT]
-                                           [MaterialPass::kCount];
-  static _INTR_ARRAY(Core::Dod::Ref)
+  static LockFreeStack<Core::Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT>
       _visibleMeshComponents[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT];
 
 private:

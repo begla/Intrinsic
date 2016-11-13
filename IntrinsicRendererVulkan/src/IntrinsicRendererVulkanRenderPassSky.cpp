@@ -112,25 +112,10 @@ void Sky::render(float p_DeltaT)
   _INTR_PROFILE_CPU("Render Pass", "Render Sky");
   _INTR_PROFILE_GPU("Render Sky");
 
-  static Components::MeshRefArray visibleMeshes;
-  visibleMeshes.clear();
-  visibleMeshes.insert(
-      visibleMeshes.begin(),
-      RenderSystem::_visibleMeshComponentsPerMaterialPass[0u]
-                                                         [MaterialPass::kSky]
-                                                             .begin(),
-      RenderSystem::_visibleMeshComponentsPerMaterialPass[0u]
-                                                         [MaterialPass::kSky]
-                                                             .end());
-
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
-  visibleDrawCalls.insert(
-      visibleDrawCalls.begin(),
-      RenderSystem::_visibleDrawCallsPerMaterialPass[0u][MaterialPass::kSky]
-          .begin(),
-      RenderSystem::_visibleDrawCallsPerMaterialPass[0u][MaterialPass::kSky]
-          .end());
+  RenderSystem::_visibleDrawCallsPerMaterialPass[0u][MaterialPass::kSky].copy(
+      visibleDrawCalls);
 
   if (visibleDrawCalls.empty())
   {
@@ -139,8 +124,7 @@ void Sky::render(float p_DeltaT)
 
   // Update per mesh uniform data
   {
-    Core::Components::MeshManager::updateUniformData(
-        RenderSystem::_visibleDrawCallsPerMaterialPass[0u][MaterialPass::kSky]);
+    Core::Components::MeshManager::updateUniformData(visibleDrawCalls);
   }
 
   RenderSystem::beginRenderPass(_renderPassRef, _framebufferRef,

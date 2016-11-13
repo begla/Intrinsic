@@ -101,22 +101,19 @@ template <class T, uint64_t Capacity> struct LockFreeStack
 
   _INTR_INLINE void insert(const _INTR_ARRAY(T) & p_Array)
   {
-    uint64_t oldSize = Threading::interlockedAdd(_size, p_Array.size());
-
-    for (uint64_t i = 0u; i < p_Array.size(); ++i)
-    {
-      _data[oldSize + i] = p_Array[i];
-    }
+    const Threading::Atomic oldSize =
+        Threading::interlockedAdd(_size, p_Array.size());
+    _INTR_ASSERT(oldSize + p_Array.size() <= _capacity);
+    memcpy(&_data[oldSize + i], p_Array.data(), p_Array.size() * sizeof(T));
   }
 
   // <-
 
   _INTR_INLINE void copy(_INTR_ARRAY(T) & p_Array) const
   {
-    for (uint64_t i = 0u; i < _size; ++i)
-    {
-      p_Array.push_back(_data[i]);
-    }
+    const uint32_t startIdx = (uint32_t)p_Array.size();
+    p_Array.resize(p_Array.size() + _size);
+    memcpy(&p_Array.data()[startIdx], _data, _size * sizeof(T));
   }
 
   // <-
