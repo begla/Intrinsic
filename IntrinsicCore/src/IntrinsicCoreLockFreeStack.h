@@ -104,7 +104,7 @@ template <class T, uint64_t Capacity> struct LockFreeStack
     const Threading::Atomic oldSize =
         Threading::interlockedAdd(_size, p_Array.size());
     _INTR_ASSERT(oldSize + p_Array.size() <= _capacity);
-    memcpy(&_data[oldSize + i], p_Array.data(), p_Array.size() * sizeof(T));
+    memcpy(&_data[oldSize], p_Array.data(), p_Array.size() * sizeof(T));
   }
 
   // <-
