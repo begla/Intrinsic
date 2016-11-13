@@ -278,52 +278,21 @@ void Shadow::render(float p_DeltaT)
 
     const uint32_t frustumIdx = shadowMapIdx + 1u;
 
-    static Components::MeshRefArray visibleMeshes;
-    visibleMeshes.clear();
-    visibleMeshes.insert(visibleMeshes.begin(),
-                         RenderSystem::_visibleMeshComponentsPerMaterialPass
-                             [frustumIdx][MaterialPass::kShadow]
-                                 .begin(),
-                         RenderSystem::_visibleMeshComponentsPerMaterialPass
-                             [frustumIdx][MaterialPass::kShadow]
-                                 .end());
-    visibleMeshes.insert(visibleMeshes.begin(),
-                         RenderSystem::_visibleMeshComponentsPerMaterialPass
-                             [frustumIdx][MaterialPass::kShadowFoliage]
-                                 .begin(),
-                         RenderSystem::_visibleMeshComponentsPerMaterialPass
-                             [frustumIdx][MaterialPass::kShadowFoliage]
-                                 .end());
-
     static DrawCallRefArray visibleDrawCalls;
     visibleDrawCalls.clear();
-    visibleDrawCalls.insert(
-        visibleDrawCalls.begin(),
-        RenderSystem::_visibleDrawCallsPerMaterialPass[frustumIdx]
-                                                      [MaterialPass::kShadow]
-                                                          .begin(),
-        RenderSystem::_visibleDrawCallsPerMaterialPass[frustumIdx]
-                                                      [MaterialPass::kShadow]
-                                                          .end());
-    visibleDrawCalls.insert(visibleDrawCalls.begin(),
-                            RenderSystem::_visibleDrawCallsPerMaterialPass
-                                [frustumIdx][MaterialPass::kShadowFoliage]
-                                    .begin(),
-                            RenderSystem::_visibleDrawCallsPerMaterialPass
-                                [frustumIdx][MaterialPass::kShadowFoliage]
-                                    .end());
+    RenderSystem::_visibleDrawCallsPerMaterialPass[frustumIdx]
+                                                  [MaterialPass::kShadow]
+                                                      .copy(visibleDrawCalls);
+    RenderSystem::_visibleDrawCallsPerMaterialPass[frustumIdx]
+                                                  [MaterialPass::kShadowFoliage]
+                                                      .copy(visibleDrawCalls);
 
     DrawCallManager::sortDrawCallsFrontToBack(visibleDrawCalls);
 
     // Update per mesh uniform data
     {
-      Components::MeshManager::updatePerInstanceData(shadowMapIdx + 1u);
-      Core::Components::MeshManager::updateUniformData(
-          RenderSystem::_visibleDrawCallsPerMaterialPass
-              [shadowMapIdx + 1u][MaterialPass::kShadow]);
-      Core::Components::MeshManager::updateUniformData(
-          RenderSystem::_visibleDrawCallsPerMaterialPass
-              [shadowMapIdx + 1u][MaterialPass::kShadowFoliage]);
+      Components::MeshManager::updatePerInstanceData(frustumIdx);
+      Core::Components::MeshManager::updateUniformData(visibleDrawCalls);
     }
 
     VkClearValue clearValues[1] = {};

@@ -193,25 +193,11 @@ void PerPixelPicking::render(float p_DeltaT)
   _INTR_PROFILE_CPU("Render Pass", "Render Per Pixel Picking");
   _INTR_PROFILE_GPU("Render Per Pixel Picking");
 
-  static Components::MeshRefArray visibleMeshes;
-  visibleMeshes.clear();
-  visibleMeshes.insert(visibleMeshes.begin(),
-                       RenderSystem::_visibleMeshComponentsPerMaterialPass
-                           [0u][MaterialPass::kPerPixelPicking]
-                               .begin(),
-                       RenderSystem::_visibleMeshComponentsPerMaterialPass
-                           [0u][MaterialPass::kPerPixelPicking]
-                               .end());
-
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
-  visibleDrawCalls.insert(visibleDrawCalls.begin(),
-                          RenderSystem::_visibleDrawCallsPerMaterialPass
-                              [0u][MaterialPass::kPerPixelPicking]
-                                  .begin(),
-                          RenderSystem::_visibleDrawCallsPerMaterialPass
-                              [0u][MaterialPass::kPerPixelPicking]
-                                  .end());
+  RenderSystem::_visibleDrawCallsPerMaterialPass[0u]
+                                                [MaterialPass::kPerPixelPicking]
+                                                    .copy(visibleDrawCalls);
 
   if (visibleDrawCalls.empty())
   {
@@ -220,9 +206,7 @@ void PerPixelPicking::render(float p_DeltaT)
 
   // Update per mesh uniform data
   {
-    Core::Components::MeshManager::updateUniformData(
-        RenderSystem::_visibleDrawCallsPerMaterialPass
-            [0u][MaterialPass::kPerPixelPicking]);
+    Core::Components::MeshManager::updateUniformData(visibleDrawCalls);
   }
 
   ImageManager::insertImageMemoryBarrier(

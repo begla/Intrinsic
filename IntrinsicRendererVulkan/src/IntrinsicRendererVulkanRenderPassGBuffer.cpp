@@ -198,49 +198,19 @@ void GBuffer::render(float p_DeltaT)
   _INTR_PROFILE_CPU("Render Pass", "Render GBuffer");
   _INTR_PROFILE_GPU("Render GBuffer");
 
-  static Components::MeshRefArray visibleMeshes;
-  visibleMeshes.clear();
-  visibleMeshes.insert(visibleMeshes.begin(),
-                       RenderSystem::_visibleMeshComponentsPerMaterialPass
-                           [0u][MaterialPass::kSurface]
-                               .begin(),
-                       RenderSystem::_visibleMeshComponentsPerMaterialPass
-                           [0u][MaterialPass::kSurface]
-                               .end());
-  visibleMeshes.insert(visibleMeshes.begin(),
-                       RenderSystem::_visibleMeshComponentsPerMaterialPass
-                           [0u][MaterialPass::kSurfaceLayered]
-                               .begin(),
-                       RenderSystem::_visibleMeshComponentsPerMaterialPass
-                           [0u][MaterialPass::kSurfaceLayered]
-                               .end());
-
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
-  visibleDrawCalls.insert(
-      visibleDrawCalls.begin(),
-      RenderSystem::_visibleDrawCallsPerMaterialPass[0u][MaterialPass::kSurface]
-          .begin(),
-      RenderSystem::_visibleDrawCallsPerMaterialPass[0u][MaterialPass::kSurface]
-          .end());
-  visibleDrawCalls.insert(visibleDrawCalls.begin(),
-                          RenderSystem::_visibleDrawCallsPerMaterialPass
-                              [0u][MaterialPass::kSurfaceLayered]
-                                  .begin(),
-                          RenderSystem::_visibleDrawCallsPerMaterialPass
-                              [0u][MaterialPass::kSurfaceLayered]
-                                  .end());
+  RenderSystem::_visibleDrawCallsPerMaterialPass[0u][MaterialPass::kSurface]
+      .copy(visibleDrawCalls);
+  RenderSystem::_visibleDrawCallsPerMaterialPass[0u]
+                                                [MaterialPass::kSurfaceLayered]
+                                                    .copy(visibleDrawCalls);
 
   DrawCallManager::sortDrawCallsFrontToBack(visibleDrawCalls);
 
   // Update per mesh uniform data
   {
-    Core::Components::MeshManager::updateUniformData(
-        RenderSystem::_visibleDrawCallsPerMaterialPass[0u]
-                                                      [MaterialPass::kSurface]);
-    Core::Components::MeshManager::updateUniformData(
-        RenderSystem::_visibleDrawCallsPerMaterialPass
-            [0u][MaterialPass::kSurfaceLayered]);
+    Core::Components::MeshManager::updateUniformData(visibleDrawCalls);
   }
 
   VkCommandBuffer primaryCmdBuffer = RenderSystem::getPrimaryCommandBuffer();
