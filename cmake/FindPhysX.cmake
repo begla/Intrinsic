@@ -10,7 +10,7 @@
 #  PhysX_PROFILE
 
 FIND_PATH(PhysX_INCLUDE_DIR PxPhysicsAPI.h
-  PATH_SUFFIXES include
+  PATH_SUFFIXES include Include
   PATHS
   ${PHYSX_HOME}
   $ENV{PHYSX_HOME}
@@ -54,6 +54,7 @@ FIND_LIBRARY(PhysX_LIBRARY_RELEASE PhysX3${PHYSXPREFIX}
   PATH_SUFFIXES lib64 lib Lib/${LIBFOLDERSUFFIX}
   PATHS
   ${PhysX_LIBRARY_DIR}
+  ${PhysX_LIBRARY_DIR}/../../Bin/${LIBFOLDER}
   ${PHYSX_HOME}
   $ENV{PHYSX_HOME}
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
@@ -71,6 +72,7 @@ FIND_LIBRARY(PhysX_LIBRARY_PROFILE PhysX3PROFILE${PHYSXPREFIX}
   PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
   PATHS
   ${PhysX_LIBRARY_DIR}
+  ${PhysX_LIBRARY_DIR}/../../Bin/${LIBFOLDER}
   ${PHYSX_HOME}
   $ENV{PHYSX_HOME}
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
@@ -88,6 +90,7 @@ FIND_LIBRARY(PhysX_LIBRARY_DEBUG PhysX3DEBUG${PHYSXPREFIX}
   PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
   PATHS
   ${PhysX_LIBRARY_DIR}
+  ${PhysX_LIBRARY_DIR}/../../Bin/${LIBFOLDER}
   ${PHYSX_HOME}
   $ENV{PHYSX_HOME}
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
@@ -117,6 +120,7 @@ FOREACH(component ${PhysX_FIND_COMPONENTS})
     PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
     PATHS
     ${PhysX_LIBRARY_DIR}
+    ${PhysX_LIBRARY_DIR}/../../Bin/${LIBFOLDER}
     ${PHYSX_HOME}
     $ENV{PHYSX_HOME}
     ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
@@ -141,6 +145,7 @@ FOREACH(component ${PhysX_FIND_COMPONENTS})
     PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
     PATHS
     ${PhysX_LIBRARY_DIR}
+    ${PhysX_LIBRARY_DIR}/../../Bin/${LIBFOLDER}
     ${PHYSX_HOME}
     $ENV{PHYSX_HOME}
     ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
