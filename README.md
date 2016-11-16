@@ -44,9 +44,42 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 14. If everything went well, you'll find the solution in the newly created "build" folder. You can also use one of the many build scripts: "Build_Release.bat", ... to get started
 15. Execute "Intrinsic.exe" or "IntrinsicEd.exe" in the "app" directory - yey!
 
-## Linux
+## Linux (Fresh Ubuntu 16.10 Install)
 
-Coming soon...
+### Prerequisites
+
+sudo apt install git cmake ninja-build libsdl2-dev
+
+### Setup Instructions
+1. Download and install the Qt (open-source) distribution  
+    Add environment variables to your .zshrc or .bashrc:  
+       # Intrinsic  
+       export INTR_QTDIR="[...]/Qt/x.x/gcc_64"  
+
+2. Download and install the Vulkan SDK
+    Add environment variables to your .zshrc or .bashrc:  
+       # vulkan sdk  
+       VULKAN_SDK=~/[...]/VulkanSDK/1.0.30.0/x86_64  
+       VK_LAYER_PATH=$VULKAN_SDK/etc/explicit_layer.d  
+  
+       export VK_LAYER_PATH  
+       export PATH=$VULKAN_SDK/bin:$PATH  
+
+3. Get access to the latest PhysX SDK  
+   After cloning of the git repository apply patches from https://github.com/NVIDIAGameWorks/PhysX-3.3/pull/57  
+   cd [...]/PhysX-3.3/PhysXSDK/Source/compiler/linux64  
+   make release profile debug  
+  
+   Add environment variables to your .zshrc or .bashrc:  
+      export PHYSX_HOME="$HOME/[...]/PhysX-3.3/PhysXSDK/"  
+  
+4. Download and install Autodesk FBX SDK  
+
+5. Go to the "scripts_linux" folder in the Intrinsic repository dir
+6. Execute "ConfigAndBuildDependencies"
+7. Execute "Config_Release"
+8. Execute "Build"
+9. Execute "Run_Release"
 
 # Build Status
 
