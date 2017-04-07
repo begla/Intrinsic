@@ -28,4 +28,3 @@ app/assets/*
 !app/assets/shaders
 
 app/Intrinsic.log
-Intrinsic_Dependencies/
