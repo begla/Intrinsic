@@ -695,11 +695,17 @@ void RenderSystem::initOrUpdateVkSwapChain()
     bool found = false;
     for (uint32_t i = 0u; i < presentModeCount; ++i)
     {
-      if (presentModes[i] == presentModeToUse)
-      {
-        found = true;
-        break;
-      }
+		if (presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
+		{
+			presentModeToUse = VK_PRESENT_MODE_MAILBOX_KHR;
+			found = true;
+			break;
+		}
+		if ((presentModeToUse != VK_PRESENT_MODE_MAILBOX_KHR) && (presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR))
+		{
+			presentModeToUse = VK_PRESENT_MODE_IMMEDIATE_KHR;
+			found = true;
+		}
     }
     _INTR_ASSERT(found && "Present mode not supported");
   }

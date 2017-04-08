@@ -208,8 +208,14 @@ mapBindingTypeToVkDescriptorType(BindingType::Enum p_BindingType)
   return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 }
 
-// <-
+/*
+	@param:	VkPhysicalDevice physicalDevice
+	@param:	VkFormat& depthFormat
+	@return: bool - returns true if optimal format for depth buffer was found
+*/
+bool GetSupportedDepthFormat(VkPhysicalDevice physicalDevice, Format::Enum& depthFormat);
 
+// <-
 _INTR_INLINE VkFormat mapFormatToVkFormat(Format::Enum p_Format)
 {
   switch (p_Format)
@@ -257,6 +263,14 @@ _INTR_INLINE VkFormat mapFormatToVkFormat(Format::Enum p_Format)
     return VK_FORMAT_BC5_SNORM_BLOCK;
   case Format::kBC6UFloat:
     return VK_FORMAT_BC6H_UFLOAT_BLOCK;
+  case Format::kD32sFLOATs8UINT:
+		return VK_FORMAT_D32_SFLOAT_S8_UINT;
+  case Format::kD32sFLOAT:
+	  return VK_FORMAT_D32_SFLOAT;
+  case Format::kD16UNORM:
+	  return VK_FORMAT_D16_UNORM;
+  case Format::kD16UnormS8UInt:
+	  return VK_FORMAT_D16_UNORM_S8_UINT;
   }
 
   _INTR_ASSERT(false && "Failed to map format");
@@ -271,6 +285,14 @@ _INTR_INLINE bool isFormatDepthStencilFormat(Format::Enum p_Format)
   {
   case Format::kD24UnormS8UInt:
     return true;
+  case Format::kD16UnormS8UInt:
+	  return true;
+  case Format::kD32sFLOATs8UINT:
+	  return true;
+  case Format::kD32sFLOAT:
+	  return true;
+  case Format::kD16UNORM:
+	  return true;
   }
 
   return false;

@@ -115,8 +115,26 @@ void createTexture(ImageRef p_Ref)
   _INTR_ASSERT(dimensions.x >= 1.0f && dimensions.y >= 1.0f &&
                dimensions.z >= 1.0f);
 
-  bool isDepthTarget = vkFormat == VK_FORMAT_D24_UNORM_S8_UINT;
-  bool isStencilTarget = vkFormat == VK_FORMAT_D24_UNORM_S8_UINT;
+  std::vector<VkFormat> depthFormats =
+  {
+	  VK_FORMAT_D32_SFLOAT_S8_UINT,
+	  VK_FORMAT_D32_SFLOAT,
+	  VK_FORMAT_D24_UNORM_S8_UINT,
+	  VK_FORMAT_D16_UNORM_S8_UINT,
+	  VK_FORMAT_D16_UNORM
+  };
+
+  bool isDepthTarget = false;
+  bool isStencilTarget = false;
+  for (auto& depth : depthFormats)
+  {
+	  if (vkFormat == depth)
+	  {
+		  isDepthTarget = true;
+		  isStencilTarget = true;
+		  break;
+	  }
+  }
 
   VkImageType vkImageType = VK_IMAGE_TYPE_1D;
   VkImageViewType vkImageViewTypeSubResource = VK_IMAGE_VIEW_TYPE_1D;
@@ -312,6 +330,8 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
       ImageManager::_descMemoryPoolType(p_Ref);
 
   gli::texture_cube texCube = gli::texture_cube(p_Texture);
+  gli::texture::format_type type = texCube.format();
+
   _INTR_ASSERT(!texCube.empty());
 
   uint32_t width = static_cast<uint32_t>(texCube[0].extent(0u).x);
@@ -631,7 +651,8 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
 void createTextureFromFile(ImageRef p_Ref)
 {
   gli::texture tex = gli::load(
-      ("media/textures/" + ImageManager::_descFileName(p_Ref)).c_str());
+	  ("media/textures/" + ImageManager::_descFileName(p_Ref)).c_str());
+
 
   if (tex.target() == gli::target::TARGET_2D)
   {

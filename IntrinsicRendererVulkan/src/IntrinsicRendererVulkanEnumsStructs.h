@@ -237,13 +237,19 @@ enum Enum
   // Depth/Stencil
   kD24UnormS8UInt,
 
+
   // TODO: Clean this up
   kB8G8R8A8Srgb,
   kBC6UFloat,
   kBC3UNorm,
   kBC3Srgb,
   kR32SFloat,
-  kR32UInt
+  kR32UInt,
+
+  kD16UnormS8UInt,
+	kD32sFLOATs8UINT,
+	kD32sFLOAT,
+	kD16UNORM
 };
 }
 
