@@ -264,6 +264,7 @@ struct RenderSystem
 
   static uint32_t _backbufferIndex;
   static uint32_t _activeBackbufferMask;
+  static Format::Enum _depthBufferFormat;
 
   // <-
 
@@ -286,6 +287,7 @@ private:
   static void initVkCommandPools();
   static void initVkCommandBuffers();
   static void initVkTempCommandBuffer();
+  static void initVkSupportedDepthBufferFormat();
   static void destroyVkCommandBuffers();
   static void initVkSynchronization();
 

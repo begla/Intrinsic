@@ -43,8 +43,10 @@ void Sky::init()
     _renderPassRef = RenderPassManager::createRenderPass(_N(Sky));
     RenderPassManager::resetToDefault(_renderPassRef);
 
+
+
     AttachmentDescription albedoAttachment = {Format::kR16G16B16A16Float, 0u};
-    AttachmentDescription depthStencilAttachment = {Format::kD24UnormS8UInt,
+    AttachmentDescription depthStencilAttachment = { Vulkan::RenderSystem::_depthBufferFormat, // //Format::kD24UnormS8UInt
                                                     0u};
 
     RenderPassManager::_descAttachments(_renderPassRef)

@@ -46,6 +46,8 @@ void GBuffer::init()
     _renderPassRef = RenderPassManager::createRenderPass(_N(GBuffer));
     RenderPassManager::resetToDefault(_renderPassRef);
 
+
+
     AttachmentDescription albedoAttachment = {Format::kR16G16B16A16Float,
                                               AttachmentFlags::kClearOnLoad};
     AttachmentDescription normalAttachment = {Format::kR16G16B16A16Float,
@@ -53,7 +55,8 @@ void GBuffer::init()
     AttachmentDescription parameter0Attachment = {
         Format::kR16G16B16A16Float, AttachmentFlags::kClearOnLoad};
     AttachmentDescription depthStencilAttachment = {
-        Format::kD24UnormS8UInt,
+		Vulkan::RenderSystem::_depthBufferFormat,
+       // Format::kD24UnormS8UInt,
         AttachmentFlags::kClearOnLoad | AttachmentFlags::kClearStencilOnLoad};
 
     RenderPassManager::_descAttachments(_renderPassRef)
@@ -155,8 +158,9 @@ void GBuffer::updateResolutionDependentResources()
     ImageManager::_descMemoryPoolType(_depthImageRef) =
         MemoryPoolType::kResolutionDependentImages;
 
+
     ImageManager::_descDimensions(_depthImageRef) = dim;
-    ImageManager::_descImageFormat(_depthImageRef) = Format::kD24UnormS8UInt;
+	ImageManager::_descImageFormat(_depthImageRef) = Vulkan::RenderSystem::_depthBufferFormat; //Format::kD24UnormS8UInt;
     ImageManager::_descImageType(_depthImageRef) = ImageType::kTexture;
   }
   imgsToCreate.push_back(_depthImageRef);

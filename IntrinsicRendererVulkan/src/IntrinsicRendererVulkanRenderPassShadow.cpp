@@ -163,8 +163,6 @@ void Shadow::init()
   RenderPassRefArray renderPassesToCreate;
   ImageRefArray imagesToCreate;
 
-  //Get valid depth format
-  Format::Enum attDepthFormat;
 
   // Render passes
   {
@@ -172,16 +170,10 @@ void Shadow::init()
     RenderPassManager::resetToDefault(_renderPassRef);
 
 	
-	if (!Intrinsic::Renderer::Vulkan::Helper::GetSupportedDepthFormat(Intrinsic::Renderer::Vulkan::RenderSystem::_vkPhysicalDevice, attDepthFormat))
-	{
-		//Could not find optimal depth format
-		_INTR_ASSERT(false);
-	}
-
 
     AttachmentDescription shadowBufferAttachment = 
 	{
-		attDepthFormat,
+		Vulkan::RenderSystem::_depthBufferFormat,
         AttachmentFlags::kClearOnLoad | AttachmentFlags::kClearStencilOnLoad};
 		RenderPassManager::_descAttachments(_renderPassRef)
         .push_back(shadowBufferAttachment);
@@ -201,7 +193,7 @@ void Shadow::init()
         Dod::Resources::ResourceFlags::kResourceVolatile);
 
     ImageManager::_descDimensions(_shadowBufferImageRef) = dim;
-    ImageManager::_descImageFormat(_shadowBufferImageRef) = attDepthFormat;
+    ImageManager::_descImageFormat(_shadowBufferImageRef) = Vulkan::RenderSystem::_depthBufferFormat;
     ImageManager::_descImageType(_shadowBufferImageRef) = ImageType::kTexture;
     ImageManager::_descArrayLayerCount(_shadowBufferImageRef) =
         _INTR_MAX_SHADOW_MAP_COUNT;

@@ -55,6 +55,7 @@ uint32_t RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex = (uint32_t)-1;
 
 uint32_t RenderSystem::_backbufferIndex = 0u;
 uint32_t RenderSystem::_activeBackbufferMask = 0u;
+Format::Enum RenderSystem::_depthBufferFormat = Format::kD24UnormS8UInt;
 
 // <-
 
@@ -118,11 +119,12 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     PipelineManager::createAllResources();
   }
 
-  // Init. swap chain and cmd buffers
+  // Init. swap chain, cmd buffers and get supported depth buffer
   {
     initOrUpdateVkSwapChain();
     initVkSynchronization();
     initVkCommandBuffers();
+	initVkSupportedDepthBufferFormat();
   }
 
   // Init. separate manager
@@ -1001,6 +1003,15 @@ void RenderSystem::initVkTempCommandBuffer()
                                     nullptr, &_vkTempCommandBufferFence);
     _INTR_VK_CHECK_RESULT(result);
   }
+}
+
+void RenderSystem::initVkSupportedDepthBufferFormat()
+{
+	if (!Intrinsic::Renderer::Vulkan::Helper::GetSupportedDepthFormat(Intrinsic::Renderer::Vulkan::RenderSystem::_vkPhysicalDevice, Vulkan::RenderSystem::_depthBufferFormat))
+	{
+		//Could not find optimal depth format
+		_INTR_ASSERT(false);
+	}
 }
 
 void RenderSystem::initVkCommandBuffers()

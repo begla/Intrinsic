@@ -50,8 +50,11 @@ void PerPixelPicking::init()
 
     AttachmentDescription pickingAttachment = {Format::kR32UInt,
                                                AttachmentFlags::kClearOnLoad};
+
+
     AttachmentDescription depthStencilAttachment = {
-        Format::kD24UnormS8UInt,
+       // Format::kD24UnormS8UInt,
+		Vulkan::RenderSystem::_depthBufferFormat,
         AttachmentFlags::kClearOnLoad | AttachmentFlags::kClearStencilOnLoad};
 
     RenderPassManager::_descAttachments(_renderPassRef)
@@ -122,10 +125,12 @@ void PerPixelPicking::updateResolutionDependentResources()
     ImageManager::_descMemoryPoolType(_pickingDepthImageRef) =
         MemoryPoolType::kResolutionDependentImages;
 
+
+
     ImageManager::_descDimensions(_pickingDepthImageRef) =
         glm::uvec3(_perPixelPickingSize, 1u);
-    ImageManager::_descImageFormat(_pickingDepthImageRef) =
-        Format::kD24UnormS8UInt;
+	ImageManager::_descImageFormat(_pickingDepthImageRef) = Vulkan::RenderSystem::_depthBufferFormat;
+       // Format::kD24UnormS8UInt;
     ImageManager::_descImageType(_pickingDepthImageRef) = ImageType::kTexture;
   }
   imgsToCreate.push_back(_pickingDepthImageRef);
