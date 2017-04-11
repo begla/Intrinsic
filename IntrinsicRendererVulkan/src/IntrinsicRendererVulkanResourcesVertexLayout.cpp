@@ -67,10 +67,15 @@ void VertexLayoutManager::createResources(
       const VertexAttribute& vtxAttribute = vertexAttributes[i];
 
       {
+		VkFormat format = Helper::mapFormatToVkFormat((Format::Enum)vtxAttribute.format);
+		if (format == VK_FORMAT_R16G16B16_SFLOAT)
+		{
+			format = VK_FORMAT_R16G16B16A16_SFLOAT;
+		}
         vertexAttributeDesc.binding = vtxAttribute.binding;
         vertexAttributeDesc.location = vtxAttribute.location;
-        vertexAttributeDesc.format =
-            Helper::mapFormatToVkFormat((Format::Enum)vtxAttribute.format);
+		vertexAttributeDesc.format = format;
+          
         vertexAttributeDesc.offset = vtxAttribute.offset;
       }
     }
