@@ -15,7 +15,7 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 * Visual Studio 2015
 * CMake >= 3.2
 * Qt 5.7
-* Vulkan SDK 1.0.30.0
+* Vulkan SDK >= 1.0.30.0
 * PhysX 3.3
 * FBX SDK 2015.1
 
@@ -42,7 +42,8 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 12. Execute "CopyDllsToAppDir_Debug.bat" and "CopyDllsToAppDir_Release.bat"
 13. Execute "Config.bat" to create a Visual Studio 2015 solution file and all project configurations
 
-14. If everything went well, you'll find the solution in the newly created "build" folder. You can also use one of the many build scripts: "Build_Release.bat", ... to get started
+14. If everything went well, you'll find the solution in the newly created "build" folder. 
+    NOTE: You can also use one of the many build scripts: "Build_Release.bat", ... to get started
 15. Execute "Intrinsic.exe" or "IntrinsicEd.exe" in the "app" directory - yey!
 ```
 
@@ -64,7 +65,7 @@ sudo apt install git cmake ninja-build libsdl2-dev
 
 2. Download and install the Vulkan SDK
     Add environment variables to your .zshrc or .bashrc:  
-       # vulkan sdk  
+       # Vulkan SDK  
        VULKAN_SDK=~/[...]/VulkanSDK/1.0.30.0/x86_64  
        VK_LAYER_PATH=$VULKAN_SDK/etc/explicit_layer.d  
   
@@ -94,7 +95,6 @@ sudo apt install git cmake ninja-build libsdl2-dev
 |:--------:|:------------:|
 | Windows  | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/eevcf6gfm77309ud?svg=true)](https://ci.appveyor.com/project/begla/intrinsic) |
 | Linux    |  [![Linux Build Status](https://travis-ci.org/begla/Intrinsic.svg?branch=master)](https://travis-ci.org/begla/Intrinsic) |
-| Android  | Coming soon... |
 
 # License
 
