@@ -52,7 +52,7 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 16. You're all set - yey!
 ```
 
-## Linux (Fresh Ubuntu 16.10 Install)
+## Linux (Ubuntu 16.10)
 
 ### Prerequisites
 
