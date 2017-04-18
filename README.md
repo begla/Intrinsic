@@ -86,7 +86,6 @@ sudo apt install git cmake ninja-build libsdl2-dev
 8. Execute `Build`
 9. Execute `Run_Release`
 10. You're all set - yey!
-```
 
 # Build Status
 
