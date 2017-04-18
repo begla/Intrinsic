@@ -21,6 +21,7 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 
 ### Setup Instructions
 
+```
 1. Download and install the Qt (open-source) distribution
 2. Create a new environment variable "INTR_QTDIR" pointing to "[...]\Qtx.x\x.x\msvc2015_64"
 
@@ -43,14 +44,19 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 
 14. If everything went well, you'll find the solution in the newly created "build" folder. You can also use one of the many build scripts: "Build_Release.bat", ... to get started
 15. Execute "Intrinsic.exe" or "IntrinsicEd.exe" in the "app" directory - yey!
+```
 
 ## Linux (Fresh Ubuntu 16.10 Install)
 
 ### Prerequisites
 
+```
 sudo apt install git cmake ninja-build libsdl2-dev
+```
 
 ### Setup Instructions
+
+```
 1. Download and install the Qt (open-source) distribution  
     Add environment variables to your .zshrc or .bashrc:  
        # Intrinsic  
@@ -80,6 +86,7 @@ sudo apt install git cmake ninja-build libsdl2-dev
 7. Execute "Config_Release"
 8. Execute "Build"
 9. Execute "Run_Release"
+```
 
 # Build Status
 
