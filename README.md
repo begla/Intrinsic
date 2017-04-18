@@ -23,28 +23,33 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 
 ```
 1. Download and install the Qt (open-source) distribution
-2. Create a new environment variable "INTR_QTDIR" pointing to "[...]\Qtx.x\x.x\msvc2015_64"
+2. Create a new environment variable "INTR_QTDIR" pointing to "...\Qtx.x\x.x\msvc2015_64"
 
 3. Download an install the Vulkan SDK
 
-4. Get access to the latest PhysX SDK from NVIDIA: https://developer.nvidia.com/physx-sdk
-5. Follow the instructions from NVIDIA and compile the PhysX libraries for the configurations "Release", "Profile" and "Debug"
+4. Get access to the latest PhysX SDK from NVIDIA: 
+   https://developer.nvidia.com/physx-sdk
+5. Follow the instructions from NVIDIA and compile the PhysX libraries for the 
+   configurations "Release", "Profile" and "Debug"
    NOTE: Make sure that PhysX links the Runtime Library dynamically as Intrinsic does!
    
 6. Download and install the Autodesk FBX SDK
 
-7. Create a new directory called "Intrinsic_Dependencies" on the _same level_ as the Intrinsic repository folder
+7. Create a new directory called "Intrinsic_Dependencies" on the *same level* as 
+   the Intrinsic repository folder
 8. Inside, create a new folder "dependencies" containing two folders "physx" and "fbx"
-9. Copy the static/dynamic libraries and header files of both SDKs to folders named "bin" (DLLs), "lib" (LIBs) and "include" respectively
+9. Copy the static/dynamic libraries and header files of both SDKs to folders named "bin" (DLLs), 
+   "lib" (LIBs) and "include" respectively
 
 10. Go to the "scripts_win32" folder in the Intrinsic repository dir
 11. Execute "ConfigAndBuildDependencies.bat" to build some of the remaining dependencies automatically
 12. Execute "CopyDllsToAppDir_Debug.bat" and "CopyDllsToAppDir_Release.bat"
 13. Execute "Config.bat" to create a Visual Studio 2015 solution file and all project configurations
 
-14. If everything went well, you'll find the solution in the newly created "build" folder. 
+14. If everything went well, you'll find the solution in the newly created "build" folder
     NOTE: You can also use one of the many build scripts: "Build_Release.bat", ... to get started
-15. Execute "Intrinsic.exe" or "IntrinsicEd.exe" in the "app" directory - yey!
+15. Execute "Intrinsic.exe" or "IntrinsicEd.exe" in the "app" directory
+16. You're all set - yey!
 ```
 
 ## Linux (Fresh Ubuntu 16.10 Install)
@@ -58,7 +63,7 @@ sudo apt install git cmake ninja-build libsdl2-dev
 ### Setup Instructions
 
 ```
-1. Download and install the Qt (open-source) distribution  
+1. Download and install the Qt (open-source) distribution
     Add environment variables to your .zshrc or .bashrc:  
        # Intrinsic  
        export INTR_QTDIR="[...]/Qt/x.x/gcc_64"  
@@ -87,6 +92,7 @@ sudo apt install git cmake ninja-build libsdl2-dev
 7. Execute "Config_Release"
 8. Execute "Build"
 9. Execute "Run_Release"
+10. You're all set - yey!
 ```
 
 # Build Status
