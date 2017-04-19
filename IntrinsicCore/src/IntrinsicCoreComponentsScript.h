@@ -108,12 +108,14 @@ struct ScriptManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(ScriptRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember(
-        "scriptName", _INTR_CREATE_PROP(p_Document, _N(Script), _N(string),
-                                        _descScriptName(p_Ref), false, false),
+        "scriptName",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Script), _N(string),
+                          _descScriptName(p_Ref), false, false),
         p_Document.GetAllocator());
   }
 

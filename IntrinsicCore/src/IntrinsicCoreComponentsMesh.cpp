@@ -54,7 +54,7 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
           Components::NodeManager::_worldPosition(nodeRef),
           Resources::FrustumManager::_frustumWorldPosition(frustumRef));
 
-      // Fill per instance data and memcpy to buffer memory
+      // Fill per instance data
       MeshPerInstanceDataVertex& perInstanceDataVertex =
           Components::MeshManager::_perInstanceDataVertex(meshCompRef);
       {

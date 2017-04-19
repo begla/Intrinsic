@@ -81,7 +81,7 @@ void IntrinsicEdManagerWindowAsset::onPopulateResourceTree()
     _INTR_ASSERT(assetEntry.isValid());
 
     rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-    _propertyCompilerEntry.compileFunction(assetEntry, properties, doc);
+    _propertyCompilerEntry.compileFunction(assetEntry, true, properties, doc);
 
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0, properties["name"]["value"].GetString());

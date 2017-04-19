@@ -78,12 +78,14 @@ struct PipelineLayoutManager
   }
 
   _INTR_INLINE static void compileDescriptor(PipelineLayoutRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         PipelineLayoutData,
         _INTR_MAX_PIPELINE_LAYOUT_COUNT>::_compileDescriptor(p_Ref,
+                                                             p_GenerateDesc,
                                                              p_Properties,
                                                              p_Document);
   }

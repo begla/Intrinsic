@@ -2,2486 +2,596 @@
     {
         "name": "checkerboard",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "checkerboard"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 64.0,
-                "valueY": 64.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "checkerboard.dds"
-            }
+            "name": "checkerboard",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                64.0,
+                64.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 7,
+            "fileName": "checkerboard.dds"
         }
     },
     {
         "name": "Prop_Atlas_01",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Prop_Atlas_01"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 9
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 4096.0,
-                "valueY": 4096.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 13
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Prop_Atlas_01.dds"
-            }
+            "name": "Prop_Atlas_01",
+            "imageType": 1,
+            "imageFormat": 9,
+            "flags": 16,
+            "dimensions": [
+                4096.0,
+                4096.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 13,
+            "fileName": "Prop_Atlas_01.dds"
         }
     },
     {
         "name": "Tree_Atlas_01",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Tree_Atlas_01"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 9
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 4096.0,
-                "valueY": 4096.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 13
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Tree_Atlas_01.dds"
-            }
+            "name": "Tree_Atlas_01",
+            "imageType": 1,
+            "imageFormat": 9,
+            "flags": 16,
+            "dimensions": [
+                4096.0,
+                4096.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 13,
+            "fileName": "Tree_Atlas_01.dds"
         }
     },
     {
         "name": "Prop_Atlas_01_NRM",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Prop_Atlas_01_NRM"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 4096.0,
-                "valueY": 4096.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 13
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Prop_Atlas_01_NRM.dds"
-            }
+            "name": "Prop_Atlas_01_NRM",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                4096.0,
+                4096.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 13,
+            "fileName": "Prop_Atlas_01_NRM.dds"
         }
     },
     {
         "name": "Tree_Atlas_01_NRM",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Tree_Atlas_01_NRM"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 4096.0,
-                "valueY": 4096.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 13
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Tree_Atlas_01_NRM.dds"
-            }
+            "name": "Tree_Atlas_01_NRM",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                4096.0,
+                4096.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 13,
+            "fileName": "Tree_Atlas_01_NRM.dds"
         }
     },
     {
         "name": "Rock_01",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Rock_01"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 2048.0,
-                "valueY": 2048.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 12
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Rock_01.dds"
-            }
+            "name": "Rock_01",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                2048.0,
+                2048.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 12,
+            "fileName": "Rock_01.dds"
         }
     },
     {
         "name": "Rock_01_NRM",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Rock_01_NRM"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 2048.0,
-                "valueY": 2048.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 12
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Rock_01_NRM.dds"
-            }
+            "name": "Rock_01_NRM",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                2048.0,
+                2048.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 12,
+            "fileName": "Rock_01_NRM.dds"
         }
     },
     {
         "name": "Prop_Atlas_01_PBR",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Prop_Atlas_01_PBR"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 4096.0,
-                "valueY": 4096.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 13
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Prop_Atlas_01_PBR.dds"
-            }
+            "name": "Prop_Atlas_01_PBR",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                4096.0,
+                4096.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 13,
+            "fileName": "Prop_Atlas_01_PBR.dds"
         }
     },
     {
         "name": "Tree_Atlas_01_PBR",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Tree_Atlas_01_PBR"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 4096.0,
-                "valueY": 4096.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 13
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Tree_Atlas_01_PBR.dds"
-            }
+            "name": "Tree_Atlas_01_PBR",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                4096.0,
+                4096.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 13,
+            "fileName": "Tree_Atlas_01_PBR.dds"
         }
     },
     {
         "name": "default_NRM",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "default_NRM"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 1.0,
-                "valueY": 1.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "default_NRM.dds"
-            }
+            "name": "default_NRM",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 1,
+            "fileName": "default_NRM.dds"
         }
     },
     {
         "name": "default_PBR",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "default_PBR"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 512.0,
-                "valueY": 512.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 10
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "default_PBR.dds"
-            }
+            "name": "default_PBR",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                512.0,
+                512.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 10,
+            "fileName": "default_PBR.dds"
         }
     },
     {
         "name": "Rock_01_PBR",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Rock_01_PBR"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 2048.0,
-                "valueY": 2048.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 12
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Rock_01_PBR.dds"
-            }
+            "name": "Rock_01_PBR",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                2048.0,
+                2048.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 12,
+            "fileName": "Rock_01_PBR.dds"
         }
     },
     {
         "name": "Mono_Lake_C_Ref_cube_specular",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Mono_Lake_C_Ref_cube_specular"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 15
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 461.0,
-                "valueY": 461.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 9
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Mono_Lake_C_Ref_cube_specular.dds"
-            }
+            "name": "Mono_Lake_C_Ref_cube_specular",
+            "imageType": 1,
+            "imageFormat": 15,
+            "flags": 16,
+            "dimensions": [
+                461.0,
+                461.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 9,
+            "fileName": "Mono_Lake_C_Ref_cube_specular.dds"
         }
     },
     {
         "name": "Mono_Lake_C_Ref_cube_irradiance",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Mono_Lake_C_Ref_cube_irradiance"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 15
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 128.0,
-                "valueY": 128.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 8
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Mono_Lake_C_Ref_cube_irradiance.dds"
-            }
+            "name": "Mono_Lake_C_Ref_cube_irradiance",
+            "imageType": 1,
+            "imageFormat": 15,
+            "flags": 16,
+            "dimensions": [
+                128.0,
+                128.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 8,
+            "fileName": "Mono_Lake_C_Ref_cube_irradiance.dds"
         }
     },
     {
         "name": "Mono_Lake_C_Ref_cube_radiance",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Mono_Lake_C_Ref_cube_radiance"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 15
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 461.0,
-                "valueY": 461.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 9
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Mono_Lake_C_Ref_cube_radiance.dds"
-            }
+            "name": "Mono_Lake_C_Ref_cube_radiance",
+            "imageType": 1,
+            "imageFormat": 15,
+            "flags": 16,
+            "dimensions": [
+                461.0,
+                461.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 9,
+            "fileName": "Mono_Lake_C_Ref_cube_radiance.dds"
         }
     },
     {
         "name": "GCanyon_C_YumaPoint_3k_cube_irradiance",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "GCanyon_C_YumaPoint_3k_cube_irradiance"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 15
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 128.0,
-                "valueY": 128.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 8
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "GCanyon_C_YumaPoint_3k_cube_irradiance.dds"
-            }
+            "name": "GCanyon_C_YumaPoint_3k_cube_irradiance",
+            "imageType": 1,
+            "imageFormat": 15,
+            "flags": 16,
+            "dimensions": [
+                128.0,
+                128.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 8,
+            "fileName": "GCanyon_C_YumaPoint_3k_cube_irradiance.dds"
         }
     },
     {
         "name": "GCanyon_C_YumaPoint_3k_cube_radiance",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "GCanyon_C_YumaPoint_3k_cube_radiance"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 15
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 923.0,
-                "valueY": 923.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 10
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "GCanyon_C_YumaPoint_3k_cube_radiance.dds"
-            }
+            "name": "GCanyon_C_YumaPoint_3k_cube_radiance",
+            "imageType": 1,
+            "imageFormat": 15,
+            "flags": 16,
+            "dimensions": [
+                923.0,
+                923.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 10,
+            "fileName": "GCanyon_C_YumaPoint_3k_cube_radiance.dds"
         }
     },
     {
         "name": "GCanyon_C_YumaPoint_3k_cube_specular",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "GCanyon_C_YumaPoint_3k_cube_specular"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 15
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 923.0,
-                "valueY": 923.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 10
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "GCanyon_C_YumaPoint_3k_cube_specular.dds"
-            }
+            "name": "GCanyon_C_YumaPoint_3k_cube_specular",
+            "imageType": 1,
+            "imageFormat": 15,
+            "flags": 16,
+            "dimensions": [
+                923.0,
+                923.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 10,
+            "fileName": "GCanyon_C_YumaPoint_3k_cube_specular.dds"
         }
     },
     {
         "name": "water_NRM",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "water_NRM"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 2048.0,
-                "valueY": 2048.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 12
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "water_NRM.dds"
-            }
+            "name": "water_NRM",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                2048.0,
+                2048.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 12,
+            "fileName": "water_NRM.dds"
         }
     },
     {
         "name": "water",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "water"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 893.0,
-                "valueY": 893.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 10
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "water.dds"
-            }
+            "name": "water",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                893.0,
+                893.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 10,
+            "fileName": "water.dds"
         }
     },
     {
         "name": "water_PBR",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "water_PBR"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 893.0,
-                "valueY": 893.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 10
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "water_PBR.dds"
-            }
+            "name": "water_PBR",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                893.0,
+                893.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 10,
+            "fileName": "water_PBR.dds"
         }
     },
     {
         "name": "terrain_BLEND",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "terrain_BLEND"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 4097.0,
-                "valueY": 4097.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 13
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "terrain_BLEND.dds"
-            }
+            "name": "terrain_BLEND",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                4097.0,
+                4097.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 13,
+            "fileName": "terrain_BLEND.dds"
         }
     },
     {
         "name": "grassleaves_01",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "grassleaves_01"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 4096.0,
-                "valueY": 4096.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 13
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "grassleaves_01.dds"
-            }
+            "name": "grassleaves_01",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                4096.0,
+                4096.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 13,
+            "fileName": "grassleaves_01.dds"
         }
     },
     {
         "name": "gravel_01",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gravel_01"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 2048.0,
-                "valueY": 2048.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 12
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "gravel_01.dds"
-            }
+            "name": "gravel_01",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                2048.0,
+                2048.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 12,
+            "fileName": "gravel_01.dds"
         }
     },
     {
         "name": "Moss_01",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Moss_01"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 2048.0,
-                "valueY": 2048.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 12
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Moss_01.dds"
-            }
+            "name": "Moss_01",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                2048.0,
+                2048.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 12,
+            "fileName": "Moss_01.dds"
         }
     },
     {
         "name": "grassleaves_01_NRM",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "grassleaves_01_NRM"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 4096.0,
-                "valueY": 4096.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 13
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "grassleaves_01_NRM.dds"
-            }
+            "name": "grassleaves_01_NRM",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                4096.0,
+                4096.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 13,
+            "fileName": "grassleaves_01_NRM.dds"
         }
     },
     {
         "name": "gravel_01_NRM",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gravel_01_NRM"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 2048.0,
-                "valueY": 2048.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 12
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "gravel_01_NRM.dds"
-            }
+            "name": "gravel_01_NRM",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                2048.0,
+                2048.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 12,
+            "fileName": "gravel_01_NRM.dds"
         }
     },
     {
         "name": "Moss_01_NRM",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Moss_01_NRM"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 2048.0,
-                "valueY": 2048.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 12
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Moss_01_NRM.dds"
-            }
+            "name": "Moss_01_NRM",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                2048.0,
+                2048.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 12,
+            "fileName": "Moss_01_NRM.dds"
         }
     },
     {
         "name": "gravel_01_PBR",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gravel_01_PBR"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 2048.0,
-                "valueY": 2048.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 12
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "gravel_01_PBR.dds"
-            }
+            "name": "gravel_01_PBR",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                2048.0,
+                2048.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 12,
+            "fileName": "gravel_01_PBR.dds"
         }
     },
     {
         "name": "Moss_01_PBR",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "Moss_01_PBR"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 2048.0,
-                "valueY": 2048.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 12
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "Moss_01_PBR.dds"
-            }
+            "name": "Moss_01_PBR",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                2048.0,
+                2048.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 12,
+            "fileName": "Moss_01_PBR.dds"
         }
     },
     {
         "name": "grassleaves_01_PBR",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "grassleaves_01_PBR"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 4096.0,
-                "valueY": 4096.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 13
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "grassleaves_01_PBR.dds"
-            }
+            "name": "grassleaves_01_PBR",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                4096.0,
+                4096.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 13,
+            "fileName": "grassleaves_01_PBR.dds"
         }
     },
     {
         "name": "foam",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "foam"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 512.0,
-                "valueY": 512.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 10
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "foam.dds"
-            }
+            "name": "foam",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                512.0,
+                512.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 10,
+            "fileName": "foam.dds"
         }
     },
     {
         "name": "lens_dirt",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "lens_dirt"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 1024.0,
-                "valueY": 576.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 11
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "lens_dirt.dds"
-            }
+            "name": "lens_dirt",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                1024.0,
+                576.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 11,
+            "fileName": "lens_dirt.dds"
         }
     },
     {
         "name": "film_grain_noise",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "film_grain_noise"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 256.0,
-                "valueY": 256.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 9
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "film_grain_noise.dds"
-            }
+            "name": "film_grain_noise",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                256.0,
+                256.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 9,
+            "fileName": "film_grain_noise.dds"
         }
     },
     {
         "name": "lens_flare",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "lens_flare"
-            },
-            "imageType": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "imageFormat": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 7
-            },
-            "flags": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 16
-            },
-            "dimensions": {
-                "cat": "Image",
-                "type": "vec3",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "valueX": 256.0,
-                "valueY": 1.0,
-                "valueZ": 1.0
-            },
-            "arrayLayerCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 1
-            },
-            "mipLevelCount": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "",
-                "readOnly": false,
-                "internal": true,
-                "value": 9
-            },
-            "fileName": {
-                "cat": "Image",
-                "type": "name",
-                "editor": "string",
-                "readOnly": true,
-                "internal": false,
-                "value": "lens_flare.dds"
-            }
+            "name": "lens_flare",
+            "imageType": 1,
+            "imageFormat": 7,
+            "flags": 16,
+            "dimensions": [
+                256.0,
+                1.0,
+                1.0
+            ],
+            "arrayLayerCount": 1,
+            "mipLevelCount": 9,
+            "fileName": "lens_flare.dds"
         }
     }
 ]

@@ -154,40 +154,42 @@ struct MaterialManager
   }
 
   _INTR_INLINE static void compileDescriptor(MaterialRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         MaterialData,
-        _INTR_MAX_MATERIAL_COUNT>::_compileDescriptor(p_Ref, p_Properties,
-                                                      p_Document);
+        _INTR_MAX_MATERIAL_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
+                                                      p_Properties, p_Document);
 
-    p_Properties.AddMember("materialPassMask",
-                           _INTR_CREATE_PROP(p_Document, _N(Material), "",
-                                             _descMaterialPassMask(p_Ref),
-                                             false, true),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "materialPassMask",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Material), "",
+                          _descMaterialPassMask(p_Ref), false, true),
+        p_Document.GetAllocator());
 
     // General
     {
       p_Properties.AddMember(
           "albedoTextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures), "string",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
                             _descAlbedoTextureName(p_Ref), false, false),
           p_Document.GetAllocator());
       p_Properties.AddMember(
           "uvOffsetScale",
-          _INTR_CREATE_PROP(p_Document, _N(Properties_UV), "vec4",
-                            _descUvOffsetScale(p_Ref), false, false),
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Properties_UV),
+                            "vec4", _descUvOffsetScale(p_Ref), false, false),
           p_Document.GetAllocator());
-      p_Properties.AddMember("uvAnimation",
-                             _INTR_CREATE_PROP(p_Document, _N(Properties_UV),
-                                               "vec2", _descUvAnimation(p_Ref),
-                                               false, false),
-                             p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "uvAnimation",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Properties_UV),
+                            "vec2", _descUvAnimation(p_Ref), false, false),
+          p_Document.GetAllocator());
       p_Properties.AddMember(
           "translucencyThickness",
-          _INTR_CREATE_PROP(p_Document, _N(Properties_Translucency), "float",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                            _N(Properties_Translucency), "float",
                             _descTranslucencyThickness(p_Ref), false, false),
           p_Document.GetAllocator());
     }
@@ -200,19 +202,19 @@ struct MaterialManager
     {
       p_Properties.AddMember(
           "normalTextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures), "string",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
                             _descNormalTextureName(p_Ref), false, false),
           p_Document.GetAllocator());
       p_Properties.AddMember(
           "pbrTextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures), "string",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
                             _descPbrTextureName(p_Ref), false, false),
           p_Document.GetAllocator());
 
       p_Properties.AddMember(
           "pbrBias",
-          _INTR_CREATE_PROP(p_Document, _N(Properties_Surface), "vec3",
-                            _descPbrBias(p_Ref), false, false),
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Properties_Surface),
+                            "vec3", _descPbrBias(p_Ref), false, false),
           p_Document.GetAllocator());
     }
 
@@ -220,62 +222,72 @@ struct MaterialManager
     if ((_descMaterialPassMask(p_Ref) & (MaterialPassFlags::kSurfaceLayered)) !=
         0u)
     {
-      p_Properties.AddMember(
-          "albedo1TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descAlbedo1TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "normal1TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descNormal1TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "pbr1TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descPbr1TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "albedo2TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descAlbedo2TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "normal2TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descNormal2TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "pbr2TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descPbr2TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "blendMaskTextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descBlendMaskTextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
+      p_Properties.AddMember("albedo1TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Textures_Layered), "string",
+                                               _descAlbedo1TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("normal1TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Textures_Layered), "string",
+                                               _descNormal1TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("pbr1TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Textures_Layered), "string",
+                                               _descPbr1TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("albedo2TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Textures_Layered), "string",
+                                               _descAlbedo2TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("normal2TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Textures_Layered), "string",
+                                               _descNormal2TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("pbr2TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Textures_Layered), "string",
+                                               _descPbr2TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("blendMaskTextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Textures_Layered), "string",
+                                               _descBlendMaskTextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
     }
 
     // Surface (Water)
     if ((_descMaterialPassMask(p_Ref) & (MaterialPassFlags::kSurfaceWater)) !=
         0u)
     {
-      p_Properties.AddMember(
-          "foamTextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Water), "string",
-                            _descFoamTextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "foamFadeDistance",
-          _INTR_CREATE_PROP(p_Document, _N(Properties_Water), "float",
-                            _descFoamFadeDistance(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "refractionFactor",
-          _INTR_CREATE_PROP(p_Document, _N(Properties_Water), "float",
-                            _descRefractionFactor(p_Ref), false, false),
-          p_Document.GetAllocator());
+      p_Properties.AddMember("foamTextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Textures_Water), "string",
+                                               _descFoamTextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("foamFadeDistance",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Properties_Water), "float",
+                                               _descFoamFadeDistance(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("refractionFactor",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Properties_Water), "float",
+                                               _descRefractionFactor(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
     }
   }
 

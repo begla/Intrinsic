@@ -87,28 +87,31 @@ struct GpuProgramManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(GpuProgramRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         GpuProgramData,
-        _INTR_MAX_GPU_PROGRAM_COUNT>::_compileDescriptor(p_Ref, p_Properties,
+        _INTR_MAX_GPU_PROGRAM_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
+                                                         p_Properties,
                                                          p_Document);
 
     p_Properties.AddMember(
         "gpuProgramName",
-        _INTR_CREATE_PROP(p_Document, _N(GpuProgram), _N(string),
-                          _descGpuProgramName(p_Ref), false, false),
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(GpuProgram),
+                          _N(string), _descGpuProgramName(p_Ref), false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember(
-        "entryPoint", _INTR_CREATE_PROP(p_Document, _N(GpuProgram), _N(string),
-                                        _descEntryPoint(p_Ref), false, false),
+        "entryPoint",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(GpuProgram),
+                          _N(string), _descEntryPoint(p_Ref), false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember(
-        "gpuProgramType",
-        _INTR_CREATE_PROP_ENUM(
-            p_Document, _N(GpuProgram), _N(enum), _descGpuProgramType(p_Ref),
-            "Vertex,Fragment,Geometry,Compute", false, false),
+        "gpuProgramType", _INTR_CREATE_PROP_ENUM(
+                              p_Document, p_GenerateDesc, _N(GpuProgram),
+                              _N(enum), _descGpuProgramType(p_Ref),
+                              "Vertex,Fragment,Geometry,Compute", false, false),
         p_Document.GetAllocator());
   }
 

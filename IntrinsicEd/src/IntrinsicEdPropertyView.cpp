@@ -179,7 +179,7 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
 
     // Compile properties
     {
-      compilerEntry.compileFunction(compilerEntry.ref, currentProperties,
+      compilerEntry.compileFunction(compilerEntry.ref, true, currentProperties,
                                     _propertyDocument);
     }
 

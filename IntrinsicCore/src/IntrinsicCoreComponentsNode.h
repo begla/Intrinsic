@@ -367,39 +367,41 @@ struct NodeManager
   // <-
 
   /// Compiles all exposed properties to a JSON descriptor.
-  _INTR_INLINE static void compileDescriptor(NodeRef p_Ref,
+  _INTR_INLINE static void compileDescriptor(NodeRef p_Ref, bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember(
-        "localPos", _INTR_CREATE_PROP(p_Document, _N(NodeLocalTransform),
-                                      _N(vec3), _position(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember("localOrient",
-                           _INTR_CREATE_PROP(p_Document, _N(NodeLocalTransform),
-                                             _N(rotation), _orientation(p_Ref),
-                                             false, false),
+    p_Properties.AddMember("localPos",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(NodeLocalTransform), _N(vec3),
+                                             _position(p_Ref), false, false),
                            p_Document.GetAllocator());
     p_Properties.AddMember(
-        "localSize", _INTR_CREATE_PROP(p_Document, _N(NodeLocalTransform),
-                                       _N(vec3), _size(p_Ref), false, false),
+        "localOrient",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(NodeLocalTransform),
+                          _N(rotation), _orientation(p_Ref), false, false),
         p_Document.GetAllocator());
+    p_Properties.AddMember("localSize",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(NodeLocalTransform), _N(vec3),
+                                             _size(p_Ref), false, false),
+                           p_Document.GetAllocator());
 
     // Read only
-    p_Properties.AddMember("worldPos",
-                           _INTR_CREATE_PROP(p_Document, _N(NodeWorldTransform),
-                                             _N(vec3), _worldPosition(p_Ref),
-                                             true, false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "worldPos",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(NodeWorldTransform),
+                          _N(vec3), _worldPosition(p_Ref), true, false),
+        p_Document.GetAllocator());
     p_Properties.AddMember(
         "worldOrient",
-        _INTR_CREATE_PROP(p_Document, _N(NodeWorldTransform), _N(rotation),
-                          _worldOrientation(p_Ref), true, false),
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(NodeWorldTransform),
+                          _N(rotation), _worldOrientation(p_Ref), true, false),
         p_Document.GetAllocator());
     p_Properties.AddMember("worldSize",
-                           _INTR_CREATE_PROP(p_Document, _N(NodeWorldTransform),
-                                             _N(vec3), _worldSize(p_Ref), true,
-                                             false),
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(NodeWorldTransform), _N(vec3),
+                                             _worldSize(p_Ref), true, false),
                            p_Document.GetAllocator());
   }
 

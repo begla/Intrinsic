@@ -84,12 +84,15 @@ struct VertexLayoutManager
   }
 
   _INTR_INLINE static void compileDescriptor(VertexLayoutRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         VertexLayoutData,
-        _INTR_MAX_VERTEX_LAYOUT_COUNT>::_compileDescriptor(p_Ref, p_Properties,
+        _INTR_MAX_VERTEX_LAYOUT_COUNT>::_compileDescriptor(p_Ref,
+                                                           p_GenerateDesc,
+                                                           p_Properties,
                                                            p_Document);
   }
 

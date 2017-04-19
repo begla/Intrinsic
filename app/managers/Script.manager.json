@@ -2,43 +2,15 @@
     {
         "name": "simple",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "simple"
-            },
-            "scriptFileName": {
-                "cat": "Script",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "simple.lua"
-            }
+            "name": "simple",
+            "scriptFileName": "simple.lua"
         }
     },
     {
         "name": "player",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "player"
-            },
-            "scriptFileName": {
-                "cat": "Script",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "player.lua"
-            }
+            "name": "player",
+            "scriptFileName": "player.lua"
         }
     }
 ]

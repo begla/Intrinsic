@@ -81,13 +81,14 @@ struct MeshManager
 
   // <-
 
-  _INTR_INLINE static void compileDescriptor(MeshRef p_Ref,
+  _INTR_INLINE static void compileDescriptor(MeshRef p_Ref, bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember(
-        "meshName", _INTR_CREATE_PROP(p_Document, _N(Mesh), _N(string),
-                                      _descMeshName(p_Ref), false, false),
+        "meshName",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Mesh), _N(string),
+                          _descMeshName(p_Ref), false, false),
         p_Document.GetAllocator());
   }
 

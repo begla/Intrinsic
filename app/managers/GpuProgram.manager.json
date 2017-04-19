@@ -2,1463 +2,307 @@
     {
         "name": "gbuffer.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "gbuffer.vert",
+            "gpuProgramName": "gbuffer.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "gbuffer.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "gbuffer.frag",
+            "gpuProgramName": "gbuffer.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "gizmo.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gizmo.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gizmo.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "gizmo.vert",
+            "gpuProgramName": "gizmo.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "gizmo.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gizmo.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gizmo.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "gizmo.frag",
+            "gpuProgramName": "gizmo.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "grid.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "grid.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "grid.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "grid.vert",
+            "gpuProgramName": "grid.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "grid.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "grid.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "grid.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "grid.frag",
+            "gpuProgramName": "grid.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "debug_line.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "debug_line.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "debug_line.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "debug_line.vert",
+            "gpuProgramName": "debug_line.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "debug_line.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "debug_line.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "debug_line.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "debug_line.frag",
+            "gpuProgramName": "debug_line.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "fullscreen_triangle.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "fullscreen_triangle.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "fullscreen_triangle.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "fullscreen_triangle.vert",
+            "gpuProgramName": "fullscreen_triangle.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "pre_combine.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "pre_combine.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "pre_combine.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "pre_combine.frag",
+            "gpuProgramName": "pre_combine.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "post_combine.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_combine.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_combine.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "post_combine.frag",
+            "gpuProgramName": "post_combine.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "lighting.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "lighting.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "lighting.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "lighting.frag",
+            "gpuProgramName": "lighting.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
-	{
+    {
         "name": "sky.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "sky.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "sky.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "sky.vert",
+            "gpuProgramName": "sky.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "sky.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "sky.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "sky.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "sky.frag",
+            "gpuProgramName": "sky.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "shadow.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "shadow.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "shadow.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "shadow.vert",
+            "gpuProgramName": "shadow.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "shadow_foliage.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "shadow_foliage.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "shadow_foliage.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "shadow_foliage.frag",
+            "gpuProgramName": "shadow_foliage.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "foliage.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "foliage.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "foliage.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "foliage.vert",
+            "gpuProgramName": "foliage.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "foliage.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "foliage.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "foliage.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "foliage.frag",
+            "gpuProgramName": "foliage.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "shadow_foliage.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "shadow_foliage.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "shadow_foliage.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "shadow_foliage.vert",
+            "gpuProgramName": "shadow_foliage.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "gbuffer_water.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer_water.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer_water.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "gbuffer_water.frag",
+            "gpuProgramName": "gbuffer_water.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "gbuffer_water.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer_water.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer_water.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "gbuffer_water.vert",
+            "gpuProgramName": "gbuffer_water.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "per_pixel_picking.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "per_pixel_picking.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "per_pixel_picking.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "per_pixel_picking.frag",
+            "gpuProgramName": "per_pixel_picking.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "per_pixel_picking.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "per_pixel_picking.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "per_pixel_picking.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "per_pixel_picking.vert",
+            "gpuProgramName": "per_pixel_picking.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "gbuffer_layered.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer_layered.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer_layered.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "gbuffer_layered.frag",
+            "gpuProgramName": "gbuffer_layered.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     },
     {
         "name": "gbuffer_layered.vert",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer_layered.vert"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "gbuffer_layered.vert.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 0
-            }
+            "name": "gbuffer_layered.vert",
+            "gpuProgramName": "gbuffer_layered.vert.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 0
         }
     },
     {
         "name": "simple.comp",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "simple.comp"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "simple.comp.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 3
-            }
+            "name": "simple.comp",
+            "gpuProgramName": "simple.comp.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 3
         }
     },
     {
         "name": "post_bloom_bright_lum.comp",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_bloom_bright_lum.comp"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_bloom_bright_lum.comp.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 3
-            }
+            "name": "post_bloom_bright_lum.comp",
+            "gpuProgramName": "post_bloom_bright_lum.comp.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 3
         }
     },
     {
         "name": "post_bloom_avg_lum.comp",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_bloom_avg_lum.comp"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_bloom_avg_lum.comp.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 3
-            }
+            "name": "post_bloom_avg_lum.comp",
+            "gpuProgramName": "post_bloom_avg_lum.comp.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 3
         }
     },
     {
         "name": "post_bloom_blur_x.comp",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_bloom_blur_x.comp"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_bloom_blur_x.comp.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 3
-            }
+            "name": "post_bloom_blur_x.comp",
+            "gpuProgramName": "post_bloom_blur_x.comp.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 3
         }
     },
     {
         "name": "post_bloom_blur_y.comp",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_bloom_blur_y.comp"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_bloom_blur_y.comp.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 3
-            }
+            "name": "post_bloom_blur_y.comp",
+            "gpuProgramName": "post_bloom_blur_y.comp.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 3
         }
     },
     {
         "name": "post_bloom_add.comp",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_bloom_add.comp"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "post_bloom_add.comp.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 3
-            }
+            "name": "post_bloom_add.comp",
+            "gpuProgramName": "post_bloom_add.comp.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 3
         }
     },
     {
         "name": "volumetric_lighting.comp",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "volumetric_lighting.comp"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "volumetric_lighting.comp.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 3
-            }
+            "name": "volumetric_lighting.comp",
+            "gpuProgramName": "volumetric_lighting.comp.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 3
         }
     },
     {
         "name": "volumetric_lighting_scattering.comp",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "volumetric_lighting_scattering.comp"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "volumetric_lighting_scattering.comp.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 3
-            }
+            "name": "volumetric_lighting_scattering.comp",
+            "gpuProgramName": "volumetric_lighting_scattering.comp.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 3
         }
     },
     {
         "name": "lens_flare.frag",
         "properties": {
-            "name": {
-                "cat": "Resource",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "lens_flare.frag"
-            },
-            "gpuProgramName": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "lens_flare.frag.glsl"
-            },
-            "entryPoint": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "string",
-                "readOnly": false,
-                "internal": false,
-                "value": "main"
-            },
-            "gpuProgramType": {
-                "cat": "GpuProgram",
-                "type": "name",
-                "editor": "enum",
-                "readOnly": false,
-                "internal": false,
-                "enumItems": [
-                    "Vertex",
-                    "Fragment",
-                    "Geometry",
-                    "Compute\u0018"
-                ],
-                "value": 1
-            }
+            "name": "lens_flare.frag",
+            "gpuProgramName": "lens_flare.frag.glsl",
+            "entryPoint": "main",
+            "gpuProgramType": 1
         }
     }
 ]

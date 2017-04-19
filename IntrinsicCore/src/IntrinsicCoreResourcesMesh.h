@@ -119,12 +119,14 @@ struct MeshManager
 
   // <-
 
-  _INTR_INLINE static void compileDescriptor(MeshRef p_Ref,
+  _INTR_INLINE static void compileDescriptor(MeshRef p_Ref, bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
-        MeshData, _INTR_MAX_MESH_COUNT>::_compileDescriptor(p_Ref, p_Properties,
+        MeshData, _INTR_MAX_MESH_COUNT>::_compileDescriptor(p_Ref,
+                                                            p_GenerateDesc,
+                                                            p_Properties,
                                                             p_Document);
 
     rapidjson::Value positionsPerSubMesh =

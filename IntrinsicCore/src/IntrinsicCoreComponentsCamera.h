@@ -95,24 +95,28 @@ struct CameraManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(CameraRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember(
-        "fov", _INTR_CREATE_PROP(p_Document, _N(Camera), _N(float),
-                                 glm::degrees(_descFov(p_Ref)), false, false),
+        "fov",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Camera), _N(float),
+                          glm::degrees(_descFov(p_Ref)), false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember(
-        "nearPlane", _INTR_CREATE_PROP(p_Document, _N(Camera), _N(float),
-                                       _descNearPlane(p_Ref), false, false),
+        "nearPlane",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Camera), _N(float),
+                          _descNearPlane(p_Ref), false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember(
-        "farPlane", _INTR_CREATE_PROP(p_Document, _N(Camera), _N(float),
-                                      _descFarPlane(p_Ref), false, false),
+        "farPlane",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Camera), _N(float),
+                          _descFarPlane(p_Ref), false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember(
         "eulerAngles",
-        _INTR_CREATE_PROP(p_Document, _N(Camera), _N(rotation),
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Camera), _N(rotation),
                           glm::degrees(_descEulerAngles(p_Ref)), false, false),
         p_Document.GetAllocator());
   }
