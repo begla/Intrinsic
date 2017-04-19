@@ -1,7 +1,7 @@
 [
     {
         "name": "WorldRoot",
-        "hasParent": false,
+        "offsetToParent": 0,
         "propertyEntries": [
             {
                 "type": "Node",
@@ -44,7 +44,6 @@
     },
     {
         "name": "Sky",
-        "hasParent": true,
         "offsetToParent": -1,
         "propertyEntries": [
             {
@@ -94,7 +93,6 @@
     },
     {
         "name": "MainCamera",
-        "hasParent": true,
         "offsetToParent": -2,
         "propertyEntries": [
             {
@@ -151,7 +149,6 @@
     },
     {
         "name": "Terrain",
-        "hasParent": true,
         "offsetToParent": -3,
         "propertyEntries": [
             {
@@ -208,7 +205,6 @@
     },
     {
         "name": "See",
-        "hasParent": true,
         "offsetToParent": -4,
         "propertyEntries": [
             {
@@ -258,7 +254,6 @@
     },
     {
         "name": "Grass",
-        "hasParent": true,
         "offsetToParent": -5,
         "propertyEntries": [
             {
@@ -302,7 +297,6 @@
     },
     {
         "name": "MaterialSpheres",
-        "hasParent": true,
         "offsetToParent": -6,
         "propertyEntries": [
             {
@@ -346,7 +340,6 @@
     },
     {
         "name": "Stones",
-        "hasParent": true,
         "offsetToParent": -7,
         "propertyEntries": [
             {
@@ -390,7 +383,6 @@
     },
     {
         "name": "Trees",
-        "hasParent": true,
         "offsetToParent": -8,
         "propertyEntries": [
             {
@@ -434,7 +426,6 @@
     },
     {
         "name": "Water",
-        "hasParent": true,
         "offsetToParent": -9,
         "propertyEntries": [
             {
@@ -484,7 +475,6 @@
     },
     {
         "name": "House",
-        "hasParent": true,
         "offsetToParent": -10,
         "propertyEntries": [
             {
@@ -534,7 +524,6 @@
     },
     {
         "name": "Player",
-        "hasParent": true,
         "offsetToParent": -11,
         "propertyEntries": [
             {
@@ -594,7 +583,6 @@
     },
     {
         "name": "GameCamera",
-        "hasParent": true,
         "offsetToParent": -12,
         "propertyEntries": [
             {
@@ -663,7 +651,6 @@
     },
     {
         "name": "PostEffectVolume0",
-        "hasParent": true,
         "offsetToParent": -13,
         "propertyEntries": [
             {
@@ -715,7 +702,6 @@
     },
     {
         "name": "Tree26",
-        "hasParent": true,
         "offsetToParent": -6,
         "propertyEntries": [
             {
@@ -765,7 +751,6 @@
     },
     {
         "name": "Tree25",
-        "hasParent": true,
         "offsetToParent": -7,
         "propertyEntries": [
             {
@@ -815,7 +800,6 @@
     },
     {
         "name": "Tree24",
-        "hasParent": true,
         "offsetToParent": -8,
         "propertyEntries": [
             {
@@ -865,7 +849,6 @@
     },
     {
         "name": "Tree23",
-        "hasParent": true,
         "offsetToParent": -9,
         "propertyEntries": [
             {
@@ -915,7 +898,6 @@
     },
     {
         "name": "Tree5",
-        "hasParent": true,
         "offsetToParent": -10,
         "propertyEntries": [
             {
@@ -965,7 +947,6 @@
     },
     {
         "name": "Tree22",
-        "hasParent": true,
         "offsetToParent": -11,
         "propertyEntries": [
             {
@@ -1015,7 +996,6 @@
     },
     {
         "name": "Tree21",
-        "hasParent": true,
         "offsetToParent": -12,
         "propertyEntries": [
             {
@@ -1065,7 +1045,6 @@
     },
     {
         "name": "Tree20",
-        "hasParent": true,
         "offsetToParent": -13,
         "propertyEntries": [
             {
@@ -1115,7 +1094,6 @@
     },
     {
         "name": "Tree19",
-        "hasParent": true,
         "offsetToParent": -14,
         "propertyEntries": [
             {
@@ -1165,7 +1143,6 @@
     },
     {
         "name": "Tree18",
-        "hasParent": true,
         "offsetToParent": -15,
         "propertyEntries": [
             {
@@ -1215,7 +1192,6 @@
     },
     {
         "name": "Tree17",
-        "hasParent": true,
         "offsetToParent": -16,
         "propertyEntries": [
             {
@@ -1265,7 +1241,6 @@
     },
     {
         "name": "Tree16",
-        "hasParent": true,
         "offsetToParent": -17,
         "propertyEntries": [
             {
@@ -1315,7 +1290,6 @@
     },
     {
         "name": "Tree15",
-        "hasParent": true,
         "offsetToParent": -18,
         "propertyEntries": [
             {
@@ -1365,7 +1339,6 @@
     },
     {
         "name": "Tree9",
-        "hasParent": true,
         "offsetToParent": -19,
         "propertyEntries": [
             {
@@ -1415,7 +1388,6 @@
     },
     {
         "name": "Tree8",
-        "hasParent": true,
         "offsetToParent": -20,
         "propertyEntries": [
             {
@@ -1465,7 +1437,6 @@
     },
     {
         "name": "Tree7",
-        "hasParent": true,
         "offsetToParent": -21,
         "propertyEntries": [
             {
@@ -1515,7 +1486,6 @@
     },
     {
         "name": "Tree6",
-        "hasParent": true,
         "offsetToParent": -22,
         "propertyEntries": [
             {
@@ -1565,7 +1535,6 @@
     },
     {
         "name": "Tree14",
-        "hasParent": true,
         "offsetToParent": -23,
         "propertyEntries": [
             {
@@ -1615,7 +1584,6 @@
     },
     {
         "name": "Tree13",
-        "hasParent": true,
         "offsetToParent": -24,
         "propertyEntries": [
             {
@@ -1665,7 +1633,6 @@
     },
     {
         "name": "Tree12",
-        "hasParent": true,
         "offsetToParent": -25,
         "propertyEntries": [
             {
@@ -1715,7 +1682,6 @@
     },
     {
         "name": "Tree",
-        "hasParent": true,
         "offsetToParent": -26,
         "propertyEntries": [
             {
@@ -1765,7 +1731,6 @@
     },
     {
         "name": "Tree11",
-        "hasParent": true,
         "offsetToParent": -27,
         "propertyEntries": [
             {
@@ -1815,7 +1780,6 @@
     },
     {
         "name": "Tree10",
-        "hasParent": true,
         "offsetToParent": -28,
         "propertyEntries": [
             {
@@ -1865,7 +1829,6 @@
     },
     {
         "name": "Tree4",
-        "hasParent": true,
         "offsetToParent": -29,
         "propertyEntries": [
             {
@@ -1915,7 +1878,6 @@
     },
     {
         "name": "Tree3",
-        "hasParent": true,
         "offsetToParent": -30,
         "propertyEntries": [
             {
@@ -1965,7 +1927,6 @@
     },
     {
         "name": "Tree2",
-        "hasParent": true,
         "offsetToParent": -31,
         "propertyEntries": [
             {
@@ -2015,7 +1976,6 @@
     },
     {
         "name": "Tree0",
-        "hasParent": true,
         "offsetToParent": -32,
         "propertyEntries": [
             {
@@ -2065,7 +2025,6 @@
     },
     {
         "name": "Tree27",
-        "hasParent": true,
         "offsetToParent": -33,
         "propertyEntries": [
             {
@@ -2115,7 +2074,6 @@
     },
     {
         "name": "Tree30",
-        "hasParent": true,
         "offsetToParent": -34,
         "propertyEntries": [
             {
@@ -2165,7 +2123,6 @@
     },
     {
         "name": "Tree31",
-        "hasParent": true,
         "offsetToParent": -35,
         "propertyEntries": [
             {
@@ -2215,7 +2172,6 @@
     },
     {
         "name": "Tree32",
-        "hasParent": true,
         "offsetToParent": -36,
         "propertyEntries": [
             {
@@ -2265,7 +2221,6 @@
     },
     {
         "name": "Tree33",
-        "hasParent": true,
         "offsetToParent": -37,
         "propertyEntries": [
             {
@@ -2315,7 +2270,6 @@
     },
     {
         "name": "Stone8",
-        "hasParent": true,
         "offsetToParent": -39,
         "propertyEntries": [
             {
@@ -2365,7 +2319,6 @@
     },
     {
         "name": "Stone7",
-        "hasParent": true,
         "offsetToParent": -40,
         "propertyEntries": [
             {
@@ -2415,7 +2368,6 @@
     },
     {
         "name": "Stone6",
-        "hasParent": true,
         "offsetToParent": -41,
         "propertyEntries": [
             {
@@ -2465,7 +2417,6 @@
     },
     {
         "name": "Stone5",
-        "hasParent": true,
         "offsetToParent": -42,
         "propertyEntries": [
             {
@@ -2515,7 +2466,6 @@
     },
     {
         "name": "Stone1",
-        "hasParent": true,
         "offsetToParent": -43,
         "propertyEntries": [
             {
@@ -2565,7 +2515,6 @@
     },
     {
         "name": "Stone2",
-        "hasParent": true,
         "offsetToParent": -44,
         "propertyEntries": [
             {
@@ -2615,7 +2564,6 @@
     },
     {
         "name": "Stone4",
-        "hasParent": true,
         "offsetToParent": -45,
         "propertyEntries": [
             {
@@ -2665,7 +2613,6 @@
     },
     {
         "name": "Stone",
-        "hasParent": true,
         "offsetToParent": -46,
         "propertyEntries": [
             {
@@ -2715,7 +2662,6 @@
     },
     {
         "name": "Stone3",
-        "hasParent": true,
         "offsetToParent": -47,
         "propertyEntries": [
             {
@@ -2765,7 +2711,6 @@
     },
     {
         "name": "Stone9",
-        "hasParent": true,
         "offsetToParent": -48,
         "propertyEntries": [
             {
@@ -2815,7 +2760,6 @@
     },
     {
         "name": "Stone10",
-        "hasParent": true,
         "offsetToParent": -49,
         "propertyEntries": [
             {
@@ -2865,7 +2809,6 @@
     },
     {
         "name": "Stone11",
-        "hasParent": true,
         "offsetToParent": -50,
         "propertyEntries": [
             {
@@ -2915,7 +2858,6 @@
     },
     {
         "name": "Stone12",
-        "hasParent": true,
         "offsetToParent": -51,
         "propertyEntries": [
             {
@@ -2965,7 +2907,6 @@
     },
     {
         "name": "Stone13",
-        "hasParent": true,
         "offsetToParent": -52,
         "propertyEntries": [
             {
@@ -3015,7 +2956,6 @@
     },
     {
         "name": "Stone14",
-        "hasParent": true,
         "offsetToParent": -53,
         "propertyEntries": [
             {
@@ -3065,7 +3005,6 @@
     },
     {
         "name": "Stone15",
-        "hasParent": true,
         "offsetToParent": -54,
         "propertyEntries": [
             {
@@ -3115,7 +3054,6 @@
     },
     {
         "name": "Stone16",
-        "hasParent": true,
         "offsetToParent": -55,
         "propertyEntries": [
             {
@@ -3165,7 +3103,6 @@
     },
     {
         "name": "Stone17",
-        "hasParent": true,
         "offsetToParent": -56,
         "propertyEntries": [
             {
@@ -3215,7 +3152,6 @@
     },
     {
         "name": "WaterSphere",
-        "hasParent": true,
         "offsetToParent": -58,
         "propertyEntries": [
             {
@@ -3265,7 +3201,6 @@
     },
     {
         "name": "DefaultSphere",
-        "hasParent": true,
         "offsetToParent": -59,
         "propertyEntries": [
             {
@@ -3315,7 +3250,6 @@
     },
     {
         "name": "Grass1",
-        "hasParent": true,
         "offsetToParent": -61,
         "propertyEntries": [
             {
@@ -3365,7 +3299,6 @@
     },
     {
         "name": "Grass2",
-        "hasParent": true,
         "offsetToParent": -62,
         "propertyEntries": [
             {
@@ -3415,7 +3348,6 @@
     },
     {
         "name": "Grass3",
-        "hasParent": true,
         "offsetToParent": -63,
         "propertyEntries": [
             {
@@ -3465,7 +3397,6 @@
     },
     {
         "name": "Grass4",
-        "hasParent": true,
         "offsetToParent": -64,
         "propertyEntries": [
             {
@@ -3515,7 +3446,6 @@
     },
     {
         "name": "Grass5",
-        "hasParent": true,
         "offsetToParent": -65,
         "propertyEntries": [
             {
@@ -3565,7 +3495,6 @@
     },
     {
         "name": "Grass8",
-        "hasParent": true,
         "offsetToParent": -66,
         "propertyEntries": [
             {
@@ -3615,7 +3544,6 @@
     },
     {
         "name": "Grass7",
-        "hasParent": true,
         "offsetToParent": -67,
         "propertyEntries": [
             {
@@ -3665,7 +3593,6 @@
     },
     {
         "name": "Grass6",
-        "hasParent": true,
         "offsetToParent": -68,
         "propertyEntries": [
             {
@@ -3715,7 +3642,6 @@
     },
     {
         "name": "Grass9",
-        "hasParent": true,
         "offsetToParent": -69,
         "propertyEntries": [
             {
@@ -3765,7 +3691,6 @@
     },
     {
         "name": "Grass10",
-        "hasParent": true,
         "offsetToParent": -70,
         "propertyEntries": [
             {
@@ -3815,7 +3740,6 @@
     },
     {
         "name": "Grass11",
-        "hasParent": true,
         "offsetToParent": -71,
         "propertyEntries": [
             {
@@ -3865,7 +3789,6 @@
     },
     {
         "name": "Grass12",
-        "hasParent": true,
         "offsetToParent": -72,
         "propertyEntries": [
             {
@@ -3915,7 +3838,6 @@
     },
     {
         "name": "Grass13",
-        "hasParent": true,
         "offsetToParent": -73,
         "propertyEntries": [
             {
