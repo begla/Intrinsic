@@ -10,7 +10,7 @@ environment:
   INTR_QTDIR: "C:\\Qt\\5.7\\msvc2015_64\\"
   INTR_GIT_TOKEN: 
     secure: 7D4rb81yGcTOgpizeKD1m3vlSDc7tU9SNQdW4/LVdHzou7gMaKK01esf7/v/3ccB
-  VK_SDK_PATH: "C:\\VulkanSDK\\1.0.30.0\\"
+  VK_SDK_PATH: "C:\\VulkanSDK\\1.0.46.0\\"
   
 artifacts:
   - path: Intrinsic_Win32.7z
