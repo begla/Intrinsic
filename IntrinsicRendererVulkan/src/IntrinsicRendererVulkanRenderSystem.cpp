@@ -398,7 +398,7 @@ void RenderSystem::initManagers()
 
   // Load managers
   {
-    GpuProgramManager::loadFromSingleFile("managers/GpuProgram.manager.json");
+    GpuProgramManager::loadFromMultipleFiles("managers/gpu_programs/", ".gpu_program.json");
     ImageManager::loadFromSingleFile("managers/Image.manager.json");
     MaterialManager::loadFromSingleFile("managers/Material.manager.json");
   }

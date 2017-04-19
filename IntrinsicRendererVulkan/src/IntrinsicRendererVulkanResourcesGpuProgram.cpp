@@ -179,10 +179,10 @@ void GpuProgramManager::init()
         Resources::GpuProgramManager::getActiveResourceAtIndex;
     managerEntry.getActiveResourceCountFunction =
         Resources::GpuProgramManager::getActiveResourceCount;
-    managerEntry.loadFromSingleFileFunction =
-        Resources::GpuProgramManager::loadFromSingleFile;
-    managerEntry.saveToSingleFileFunction =
-        Resources::GpuProgramManager::saveToSingleFile;
+    managerEntry.loadFromMultipleFilesFunction =
+        Resources::GpuProgramManager::loadFromMultipleFiles;
+    managerEntry.saveToMultipleFilesFunction =
+        Resources::GpuProgramManager::saveToMultipleFiles;
     managerEntry.getResourceFlagsFunction = GpuProgramManager::_resourceFlags;
     Application::_resourceManagerMapping[_N(GpuProgram)] = managerEntry;
   }
