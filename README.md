@@ -26,10 +26,9 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 3. Download an install the Vulkan SDK
 4. Get access to the latest PhysX SDK from NVIDIA: https://developer.nvidia.com/physx-sdk
 5. Follow the instructions from NVIDIA and compile the PhysX libraries for the configurations *Release*, *Profile* and *Debug*
-   NOTE: Make sure that PhysX links the Runtime Library dynamically as Intrinsic does! 
+NOTE: Make sure that PhysX links the Runtime Library dynamically as Intrinsic does! 
 6. Download and install the Autodesk FBX SDK
-7. Create a new directory called `Intrinsic_Dependencies` on the _same level_ as 
-   the Intrinsic repository folder
+7. Create a new directory called `Intrinsic_Dependencies` on the _same level_ as the Intrinsic repository folder
 8. Inside, create a new folder `dependencies` containing two folders `physx` and `fbx`
 9. Copy the static/dynamic libraries and header files of both SDKs to folders named `bin` (DLLs), 
    `lib` (LIBs) and `include` respectively
@@ -37,9 +36,8 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 11. Execute `ConfigAndBuildDependencies.bat` to build some of the remaining dependencies automatically
 12. Execute `CopyDllsToAppDir_Debug.bat` and `CopyDllsToAppDir_Release.bat`
 13. Execute `Config.bat` to create a Visual Studio 2015 solution file and all project configurations
-
 14. If everything went well, you'll find the solution in the newly created `build` folder
-    NOTE: You can also use one of the many build scripts: `Build_Release.bat`, ... to get started
+NOTE: You can also use one of the many build scripts: `Build_Release.bat`, ... to get started
 15. Execute `Intrinsic.exe` or `IntrinsicEd.exe` in the `app` directory
 16. You're all set - yey!
 
