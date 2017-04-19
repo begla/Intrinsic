@@ -256,12 +256,14 @@ struct DrawCallManager
   }
 
   _INTR_INLINE static void compileDescriptor(DrawCallRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         DrawCallData,
-        _INTR_MAX_DRAW_CALL_COUNT>::_compileDescriptor(p_Ref, p_Properties,
+        _INTR_MAX_DRAW_CALL_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
+                                                       p_Properties,
                                                        p_Document);
   }
 

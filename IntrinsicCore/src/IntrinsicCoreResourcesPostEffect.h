@@ -69,19 +69,21 @@ struct PostEffectManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(PostEffectRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         PostEffectData,
-        _INTR_MAX_POST_EFFECT_COUNT>::_compileDescriptor(p_Ref, p_Properties,
+        _INTR_MAX_POST_EFFECT_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
+                                                         p_Properties,
                                                          p_Document);
 
     p_Properties.AddMember(
         "volumetricLightingScattering",
-        _INTR_CREATE_PROP(p_Document, _N(VolumetricLighting), _N(float),
-                          _descVolumetricLightingScattering(p_Ref), false,
-                          false),
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(VolumetricLighting),
+                          _N(float), _descVolumetricLightingScattering(p_Ref),
+                          false, false),
         p_Document.GetAllocator());
   }
 

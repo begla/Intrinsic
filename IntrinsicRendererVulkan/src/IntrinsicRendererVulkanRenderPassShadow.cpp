@@ -47,9 +47,9 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
   Math::AABB worldBounds = {glm::vec3(-5000.0f, -5000.0f, -5000.0f),
                             glm::vec3(5000.0f, 5000.0f, 5000.0f)};
 
-  glm::vec3 worldBoundsHalfExtent = Math::calcAABBHalfExtent(worldBounds);
-  float worldBoundsHalfExtentLength = glm::length(worldBoundsHalfExtent);
-  glm::vec3 worldBoundsCenter = Math::calcAABBCenter(worldBounds);
+  const glm::vec3 worldBoundsHalfExtent = Math::calcAABBHalfExtent(worldBounds);
+  const float worldBoundsHalfExtentLength = glm::length(worldBoundsHalfExtent);
+  const glm::vec3 worldBoundsCenter = Math::calcAABBCenter(worldBounds);
 
   const glm::vec3 eye = worldBoundsHalfExtentLength *
                         glm::normalize(glm::vec3(1.0f, 0.45f, -0.15));

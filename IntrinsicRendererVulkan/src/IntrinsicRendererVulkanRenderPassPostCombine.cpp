@@ -129,8 +129,8 @@ void PostCombine::updateResolutionDependentResources()
     _framebufferRefs.clear();
   }
 
-  glm::uvec3 dim = glm::uvec3(RenderSystem::_backbufferDimensions.x,
-                              RenderSystem::_backbufferDimensions.y, 1u);
+  const glm::uvec3 dim = glm::uvec3(RenderSystem::_backbufferDimensions.x,
+                                    RenderSystem::_backbufferDimensions.y, 1u);
 
   // Create framebuffers
   for (uint32_t i = 0u; i < (uint32_t)RenderSystem::_vkSwapchainImages.size();

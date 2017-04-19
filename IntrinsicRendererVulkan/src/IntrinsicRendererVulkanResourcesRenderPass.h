@@ -75,12 +75,14 @@ struct RenderPassManager
   }
 
   _INTR_INLINE static void compileDescriptor(RenderPassRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         RenderPassData,
-        _INTR_MAX_RENDER_PASS_COUNT>::_compileDescriptor(p_Ref, p_Properties,
+        _INTR_MAX_RENDER_PASS_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
+                                                         p_Properties,
                                                          p_Document);
   }
 

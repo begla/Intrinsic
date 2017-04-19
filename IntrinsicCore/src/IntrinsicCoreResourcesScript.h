@@ -67,19 +67,21 @@ struct ScriptManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(ScriptRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         ScriptData, _INTR_MAX_SCRIPT_COUNT>::_compileDescriptor(p_Ref,
+                                                                p_GenerateDesc,
                                                                 p_Properties,
                                                                 p_Document);
 
-    p_Properties.AddMember("scriptFileName",
-                           _INTR_CREATE_PROP(p_Document, _N(Script), _N(string),
-                                             _descScriptFileName(p_Ref), false,
-                                             false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "scriptFileName",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Script), _N(string),
+                          _descScriptFileName(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   // <-

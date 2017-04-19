@@ -66,16 +66,16 @@ void IntrinsicEdPropertyEditorRotation::updateFromProperty()
   if (strcmp(prop["type"].GetString(), "quat") == 0u)
   {
     const glm::quat quat =
-        glm::quat(prop["valueW"].GetFloat(), prop["valueX"].GetFloat(),
-                  prop["valueY"].GetFloat(), prop["valueZ"].GetFloat());
+        glm::quat(prop["values"][3].GetFloat(), prop["values"][0].GetFloat(),
+                  prop["values"][1].GetFloat(), prop["values"][3].GetFloat());
     euler = glm::eulerAngles(quat);
   }
   else if (strcmp(prop["type"].GetString(), "vec3") == 0u)
   {
     euler =
-        glm::vec3(glm::radians(glm::mod(prop["valueX"].GetFloat(), 360.0f)),
-                  glm::radians(glm::mod(prop["valueY"].GetFloat(), 360.0f)),
-                  glm::radians(glm::mod(prop["valueZ"].GetFloat(), 360.0f)));
+        glm::vec3(glm::radians(glm::mod(prop["values"][0].GetFloat(), 360.0f)),
+                  glm::radians(glm::mod(prop["values"][1].GetFloat(), 360.0f)),
+                  glm::radians(glm::mod(prop["values"][2].GetFloat(), 360.0f)));
   }
 
   _ui.yaw->setValue(glm::degrees(euler.x));
@@ -104,16 +104,16 @@ void IntrinsicEdPropertyEditorRotation::onValueChanged()
   if (strcmp(prop["type"].GetString(), "quat") == 0u)
   {
     const glm::quat quat = glm::quat(euler);
-    prop["valueX"].SetFloat(quat.x);
-    prop["valueY"].SetFloat(quat.y);
-    prop["valueZ"].SetFloat(quat.z);
-    prop["valueW"].SetFloat(quat.w);
+    prop["values"][0].SetFloat(quat.x);
+    prop["values"][1].SetFloat(quat.y);
+    prop["values"][2].SetFloat(quat.z);
+    prop["values"][3].SetFloat(quat.w);
   }
   else if (strcmp(prop["type"].GetString(), "vec3") == 0u)
   {
-    prop["valueX"].SetFloat(glm::degrees(euler.x));
-    prop["valueY"].SetFloat(glm::degrees(euler.y));
-    prop["valueZ"].SetFloat(glm::degrees(euler.z));
+    prop["values"][0].SetFloat(glm::degrees(euler.x));
+    prop["values"][1].SetFloat(glm::degrees(euler.y));
+    prop["values"][2].SetFloat(glm::degrees(euler.z));
   }
 
   emit valueChanged(*_properties);

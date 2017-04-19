@@ -78,7 +78,7 @@ void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
     _INTR_ASSERT(resource.isValid());
 
     rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-    _propertyCompilerEntry.compileFunction(resource, properties, doc);
+    _propertyCompilerEntry.compileFunction(resource, true, properties, doc);
 
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0, properties["name"]["value"].GetString());
@@ -120,7 +120,7 @@ void IntrinsicEdManagerWindowBase::onItemChanged(QTreeWidgetItem* item,
     Dod::Ref resource = _itemToResourceMapping[item];
 
     rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-    _propertyCompilerEntry.compileFunction(resource, properties, doc);
+    _propertyCompilerEntry.compileFunction(resource, true, properties, doc);
 
     if (strcmp(properties["name"]["value"].GetString(),
                item->text(0).toStdString().c_str()) != 0)
@@ -156,7 +156,7 @@ IntrinsicEdManagerWindowBase::makeResourceNameUnique(const char* p_Name)
           _resourceManagerEntry.getActiveResourceAtIndexFunction(i);
 
       rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-      _propertyCompilerEntry.compileFunction(resource, properties, doc);
+      _propertyCompilerEntry.compileFunction(resource, false, properties, doc);
 
       if (properties["name"]["value"].GetString() == newResourceName)
       {
@@ -209,8 +209,8 @@ void IntrinsicEdManagerWindowBase::onCloneResource()
     rapidjson::Document doc;
     rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
 
-    _propertyCompilerEntry.compileFunction(templateResourceRef, properties,
-                                           doc);
+    _propertyCompilerEntry.compileFunction(templateResourceRef, false,
+                                           properties, doc);
     properties["name"]["value"].SetString(
         makeResourceNameUnique(properties["name"]["value"].GetString()).c_str(),
         doc.GetAllocator());

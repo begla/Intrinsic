@@ -95,6 +95,7 @@ struct CharacterControllerManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(CharacterControllerRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {

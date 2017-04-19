@@ -100,7 +100,7 @@ Components::NodeRef World::cloneNodeFull(Components::NodeRef p_Ref)
           _INTR_ASSERT(propCompIt->second.compileFunction);
           propCompIt->second.compileFunction(
               managerEntry.getComponentForEntityFunction(referenceEntityRef),
-              properties, doc);
+              false, properties, doc);
 
           // Create new component and init from reference
           _INTR_ASSERT(managerEntry.createFunction);
@@ -278,7 +278,7 @@ void World::save(const _INTR_STRING& p_FilePath)
             rapidjson::Value properties =
                 rapidjson::Value(rapidjson::kObjectType);
             propCompIt->second.compileFunction(
-                managerEntry.getComponentForEntityFunction(entityRef),
+                managerEntry.getComponentForEntityFunction(entityRef), false,
                 properties, worldDesc);
 
             rapidjson::Value propertyEntry =

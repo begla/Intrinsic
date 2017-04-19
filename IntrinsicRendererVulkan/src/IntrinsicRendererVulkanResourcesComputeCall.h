@@ -80,12 +80,14 @@ struct ComputeCallManager
   }
 
   _INTR_INLINE static void compileDescriptor(ComputeCallRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         ComputeCallData,
-        _INTR_MAX_COMPUTE_CALL_COUNT>::_compileDescriptor(p_Ref, p_Properties,
+        _INTR_MAX_COMPUTE_CALL_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
+                                                          p_Properties,
                                                           p_Document);
   }
 

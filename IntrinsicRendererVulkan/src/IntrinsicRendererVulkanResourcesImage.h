@@ -94,46 +94,49 @@ struct ImageManager
   }
 
   _INTR_INLINE static void compileDescriptor(ImageRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         ImageData, _INTR_MAX_IMAGE_COUNT>::_compileDescriptor(p_Ref,
+                                                              p_GenerateDesc,
                                                               p_Properties,
                                                               p_Document);
 
-    p_Properties.AddMember("imageType",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             (uint32_t)_descImageType(p_Ref),
-                                             false, true),
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("imageFormat",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             (uint32_t)_descImageFormat(p_Ref),
-                                             false, true),
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("flags",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             (uint32_t)_descImageFlags(p_Ref),
-                                             false, true),
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("dimensions",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             glm::vec3(_descDimensions(p_Ref)),
-                                             false, true),
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("arrayLayerCount",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             _descArrayLayerCount(p_Ref), false,
-                                             true),
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("mipLevelCount",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             _descMipLevelCount(p_Ref), false,
-                                             true),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "imageType",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          (uint32_t)_descImageType(p_Ref), false, true),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "imageFormat",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          (uint32_t)_descImageFormat(p_Ref), false, true),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "flags",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          (uint32_t)_descImageFlags(p_Ref), false, true),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "dimensions",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          glm::vec3(_descDimensions(p_Ref)), false, true),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "arrayLayerCount",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          _descArrayLayerCount(p_Ref), false, true),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "mipLevelCount",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          _descMipLevelCount(p_Ref), false, true),
+        p_Document.GetAllocator());
     p_Properties.AddMember("fileName",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "string",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(Image), "string",
                                              _descFileName(p_Ref), true, false),
                            p_Document.GetAllocator());
   }
@@ -350,7 +353,7 @@ struct ImageManager
     return _data.descFileName[p_Ref._id];
   }
 
-  // Resources
+  // GPU resources
   _INTR_INLINE static VkImage& _vkImage(ImageRef p_Ref)
   {
     return _data.vkImage[p_Ref._id];

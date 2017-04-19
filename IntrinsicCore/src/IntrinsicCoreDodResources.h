@@ -166,14 +166,14 @@ protected:
 
   // <-
 
-  _INTR_INLINE static void _compileDescriptor(Ref p_Ref,
+  _INTR_INLINE static void _compileDescriptor(Ref p_Ref, bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties,
                                               rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember("name", _INTR_CREATE_PROP(p_Document, _N(Resource),
-                                                     _N(string), _name(p_Ref),
-                                                     false, false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "name", _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Resource),
+                                  _N(string), _name(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   // <-
@@ -231,7 +231,7 @@ protected:
       resource.AddMember("name", nameValue, resources.GetAllocator());
 
       rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-      p_CompileFunction(ref, properties, resources);
+      p_CompileFunction(ref, false, properties, resources);
 
       resource.AddMember("properties", properties, resources.GetAllocator());
 
@@ -328,7 +328,7 @@ protected:
       resource.AddMember("name", nameValue, resource.GetAllocator());
 
       rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-      p_CompileFunction(ref, properties, resource);
+      p_CompileFunction(ref, false, properties, resource);
 
       resource.AddMember("properties", properties, resource.GetAllocator());
 

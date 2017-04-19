@@ -52,9 +52,9 @@ void IntrinsicEdPropertyEditorVec3::updateFromProperty()
     _ui.z->setReadOnly(true);
   }
 
-  _ui.x->setValue(prop["valueX"].GetFloat());
-  _ui.y->setValue(prop["valueY"].GetFloat());
-  _ui.z->setValue(prop["valueZ"].GetFloat());
+  _ui.x->setValue(prop["values"][0].GetFloat());
+  _ui.y->setValue(prop["values"][1].GetFloat());
+  _ui.z->setValue(prop["values"][2].GetFloat());
 
   _ui.propertyTitle->setText(_propertyName.c_str());
 }
@@ -64,9 +64,9 @@ void IntrinsicEdPropertyEditorVec3::onValueChanged()
   _INTR_ASSERT(_property);
   rapidjson::Value& prop = *_property;
 
-  prop["valueX"].SetFloat((float)_ui.x->value());
-  prop["valueY"].SetFloat((float)_ui.y->value());
-  prop["valueZ"].SetFloat((float)_ui.z->value());
+  prop["values"][0].SetFloat((float)_ui.x->value());
+  prop["values"][1].SetFloat((float)_ui.y->value());
+  prop["values"][2].SetFloat((float)_ui.z->value());
 
   emit valueChanged(*_properties);
 }

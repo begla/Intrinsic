@@ -69,12 +69,14 @@ struct PlayerManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(PlayerRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember(
-        "playerId", _INTR_CREATE_PROP(p_Document, _N(Player), _N(Enum),
-                                      _descPlayerId(p_Ref), false, false),
+        "playerId",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Player), _N(Enum),
+                          _descPlayerId(p_Ref), false, false),
         p_Document.GetAllocator());
   }
 

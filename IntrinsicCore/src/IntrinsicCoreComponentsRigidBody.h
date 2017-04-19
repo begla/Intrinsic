@@ -87,21 +87,24 @@ struct RigidBodyManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(RigidBodyRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember(
         "rigidBodyType",
         _INTR_CREATE_PROP_ENUM(
-            p_Document, _N(RigidBody), _N(enum), _descRigidBodyType(p_Ref),
+            p_Document, p_GenerateDesc, _N(RigidBody), _N(enum),
+            _descRigidBodyType(p_Ref),
             "BoxKinematic,BoxDynamic,TriangleMeshStatic,TriangleMeshKinematic,"
             "SphereKinematic,SphereDynamic,",
             false, false),
         p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "density", _INTR_CREATE_PROP(p_Document, _N(RigidBody), _N(float),
-                                     _descDensity(p_Ref), false, false),
-        p_Document.GetAllocator());
+    p_Properties.AddMember("density",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(RigidBody), _N(float),
+                                             _descDensity(p_Ref), false, false),
+                           p_Document.GetAllocator());
   }
 
   // <-

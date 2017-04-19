@@ -173,11 +173,12 @@ case IDCONTINUE : break;                                                       \
   a = nullptr
 
 // Properties
-#define _INTR_CREATE_PROP(_doc, _cat, _ed, _val, _ro, _int)                    \
-  Intrinsic::Core::JsonHelper::createProperty(_doc, _cat, _ed, _val, _ro, _int)
-#define _INTR_CREATE_PROP_ENUM(_doc, _cat, _ed, _val, _enum, _ro, _int)        \
-  Intrinsic::Core::JsonHelper::createProperty(_doc, _cat, _ed, _val, _enum,    \
-                                              _ro, _int)
+#define _INTR_CREATE_PROP(_doc, _gd, _cat, _ed, _val, _ro, _int)               \
+  Intrinsic::Core::JsonHelper::createProperty(_doc, _gd, _cat, _ed, _val, _ro, \
+                                              _int)
+#define _INTR_CREATE_PROP_ENUM(_doc, _gd, _cat, _ed, _val, _enum, _ro, _int)   \
+  Intrinsic::Core::JsonHelper::createProperty(_doc, _gd, _cat, _ed, _val,      \
+                                              _enum, _ro, _int)
 
 // Math
 #define _INTR_EPSILON 1.0e-6f

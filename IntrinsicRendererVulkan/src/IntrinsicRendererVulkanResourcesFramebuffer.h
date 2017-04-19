@@ -79,12 +79,14 @@ struct FramebufferManager
   }
 
   _INTR_INLINE static void compileDescriptor(FramebufferRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         FramebufferData,
-        _INTR_MAX_FRAMEBUFFER_COUNT>::_compileDescriptor(p_Ref, p_Properties,
+        _INTR_MAX_FRAMEBUFFER_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
+                                                         p_Properties,
                                                          p_Document);
   }
 

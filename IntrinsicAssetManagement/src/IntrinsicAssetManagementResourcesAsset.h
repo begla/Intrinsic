@@ -83,23 +83,26 @@ struct AssetManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(AssetRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         AssetData, _INTR_MAX_ASSET_COUNT>::_compileDescriptor(p_Ref,
+                                                              p_GenerateDesc,
                                                               p_Properties,
                                                               p_Document);
 
-    p_Properties.AddMember("assetFileName",
-                           _INTR_CREATE_PROP(p_Document, _N(Asset), _N(string),
-                                             _descAssetFileName(p_Ref), false,
-                                             false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "assetFileName",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Asset), _N(string),
+                          _descAssetFileName(p_Ref), false, false),
+        p_Document.GetAllocator());
     p_Properties.AddMember(
         "assetType",
         _INTR_CREATE_PROP_ENUM(
-            p_Document, _N(Asset), _N(enum), _descAssetType(p_Ref),
+            p_Document, p_GenerateDesc, _N(Asset), _N(enum),
+            _descAssetType(p_Ref),
             "None,Mesh,ColorTexture,AlphaTexture,NormalTexture,HdrTexture",
             false, false),
         p_Document.GetAllocator());

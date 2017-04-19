@@ -68,7 +68,7 @@ typedef _INTR_ARRAY(Ref) RefArray;
 // <-
 
 // Function ptr typedefs
-typedef void (*ManagerCompileDescriptorFunction)(Ref, rapidjson::Value&,
+typedef void (*ManagerCompileDescriptorFunction)(Ref, bool, rapidjson::Value&,
                                                  rapidjson::Document&);
 typedef void (*ManagerInitFromDescriptorFunction)(Ref, rapidjson::Value&);
 typedef Ref (*ManagerCreateFunction)(Ref);

@@ -121,25 +121,28 @@ struct CameraControllerManager
   /// Compiles all exposed properties to a JSON descriptor.
   ///
   _INTR_INLINE static void compileDescriptor(CameraControllerRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember(
         "cameraControllerType",
-        _INTR_CREATE_PROP_ENUM(p_Document, _N(CameraController), _N(enum),
-                               _descCameraControllerType(p_Ref),
+        _INTR_CREATE_PROP_ENUM(p_Document, p_GenerateDesc, _N(CameraController),
+                               _N(enum), _descCameraControllerType(p_Ref),
                                "ThirdPerson,FirstPerson", false, false),
         p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "targetObjectName",
-        _INTR_CREATE_PROP(p_Document, _N(CameraController), _N(string),
-                          _descTargetObjectName(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "targetEulerAngles",
-        _INTR_CREATE_PROP(p_Document, _N(CameraController), _N(vec3),
-                          _descTargetEulerAngles(p_Ref), false, false),
-        p_Document.GetAllocator());
+    p_Properties.AddMember("targetObjectName",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(CameraController), _N(string),
+                                             _descTargetObjectName(p_Ref),
+                                             false, false),
+                           p_Document.GetAllocator());
+    p_Properties.AddMember("targetEulerAngles",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(CameraController), _N(vec3),
+                                             _descTargetEulerAngles(p_Ref),
+                                             false, false),
+                           p_Document.GetAllocator());
   }
 
   // <-

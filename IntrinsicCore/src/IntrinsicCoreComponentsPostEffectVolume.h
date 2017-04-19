@@ -81,23 +81,25 @@ struct PostEffectVolumeManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(PostEffectVolumeRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember(
         "postEffectName",
-        _INTR_CREATE_PROP(p_Document, _N(PostEffectVolume), _N(string),
-                          _descPostEffectName(p_Ref), false, false),
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(PostEffectVolume),
+                          _N(string), _descPostEffectName(p_Ref), false, false),
         p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "radius", _INTR_CREATE_PROP(p_Document, _N(PostEffectVolume), _N(float),
-                                    _descRadius(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember("blendRange",
-                           _INTR_CREATE_PROP(p_Document, _N(PostEffectVolume),
-                                             _N(float), _descBlendRange(p_Ref),
-                                             false, false),
+    p_Properties.AddMember("radius",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(PostEffectVolume), _N(float),
+                                             _descRadius(p_Ref), false, false),
                            p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "blendRange",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(PostEffectVolume),
+                          _N(float), _descBlendRange(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   // <-
