@@ -423,7 +423,7 @@ protected:
                                               extension);
 
       // Ignore files not matching the extension
-      if (extension != p_Extension)
+      if (extension.find(p_Extension) == std::string::npos)
       {
         tinydir_next(&dir);
         continue;

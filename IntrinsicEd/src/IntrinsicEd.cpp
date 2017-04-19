@@ -81,8 +81,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   // Init. resources
   {
     Intrinsic::AssetManagement::Resources::AssetManager::init();
-    Intrinsic::AssetManagement::Resources::AssetManager::loadFromSingleFile(
-        "managers/Asset.manager.json");
+    Intrinsic::AssetManagement::Resources::AssetManager::loadFromMultipleFiles(
+        "managers/assets/", ".asset.json");
   }
 
   _viewport = _ui.centralWidget;

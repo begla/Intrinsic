@@ -28,8 +28,9 @@ IntrinsicEdManagerWindowAsset::IntrinsicEdManagerWindowAsset(QWidget* parent)
       Application::_resourcePropertyCompilerMapping[_N(Asset)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(Asset)];
   _resourceIcon = QIcon(":/Icons/asset");
-  _managerFilePath = "managers/Asset.manager.json";
   _resourceName = "Asset";
+  _managerPath = "managers/assets/";
+  _managerExtension = ".asset.json";
 
   _assetChangeWatch = new QFileSystemWatcher(this);
   QObject::connect(_assetChangeWatch, SIGNAL(fileChanged(const QString&)), this,

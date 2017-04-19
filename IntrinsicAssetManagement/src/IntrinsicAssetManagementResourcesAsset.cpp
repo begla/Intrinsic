@@ -38,8 +38,8 @@ void AssetManager::init()
         AssetManager::getActiveResourceAtIndex;
     assetEntry.getActiveResourceCountFunction =
         AssetManager::getActiveResourceCount;
-    assetEntry.loadFromSingleFileFunction = AssetManager::loadFromSingleFile;
-    assetEntry.saveToSingleFileFunction = AssetManager::saveToSingleFile;
+    assetEntry.loadFromMultipleFilesFunction = AssetManager::loadFromMultipleFiles;
+    assetEntry.saveToMultipleFilesFunction = AssetManager::saveToMultipleFiles;
     assetEntry.getResourceFlagsFunction = AssetManager::_resourceFlags;
 
     Application::_resourceManagerMapping[_N(Asset)] = assetEntry;
