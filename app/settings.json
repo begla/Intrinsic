@@ -6,7 +6,7 @@
   "targetFrameRate": 0.016,
   
   "windowMode": 0,
-  "presentMode": 0,
+  "presentMode": 2,
 
   "screenResolutionWidth": 1280,
   "screenResolutionHeight": 720,

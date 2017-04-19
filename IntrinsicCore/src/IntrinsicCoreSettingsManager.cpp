@@ -32,7 +32,7 @@ float Manager::_targetFrameRate = 0.016f;
 WindowMode::Enum Manager::_windowMode = WindowMode::kWindowed;
 uint32_t Manager::_screenResolutionWidth = 1280u;
 uint32_t Manager::_screenResolutionHeight = 720u;
-PresentMode::Enum Manager::_presentMode = PresentMode::kImmediate;
+PresentMode::Enum Manager::_presentMode = PresentMode::kFifo;
 
 namespace
 {

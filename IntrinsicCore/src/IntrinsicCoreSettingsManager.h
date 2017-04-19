@@ -43,26 +43,11 @@ namespace PresentMode
 {
 enum Enum
 {
-  kImmediate,
-  kMailbox,
-  kFifo,
-  kFifoRelaxed
+  kImmediate, // = VK_PRESENT_MODE_IMMEDIATE_KHR
+  kMailbox, // = VK_PRESENT_MODE_MAILBOX_KHR
+  kFifo, // = VK_PRESENT_MODE_FIFO_KHR
+  kFifoRelaxed // = VK_PRESENT_MODE_FIFO_RELAXED_KHR
 };
-}
-
-_INTR_INLINE VkPresentModeKHR mapPresentMode(PresentMode::Enum p_PresentMode)
-{
-  switch (p_PresentMode)
-  {
-  case PresentMode::kMailbox:
-    return VK_PRESENT_MODE_MAILBOX_KHR;
-  case PresentMode::kFifo:
-    return VK_PRESENT_MODE_FIFO_KHR;
-  case PresentMode::kFifoRelaxed:
-    return VK_PRESENT_MODE_FIFO_RELAXED_KHR;
-  }
-
-  return VK_PRESENT_MODE_IMMEDIATE_KHR;
 }
 
 struct Manager
