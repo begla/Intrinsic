@@ -44,7 +44,7 @@ install:
   - cd ..
   
 script:
-  - export VK_SDK_PATH=$(pwd)/VulkanSDK/1.0.30.0/x86_64/
+  - export VK_SDK_PATH=$(pwd)/VulkanSDK/1.0.46.0/x86_64/
   
 # Check all env. variables
   - printenv
