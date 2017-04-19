@@ -33,7 +33,7 @@ install:
   - (cd SDL2-2.0.5 && ./configure && make && sudo make install)
   
 # Vulkan SDK
-  - curl https://vulkan.lunarg.com/sdk/download/1.0.30.0/linux/vulkansdk-linux-x86_64-1.0.30.0.run -L -o vulkan.run
+  - curl https://vulkan.lunarg.com/sdk/download/1.0.46.0/linux/vulkansdk-linux-x86_64-1.0.46.0.run -L -o vulkan.run
   - chmod +x vulkan.run
   - ./vulkan.run
   
@@ -55,4 +55,3 @@ script:
   - ./Config_Release_CompileOnly
   - ./Build
   - cd ..
-  
