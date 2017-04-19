@@ -243,15 +243,11 @@ void World::save(const _INTR_STRING& p_FilePath)
           worldDesc.GetAllocator());
 
       node.AddMember("name", name, worldDesc.GetAllocator());
-      node.AddMember("hasParent", parent.isValid(), worldDesc.GetAllocator());
 
-      if (parent.isValid())
-      {
-        const int32_t offsetToParent = calcOffsetToParent(
-            storedNodes, parent, (uint32_t)storedNodes.size());
-        node.AddMember("offsetToParent", offsetToParent,
-                       worldDesc.GetAllocator());
-      }
+      const int32_t offsetToParent = parent.isValid() ? calcOffsetToParent(
+        storedNodes, parent, (uint32_t)storedNodes.size()) : 0;
+      node.AddMember("offsetToParent", offsetToParent,
+        worldDesc.GetAllocator());
 
       rapidjson::Value propertyEntries =
           rapidjson::Value(rapidjson::kArrayType);
@@ -399,11 +395,12 @@ void World::load(const _INTR_STRING& p_FilePath)
       const Components::NodeRef nodeRef = worldNodes[i];
       rapidjson::Value& node = worldDesc[i];
 
-      if (node["hasParent"].GetBool())
+      const int32_t offsetToParent = node["offsetToParent"].GetInt();
+
+      if (offsetToParent != 0)
       {
-        const int32_t offsetToParent = node["offsetToParent"].GetInt();
         Components::NodeManager::attachChildIgnoreParent(
-            worldNodes[i + offsetToParent], nodeRef);
+          worldNodes[i + offsetToParent], nodeRef);
       }
     }
   }
