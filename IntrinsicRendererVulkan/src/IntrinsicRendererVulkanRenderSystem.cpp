@@ -93,6 +93,8 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
   // Init. Vulkan
   {
+    _INTR_LOG_INFO("Using Vulkan SDK version 1.0.%u.x...", VK_HEADER_VERSION);
+
     initVkInstance();
     initVkDevice();
     Debugging::init(_vkInstance);
@@ -675,9 +677,11 @@ void RenderSystem::initOrUpdateVkSwapChain()
   static VkFormat surfaceFormatToUse = VK_FORMAT_B8G8R8A8_SRGB;
   static VkColorSpaceKHR surfaceColorSpaceToUse =
       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-  static VkPresentModeKHR presentModeToUse = Settings::mapPresentMode(Settings::Manager::_presentMode);
+  VkPresentModeKHR presentModeToUse = (VkPresentModeKHR)Settings::Manager::_presentMode;
 
   // Check if present mode is supported
+  _INTR_LOG_INFO("Checking present mode to use...");
+  _INTR_LOG_PUSH();
   {
     uint32_t presentModeCount = 0u;
     result = vkGetPhysicalDeviceSurfacePresentModesKHR(
@@ -695,19 +699,22 @@ void RenderSystem::initOrUpdateVkSwapChain()
     bool found = false;
     for (uint32_t i = 0u; i < presentModeCount; ++i)
     {
+      _INTR_LOG_INFO("Present mode '%u' available...", presentModes[i]);
+
       if (presentModes[i] == presentModeToUse)
       {
+        _INTR_LOG_INFO("Using present mode '%u'...", presentModes[i]);
         found = true;
-        break;
       }
     }
 
     if (!found)
     {
-      _INTR_LOG_WARNING("Selected present mode is not supported, falling back to immediate mode...");
-      presentModeToUse = VK_PRESENT_MODE_IMMEDIATE_KHR;
+      _INTR_LOG_WARNING("Selected present mode is not supported, falling back to fifo mode...");
+      presentModeToUse = VK_PRESENT_MODE_FIFO_KHR;
     }
   }
+  _INTR_LOG_POP();
 
   // Check if surface format is supported
   {
