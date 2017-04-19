@@ -38,7 +38,7 @@ install:
   - cd ..
   
 # Download and install Vulkan SDK
-  - curl -fsS -o vulkan.exe  https://vulkan.lunarg.com/sdk/download/1.0.30.0/windows/VulkanSDK-1.0.30.0-Installer.exe
+  - curl -fsS -o vulkan.exe  https://vulkan.lunarg.com/sdk/download/1.0.46.0/windows/VulkanSDK-1.0.46.0-Installer.exe
   - vulkan.exe /S
 
 build_script:
