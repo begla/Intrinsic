@@ -675,7 +675,7 @@ void RenderSystem::initOrUpdateVkSwapChain()
   static VkFormat surfaceFormatToUse = VK_FORMAT_B8G8R8A8_SRGB;
   static VkColorSpaceKHR surfaceColorSpaceToUse =
       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-  static VkPresentModeKHR presentModeToUse = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
+  static VkPresentModeKHR presentModeToUse = Settings::mapPresentMode(Settings::Manager::_presentMode);
 
   // Check if present mode is supported
   {
@@ -701,7 +701,12 @@ void RenderSystem::initOrUpdateVkSwapChain()
         break;
       }
     }
-    _INTR_ASSERT(found && "Present mode not supported");
+
+    if (!found)
+    {
+      _INTR_LOG_WARNING("Selected present mode is not supported, falling back to immediate mode...");
+      presentModeToUse = VK_PRESENT_MODE_IMMEDIATE_KHR;
+    }
   }
 
   // Check if surface format is supported

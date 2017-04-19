@@ -32,6 +32,7 @@ float Manager::_targetFrameRate = 0.016f;
 WindowMode::Enum Manager::_windowMode = WindowMode::kWindowed;
 uint32_t Manager::_screenResolutionWidth = 1280u;
 uint32_t Manager::_screenResolutionHeight = 720u;
+PresentMode::Enum Manager::_presentMode = PresentMode::kImmediate;
 
 namespace
 {
@@ -100,6 +101,7 @@ void Manager::loadSettings()
     readSetting(doc, _N(initialWorld), _initialWorld);
     readSetting(doc, _N(assetMeshPath), _assetMeshPath);
     readSetting(doc, _N(assetTexturePath), _assetTexturePath);
+    readSetting(doc, _N(presentMode), (uint32_t&)_presentMode);
   }
 
   _INTR_LOG_POP();

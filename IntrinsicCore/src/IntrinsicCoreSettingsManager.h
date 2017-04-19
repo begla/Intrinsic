@@ -39,6 +39,32 @@ enum Flags
 };
 }
 
+namespace PresentMode
+{
+enum Enum
+{
+  kImmediate,
+  kMailbox,
+  kFifo,
+  kFifoRelaxed
+};
+}
+
+_INTR_INLINE VkPresentModeKHR mapPresentMode(PresentMode::Enum p_PresentMode)
+{
+  switch (p_PresentMode)
+  {
+  case PresentMode::kMailbox:
+    return VK_PRESENT_MODE_MAILBOX_KHR;
+  case PresentMode::kFifo:
+    return VK_PRESENT_MODE_FIFO_KHR;
+  case PresentMode::kFifoRelaxed:
+    return VK_PRESENT_MODE_FIFO_RELAXED_KHR;
+  }
+
+  return VK_PRESENT_MODE_IMMEDIATE_KHR;
+}
+
 struct Manager
 {
   static void loadSettings();
@@ -53,6 +79,7 @@ struct Manager
   static WindowMode::Enum _windowMode;
   static uint32_t _screenResolutionWidth;
   static uint32_t _screenResolutionHeight;
+  static PresentMode::Enum _presentMode;
 };
 }
 }
