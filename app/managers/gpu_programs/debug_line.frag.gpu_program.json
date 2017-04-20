@@ -1,1 +1,9 @@
-{"name":"debug_line.frag","properties":{"name":"debug_line.frag","gpuProgramName":"debug_line.frag.glsl","entryPoint":"main","gpuProgramType":1}}
+{
+    "name": "debug_line.frag",
+    "properties": {
+        "name": "debug_line.frag",
+        "gpuProgramName": "debug_line.frag.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 1
+    }
+}

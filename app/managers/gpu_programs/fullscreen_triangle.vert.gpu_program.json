@@ -1,1 +1,9 @@
-{"name":"fullscreen_triangle.vert","properties":{"name":"fullscreen_triangle.vert","gpuProgramName":"fullscreen_triangle.vert.glsl","entryPoint":"main","gpuProgramType":0}}
+{
+    "name": "fullscreen_triangle.vert",
+    "properties": {
+        "name": "fullscreen_triangle.vert",
+        "gpuProgramName": "fullscreen_triangle.vert.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 0
+    }
+}

@@ -24,7 +24,8 @@ IntrinsicEdManagerWindowScript::IntrinsicEdManagerWindowScript(QWidget* parent)
       Application::_resourcePropertyCompilerMapping[_N(Script)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(Script)];
   _resourceIcon = QIcon(":/Icons/calendar");
-  _managerFilePath = "managers/Script.manager.json";
+  _managerPath = "managers/scripts/";
+  _managerExtension = ".script.json";
   _resourceName = "Script";
   _scriptPath = "scripts/";
 

@@ -1,0 +1,29 @@
+{
+    "name": "water",
+    "properties": {
+        "name": "water",
+        "materialPassMask": 128,
+        "albedoTextureName": "water",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.009999999776482582,
+            0.009999999776482582
+        ],
+        "translucencyThickness": 0.0,
+        "normalTextureName": "water_NRM",
+        "pbrTextureName": "water_PBR",
+        "pbrBias": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "foamTextureName": "foam",
+        "foamFadeDistance": 1.0,
+        "refractionFactor": 0.00009999999747378752
+    }
+}

@@ -1,1 +1,8 @@
-{"name":"Mono_Lake_C_Ref_cube_radiance","properties":{"name":"Mono_Lake_C_Ref_cube_radiance","assetFileName":"Mono_Lake_C_Ref_cube_radiance.dds","assetType":5}}
+{
+    "name": "Mono_Lake_C_Ref_cube_radiance",
+    "properties": {
+        "name": "Mono_Lake_C_Ref_cube_radiance",
+        "assetFileName": "Mono_Lake_C_Ref_cube_radiance.dds",
+        "assetType": 5
+    }
+}

@@ -171,17 +171,25 @@ struct ImageManager
           JsonHelper::readPropertyString(p_Properties["fileName"]);
   }
 
-  _INTR_INLINE static void saveToSingleFile(const char* p_FileName)
-  {
-    Dod::Resources::ResourceManagerBase<
-        ImageData, _INTR_MAX_IMAGE_COUNT>::_saveToSingleFile(p_FileName,
-                                                             compileDescriptor);
-  }
+  // <-
 
-  _INTR_INLINE static void loadFromSingleFile(const char* p_FileName)
+  _INTR_INLINE static void saveToMultipleFiles(const char* p_Path,
+                                               const char* p_Extension)
   {
     Dod::Resources::ResourceManagerBase<ImageData, _INTR_MAX_IMAGE_COUNT>::
-        _loadFromSingleFile(p_FileName, initFromDescriptor, resetToDefault);
+        _saveToMultipleFiles<
+            rapidjson::PrettyWriter<rapidjson::FileWriteStream>>(
+            p_Path, p_Extension, compileDescriptor);
+  }
+
+  // <-
+
+  _INTR_INLINE static void loadFromMultipleFiles(const char* p_Path,
+                                                 const char* p_Extension)
+  {
+    Dod::Resources::ResourceManagerBase<ImageData, _INTR_MAX_IMAGE_COUNT>::
+        _loadFromMultipleFiles(p_Path, p_Extension, initFromDescriptor,
+                               resetToDefault);
   }
 
   // <-

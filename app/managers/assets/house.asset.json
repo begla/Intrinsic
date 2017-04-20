@@ -1,1 +1,8 @@
-{"name":"house","properties":{"name":"house","assetFileName":"house.fbx","assetType":1}}
+{
+    "name": "house",
+    "properties": {
+        "name": "house",
+        "assetFileName": "house.fbx",
+        "assetType": 1
+    }
+}

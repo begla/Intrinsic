@@ -80,11 +80,13 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
     Resources::MeshManager::loadFromMultipleFiles("managers/meshes/",
                                                   ".mesh.json");
     Resources::MeshManager::createAllResources();
-    Resources::ScriptManager::loadFromSingleFile(
-        "managers/Script.manager.json");
+
+    Resources::ScriptManager::loadFromMultipleFiles("managers/scripts/",
+                                                    ".script.json");
     Resources::ScriptManager::createAllResources();
-    Resources::PostEffectManager::loadFromSingleFile(
-        "managers/PostEffect.manager.json");
+
+    Resources::PostEffectManager::loadFromMultipleFiles(
+        "managers/post_effects/", ".post_effect.json");
   }
 
   // Init. world

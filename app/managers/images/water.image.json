@@ -1,0 +1,17 @@
+{
+    "name": "water",
+    "properties": {
+        "name": "water",
+        "imageType": 1,
+        "imageFormat": 7,
+        "flags": 16,
+        "dimensions": [
+            893.0,
+            893.0,
+            1.0
+        ],
+        "arrayLayerCount": 1,
+        "mipLevelCount": 10,
+        "fileName": "water.dds"
+    }
+}

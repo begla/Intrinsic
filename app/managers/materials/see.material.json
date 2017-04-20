@@ -1,0 +1,29 @@
+{
+    "name": "see",
+    "properties": {
+        "name": "see",
+        "materialPassMask": 128,
+        "albedoTextureName": "water",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            5.0,
+            5.0
+        ],
+        "uvAnimation": [
+            0.004999999888241291,
+            0.004999999888241291
+        ],
+        "translucencyThickness": 0.0,
+        "normalTextureName": "water_NRM",
+        "pbrTextureName": "water_PBR",
+        "pbrBias": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "foamTextureName": "foam",
+        "foamFadeDistance": 99.0,
+        "refractionFactor": 0.0020000000949949028
+    }
+}

@@ -1,1 +1,9 @@
-{"name":"foliage.frag","properties":{"name":"foliage.frag","gpuProgramName":"foliage.frag.glsl","entryPoint":"main","gpuProgramType":1}}
+{
+    "name": "foliage.frag",
+    "properties": {
+        "name": "foliage.frag",
+        "gpuProgramName": "foliage.frag.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 1
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "name": "terrain",
+    "properties": {
+        "name": "terrain",
+        "materialPassMask": 770,
+        "albedoTextureName": "grassleaves_01",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            120.0,
+            120.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 0.0,
+        "normalTextureName": "grassleaves_01_NRM",
+        "pbrTextureName": "grassleaves_01_PBR",
+        "pbrBias": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "albedo1TextureName": "gravel_01",
+        "normal1TextureName": "gravel_01_NRM",
+        "pbr1TextureName": "gravel_01_PBR",
+        "albedo2TextureName": "Rock_01",
+        "normal2TextureName": "Rock_01_NRM",
+        "pbr2TextureName": "Rock_01_PBR",
+        "blendMaskTextureName": "terrain_BLEND"
+    }
+}

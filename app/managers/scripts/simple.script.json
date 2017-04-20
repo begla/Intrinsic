@@ -1,0 +1,7 @@
+{
+    "name": "simple",
+    "properties": {
+        "name": "simple",
+        "scriptFileName": "simple.lua"
+    }
+}

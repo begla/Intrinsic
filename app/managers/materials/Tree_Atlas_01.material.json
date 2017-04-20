@@ -1,0 +1,26 @@
+{
+    "name": "Tree_Atlas_01",
+    "properties": {
+        "name": "Tree_Atlas_01",
+        "materialPassMask": 608,
+        "albedoTextureName": "Tree_Atlas_01",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 1.0,
+        "normalTextureName": "Tree_Atlas_01_NRM",
+        "pbrTextureName": "Tree_Atlas_01_PBR",
+        "pbrBias": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    }
+}

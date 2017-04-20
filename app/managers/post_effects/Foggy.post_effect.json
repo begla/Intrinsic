@@ -1,0 +1,7 @@
+{
+    "name": "Foggy",
+    "properties": {
+        "name": "Foggy",
+        "volumetricLightingScattering": 0.003000000026077032
+    }
+}

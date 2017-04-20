@@ -1,1 +1,8 @@
-{"name":"GCanyon_C_YumaPoint_3k_cube_radiance","properties":{"name":"GCanyon_C_YumaPoint_3k_cube_radiance","assetFileName":"GCanyon_C_YumaPoint_3k_cube_radiance.dds","assetType":5}}
+{
+    "name": "GCanyon_C_YumaPoint_3k_cube_radiance",
+    "properties": {
+        "name": "GCanyon_C_YumaPoint_3k_cube_radiance",
+        "assetFileName": "GCanyon_C_YumaPoint_3k_cube_radiance.dds",
+        "assetType": 5
+    }
+}

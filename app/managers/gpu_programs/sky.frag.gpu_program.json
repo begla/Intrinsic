@@ -1,1 +1,9 @@
-{"name":"sky.frag","properties":{"name":"sky.frag","gpuProgramName":"sky.frag.glsl","entryPoint":"main","gpuProgramType":1}}
+{
+    "name": "sky.frag",
+    "properties": {
+        "name": "sky.frag",
+        "gpuProgramName": "sky.frag.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 1
+    }
+}

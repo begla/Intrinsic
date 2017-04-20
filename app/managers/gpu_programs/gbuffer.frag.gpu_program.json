@@ -1,1 +1,9 @@
-{"name":"gbuffer.frag","properties":{"name":"gbuffer.frag","gpuProgramName":"gbuffer.frag.glsl","entryPoint":"main","gpuProgramType":1}}
+{
+    "name": "gbuffer.frag",
+    "properties": {
+        "name": "gbuffer.frag",
+        "gpuProgramName": "gbuffer.frag.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 1
+    }
+}

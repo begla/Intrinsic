@@ -1,1 +1,8 @@
-{"name":"Prop_Atlas_01_PBR","properties":{"name":"Prop_Atlas_01_PBR","assetFileName":"Prop_Atlas_01_PBR.TGA","assetType":2}}
+{
+    "name": "Prop_Atlas_01_PBR",
+    "properties": {
+        "name": "Prop_Atlas_01_PBR",
+        "assetFileName": "Prop_Atlas_01_PBR.TGA",
+        "assetType": 2
+    }
+}
