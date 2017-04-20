@@ -22,14 +22,21 @@ namespace Vulkan
 {
 namespace RenderPass
 {
-struct PreCombine
+struct GenericFullscreen
 {
-  static void init();
-  static void updateResolutionDependentResources();
+  void init(const rapidjson::Value& p_RenderPassDesc);
+  void destroy();
 
-  static void destroy();
+  void render(float p_DeltaT);
 
-  static void render(float p_DeltaT);
+private:
+  _INTR_STRING _name;
+
+  Resources::FramebufferRef _framebufferRef;
+  Resources::ImageRefArray _imageRefs;
+  Resources::RenderPassRef _renderPassRef;
+  Resources::PipelineRef _pipelineRef;
+  Resources::DrawCallRef _drawCallRef;
 };
 }
 }

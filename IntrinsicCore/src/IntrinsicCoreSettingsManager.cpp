@@ -33,6 +33,7 @@ WindowMode::Enum Manager::_windowMode = WindowMode::kWindowed;
 uint32_t Manager::_screenResolutionWidth = 1280u;
 uint32_t Manager::_screenResolutionHeight = 720u;
 PresentMode::Enum Manager::_presentMode = PresentMode::kFifo;
+_INTR_STRING Manager::_rendererConfig = "renderer_config.json";
 
 namespace
 {

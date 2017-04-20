@@ -1,6 +1,7 @@
 {
   "initialWorld": "Default.world.json",
 
+  "rendererConfig" : "renderer_config.json",
   "rendererValidationEnabled": false,
 
   "targetFrameRate": 0.016,

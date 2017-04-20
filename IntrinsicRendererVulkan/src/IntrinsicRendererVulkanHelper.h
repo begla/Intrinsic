@@ -566,7 +566,87 @@ _INTR_INLINE static uint32_t computeGpuMemoryTypeIdx(uint32_t p_TypeBits,
   _INTR_ASSERT(false);
   return (uint32_t)-1;
 }
-};
+
+// <-
+
+_INTR_INLINE static Format::Enum
+mapStringFormatToFormat(const _INTR_STRING& p_Format)
+{
+  static _INTR_HASH_MAP(_INTR_STRING, Format::Enum)
+      formats = {{"R16G16B16A16Float", Format::kR16G16B16A16Float}};
+
+  auto format = formats.find(p_Format);
+  if (format != formats.end())
+  {
+    return format->second;
+  }
+
+  _INTR_ASSERT(false && "Format not supported/found");
+  return Format::kB8G8R8A8UNorm;
+}
+
+// <-
+
+_INTR_INLINE static RenderSize::Enum
+mapStringRenderSizeToRenderSize(const _INTR_STRING& p_RenderSize)
+{
+  static _INTR_HASH_MAP(_INTR_STRING, RenderSize::Enum)
+      renderSizes = {{"Full", RenderSize::kFull},
+                     {"Half", RenderSize::kHalf},
+                     {"Quarter", RenderSize::kQuarter}};
+
+  auto renderSize = renderSizes.find(p_RenderSize);
+  if (renderSize != renderSizes.end())
+  {
+    return renderSize->second;
+  }
+
+  _INTR_ASSERT(false && "Render size not supported/found");
+  return RenderSize::kFull;
+}
+
+// <-
+
+_INTR_INLINE static GpuProgramType::Enum
+mapStringGpuProgramTypeToGpuProgramType(const _INTR_STRING& p_GpuProgramType)
+{
+  static _INTR_HASH_MAP(_INTR_STRING, GpuProgramType::Enum)
+      gpuProgramTypes = {{"Fragment", GpuProgramType::kFragment},
+                         {"Vertex", GpuProgramType::kVertex},
+                         {"Compute", GpuProgramType::kCompute}};
+
+  auto gpuProgramType = gpuProgramTypes.find(p_GpuProgramType);
+  if (gpuProgramType != gpuProgramTypes.end())
+  {
+    return gpuProgramType->second;
+  }
+
+  _INTR_ASSERT(false && "GPU program type not supported/found");
+  return GpuProgramType::kVertex;
+}
+
+// <-
+
+_INTR_INLINE static Samplers::Enum
+mapStringSamplerToSampler(const _INTR_STRING& p_Sampler)
+{
+  static _INTR_HASH_MAP(_INTR_STRING, Samplers::Enum)
+      samplers = {{"LinearClamp", Samplers::kLinearClamp},
+                  {"LinearRepeat", Samplers::kLinearRepeat},
+                  {"NearestClamp", Samplers::kNearestClamp},
+                  {"NearestRepeat", Samplers::kNearestRepeat},
+                  {"Shadow", Samplers::kShadow}};
+
+  auto sampler = samplers.find(p_Sampler);
+  if (sampler != samplers.end())
+  {
+    return sampler->second;
+  }
+
+  _INTR_ASSERT(false && "GPU program type not supported/found");
+  return Samplers::kLinearClamp;
+}
+}
 }
 }
 }

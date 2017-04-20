@@ -1,0 +1,41 @@
+{
+	"name" : "Default",
+	"renderSteps" : [
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "Scene",
+			"sourceLayout" : "Undefined",
+			"targetLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"images" : [
+				{
+					"name" : "Scene",
+					"renderSize" : "Full",
+					"imageFormat" : "R16G16B16A16Float"
+				}
+			],
+			"name" : "PreCombine",
+			"fragmentGpuProgram" : "pre_combine.frag",
+			"renderSize" : "Full",
+			"inputs" : [
+				["Image", "GBufferAlbedo", "albedoTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferNormal", "normalTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferParameter0", "param0Tex", "Fragment", "NearestClamp"],
+				["Image", "GBufferTransparentsAlbedo", "albedoTransparentsTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferTransparentsNormal", "normalTransparentsTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferTransparentsParameter0", "param0TransparentsTex", "Fragment", "NearestClamp"],
+				["Image", "LightBuffer", "lightBufferTex", "Fragment", "NearestClamp"],
+				["Image", "LightBufferTransparents", "lightBufferTransparentsTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferTransparentsDepth", "depthBufferTransparentsTex", "Fragment", "NearestClamp"],
+				["Buffer", "MaterialBuffer", "MaterialBuffer", "Fragment"],
+				["Image", "VolumetricLightingScatteringBuffer", "volumetricLightingScatteringBufferTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["Image", "Scene"]
+			]
+		}
+	]
+}

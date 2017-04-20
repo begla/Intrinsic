@@ -65,6 +65,8 @@ struct Manager
   static uint32_t _screenResolutionWidth;
   static uint32_t _screenResolutionHeight;
   static PresentMode::Enum _presentMode;
+
+  static _INTR_STRING _rendererConfig;
 };
 }
 }
