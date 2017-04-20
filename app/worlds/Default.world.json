@@ -204,7 +204,7 @@
         ]
     },
     {
-        "name": "See",
+        "name": "Sea",
         "offsetToParent": -4,
         "propertyEntries": [
             {
@@ -247,7 +247,7 @@
             {
                 "type": "Mesh",
                 "properties": {
-                    "meshName": "see_plane"
+                    "meshName": "sea_plane"
                 }
             }
         ]
