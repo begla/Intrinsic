@@ -43,9 +43,9 @@ namespace PresentMode
 {
 enum Enum
 {
-  kImmediate, // = VK_PRESENT_MODE_IMMEDIATE_KHR
-  kMailbox, // = VK_PRESENT_MODE_MAILBOX_KHR
-  kFifo, // = VK_PRESENT_MODE_FIFO_KHR
+  kImmediate,  // = VK_PRESENT_MODE_IMMEDIATE_KHR
+  kMailbox,    // = VK_PRESENT_MODE_MAILBOX_KHR
+  kFifo,       // = VK_PRESENT_MODE_FIFO_KHR
   kFifoRelaxed // = VK_PRESENT_MODE_FIFO_RELAXED_KHR
 };
 }

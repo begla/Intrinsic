@@ -398,7 +398,8 @@ void RenderSystem::initManagers()
 
   // Load managers
   {
-    GpuProgramManager::loadFromMultipleFiles("managers/gpu_programs/", ".gpu_program.json");
+    GpuProgramManager::loadFromMultipleFiles("managers/gpu_programs/",
+                                             ".gpu_program.json");
     ImageManager::loadFromSingleFile("managers/Image.manager.json");
     MaterialManager::loadFromSingleFile("managers/Material.manager.json");
   }
@@ -677,7 +678,8 @@ void RenderSystem::initOrUpdateVkSwapChain()
   static VkFormat surfaceFormatToUse = VK_FORMAT_B8G8R8A8_SRGB;
   static VkColorSpaceKHR surfaceColorSpaceToUse =
       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-  VkPresentModeKHR presentModeToUse = (VkPresentModeKHR)Settings::Manager::_presentMode;
+  VkPresentModeKHR presentModeToUse =
+      (VkPresentModeKHR)Settings::Manager::_presentMode;
 
   // Check if present mode is supported
   _INTR_LOG_INFO("Checking present mode to use...");
@@ -710,7 +712,8 @@ void RenderSystem::initOrUpdateVkSwapChain()
 
     if (!found)
     {
-      _INTR_LOG_WARNING("Selected present mode is not supported, falling back to fifo mode...");
+      _INTR_LOG_WARNING("Selected present mode is not supported, falling back "
+                        "to fifo mode...");
       presentModeToUse = VK_PRESENT_MODE_FIFO_KHR;
     }
   }
