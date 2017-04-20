@@ -74,8 +74,9 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
 
       Core::Resources::MeshManager::saveToMultipleFiles("managers/meshes/",
                                                         ".mesh.json");
-      Renderer::Vulkan::Resources::MaterialManager::saveToSingleFile(
-          "managers/Material.manager.json");
+
+      Renderer::Vulkan::Resources::MaterialManager::saveToMultipleFiles(
+          "managers/materials/", ".material.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kColorTexture)
     {
@@ -85,8 +86,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      Renderer::Vulkan::Resources::ImageManager::saveToSingleFile(
-          "managers/Image.manager.json");
+      Renderer::Vulkan::Resources::ImageManager::saveToMultipleFiles(
+          "managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kAlphaTexture)
     {
@@ -96,8 +97,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      Renderer::Vulkan::Resources::ImageManager::saveToSingleFile(
-          "managers/Image.manager.json");
+      Renderer::Vulkan::Resources::ImageManager::saveToMultipleFiles(
+          "managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kNormalTexture)
     {
@@ -107,8 +108,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      Renderer::Vulkan::Resources::ImageManager::saveToSingleFile(
-          "managers/Image.manager.json");
+      Renderer::Vulkan::Resources::ImageManager::saveToMultipleFiles(
+          "managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kHdrTexture)
     {
@@ -118,8 +119,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      Renderer::Vulkan::Resources::ImageManager::saveToSingleFile(
-          "managers/Image.manager.json");
+      Renderer::Vulkan::Resources::ImageManager::saveToMultipleFiles(
+          "managers/images/", ".image.json");
     }
   }
 }

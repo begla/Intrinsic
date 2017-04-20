@@ -188,8 +188,10 @@ void ScriptManager::init()
         ScriptManager::getActiveResourceAtIndex;
     managerEntry.getActiveResourceCountFunction =
         ScriptManager::getActiveResourceCount;
-    managerEntry.loadFromSingleFileFunction = ScriptManager::loadFromSingleFile;
-    managerEntry.saveToSingleFileFunction = ScriptManager::saveToSingleFile;
+    managerEntry.loadFromMultipleFilesFunction =
+        ScriptManager::loadFromMultipleFiles;
+    managerEntry.saveToMultipleFilesFunction =
+        ScriptManager::saveToMultipleFiles;
     managerEntry.resetToDefaultFunction = ScriptManager::resetToDefault;
     managerEntry.getResourceFlagsFunction = ScriptManager::_resourceFlags;
 

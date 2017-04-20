@@ -1,1 +1,9 @@
-{"name":"grid.frag","properties":{"name":"grid.frag","gpuProgramName":"grid.frag.glsl","entryPoint":"main","gpuProgramType":1}}
+{
+    "name": "grid.frag",
+    "properties": {
+        "name": "grid.frag",
+        "gpuProgramName": "grid.frag.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 1
+    }
+}

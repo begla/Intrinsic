@@ -1,1 +1,9 @@
-{"name":"gbuffer_water.vert","properties":{"name":"gbuffer_water.vert","gpuProgramName":"gbuffer_water.vert.glsl","entryPoint":"main","gpuProgramType":0}}
+{
+    "name": "gbuffer_water.vert",
+    "properties": {
+        "name": "gbuffer_water.vert",
+        "gpuProgramName": "gbuffer_water.vert.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 0
+    }
+}

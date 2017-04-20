@@ -1,1 +1,9 @@
-{"name":"lens_flare.frag","properties":{"name":"lens_flare.frag","gpuProgramName":"lens_flare.frag.glsl","entryPoint":"main","gpuProgramType":1}}
+{
+    "name": "lens_flare.frag",
+    "properties": {
+        "name": "lens_flare.frag",
+        "gpuProgramName": "lens_flare.frag.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 1
+    }
+}

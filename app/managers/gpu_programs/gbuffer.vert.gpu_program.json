@@ -1,1 +1,9 @@
-{"name":"gbuffer.vert","properties":{"name":"gbuffer.vert","gpuProgramName":"gbuffer.vert.glsl","entryPoint":"main","gpuProgramType":0}}
+{
+    "name": "gbuffer.vert",
+    "properties": {
+        "name": "gbuffer.vert",
+        "gpuProgramName": "gbuffer.vert.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 0
+    }
+}

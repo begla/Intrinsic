@@ -1,1 +1,9 @@
-{"name":"gizmo.vert","properties":{"name":"gizmo.vert","gpuProgramName":"gizmo.vert.glsl","entryPoint":"main","gpuProgramType":0}}
+{
+    "name": "gizmo.vert",
+    "properties": {
+        "name": "gizmo.vert",
+        "gpuProgramName": "gizmo.vert.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 0
+    }
+}

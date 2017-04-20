@@ -1,0 +1,26 @@
+{
+    "name": "Prop_Atlas_01",
+    "properties": {
+        "name": "Prop_Atlas_01",
+        "materialPassMask": 515,
+        "albedoTextureName": "Prop_Atlas_01",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 0.0,
+        "normalTextureName": "Prop_Atlas_01_NRM",
+        "pbrTextureName": "Prop_Atlas_01_PBR",
+        "pbrBias": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    }
+}

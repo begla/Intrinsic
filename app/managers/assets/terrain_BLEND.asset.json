@@ -1,1 +1,8 @@
-{"name":"terrain_BLEND","properties":{"name":"terrain_BLEND","assetFileName":"terrain_BLEND.TGA","assetType":2}}
+{
+    "name": "terrain_BLEND",
+    "properties": {
+        "name": "terrain_BLEND",
+        "assetFileName": "terrain_BLEND.TGA",
+        "assetType": 2
+    }
+}

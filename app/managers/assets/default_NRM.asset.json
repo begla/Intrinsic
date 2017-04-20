@@ -1,1 +1,8 @@
-{"name":"default_NRM","properties":{"name":"default_NRM","assetFileName":"default_NRM.TGA","assetType":4}}
+{
+    "name": "default_NRM",
+    "properties": {
+        "name": "default_NRM",
+        "assetFileName": "default_NRM.TGA",
+        "assetType": 4
+    }
+}

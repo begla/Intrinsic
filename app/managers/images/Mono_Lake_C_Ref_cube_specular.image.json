@@ -1,0 +1,17 @@
+{
+    "name": "Mono_Lake_C_Ref_cube_specular",
+    "properties": {
+        "name": "Mono_Lake_C_Ref_cube_specular",
+        "imageType": 1,
+        "imageFormat": 15,
+        "flags": 16,
+        "dimensions": [
+            461.0,
+            461.0,
+            1.0
+        ],
+        "arrayLayerCount": 1,
+        "mipLevelCount": 9,
+        "fileName": "Mono_Lake_C_Ref_cube_specular.dds"
+    }
+}

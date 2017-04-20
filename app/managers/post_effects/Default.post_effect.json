@@ -1,0 +1,7 @@
+{
+    "name": "Default",
+    "properties": {
+        "name": "Default",
+        "volumetricLightingScattering": 0.0
+    }
+}

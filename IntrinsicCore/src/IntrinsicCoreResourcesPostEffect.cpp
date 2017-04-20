@@ -41,10 +41,10 @@ void PostEffectManager::init()
         Resources::PostEffectManager::getActiveResourceAtIndex;
     managerEntry.getActiveResourceCountFunction =
         Resources::PostEffectManager::getActiveResourceCount;
-    managerEntry.loadFromSingleFileFunction =
-        Resources::PostEffectManager::loadFromSingleFile;
-    managerEntry.saveToSingleFileFunction =
-        Resources::PostEffectManager::saveToSingleFile;
+    managerEntry.loadFromMultipleFilesFunction =
+        Resources::PostEffectManager::loadFromMultipleFiles;
+    managerEntry.saveToMultipleFilesFunction =
+        Resources::PostEffectManager::saveToMultipleFiles;
     managerEntry.resetToDefaultFunction =
         Resources::PostEffectManager::resetToDefault;
     managerEntry.getResourceFlagsFunction = PostEffectManager::_resourceFlags;

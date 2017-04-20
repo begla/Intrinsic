@@ -1,1 +1,9 @@
-{"name":"shadow.vert","properties":{"name":"shadow.vert","gpuProgramName":"shadow.vert.glsl","entryPoint":"main","gpuProgramType":0}}
+{
+    "name": "shadow.vert",
+    "properties": {
+        "name": "shadow.vert",
+        "gpuProgramName": "shadow.vert.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 0
+    }
+}

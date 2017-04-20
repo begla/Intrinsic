@@ -47,9 +47,10 @@ void MaterialManager::init()
         MaterialManager::getActiveResourceAtIndex;
     managerEntry.getActiveResourceCountFunction =
         MaterialManager::getActiveResourceCount;
-    managerEntry.loadFromSingleFileFunction =
-        MaterialManager::loadFromSingleFile;
-    managerEntry.saveToSingleFileFunction = MaterialManager::saveToSingleFile;
+    managerEntry.loadFromMultipleFilesFunction =
+        MaterialManager::loadFromMultipleFiles;
+    managerEntry.saveToMultipleFilesFunction =
+        MaterialManager::saveToMultipleFiles;
     managerEntry.getResourceFlagsFunction = MaterialManager::_resourceFlags;
     Application::_resourceManagerMapping[_N(Material)] = managerEntry;
   }

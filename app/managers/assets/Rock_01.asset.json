@@ -1,1 +1,8 @@
-{"name":"Rock_01","properties":{"name":"Rock_01","assetFileName":"Rock_01.TGA","assetType":2}}
+{
+    "name": "Rock_01",
+    "properties": {
+        "name": "Rock_01",
+        "assetFileName": "Rock_01.TGA",
+        "assetType": 2
+    }
+}

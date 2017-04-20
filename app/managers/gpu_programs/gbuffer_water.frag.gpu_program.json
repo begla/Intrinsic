@@ -1,1 +1,9 @@
-{"name":"gbuffer_water.frag","properties":{"name":"gbuffer_water.frag","gpuProgramName":"gbuffer_water.frag.glsl","entryPoint":"main","gpuProgramType":1}}
+{
+    "name": "gbuffer_water.frag",
+    "properties": {
+        "name": "gbuffer_water.frag",
+        "gpuProgramName": "gbuffer_water.frag.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 1
+    }
+}

@@ -46,10 +46,10 @@ void ImageManager::init()
         Resources::ImageManager::getActiveResourceAtIndex;
     managerEntry.getActiveResourceCountFunction =
         Resources::ImageManager::getActiveResourceCount;
-    managerEntry.loadFromSingleFileFunction =
-        Resources::ImageManager::loadFromSingleFile;
-    managerEntry.saveToSingleFileFunction =
-        Resources::ImageManager::saveToSingleFile;
+    managerEntry.loadFromMultipleFilesFunction =
+        Resources::ImageManager::loadFromMultipleFiles;
+    managerEntry.saveToMultipleFilesFunction =
+        Resources::ImageManager::saveToMultipleFiles;
     managerEntry.getResourceFlagsFunction = ImageManager::_resourceFlags;
     Application::_resourceManagerMapping[_N(Image)] = managerEntry;
   }

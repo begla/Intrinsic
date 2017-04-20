@@ -400,8 +400,9 @@ void RenderSystem::initManagers()
   {
     GpuProgramManager::loadFromMultipleFiles("managers/gpu_programs/",
                                              ".gpu_program.json");
-    ImageManager::loadFromSingleFile("managers/Image.manager.json");
-    MaterialManager::loadFromSingleFile("managers/Material.manager.json");
+    ImageManager::loadFromMultipleFiles("managers/images/", ".image.json");
+    MaterialManager::loadFromMultipleFiles("managers/materials/",
+                                           ".material.json");
   }
 
   // Setup default vertex layouts

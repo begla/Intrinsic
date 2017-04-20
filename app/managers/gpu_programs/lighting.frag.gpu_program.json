@@ -1,1 +1,9 @@
-{"name":"lighting.frag","properties":{"name":"lighting.frag","gpuProgramName":"lighting.frag.glsl","entryPoint":"main","gpuProgramType":1}}
+{
+    "name": "lighting.frag",
+    "properties": {
+        "name": "lighting.frag",
+        "gpuProgramName": "lighting.frag.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 1
+    }
+}

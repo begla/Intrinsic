@@ -1,0 +1,17 @@
+{
+    "name": "foam",
+    "properties": {
+        "name": "foam",
+        "imageType": 1,
+        "imageFormat": 7,
+        "flags": 16,
+        "dimensions": [
+            512.0,
+            512.0,
+            1.0
+        ],
+        "arrayLayerCount": 1,
+        "mipLevelCount": 10,
+        "fileName": "foam.dds"
+    }
+}

@@ -1,1 +1,8 @@
-{"name":"plane","properties":{"name":"plane","assetFileName":"plane.fbx","assetType":1}}
+{
+    "name": "plane",
+    "properties": {
+        "name": "plane",
+        "assetFileName": "plane.fbx",
+        "assetType": 1
+    }
+}

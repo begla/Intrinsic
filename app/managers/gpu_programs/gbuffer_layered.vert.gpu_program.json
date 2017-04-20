@@ -1,1 +1,9 @@
-{"name":"gbuffer_layered.vert","properties":{"name":"gbuffer_layered.vert","gpuProgramName":"gbuffer_layered.vert.glsl","entryPoint":"main","gpuProgramType":0}}
+{
+    "name": "gbuffer_layered.vert",
+    "properties": {
+        "name": "gbuffer_layered.vert",
+        "gpuProgramName": "gbuffer_layered.vert.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 0
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "name": "lens_dirt",
+    "properties": {
+        "name": "lens_dirt",
+        "imageType": 1,
+        "imageFormat": 7,
+        "flags": 16,
+        "dimensions": [
+            1024.0,
+            576.0,
+            1.0
+        ],
+        "arrayLayerCount": 1,
+        "mipLevelCount": 11,
+        "fileName": "lens_dirt.dds"
+    }
+}

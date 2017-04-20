@@ -1,1 +1,9 @@
-{"name":"shadow_foliage.vert","properties":{"name":"shadow_foliage.vert","gpuProgramName":"shadow_foliage.vert.glsl","entryPoint":"main","gpuProgramType":0}}
+{
+    "name": "shadow_foliage.vert",
+    "properties": {
+        "name": "shadow_foliage.vert",
+        "gpuProgramName": "shadow_foliage.vert.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 0
+    }
+}

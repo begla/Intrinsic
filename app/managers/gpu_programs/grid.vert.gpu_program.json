@@ -1,1 +1,9 @@
-{"name":"grid.vert","properties":{"name":"grid.vert","gpuProgramName":"grid.vert.glsl","entryPoint":"main","gpuProgramType":0}}
+{
+    "name": "grid.vert",
+    "properties": {
+        "name": "grid.vert",
+        "gpuProgramName": "grid.vert.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 0
+    }
+}
