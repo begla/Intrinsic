@@ -42,8 +42,6 @@ IntrinsicEdManagerWindowBase::IntrinsicEdManagerWindowBase(QWidget* parent)
                    this, SLOT(onItemChanged(QTreeWidgetItem*, int)));
 
   _ui.propertyView->setFeatures(0);
-  _ui.splitter->setStretchFactor(0, 1);
-  _ui.splitter->setStretchFactor(1, 2);
   _ui.resourceView->setSortingEnabled(true);
   _ui.resourceView->sortByColumn(0u, Qt::AscendingOrder);
   _resourceName = "Resource";
