@@ -215,7 +215,7 @@ void GpuProgramManager::reflectPipelineLayout(
     GpuProgramRef gpuProgramRef = p_GpuPrograms[i];
 
     spirv_cross::CompilerGLSL glsl(
-        std::move(GpuProgramManager::_spirvBuffer(gpuProgramRef)));
+        GpuProgramManager::_spirvBuffer(gpuProgramRef));
     spirv_cross::ShaderResources resources = glsl.get_shader_resources();
 
     // Uniform buffers

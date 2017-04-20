@@ -144,7 +144,6 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     RenderPass::Lighting::init();
     RenderPass::VolumetricLighting::init();
 
-    RenderPass::PreCombine::init();
     RenderPass::Bloom::init();
     RenderPass::PostCombine::init();
     RenderPass::LensFlare::init();
@@ -243,7 +242,10 @@ void RenderSystem::updateResolutionDependentResources()
   RenderPass::Shadow::updateResolutionDependentResources();
   RenderPass::Lighting::updateResolutionDependentResources();
   RenderPass::VolumetricLighting::updateResolutionDependentResources();
-  RenderPass::PreCombine::updateResolutionDependentResources();
+
+  // TODO
+  DefaultRenderProcess::load();
+
   RenderPass::Bloom::updateResolutionDependentResources();
   RenderPass::LensFlare::updateResolutionDependentResources();
   RenderPass::PostCombine::updateResolutionDependentResources();

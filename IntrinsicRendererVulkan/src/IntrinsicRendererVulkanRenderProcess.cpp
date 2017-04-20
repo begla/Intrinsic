@@ -22,11 +22,132 @@ namespace Renderer
 {
 namespace Vulkan
 {
-// Static members
+namespace
+{
+namespace RenderStepType
+{
+enum Enum
+{
+  kImageMemoryBarrier,
 
+  kRenderPassGenericFullscreen
+};
+}
+
+struct RenderStep
+{
+  RenderStep(uint8_t p_Type, uint8_t p_RenderPassIndex)
+  {
+    data = (uint32_t)p_Type | (uint32_t)p_RenderPassIndex << 8u;
+    resourceName = 0x0u;
+  }
+
+  RenderStep(uint8_t p_Type, uint8_t p_SourceLayout, uint8_t p_TargetLayout,
+             const Name& p_ResourceName)
+  {
+    data = (uint32_t)p_Type | (uint32_t)p_SourceLayout << 8u |
+           (uint32_t)p_TargetLayout << 16u;
+    resourceName = p_ResourceName;
+  }
+
+  _INTR_INLINE uint8_t getType() const { return data & 0xFF; }
+  _INTR_INLINE uint8_t getIndex() const { return (data >> 8u) & 0xFF; }
+  _INTR_INLINE uint8_t getSourceLayout() const { return (data >> 8u) & 0xFF; }
+  _INTR_INLINE uint8_t getTargetLayout() const { return (data >> 16u) & 0xFF; }
+
+  Name resourceName;
+  uint32_t data;
+};
+
+_INTR_ARRAY(RenderPass::GenericFullscreen) _renderPassesGenericFullScreen;
+_INTR_ARRAY(RenderStep) _renderSteps;
+
+_INTR_INLINE void executeRenderSteps(float p_DeltaT)
+{
+  for (uint32_t i = 0u; i < _renderSteps.size(); ++i)
+  {
+    const RenderStep& step = _renderSteps[i];
+
+    if (step.getType() == RenderStepType::kRenderPassGenericFullscreen)
+    {
+      _renderPassesGenericFullScreen[step.getIndex()].render(p_DeltaT);
+    }
+    else if (step.getType() == RenderStepType::kImageMemoryBarrier)
+    {
+      using namespace Resources;
+
+      ImageManager::insertImageMemoryBarrier(
+          ImageManager::_getResourceByName(step.resourceName),
+          (VkImageLayout)step.getSourceLayout(),
+          (VkImageLayout)step.getTargetLayout());
+    }
+  }
+}
+}
+
+// Static members
 Dod::RefArray DefaultRenderProcess::_activeFrustums;
 
 // <-
+
+void DefaultRenderProcess::load()
+{
+  for (uint32_t i = 0u; i < _renderPassesGenericFullScreen.size(); ++i)
+  {
+    _renderPassesGenericFullScreen[i].destroy();
+  }
+  _renderPassesGenericFullScreen.clear();
+  _renderSteps.clear();
+
+  rapidjson::Document rendererConfig;
+  {
+    FILE* fp = fopen(Settings::Manager::_rendererConfig.c_str(), "rb");
+
+    if (fp == nullptr)
+    {
+      _INTR_LOG_WARNING("Failed to load resources from file '%s'...",
+                        Settings::Manager::_rendererConfig.c_str());
+      return;
+    }
+
+    char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+    {
+      rapidjson::FileReadStream is(fp, readBuffer, 65536u);
+      rendererConfig.ParseStream(is);
+      fclose(fp);
+    }
+    Tlsf::MainAllocator::free(readBuffer);
+  }
+
+  _INTR_LOG_INFO("Loading renderer config '%s'...",
+                 rendererConfig["name"].GetString());
+  const rapidjson::Value& renderSteps = rendererConfig["renderSteps"];
+
+  for (uint32_t i = 0u; i < renderSteps.Size(); ++i)
+  {
+    const rapidjson::Value& renderStep = renderSteps[i];
+
+    if (renderStep["type"] == "ImageMemoryBarrier")
+    {
+      // TODO
+      _renderSteps.push_back(RenderStep(
+          RenderStepType::kImageMemoryBarrier, VK_IMAGE_LAYOUT_UNDEFINED,
+          VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+          renderStep["image"].GetString()));
+    }
+    else if (renderStep["type"] == "RenderPassGenericFullscreen")
+    {
+      _renderPassesGenericFullScreen.push_back(RenderPass::GenericFullscreen());
+      RenderPass::GenericFullscreen& renderPass =
+          _renderPassesGenericFullScreen.back();
+      renderPass.init(renderStep);
+
+      _renderSteps.push_back(
+          RenderStep(RenderStepType::kRenderPassGenericFullscreen,
+                     (uint8_t)_renderPassesGenericFullScreen.size() - 1u));
+    }
+  }
+}
 
 void DefaultRenderProcess::renderFrame(float p_DeltaT)
 {
@@ -95,7 +216,7 @@ void DefaultRenderProcess::renderFrame(float p_DeltaT)
         _INTR_PROFILE_CPU("Render System", "Post/Combine");
         _INTR_PROFILE_GPU("Post/Combine");
 
-        RenderPass::PreCombine::render(p_DeltaT);
+        executeRenderSteps(p_DeltaT);
         {
           RenderPass::Bloom::render(p_DeltaT);
           RenderPass::LensFlare::render(p_DeltaT);

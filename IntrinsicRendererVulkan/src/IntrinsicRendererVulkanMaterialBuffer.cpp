@@ -34,7 +34,7 @@ void MaterialBuffer::init()
 
   BufferRefArray buffersToCreate;
 
-  _materialBuffer = BufferManager::createBuffer(_N(_MaterialBuffer));
+  _materialBuffer = BufferManager::createBuffer(_N(MaterialBuffer));
   {
     BufferManager::resetToDefault(_materialBuffer);
     BufferManager::addResourceFlags(

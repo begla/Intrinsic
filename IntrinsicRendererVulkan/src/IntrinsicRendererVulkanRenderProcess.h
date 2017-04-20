@@ -22,6 +22,7 @@ namespace Vulkan
 {
 struct DefaultRenderProcess
 {
+  static void load();
   static void renderFrame(float p_DeltaT);
 
   // Static members
