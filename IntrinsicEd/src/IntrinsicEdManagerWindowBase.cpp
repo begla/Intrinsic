@@ -47,7 +47,6 @@ IntrinsicEdManagerWindowBase::IntrinsicEdManagerWindowBase(QWidget* parent)
   _ui.resourceView->setSortingEnabled(true);
   _ui.resourceView->sortByColumn(0u, Qt::AscendingOrder);
   _resourceName = "Resource";
-  setWindowFlags(Qt::WindowStaysOnTopHint);
 }
 
 void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
