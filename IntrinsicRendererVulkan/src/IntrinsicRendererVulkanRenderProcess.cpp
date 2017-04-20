@@ -24,15 +24,66 @@ namespace Vulkan
 {
 namespace
 {
+typedef void (*RenderPassRenderFunction)(float);
+
 namespace RenderStepType
 {
 enum Enum
 {
   kImageMemoryBarrier,
 
-  kRenderPassGenericFullscreen
+  kRenderPassGenericFullscreen,
+
+  // TODO: Port me
+  kRenderPassGBuffer,
+  kRenderPassFoliage,
+  kRenderPassSky,
+  kRenderPassDebug,
+  kRenderPassGBufferTransparents,
+  kRenderPassPerPixelPicking,
+  kRenderPassShadow,
+  kRenderPassLighting,
+  kRenderPassVolumetricLighting,
+  kRenderPassBloom,
+  kRenderPassLensFlare,
+  kRenderPassPostCombine
 };
 }
+
+_INTR_HASH_MAP(_INTR_STRING, RenderStepType::Enum)
+_renderStepTypeMapping = {
+    {"RenderPassGBuffer", RenderStepType::kRenderPassGBuffer},
+    {"RenderPassFoliage", RenderStepType::kRenderPassFoliage},
+    {"RenderPassSky", RenderStepType::kRenderPassSky},
+    {"RenderPassDebug", RenderStepType::kRenderPassDebug},
+    {"RenderPassGBufferTransparents",
+     RenderStepType::kRenderPassGBufferTransparents},
+    {"RenderPassPerPixelPicking", RenderStepType::kRenderPassPerPixelPicking},
+    {"RenderPassShadow", RenderStepType::kRenderPassShadow},
+    {"RenderPassLighting", RenderStepType::kRenderPassLighting},
+    {"RenderPassVolumetricLighting",
+     RenderStepType::kRenderPassVolumetricLighting},
+    {"RenderPassBloom", RenderStepType::kRenderPassBloom},
+    {"RenderPassLensFlare", RenderStepType::kRenderPassLensFlare},
+    {"RenderPassPostCombine", RenderStepType::kRenderPassPostCombine}};
+
+_INTR_HASH_MAP(RenderStepType::Enum, RenderPassRenderFunction)
+_renderStepFunctionMapping = {
+    {RenderStepType::kRenderPassGBuffer, RenderPass::GBuffer::render},
+    {RenderStepType::kRenderPassFoliage, RenderPass::Foliage::render},
+    {RenderStepType::kRenderPassSky, RenderPass::Sky::render},
+    {RenderStepType::kRenderPassDebug, RenderPass::Debug::render},
+    {RenderStepType::kRenderPassGBufferTransparents,
+     RenderPass::GBufferTransparents::render},
+    {RenderStepType::kRenderPassPerPixelPicking,
+     RenderPass::PerPixelPicking::render},
+    {RenderStepType::kRenderPassShadow, RenderPass::Shadow::render},
+    {RenderStepType::kRenderPassLighting, RenderPass::Lighting::render},
+    {RenderStepType::kRenderPassVolumetricLighting,
+     RenderPass::VolumetricLighting::render},
+    {RenderStepType::kRenderPassBloom, RenderPass::Bloom::render},
+    {RenderStepType::kRenderPassLensFlare, RenderPass::LensFlare::render},
+    {RenderStepType::kRenderPassPostCombine, RenderPass::PostCombine::render}};
 
 struct RenderStep
 {
@@ -64,23 +115,34 @@ _INTR_ARRAY(RenderStep) _renderSteps;
 
 _INTR_INLINE void executeRenderSteps(float p_DeltaT)
 {
+  using namespace Resources;
+
   for (uint32_t i = 0u; i < _renderSteps.size(); ++i)
   {
     const RenderStep& step = _renderSteps[i];
 
-    if (step.getType() == RenderStepType::kRenderPassGenericFullscreen)
+    switch (step.getType())
     {
+    case RenderStepType::kRenderPassGenericFullscreen:
       _renderPassesGenericFullScreen[step.getIndex()].render(p_DeltaT);
-    }
-    else if (step.getType() == RenderStepType::kImageMemoryBarrier)
-    {
-      using namespace Resources;
-
+      continue;
+    case RenderStepType::kImageMemoryBarrier:
       ImageManager::insertImageMemoryBarrier(
           ImageManager::_getResourceByName(step.resourceName),
           (VkImageLayout)step.getSourceLayout(),
           (VkImageLayout)step.getTargetLayout());
+      continue;
     }
+
+    auto renderPassFunction =
+        _renderStepFunctionMapping.find((RenderStepType::Enum)step.getType());
+    if (renderPassFunction != _renderStepFunctionMapping.end())
+    {
+      renderPassFunction->second(p_DeltaT);
+      continue;
+    }
+
+    _INTR_ASSERT(false && "Failed to execute render step");
   }
 }
 }
@@ -129,11 +191,13 @@ void DefaultRenderProcess::load()
 
     if (renderStep["type"] == "ImageMemoryBarrier")
     {
-      // TODO
-      _renderSteps.push_back(RenderStep(
-          RenderStepType::kImageMemoryBarrier, VK_IMAGE_LAYOUT_UNDEFINED,
-          VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-          renderStep["image"].GetString()));
+      _renderSteps.push_back(
+          RenderStep(RenderStepType::kImageMemoryBarrier,
+                     Helper::mapStringImageLayoutToVkImageLayout(
+                         renderStep["sourceImageLayout"].GetString()),
+                     Helper::mapStringImageLayoutToVkImageLayout(
+                         renderStep["targetImageLayout"].GetString()),
+                     renderStep["image"].GetString()));
     }
     else if (renderStep["type"] == "RenderPassGenericFullscreen")
     {
@@ -145,6 +209,16 @@ void DefaultRenderProcess::load()
       _renderSteps.push_back(
           RenderStep(RenderStepType::kRenderPassGenericFullscreen,
                      (uint8_t)_renderPassesGenericFullScreen.size() - 1u));
+    }
+    else if (_renderStepTypeMapping.find(renderStep["type"].GetString()) !=
+             _renderStepTypeMapping.end())
+    {
+      _renderSteps.push_back(RenderStep(
+          _renderStepTypeMapping[renderStep["type"].GetString()], (uint8_t)-1));
+    }
+    else
+    {
+      _INTR_ASSERT(false && "Invalid render step type provided");
     }
   }
 }
@@ -182,47 +256,12 @@ void DefaultRenderProcess::renderFrame(float p_DeltaT)
     // Collect visible draw calls and mesh components
     {
       Components::MeshManager::collectDrawCallsAndMeshComponents();
+      Components::MeshManager::updatePerInstanceData(0u);
     }
 
-    // Render passes
+    // Execute render steps
     {
-      // GBuffer passes
-      {
-        _INTR_PROFILE_CPU("Render System", "GBuffer");
-        _INTR_PROFILE_GPU("GBuffer");
-
-        Components::MeshManager::updatePerInstanceData(0u);
-
-        RenderPass::GBuffer::render(p_DeltaT);
-        RenderPass::Foliage::render(p_DeltaT);
-        RenderPass::Sky::render(p_DeltaT);
-        RenderPass::Debug::render(p_DeltaT);
-        RenderPass::GBufferTransparents::render(p_DeltaT);
-        RenderPass::PerPixelPicking::render(p_DeltaT);
-      }
-
-      // Lighting passes
-      {
-        _INTR_PROFILE_CPU("Render System", "Shadows/Lighting");
-        _INTR_PROFILE_GPU("Shadows/Lighting");
-
-        RenderPass::Shadow::render(p_DeltaT);
-        RenderPass::Lighting::render(p_DeltaT);
-        RenderPass::VolumetricLighting::render(p_DeltaT);
-      }
-
-      // Post and combine passes
-      {
-        _INTR_PROFILE_CPU("Render System", "Post/Combine");
-        _INTR_PROFILE_GPU("Post/Combine");
-
-        executeRenderSteps(p_DeltaT);
-        {
-          RenderPass::Bloom::render(p_DeltaT);
-          RenderPass::LensFlare::render(p_DeltaT);
-        }
-        RenderPass::PostCombine::render(p_DeltaT);
-      }
+      executeRenderSteps(p_DeltaT);
     }
   }
 

@@ -646,6 +646,32 @@ mapStringSamplerToSampler(const _INTR_STRING& p_Sampler)
   _INTR_ASSERT(false && "GPU program type not supported/found");
   return Samplers::kLinearClamp;
 }
+
+// <-
+
+_INTR_INLINE static VkImageLayout
+mapStringImageLayoutToVkImageLayout(const _INTR_STRING& p_ImageLayout)
+{
+  static _INTR_HASH_MAP(_INTR_STRING, VkImageLayout) imageLayouts = {
+      {"Undefined", VK_IMAGE_LAYOUT_UNDEFINED},
+      {"General", VK_IMAGE_LAYOUT_GENERAL},
+      {"ColorAttachment", VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL},
+      {"DepthStencilAttachment",
+       VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL},
+      {"DepthStencilReadOnly", VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL},
+      {"TransferSrc", VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL},
+      {"TransferDst", VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL},
+      {"Preinitialized", VK_IMAGE_LAYOUT_PREINITIALIZED}};
+
+  auto imageLayout = imageLayouts.find(p_ImageLayout);
+  if (imageLayout != imageLayouts.end())
+  {
+    return imageLayout->second;
+  }
+
+  _INTR_ASSERT(false && "Image layout not supported/found");
+  return VK_IMAGE_LAYOUT_GENERAL;
+}
 }
 }
 }

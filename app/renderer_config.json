@@ -2,10 +2,37 @@
 	"name" : "Default",
 	"renderSteps" : [
 		{
+			"type" : "RenderPassGBuffer"
+		},
+		{
+			"type" : "RenderPassFoliage"
+		},
+		{
+			"type" : "RenderPassSky"
+		},
+		{
+			"type" : "RenderPassDebug"
+		},
+		{
+			"type" : "RenderPassGBufferTransparents"
+		},
+		{
+			"type" : "RenderPassPerPixelPicking"
+		},
+		{
+			"type" : "RenderPassShadow"
+		},
+		{
+			"type" : "RenderPassLighting"
+		},
+		{
+			"type" : "RenderPassVolumetricLighting"
+		},
+		{
 			"type" : "ImageMemoryBarrier",
 			"image" : "Scene",
-			"sourceLayout" : "Undefined",
-			"targetLayout" : "ColorAttachment"
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
 		},
 		{
 			"type" : "RenderPassGenericFullscreen",
@@ -18,7 +45,7 @@
 			],
 			"name" : "PreCombine",
 			"fragmentGpuProgram" : "pre_combine.frag",
-			"renderSize" : "Full",
+			"viewportRenderSize" : "Full",
 			"inputs" : [
 				["Image", "GBufferAlbedo", "albedoTex", "Fragment", "NearestClamp"],
 				["Image", "GBufferNormal", "normalTex", "Fragment", "NearestClamp"],
@@ -36,6 +63,15 @@
 			"outputs" : [
 				["Image", "Scene"]
 			]
+		},
+		{
+			"type" : "RenderPassBloom"
+		},
+		{
+			"type" : "RenderPassLensFlare"
+		},
+		{
+			"type" : "RenderPassPostCombine"
 		}
 	]
 }
