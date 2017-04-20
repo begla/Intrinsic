@@ -100,8 +100,7 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
 
   // Render passes
   {
-    _renderPassRef =
-        RenderPassManager::createRenderPass(renderPassName + "RenderPass");
+    _renderPassRef = RenderPassManager::createRenderPass(renderPassName);
     RenderPassManager::resetToDefault(_renderPassRef);
 
     for (uint32_t i = 0u; i < outputs.Size(); ++i)
@@ -119,9 +118,12 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   }
   renderpassesToCreate.push_back(_renderPassRef);
 
+  RenderSize::Enum viewportRenderSize = Helper::mapStringRenderSizeToRenderSize(
+      p_RenderPassDesc["viewportRenderSize"].GetString());
+
   // Pipelines
   {
-    _pipelineRef = PipelineManager::createPipeline(renderPassName + "Pipeline");
+    _pipelineRef = PipelineManager::createPipeline(renderPassName);
     PipelineManager::resetToDefault(_pipelineRef);
 
     PipelineManager::_descFragmentProgram(_pipelineRef) =
@@ -133,6 +135,8 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
     PipelineManager::_descVertexLayout(_pipelineRef) = Dod::Ref();
     PipelineManager::_descDepthStencilState(_pipelineRef) =
         DepthStencilStates::kDefaultNoDepthTestAndWrite;
+    PipelineManager::_descViewportRenderSize(_pipelineRef) =
+        (uint8_t)viewportRenderSize;
   }
   pipelinesToCreate.push_back(_pipelineRef);
 
@@ -141,24 +145,27 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   PipelineManager::createResources(pipelinesToCreate);
 
   // Create framebuffer
-  _framebufferRef = FramebufferManager::createFramebuffer(_N(Generic));
+  _framebufferRef = FramebufferManager::createFramebuffer(renderPassName);
   {
     FramebufferManager::resetToDefault(_framebufferRef);
     FramebufferManager::addResourceFlags(
         _framebufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
 
+    glm::uvec3 dim = glm::vec3(0u);
     for (uint32_t i = 0u; i < outputs.Size(); ++i)
     {
+      ImageRef outputImage =
+          ImageManager::getResourceByName(outputs[i][1].GetString());
       FramebufferManager::_descAttachedImages(_framebufferRef)
-          .push_back(Resources::ImageManager::getResourceByName(
-              outputs[i][1].GetString()));
+          .push_back(outputImage);
+
+      _INTR_ASSERT((dim == glm::uvec3(0u) ||
+                    dim == ImageManager::_descDimensions(outputImage)) &&
+                   "Dimensions of all outputs must be identical")
+      dim = ImageManager::_descDimensions(outputImage);
     }
 
-    FramebufferManager::_descDimensions(_framebufferRef) =
-        glm::uvec3(RenderSystem::getAbsoluteRenderSize(
-                       Helper::mapStringRenderSizeToRenderSize(
-                           p_RenderPassDesc["renderSize"].GetString())),
-                   1u);
+    FramebufferManager::_descDimensions(_framebufferRef) = dim;
     FramebufferManager::_descRenderPass(_framebufferRef) = _renderPassRef;
   }
   framebuffersToCreate.push_back(_framebufferRef);
@@ -166,15 +173,14 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   FramebufferManager::createResources(framebuffersToCreate);
 
   // Draw calls
-  _drawCallRef = DrawCallManager::createDrawCall(_N(Generic));
+  _drawCallRef = DrawCallManager::createDrawCall(renderPassName);
   {
-    Vulkan::Resources::DrawCallManager::resetToDefault(_drawCallRef);
-    Vulkan::Resources::DrawCallManager::addResourceFlags(
+    DrawCallManager::resetToDefault(_drawCallRef);
+    DrawCallManager::addResourceFlags(
         _drawCallRef, Dod::Resources::ResourceFlags::kResourceVolatile);
 
-    Vulkan::Resources::DrawCallManager::_descPipeline(_drawCallRef) =
-        _pipelineRef;
-    Vulkan::Resources::DrawCallManager::_descVertexCount(_drawCallRef) = 3u;
+    DrawCallManager::_descPipeline(_drawCallRef) = _pipelineRef;
+    DrawCallManager::_descVertexCount(_drawCallRef) = 3u;
 
     DrawCallManager::bindBuffer(_drawCallRef, _N(PerInstance),
                                 GpuProgramType::kFragment,
