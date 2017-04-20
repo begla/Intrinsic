@@ -139,21 +139,26 @@ struct GpuProgramManager
   // <-
 
   _INTR_INLINE static void saveToMultipleFiles(const char* p_Path,
-    const char* p_Extension)
+                                               const char* p_Extension)
   {
-    Dod::Resources::ResourceManagerBase<GpuProgramData, _INTR_MAX_GPU_PROGRAM_COUNT>::
-      _saveToMultipleFiles<rapidjson::PrettyWriter<rapidjson::FileWriteStream>>(
-        p_Path, p_Extension, compileDescriptor);
+    Dod::Resources::ResourceManagerBase<GpuProgramData,
+                                        _INTR_MAX_GPU_PROGRAM_COUNT>::
+        _saveToMultipleFiles<
+            rapidjson::PrettyWriter<rapidjson::FileWriteStream>>(
+            p_Path, p_Extension, compileDescriptor);
   }
 
   // <-
 
   _INTR_INLINE static void loadFromMultipleFiles(const char* p_Path,
-    const char* p_Extension)
+                                                 const char* p_Extension)
   {
-    Dod::Resources::ResourceManagerBase<GpuProgramData, _INTR_MAX_GPU_PROGRAM_COUNT>::
-      _loadFromMultipleFiles(p_Path, p_Extension, initFromDescriptor,
-        resetToDefault);
+    Dod::Resources::ResourceManagerBase<
+        GpuProgramData,
+        _INTR_MAX_GPU_PROGRAM_COUNT>::_loadFromMultipleFiles(p_Path,
+                                                             p_Extension,
+                                                             initFromDescriptor,
+                                                             resetToDefault);
   }
 
   // <-

@@ -244,10 +244,12 @@ void World::save(const _INTR_STRING& p_FilePath)
 
       node.AddMember("name", name, worldDesc.GetAllocator());
 
-      const int32_t offsetToParent = parent.isValid() ? calcOffsetToParent(
-        storedNodes, parent, (uint32_t)storedNodes.size()) : 0;
+      const int32_t offsetToParent =
+          parent.isValid() ? calcOffsetToParent(storedNodes, parent,
+                                                (uint32_t)storedNodes.size())
+                           : 0;
       node.AddMember("offsetToParent", offsetToParent,
-        worldDesc.GetAllocator());
+                     worldDesc.GetAllocator());
 
       rapidjson::Value propertyEntries =
           rapidjson::Value(rapidjson::kArrayType);
@@ -400,7 +402,7 @@ void World::load(const _INTR_STRING& p_FilePath)
       if (offsetToParent != 0)
       {
         Components::NodeManager::attachChildIgnoreParent(
-          worldNodes[i + offsetToParent], nodeRef);
+            worldNodes[i + offsetToParent], nodeRef);
       }
     }
   }

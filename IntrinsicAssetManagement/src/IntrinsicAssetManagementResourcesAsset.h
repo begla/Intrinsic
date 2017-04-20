@@ -128,21 +128,22 @@ struct AssetManager
   // <-
 
   _INTR_INLINE static void saveToMultipleFiles(const char* p_Path,
-    const char* p_Extension)
+                                               const char* p_Extension)
   {
     Dod::Resources::ResourceManagerBase<AssetData, _INTR_MAX_ASSET_COUNT>::
-      _saveToMultipleFiles<rapidjson::PrettyWriter<rapidjson::FileWriteStream>>(
-        p_Path, p_Extension, compileDescriptor);
+        _saveToMultipleFiles<
+            rapidjson::PrettyWriter<rapidjson::FileWriteStream>>(
+            p_Path, p_Extension, compileDescriptor);
   }
 
   // <-
 
   _INTR_INLINE static void loadFromMultipleFiles(const char* p_Path,
-    const char* p_Extension)
+                                                 const char* p_Extension)
   {
     Dod::Resources::ResourceManagerBase<AssetData, _INTR_MAX_ASSET_COUNT>::
-      _loadFromMultipleFiles(p_Path, p_Extension, initFromDescriptor,
-        resetToDefault);
+        _loadFromMultipleFiles(p_Path, p_Extension, initFromDescriptor,
+                               resetToDefault);
   }
 
   // <-
