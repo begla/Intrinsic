@@ -146,7 +146,7 @@ void PreCombine::updateResolutionDependentResources()
   ImageManager::createResources(imagesToCreate);
 
   // Create framebuffer
-  _framebufferRef = FramebufferManager::createFramebuffer(_N(GBuffer));
+  _framebufferRef = FramebufferManager::createFramebuffer(_N(PreCombine));
   {
     FramebufferManager::resetToDefault(_framebufferRef);
     FramebufferManager::addResourceFlags(
