@@ -207,11 +207,6 @@ void GBufferTransparents::render(float p_DeltaT)
                                                 [MaterialPass::kSurfaceWater]
                                                     .copy(visibleDrawCalls);
 
-  if (visibleDrawCalls.empty())
-  {
-    return;
-  }
-
   DrawCallManager::sortDrawCallsBackToFront(visibleDrawCalls);
 
   // Update per mesh uniform data
