@@ -69,7 +69,7 @@ void main()
   d.roughness = normalSample.a;
 
   d.N = normalize(decodeNormal(normalSample.rg));  
-  d.L = normalize(uboPerInstance.viewMatrix * vec4(1.0, 0.45, -0.15, 0.0)).xyz;
+  d.L = normalize(uboPerInstance.viewMatrix * vec4(1.0, 0.45, -0.275, 0.0)).xyz;
   d.V = -normalize(posVS); 
   d.energy = 30.0 * vec3(1.0, 1.0, 1.0);
   initLightingData(d);
@@ -105,7 +105,7 @@ void main()
   float shadowAttenuation = calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
 
   // Direct lighting
-  const vec3 lightColor = vec3(1.0, 0.7, 0.75);
+  const vec3 lightColor = vec3(1.0, 0.5, 0.5);
   outColor.rgb += shadowAttenuation * calcLighting(d) * lightColor;
 
   // Translucency

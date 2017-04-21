@@ -151,6 +151,7 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
           Components::CameraManager::_entity(p_Camera));
   _uniformDataSource.cameraWorldPosition =
       glm::vec4(Components::NodeManager::_worldPosition(cameraNode), 0.0f);
+
   _uniformDataSource.haltonSamples = glm::ivec4(
       (int32_t)(
           _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].x *

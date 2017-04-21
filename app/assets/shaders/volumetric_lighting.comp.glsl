@@ -57,7 +57,7 @@ void main()
 {
   const float sunDensity = 12.0; 
   const vec3 fogSunColor = 50.0 * vec3(1.0, 0.9, 0.8); 
-  const vec3 fogSkyColor = 40.0 * vec3(0.2, 0.5, 1.0);
+  const vec3 fogSkyColor = 40.0 * vec3(0.8, 1.0, 1.0);
   const float minShadowAttenuation = 0.05;
   const float heightAttenuationFactor = 0.025;
   const float scatteringFactor = uboPerInstance.data0.x;
