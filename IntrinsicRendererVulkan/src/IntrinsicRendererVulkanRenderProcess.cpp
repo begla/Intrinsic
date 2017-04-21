@@ -50,7 +50,7 @@ enum Enum
 };
 }
 
-_INTR_HASH_MAP(_INTR_STRING, RenderStepType::Enum)
+_INTR_HASH_MAP(Name, RenderStepType::Enum)
 _renderStepTypeMapping = {
     {"RenderPassGBuffer", RenderStepType::kRenderPassGBuffer},
     {"RenderPassFoliage", RenderStepType::kRenderPassFoliage},
