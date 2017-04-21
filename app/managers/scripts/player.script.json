@@ -1,7 +1,0 @@
-{
-    "name": "player",
-    "properties": {
-        "name": "player",
-        "scriptFileName": "player.lua"
-    }
-}
