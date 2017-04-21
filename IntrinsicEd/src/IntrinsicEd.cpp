@@ -159,13 +159,18 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     darkPalette.setColor(QPalette::ButtonText, Qt::white);
     darkPalette.setColor(QPalette::BrightText, Qt::red);
     darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-
     darkPalette.setColor(QPalette::Highlight, QColor(236, 112, 0));
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
 
     qApp->setPalette(darkPalette);
     qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #202428; "
                         "border: 1px solid #EC7000; }");
+
+    int id = QFontDatabase::addApplicationFont(":/Fonts/fira");
+    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+    QFont monospace(family);
+    monospace.setPointSize(10);
+    qApp->setFont(monospace);
   }
 
   QObject::connect(_ui.actionExit, SIGNAL(triggered()), this, SLOT(onExit()));
