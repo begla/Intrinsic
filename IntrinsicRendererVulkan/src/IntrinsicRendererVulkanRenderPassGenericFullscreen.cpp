@@ -161,7 +161,7 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
 
       _INTR_ASSERT((dim == glm::uvec3(0u) ||
                     dim == ImageManager::_descDimensions(outputImage)) &&
-                   "Dimensions of all outputs must be identical")
+                   "Dimensions of all outputs must be identical");
       dim = ImageManager::_descDimensions(outputImage);
     }
 
