@@ -34,6 +34,7 @@
 #include "IntrinsicEdPropertyEditorFloat.h"
 #include "IntrinsicEdPropertyEditorString.h"
 #include "IntrinsicEdPropertyEditorEnum.h"
+#include "IntrinsicEdPropertyEditorResourceSelector.h"
 #include "IntrinsicEdNotificationBase.h"
 #include "IntrinsicEdNotificationSimple.h"
 #include "IntrinsicEdManagerWindowBase.h"
