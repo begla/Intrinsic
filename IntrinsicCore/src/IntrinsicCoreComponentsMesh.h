@@ -87,8 +87,8 @@ struct MeshManager
   {
     p_Properties.AddMember(
         "meshName",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Mesh), _N(string),
-                          _descMeshName(p_Ref), false, false),
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Mesh),
+                          _N(meshSelector), _descMeshName(p_Ref), false, false),
         p_Document.GetAllocator());
   }
 

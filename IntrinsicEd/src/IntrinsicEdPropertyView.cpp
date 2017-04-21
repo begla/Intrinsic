@@ -308,6 +308,18 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
               &_propertyDocument, &currentProperties, &it->value,
               it->name.GetString());
         }
+        else if (strcmp(editor, "meshSelector") == 0u)
+        {
+          propertyEditor = new IntrinsicEdPropertyEditorResourceSelector(
+              &_propertyDocument, &currentProperties, &it->value,
+              it->name.GetString(), "Mesh");
+        }
+        else if (strcmp(editor, "scriptSelector") == 0u)
+        {
+          propertyEditor = new IntrinsicEdPropertyEditorResourceSelector(
+              &_propertyDocument, &currentProperties, &it->value,
+              it->name.GetString(), "Script");
+        }
 
         if (propertyEditor)
         {
