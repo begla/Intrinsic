@@ -32,5 +32,6 @@
     "per_pixel_picking.frag.glsl": 675083463,
     "per_pixel_picking.vert.glsl": 44469012,
     "debug_line.vert.glsl": 1157406093,
-    "debug_line.frag.glsl": 4047473791
+    "debug_line.frag.glsl": 4047473791,
+    "blit.frag.glsl": 481682702
 }

@@ -97,17 +97,26 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
     _renderPassRef = RenderPassManager::createRenderPass(_name);
     RenderPassManager::resetToDefault(_renderPassRef);
 
-    for (uint32_t i = 0u; i < outputs.Size(); ++i)
+    if (outputs[0][1] != "Backbuffer")
     {
-      const rapidjson::Value& output = outputs[i];
+      for (uint32_t i = 0u; i < outputs.Size(); ++i)
+      {
+        const rapidjson::Value& output = outputs[i];
 
-      ImageRef imageRef =
-          ImageManager::_getResourceByName(output[1].GetString());
+        ImageRef imageRef =
+            ImageManager::_getResourceByName(output[1].GetString());
 
-      AttachmentDescription colorAttachment = {
-          (uint8_t)ImageManager::_descImageFormat(imageRef), (uint8_t)i};
+        AttachmentDescription colorAttachment = {
+            (uint8_t)ImageManager::_descImageFormat(imageRef), (uint8_t)i};
+        RenderPassManager::_descAttachments(_renderPassRef)
+            .push_back(colorAttachment);
+      }
+    }
+    else
+    {
+      AttachmentDescription sceneAttachment = {Format::kB8G8R8A8Srgb, 0u};
       RenderPassManager::_descAttachments(_renderPassRef)
-          .push_back(colorAttachment);
+          .push_back(sceneAttachment);
     }
   }
   renderpassesToCreate.push_back(_renderPassRef);
@@ -139,30 +148,60 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   PipelineManager::createResources(pipelinesToCreate);
 
   // Create framebuffer
-  _framebufferRef = FramebufferManager::createFramebuffer(_name);
+  if (outputs[0][1] != "Backbuffer")
   {
-    FramebufferManager::resetToDefault(_framebufferRef);
-    FramebufferManager::addResourceFlags(
-        _framebufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
-
-    glm::uvec3 dim = glm::vec3(0u);
-    for (uint32_t i = 0u; i < outputs.Size(); ++i)
+    FramebufferRef framebufferRef =
+        FramebufferManager::createFramebuffer(_name);
     {
-      ImageRef outputImage =
-          ImageManager::getResourceByName(outputs[i][1].GetString());
-      FramebufferManager::_descAttachedImages(_framebufferRef)
-          .push_back(outputImage);
+      FramebufferManager::resetToDefault(framebufferRef);
+      FramebufferManager::addResourceFlags(
+          framebufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
 
-      _INTR_ASSERT((dim == glm::uvec3(0u) ||
-                    dim == ImageManager::_descDimensions(outputImage)) &&
-                   "Dimensions of all outputs must be identical");
-      dim = ImageManager::_descDimensions(outputImage);
+      glm::uvec3 dim = glm::vec3(0u);
+      for (uint32_t i = 0u; i < outputs.Size(); ++i)
+      {
+        ImageRef outputImage =
+            ImageManager::getResourceByName(outputs[i][1].GetString());
+        FramebufferManager::_descAttachedImages(framebufferRef)
+            .push_back(outputImage);
+
+        _INTR_ASSERT((dim == glm::uvec3(0u) ||
+                      dim == ImageManager::_descDimensions(outputImage)) &&
+                     "Dimensions of all outputs must be identical");
+        dim = ImageManager::_descDimensions(outputImage);
+      }
+
+      FramebufferManager::_descDimensions(framebufferRef) = dim;
+      FramebufferManager::_descRenderPass(framebufferRef) = _renderPassRef;
     }
-
-    FramebufferManager::_descDimensions(_framebufferRef) = dim;
-    FramebufferManager::_descRenderPass(_framebufferRef) = _renderPassRef;
+    framebuffersToCreate.push_back(framebufferRef);
+    _framebufferRefs.push_back(framebufferRef);
   }
-  framebuffersToCreate.push_back(_framebufferRef);
+  else
+  {
+    for (uint32_t i = 0u; i < (uint32_t)RenderSystem::_vkSwapchainImages.size();
+         ++i)
+    {
+      FramebufferRef fbRef = FramebufferManager::createFramebuffer(_name);
+      {
+        FramebufferManager::resetToDefault(fbRef);
+        FramebufferManager::addResourceFlags(
+            fbRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+
+        FramebufferManager::_descAttachedImages(fbRef).push_back(
+            ImageManager::getResourceByName(_INTR_STRING("Backbuffer") +
+                                            StringUtil::toString<uint32_t>(i)));
+
+        FramebufferManager::_descDimensions(fbRef) =
+            glm::uvec2(RenderSystem::_backbufferDimensions.x,
+                       RenderSystem::_backbufferDimensions.y);
+        FramebufferManager::_descRenderPass(fbRef) = _renderPassRef;
+      }
+
+      framebuffersToCreate.push_back(fbRef);
+      _framebufferRefs.push_back(fbRef);
+    }
+  }
 
   FramebufferManager::createResources(framebuffersToCreate);
 
@@ -224,11 +263,15 @@ void GenericFullscreen::destroy()
 
   if (_drawCallRef.isValid())
     drawCallsToDestroy.push_back(_drawCallRef);
-  if (_framebufferRef.isValid())
-    framebuffersToDestroy.push_back(_framebufferRef);
+  if (!_framebufferRefs.empty())
+    framebuffersToDestroy.insert(framebuffersToDestroy.end(),
+                                 _framebufferRefs.begin(),
+                                 _framebufferRefs.end());
+  _framebufferRefs.clear();
   if (!_imageRefs.empty())
     imagesToDestroy.insert(imagesToDestroy.end(), _imageRefs.begin(),
                            _imageRefs.end());
+  _imageRefs.clear();
 
   DrawCallManager::destroyDrawCallsAndResources(drawCallsToDestroy);
   FramebufferManager::destroyFramebuffersAndResources(framebuffersToDestroy);
@@ -256,8 +299,11 @@ void GenericFullscreen::render(float p_DeltaT)
   DrawCallManager::allocateAndUpdateUniformMemory(
       {_drawCallRef}, nullptr, 0u, uniformData.uniformData, uniformData.size);
 
-  RenderSystem::beginRenderPass(_renderPassRef, _framebufferRef,
-                                VK_SUBPASS_CONTENTS_INLINE);
+  RenderSystem::beginRenderPass(
+      _renderPassRef,
+      _framebufferRefs[RenderSystem::_backbufferIndex %
+                       _framebufferRefs.size()],
+      VK_SUBPASS_CONTENTS_INLINE);
   {
     RenderSystem::dispatchDrawCall(_drawCallRef,
                                    RenderSystem::getPrimaryCommandBuffer());

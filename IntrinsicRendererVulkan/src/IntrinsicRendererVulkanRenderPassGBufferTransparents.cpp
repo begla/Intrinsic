@@ -78,22 +78,22 @@ void GBufferTransparents::updateResolutionDependentResources()
   using namespace Resources;
 
   FramebufferRefArray fbsToDestroy;
-  FramebufferRefArray imgsToDestroy;
+  ImageRefArray imgsToDestroy;
   FramebufferRefArray fbsToCreate;
-  FramebufferRefArray imgsToCreate;
+  ImageRefArray imgsToCreate;
 
   // Cleanup old resources
   {
     if (_framebufferRef.isValid())
       fbsToDestroy.push_back(_framebufferRef);
     if (_albedoImageRef.isValid())
-      fbsToDestroy.push_back(_albedoImageRef);
+      imgsToDestroy.push_back(_albedoImageRef);
     if (_normalImageRef.isValid())
-      fbsToDestroy.push_back(_normalImageRef);
+      imgsToDestroy.push_back(_normalImageRef);
     if (_parameter0ImageRef.isValid())
-      fbsToDestroy.push_back(_parameter0ImageRef);
+      imgsToDestroy.push_back(_parameter0ImageRef);
     if (_depthImageRef.isValid())
-      fbsToDestroy.push_back(_depthImageRef);
+      imgsToDestroy.push_back(_depthImageRef);
 
     FramebufferManager::destroyFramebuffersAndResources(fbsToDestroy);
     ImageManager::destroyImagesAndResources(imgsToDestroy);

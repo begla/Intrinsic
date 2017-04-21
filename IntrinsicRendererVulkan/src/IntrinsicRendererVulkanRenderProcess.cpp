@@ -27,6 +27,7 @@ namespace RenderProcess
 namespace
 {
 typedef void (*RenderPassRenderFunction)(float);
+typedef void (*RenderPassUpdateResDepResFunction)(void);
 
 namespace RenderStepType
 {
@@ -47,8 +48,7 @@ enum Enum
   kRenderPassLighting,
   kRenderPassVolumetricLighting,
   kRenderPassBloom,
-  kRenderPassLensFlare,
-  kRenderPassPostCombine
+  kRenderPassLensFlare
 };
 }
 
@@ -66,26 +66,49 @@ _renderStepTypeMapping = {
     {"RenderPassVolumetricLighting",
      RenderStepType::kRenderPassVolumetricLighting},
     {"RenderPassBloom", RenderStepType::kRenderPassBloom},
-    {"RenderPassLensFlare", RenderStepType::kRenderPassLensFlare},
-    {"RenderPassPostCombine", RenderStepType::kRenderPassPostCombine}};
+    {"RenderPassLensFlare", RenderStepType::kRenderPassLensFlare}};
 
-_INTR_HASH_MAP(RenderStepType::Enum, RenderPassRenderFunction)
+struct RenderPassInterface
+{
+  RenderPassRenderFunction render;
+  RenderPassUpdateResDepResFunction updateResolutionDependentResources;
+};
+
+_INTR_HASH_MAP(RenderStepType::Enum, RenderPassInterface)
 _renderStepFunctionMapping = {
-    {RenderStepType::kRenderPassGBuffer, RenderPass::GBuffer::render},
-    {RenderStepType::kRenderPassFoliage, RenderPass::Foliage::render},
-    {RenderStepType::kRenderPassSky, RenderPass::Sky::render},
-    {RenderStepType::kRenderPassDebug, RenderPass::Debug::render},
+    {RenderStepType::kRenderPassGBuffer,
+     {RenderPass::GBuffer::render,
+      RenderPass::GBuffer::updateResolutionDependentResources}},
+    {RenderStepType::kRenderPassFoliage,
+     {RenderPass::Foliage::render,
+      RenderPass::Foliage::updateResolutionDependentResources}},
+    {RenderStepType::kRenderPassSky,
+     {RenderPass::Sky::render,
+      RenderPass::Sky::updateResolutionDependentResources}},
+    {RenderStepType::kRenderPassDebug,
+     {RenderPass::Debug::render,
+      RenderPass::Debug::updateResolutionDependentResources}},
     {RenderStepType::kRenderPassGBufferTransparents,
-     RenderPass::GBufferTransparents::render},
+     {RenderPass::GBufferTransparents::render,
+      RenderPass::GBufferTransparents::updateResolutionDependentResources}},
     {RenderStepType::kRenderPassPerPixelPicking,
-     RenderPass::PerPixelPicking::render},
-    {RenderStepType::kRenderPassShadow, RenderPass::Shadow::render},
-    {RenderStepType::kRenderPassLighting, RenderPass::Lighting::render},
+     {RenderPass::PerPixelPicking::render,
+      RenderPass::PerPixelPicking::updateResolutionDependentResources}},
+    {RenderStepType::kRenderPassShadow,
+     {RenderPass::Shadow::render,
+      RenderPass::Shadow::updateResolutionDependentResources}},
+    {RenderStepType::kRenderPassLighting,
+     {RenderPass::Lighting::render,
+      RenderPass::Lighting::updateResolutionDependentResources}},
     {RenderStepType::kRenderPassVolumetricLighting,
-     RenderPass::VolumetricLighting::render},
-    {RenderStepType::kRenderPassBloom, RenderPass::Bloom::render},
-    {RenderStepType::kRenderPassLensFlare, RenderPass::LensFlare::render},
-    {RenderStepType::kRenderPassPostCombine, RenderPass::PostCombine::render}};
+     {RenderPass::VolumetricLighting::render,
+      RenderPass::VolumetricLighting::updateResolutionDependentResources}},
+    {RenderStepType::kRenderPassBloom,
+     {RenderPass::Bloom::render,
+      RenderPass::Bloom::updateResolutionDependentResources}},
+    {RenderStepType::kRenderPassLensFlare,
+     {RenderPass::LensFlare::render,
+      RenderPass::LensFlare::updateResolutionDependentResources}}};
 
 struct RenderStep
 {
@@ -140,7 +163,7 @@ _INTR_INLINE void executeRenderSteps(float p_DeltaT)
         _renderStepFunctionMapping.find((RenderStepType::Enum)step.getType());
     if (renderPassFunction != _renderStepFunctionMapping.end())
     {
-      renderPassFunction->second(p_DeltaT);
+      renderPassFunction->second.render(p_DeltaT);
       continue;
     }
 
@@ -192,34 +215,38 @@ void Default::load()
 
   for (uint32_t i = 0u; i < renderSteps.Size(); ++i)
   {
-    const rapidjson::Value& renderStep = renderSteps[i];
+    const rapidjson::Value& renderStepDesc = renderSteps[i];
 
-    if (renderStep["type"] == "ImageMemoryBarrier")
+    if (renderStepDesc["type"] == "ImageMemoryBarrier")
     {
       _renderSteps.push_back(
           RenderStep(RenderStepType::kImageMemoryBarrier,
                      Helper::mapStringImageLayoutToVkImageLayout(
-                         renderStep["sourceImageLayout"].GetString()),
+                         renderStepDesc["sourceImageLayout"].GetString()),
                      Helper::mapStringImageLayoutToVkImageLayout(
-                         renderStep["targetImageLayout"].GetString()),
-                     renderStep["image"].GetString()));
+                         renderStepDesc["targetImageLayout"].GetString()),
+                     renderStepDesc["image"].GetString()));
     }
-    else if (renderStep["type"] == "RenderPassGenericFullscreen")
+    else if (renderStepDesc["type"] == "RenderPassGenericFullscreen")
     {
       _renderPassesGenericFullScreen.push_back(RenderPass::GenericFullscreen());
       RenderPass::GenericFullscreen& renderPass =
           _renderPassesGenericFullScreen.back();
-      renderPass.init(renderStep);
+      renderPass.init(renderStepDesc);
 
       _renderSteps.push_back(
           RenderStep(RenderStepType::kRenderPassGenericFullscreen,
                      (uint8_t)_renderPassesGenericFullScreen.size() - 1u));
     }
-    else if (_renderStepTypeMapping.find(renderStep["type"].GetString()) !=
+    else if (_renderStepTypeMapping.find(renderStepDesc["type"].GetString()) !=
              _renderStepTypeMapping.end())
     {
-      _renderSteps.push_back(RenderStep(
-          _renderStepTypeMapping[renderStep["type"].GetString()], (uint8_t)-1));
+      RenderStep renderStep =
+          RenderStep(_renderStepTypeMapping[renderStepDesc["type"].GetString()],
+                     (uint8_t)-1);
+      _renderStepFunctionMapping[(RenderStepType::Enum)renderStep.getType()]
+          .updateResolutionDependentResources();
+      _renderSteps.push_back(renderStep);
     }
     else
     {

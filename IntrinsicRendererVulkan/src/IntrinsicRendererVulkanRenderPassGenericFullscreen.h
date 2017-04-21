@@ -33,7 +33,7 @@ private:
   _INTR_STRING _name;
   Name _perInstanceDataBufferName;
 
-  Resources::FramebufferRef _framebufferRef;
+  Resources::FramebufferRefArray _framebufferRefs;
   Resources::ImageRefArray _imageRefs;
   Resources::RenderPassRef _renderPassRef;
   Resources::PipelineRef _pipelineRef;

@@ -1,0 +1,9 @@
+{
+    "name": "blit.frag",
+    "properties": {
+        "name": "blit.frag",
+        "gpuProgramName": "blit.frag.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 1
+    }
+}

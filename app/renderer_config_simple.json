@@ -1,0 +1,37 @@
+{
+	"name" : "Default",
+	"uniformBuffers" : [
+		{
+			"name" : "Dummy",
+			"entries" : [
+				"CameraWorldPosition"
+			]
+		}
+	],
+	"renderSteps" : [
+		{
+			"type" : "RenderPassGBuffer"
+		},
+		{
+			"type" : "RenderPassFoliage"
+		},
+		{
+			"type" : "RenderPassSky"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"images" : [
+			],
+			"name" : "PostCombine",
+			"fragmentGpuProgram" : "blit.frag",
+			"viewportRenderSize" : "Full",
+			"perInstanceDataBufferName" : "Dummy",
+			"inputs" : [
+				["Image", "GBufferAlbedo", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["Image", "Backbuffer"]
+			]
+		}
+	]
+}
