@@ -122,6 +122,6 @@ void main()
 
   outColor.rgb += shadowAttenuation * translColor;
 
-  outColor.a = 1.0; 
+  outColor.a = 1.0;
 }
   
