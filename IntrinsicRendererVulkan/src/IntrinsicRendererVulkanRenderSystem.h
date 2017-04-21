@@ -32,7 +32,7 @@ struct RenderSystem
   // <-
 
   static void onViewportChanged();
-  static void resizeSwapChain();
+  static void resizeSwapChain(bool p_Force = false);
 
   // <-
 

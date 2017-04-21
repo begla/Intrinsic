@@ -171,6 +171,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   QObject::connect(_ui.actionExit, SIGNAL(triggered()), this, SLOT(onExit()));
   QObject::connect(_ui.actionLoad_World, SIGNAL(triggered()), this,
                    SLOT(onLoadWorld()));
+  QObject::connect(_ui.actionReload_Settings_And_Renderer_Config, SIGNAL(triggered()), this,
+    SLOT(onReloadSettingsAndRendererConfig()));
   QObject::connect(_ui.actionSave_World, SIGNAL(triggered()), this,
                    SLOT(onSaveWorld()));
   QObject::connect(_ui.actionSave_Editor_Settings, SIGNAL(triggered()), this,
@@ -358,6 +360,12 @@ void IntrinsicEd::onLoadWorld()
     World::load(fileName.toStdString().c_str());
     _nodeView->populateNodeTree();
   }
+}
+
+void IntrinsicEd::onReloadSettingsAndRendererConfig()
+{
+  Settings::Manager::loadSettings();
+  Vulkan::RenderSystem::resizeSwapChain(true);
 }
 
 void IntrinsicEd::onSaveWorld()

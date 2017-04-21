@@ -60,6 +60,7 @@ public slots:
   void onLoadEditorSettings();
   void onExit();
   void onLoadWorld();
+  void onReloadSettingsAndRendererConfig();
   void onSaveWorld();
   void onFullscreen();
   void onEndFullscreen();
