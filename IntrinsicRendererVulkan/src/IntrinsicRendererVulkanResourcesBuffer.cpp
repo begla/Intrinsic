@@ -119,9 +119,13 @@ void BufferManager::createResources(const BufferRefArray& p_Buffers)
         copyCmd = RenderSystem::beginTemporaryCommandBuffer();
       }
 
+      VkMemoryRequirements stagingMemReqs;
+      vkGetBufferMemoryRequirements(RenderSystem::_vkDevice, stagingBuffer,
+                                    &stagingMemReqs);
+
       const uint32_t stagingMemOffset = GpuMemoryManager::allocateOffset(
-          MemoryPoolType::kVolatileStagingBuffers, (uint32_t)memReqs.size,
-          (uint32_t)memReqs.alignment);
+          MemoryPoolType::kVolatileStagingBuffers,
+          (uint32_t)stagingMemReqs.size, (uint32_t)stagingMemReqs.alignment);
 
       result = vkBindBufferMemory(RenderSystem::_vkDevice, stagingBuffer,
                                   GpuMemoryManager::getDeviceMemory(
