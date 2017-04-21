@@ -28,9 +28,13 @@ void ScriptManager::createResources(const ScriptRefArray& p_Scripts)
     ScriptRef scriptRef = p_Scripts[scriptIdx];
     Resources::ScriptRef& scriptResRef = _script(scriptRef);
 
-    scriptResRef =
-        Resources::ScriptManager::getResourceByName(_descScriptName(scriptRef));
-    Resources::ScriptManager::callOnCreate(scriptResRef, scriptRef._id);
+    scriptResRef = Resources::ScriptManager::_getResourceByName(
+        _descScriptName(scriptRef));
+
+    if (scriptResRef.isValid())
+    {
+      Resources::ScriptManager::callOnCreate(scriptResRef, scriptRef._id);
+    }
   }
 }
 
