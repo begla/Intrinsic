@@ -75,7 +75,7 @@
 				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"],
 				["Image", "GBufferTransparentsDepth", "depthBufferTransparentsTex", "Fragment", "NearestClamp"],
 				["Buffer", "MaterialBuffer", "MaterialBuffer", "Fragment"],
-				["Image", "VolumetricLightingScatteringBuffer", "volumetricLightingScatteringBufferTex", "Fragment", "NearestClamp"]
+				["Image", "VolumetricLightingScatteringBuffer", "volumetricLightingScatteringBufferTex", "Fragment", "LinearClamp"]
 			],
 			"outputs" : [
 				["Image", "Scene"]
