@@ -8,6 +8,12 @@
 				"InverseViewProjectionMatrix",
 				"CameraWorldPosition"
 			]
+		},
+		{
+			"name" : "PerInstanceDataPostCombine",
+			"entries" : [
+				"HaltonSamples"
+			]
 		}
 	],
 	"renderSteps" : [

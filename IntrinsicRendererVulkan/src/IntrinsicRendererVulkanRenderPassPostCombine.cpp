@@ -16,8 +16,6 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
-#define HALTON_SAMPLE_COUNT 1024
-
 namespace Intrinsic
 {
 namespace Renderer
@@ -32,16 +30,6 @@ Resources::FramebufferRefArray _framebufferRefs;
 Resources::RenderPassRef _renderPassRef;
 Resources::PipelineRef _pipelineRef;
 Resources::DrawCallRef _drawCallRef;
-
-glm::vec2 _haltonSamples[HALTON_SAMPLE_COUNT];
-}
-
-namespace
-{
-struct PerInstanceDataPostCombine
-{
-  int32_t data0[4];
-};
 }
 
 void PostCombine::init()
@@ -99,15 +87,6 @@ void PostCombine::init()
   PipelineLayoutManager::createResources(pipelineLayoutsToCreate);
   RenderPassManager::createResources(renderpassesToCreate);
   PipelineManager::createResources(pipelinesToCreate);
-
-  // Generate Halton Samples for film grain
-  {
-    for (uint32_t i = 0u; i < HALTON_SAMPLE_COUNT; ++i)
-    {
-      _haltonSamples[i] = glm::vec2(Math::calcHaltonSequence(i, 2u),
-                                    Math::calcHaltonSequence(i, 3u));
-    }
-  }
 }
 
 // <-
@@ -168,10 +147,14 @@ void PostCombine::updateResolutionDependentResources()
         _pipelineRef;
     Vulkan::Resources::DrawCallManager::_descVertexCount(_drawCallRef) = 3u;
 
+    const RenderProcess::UniformBufferDataEntry uniformData =
+        RenderProcess::UniformManager::requestUniformBufferData(
+            _N(PerInstanceDataPostCombine));
+
     DrawCallManager::bindBuffer(
         _drawCallRef, _N(PerInstance), GpuProgramType::kFragment,
         UniformManager::_perInstanceUniformBuffer,
-        UboType::kPerInstanceFragment, sizeof(PerInstanceDataPostCombine));
+        UboType::kPerInstanceFragment, uniformData.size);
     DrawCallManager::bindImage(
         _drawCallRef, _N(sceneTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(Scene)), Samplers::kNearestClamp);
@@ -212,19 +195,12 @@ void PostCombine::render(float p_DeltaT)
   _INTR_PROFILE_CPU("Render Pass", "Render Post Combine");
   _INTR_PROFILE_GPU("Render Post Combine");
 
-  // Update per instance data
-  PerInstanceDataPostCombine perInstanceData = {
-      (int32_t)(
-          _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].x *
-          255),
-      (int32_t)(
-          _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].y *
-          255),
-      0, 0};
+  const RenderProcess::UniformBufferDataEntry uniformData =
+      RenderProcess::UniformManager::requestUniformBufferData(
+          _N(PerInstanceDataPostCombine));
 
   DrawCallManager::allocateAndUpdateUniformMemory(
-      {_drawCallRef}, nullptr, 0u, &perInstanceData,
-      sizeof(PerInstanceDataPostCombine));
+      {_drawCallRef}, nullptr, 0u, uniformData.uniformData, uniformData.size);
 
   RenderSystem::beginRenderPass(
       _renderPassRef, _framebufferRefs[RenderSystem::_backbufferIndex],

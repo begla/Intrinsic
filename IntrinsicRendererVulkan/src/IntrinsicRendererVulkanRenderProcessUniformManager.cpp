@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+#define HALTON_SAMPLE_COUNT 1024
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -24,6 +26,7 @@ namespace Vulkan
 {
 namespace RenderProcess
 {
+// Uniform data decl.
 namespace
 {
 struct UniformDataSource
@@ -31,8 +34,26 @@ struct UniformDataSource
   glm::mat4 inverseProjectionMatrix;
   glm::mat4 inverseViewProjectionMatrix;
   glm::vec4 cameraWorldPosition;
+  glm::ivec4 haltonSamples;
 } _uniformDataSource;
 
+glm::vec2 _haltonSamples[HALTON_SAMPLE_COUNT];
+
+_INTR_INLINE void initStaticUniformData()
+{
+  // Generate Halton Samples
+  {
+    for (uint32_t i = 0u; i < HALTON_SAMPLE_COUNT; ++i)
+    {
+      _haltonSamples[i] = glm::vec2(Math::calcHaltonSequence(i, 2u),
+                                    Math::calcHaltonSequence(i, 3u));
+    }
+  }
+}
+}
+
+namespace
+{
 struct UniformDataRef
 {
   UniformDataRef() { memset(this, 0x00u, sizeof(UniformDataRef)); }
@@ -70,7 +91,8 @@ _uniformOffsetMapping = {
     {"CameraWorldPosition",
      UniformDataRef(&_uniformDataSource.cameraWorldPosition,
                     sizeof(glm::vec4))},
-};
+    {"HaltonSamples",
+     UniformDataRef(&_uniformDataSource.haltonSamples, sizeof(glm::ivec4))}};
 
 _INTR_HASH_MAP(Name, UniformBuffer) _uniformBuffers;
 uint8_t* _uniformBufferMemory = nullptr;
@@ -111,6 +133,8 @@ void UniformManager::load(const rapidjson::Value& p_UniformBuffers)
 
     _uniformBuffers[uniformBufferDesc["name"].GetString()] = uniformBuffer;
   }
+
+  initStaticUniformData();
 }
 
 // <-
@@ -123,6 +147,14 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
       Components::CameraManager::_inverseViewProjectionMatrix(p_Camera);
   _uniformDataSource.cameraWorldPosition =
       glm::vec4(Components::NodeManager::_worldPosition(p_Camera), 0.0f);
+  _uniformDataSource.haltonSamples = glm::ivec4(
+      (int32_t)(
+          _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].x *
+          255),
+      (int32_t)(
+          _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].y *
+          255),
+      0, 0);
 }
 
 // <-
