@@ -99,7 +99,7 @@ vec4 calcPosLS(vec3 posVS, uint shadowMapIdx, mat4 shadowViewProjMatrix[PSSM_SPL
   posLS.xy *= 0.5;
   posLS.xy += 0.5;
 
-  const float splitBias[] = { 0.0001, 0.0001, 0.0005, 0.001 };
+  const float splitBias[] = { 0.00001, 0.0002, 0.001, 0.0025 };
   posLS.z -= splitBias[shadowMapIdx];
 
   return posLS;
@@ -188,7 +188,7 @@ float calcShadowAttenuation(vec3 posVS, mat4 shadowViewProjMatrix[PSSM_SPLIT_COU
 
   if (shadowMapIdx != uint(-1))
   {
-    const float fadeDist = 0.05;
+    const float fadeDist = 0.1;
     const float fadeStart = 1.0 - fadeDist;
 
     const float fade = max(clamp(length(posLS.xy * 2.0 -1.0), 0.0, 1.0) - fadeStart, 0.0) / fadeDist;

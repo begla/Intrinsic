@@ -8,7 +8,7 @@
     "fullscreen_triangle.vert.glsl": 3936765892,
     "pre_combine.frag.glsl": 2467619544,
     "post_combine.frag.glsl": 366069386,
-    "lighting.frag.glsl": 732150724,
+    "lighting.frag.glsl": 618293380,
     "sky.vert.glsl": 796491219,
     "sky.frag.glsl": 1917427412,
     "shadow.vert.glsl": 3818036984,
