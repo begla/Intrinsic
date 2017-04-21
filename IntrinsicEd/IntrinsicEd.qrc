@@ -1220,4 +1220,7 @@
     <qresource prefix="/Media">
         <file alias="splashscreen">media/splashscreen.png</file>
     </qresource>
+    <qresource prefix="/Fonts">
+        <file alias="fira">fonts/FiraSans-Regular.ttf</file>
+    </qresource>
 </RCC>
