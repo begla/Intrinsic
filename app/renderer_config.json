@@ -94,7 +94,24 @@
 			"targetImageLayout" : "ShaderReadOnly"
 		},
 		{
-			"type" : "RenderPassPostCombine"
+			"type" : "RenderPassGenericFullscreen",
+			"images" : [
+			],
+			"name" : "PostCombine",
+			"fragmentGpuProgram" : "post_combine.frag",
+			"viewportRenderSize" : "Full",
+			"perInstanceDataBufferName" : "PerInstanceDataPostCombine",
+			"inputs" : [
+				["Image", "Scene", "sceneTex", "Fragment", "NearestClamp"],
+				["Image", "BloomSummed", "bloomTex", "Fragment", "NearestClamp"],
+				["Image", "lens_dirt", "lensDirtTex", "Fragment", "NearestClamp"],
+				["Image", "film_grain_noise", "filmGrainTex", "Fragment", "NearestClamp"],
+				["Image", "LensFlare", "lensFlareTex", "Fragment", "NearestClamp"],
+				["Buffer", "BloomLumBuffer", "AvgLum", "Fragment"]
+			],
+			"outputs" : [
+				["Image", "Backbuffer"]
+			]
 		}
 	]
 }

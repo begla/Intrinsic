@@ -62,7 +62,6 @@
 #include "IntrinsicRendererVulkanRenderPassShadow.h"
 #include "IntrinsicRendererVulkanRenderPassDebug.h"
 #include "IntrinsicRendererVulkanRenderPassGenericFullscreen.h"
-#include "IntrinsicRendererVulkanRenderPassPostCombine.h"
 #include "IntrinsicRendererVulkanRenderPassVolumetricLighting.h"
 #include "IntrinsicRendererVulkanRenderPassLighting.h"
 #include "IntrinsicRendererVulkanRenderPassBloom.h"

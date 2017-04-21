@@ -95,7 +95,7 @@ void GBuffer::updateResolutionDependentResources()
       imgsToDestroy.push_back(_depthImageRef);
 
     ImageManager::destroyImagesAndResources(imgsToDestroy);
-    FramebufferManager::destroyFramebuffersAndResources(imgsToDestroy);
+    FramebufferManager::destroyFramebuffersAndResources(fbsToDestroy);
   }
 
   glm::uvec3 dim = glm::vec3(RenderSystem::_backbufferDimensions.x,

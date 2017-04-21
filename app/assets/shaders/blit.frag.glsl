@@ -12,26 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
+#version 450
 
-namespace Intrinsic
-{
-namespace Renderer
-{
-namespace Vulkan
-{
-namespace RenderPass
-{
-struct PostCombine
-{
-  static void init();
-  static void updateResolutionDependentResources();
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_shading_language_420pack : enable
+#extension GL_GOOGLE_include_directive : enable
 
-  static void destroy();
+#include "lib_math.glsl"
 
-  static void render(float p_DeltaT);
-};
-}
-}
-}
+layout (binding = 0) uniform PerInstance
+{
+  vec4 cameraWorldPosition;
+} uboPerInstance;
+
+layout (binding = 1) uniform sampler2D inputTex;
+
+layout (location = 0) in vec2 inUV0;
+layout (location = 0) out vec4 outColor;
+
+void main()
+{
+  const vec2 framebufferSize = vec2(textureSize(inputTex, 0));
+  outColor = textureLod(inputTex, inUV0, 0.0).rgba;
 }

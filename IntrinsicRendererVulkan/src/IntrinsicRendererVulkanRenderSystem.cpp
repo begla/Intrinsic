@@ -145,7 +145,6 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     RenderPass::VolumetricLighting::init();
 
     RenderPass::Bloom::init();
-    RenderPass::PostCombine::init();
     RenderPass::LensFlare::init();
 
     RenderPass::Debug::init();
@@ -233,22 +232,7 @@ void RenderSystem::updateResolutionDependentResources()
   GpuMemoryManager::resetAllocator(MemoryPoolType::kResolutionDependentBuffers);
   GpuMemoryManager::resetAllocator(MemoryPoolType::kResolutionDependentImages);
 
-  RenderPass::GBufferTransparents::updateResolutionDependentResources();
-  RenderPass::GBuffer::updateResolutionDependentResources();
-  RenderPass::Debug::updateResolutionDependentResources();
-  RenderPass::PerPixelPicking::updateResolutionDependentResources();
-  RenderPass::Foliage::updateResolutionDependentResources();
-  RenderPass::Sky::updateResolutionDependentResources();
-  RenderPass::Shadow::updateResolutionDependentResources();
-  RenderPass::Lighting::updateResolutionDependentResources();
-  RenderPass::VolumetricLighting::updateResolutionDependentResources();
-
-  // TODO
   RenderProcess::Default::load();
-
-  RenderPass::Bloom::updateResolutionDependentResources();
-  RenderPass::LensFlare::updateResolutionDependentResources();
-  RenderPass::PostCombine::updateResolutionDependentResources();
 
   // Recreate all mesh draw calls (might use resources of the render passes)
   Components::MeshManager::destroyResources(
