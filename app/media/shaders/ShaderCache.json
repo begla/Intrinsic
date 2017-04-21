@@ -14,7 +14,7 @@
     "shadow.vert.glsl": 3818036984,
     "shadow_foliage.frag.glsl": 4117274084,
     "foliage.vert.glsl": 1856324351,
-    "foliage.frag.glsl": 3632350735,
+    "foliage.frag.glsl": 996032780,
     "shadow_foliage.vert.glsl": 4081143972,
     "gbuffer_water.frag.glsl": 2235947279,
     "gbuffer_water.vert.glsl": 2387981344,
