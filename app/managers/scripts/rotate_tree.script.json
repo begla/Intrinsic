@@ -1,0 +1,7 @@
+{
+    "name": "rotate_tree",
+    "properties": {
+        "name": "rotate_tree",
+        "scriptFileName": "rotate_tree.lua"
+    }
+}
