@@ -572,7 +572,7 @@ _INTR_INLINE static uint32_t computeGpuMemoryTypeIdx(uint32_t p_TypeBits,
 _INTR_INLINE static Format::Enum
 mapStringFormatToFormat(const _INTR_STRING& p_Format)
 {
-  static _INTR_HASH_MAP(_INTR_STRING, Format::Enum)
+  static _INTR_HASH_MAP(Name, Format::Enum)
       formats = {{"R16G16B16A16Float", Format::kR16G16B16A16Float}};
 
   auto format = formats.find(p_Format);
@@ -590,7 +590,7 @@ mapStringFormatToFormat(const _INTR_STRING& p_Format)
 _INTR_INLINE static RenderSize::Enum
 mapStringRenderSizeToRenderSize(const _INTR_STRING& p_RenderSize)
 {
-  static _INTR_HASH_MAP(_INTR_STRING, RenderSize::Enum)
+  static _INTR_HASH_MAP(Name, RenderSize::Enum)
       renderSizes = {{"Full", RenderSize::kFull},
                      {"Half", RenderSize::kHalf},
                      {"Quarter", RenderSize::kQuarter}};
@@ -610,7 +610,7 @@ mapStringRenderSizeToRenderSize(const _INTR_STRING& p_RenderSize)
 _INTR_INLINE static GpuProgramType::Enum
 mapStringGpuProgramTypeToGpuProgramType(const _INTR_STRING& p_GpuProgramType)
 {
-  static _INTR_HASH_MAP(_INTR_STRING, GpuProgramType::Enum)
+  static _INTR_HASH_MAP(Name, GpuProgramType::Enum)
       gpuProgramTypes = {{"Fragment", GpuProgramType::kFragment},
                          {"Vertex", GpuProgramType::kVertex},
                          {"Compute", GpuProgramType::kCompute}};
@@ -630,7 +630,7 @@ mapStringGpuProgramTypeToGpuProgramType(const _INTR_STRING& p_GpuProgramType)
 _INTR_INLINE static Samplers::Enum
 mapStringSamplerToSampler(const _INTR_STRING& p_Sampler)
 {
-  static _INTR_HASH_MAP(_INTR_STRING, Samplers::Enum)
+  static _INTR_HASH_MAP(Name, Samplers::Enum)
       samplers = {{"LinearClamp", Samplers::kLinearClamp},
                   {"LinearRepeat", Samplers::kLinearRepeat},
                   {"NearestClamp", Samplers::kNearestClamp},
@@ -652,7 +652,7 @@ mapStringSamplerToSampler(const _INTR_STRING& p_Sampler)
 _INTR_INLINE static VkImageLayout
 mapStringImageLayoutToVkImageLayout(const _INTR_STRING& p_ImageLayout)
 {
-  static _INTR_HASH_MAP(_INTR_STRING, VkImageLayout) imageLayouts = {
+  static _INTR_HASH_MAP(Name, VkImageLayout) imageLayouts = {
       {"Undefined", VK_IMAGE_LAYOUT_UNDEFINED},
       {"General", VK_IMAGE_LAYOUT_GENERAL},
       {"ColorAttachment", VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL},
