@@ -82,6 +82,8 @@
    <addaction name="separator"/>
    <addaction name="actionLoad_World"/>
    <addaction name="actionSave_World"/>
+   <addaction name="separator"/>
+   <addaction name="actionReload_Settings_And_Renderer_Config"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="editingToolBar">
@@ -548,6 +550,18 @@
    </property>
    <property name="toolTip">
     <string>Post Effects</string>
+   </property>
+  </action>
+  <action name="actionReload_Settings_And_Renderer_Config">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/refresh</normaloff>:/Icons/refresh</iconset>
+   </property>
+   <property name="text">
+    <string>Reload Settings and Renderer Config</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload Settings and Renderer Config</string>
    </property>
   </action>
  </widget>
