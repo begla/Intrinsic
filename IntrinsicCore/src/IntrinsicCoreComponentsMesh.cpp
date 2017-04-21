@@ -33,7 +33,7 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
     _INTR_PROFILE_CPU("Components", "Mesh Inst. Data Updt.");
 
     Dod::Ref frustumRef =
-        Renderer::Vulkan::DefaultRenderProcess::_activeFrustums[_frustumIdx];
+        Renderer::Vulkan::RenderProcess::Default::_activeFrustums[_frustumIdx];
     glm::mat4& viewMatrix =
         Resources::FrustumManager::_descViewMatrix(frustumRef);
     glm::mat4& viewProjectionMatrix =
@@ -143,7 +143,7 @@ struct DrawCallCollectionParallelTaskSet : enki::ITaskSet
         DrawCallManager::_drawCallsPerMaterialPass[_materialPassIdx];
     const uint32_t activeFrustumCount =
         (uint32_t)
-            Renderer::Vulkan::DefaultRenderProcess::_activeFrustums.size();
+            Renderer::Vulkan::RenderProcess::Default::_activeFrustums.size();
 
     for (uint32_t drawCallIdx = p_Range.start; drawCallIdx < p_Range.end;
          ++drawCallIdx)
@@ -196,7 +196,7 @@ struct MeshCollectionParallelTaskSet : enki::ITaskSet
     _INTR_PROFILE_CPU("Components", "Collect Visible Mesh Components");
     uint32_t activeFrustumsCount =
         (uint32_t)
-            Renderer::Vulkan::DefaultRenderProcess::_activeFrustums.size();
+            Renderer::Vulkan::RenderProcess::Default::_activeFrustums.size();
 
     for (uint32_t meshCompId = p_Range.start; meshCompId < p_Range.end;
          ++meshCompId)
@@ -418,7 +418,7 @@ void MeshManager::collectDrawCallsAndMeshComponents()
 
   for (uint32_t frustIdx = 0u;
        frustIdx <
-       Renderer::Vulkan::DefaultRenderProcess::_activeFrustums.size();
+       Renderer::Vulkan::RenderProcess::Default::_activeFrustums.size();
        ++frustIdx)
   {
     for (uint32_t materialPassIdx = 0u;

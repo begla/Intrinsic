@@ -22,6 +22,8 @@ namespace Renderer
 {
 namespace Vulkan
 {
+namespace RenderProcess
+{
 namespace
 {
 typedef void (*RenderPassRenderFunction)(float);
@@ -148,11 +150,11 @@ _INTR_INLINE void executeRenderSteps(float p_DeltaT)
 }
 
 // Static members
-Dod::RefArray DefaultRenderProcess::_activeFrustums;
+Dod::RefArray Default::_activeFrustums;
 
 // <-
 
-void DefaultRenderProcess::load()
+void Default::load()
 {
   for (uint32_t i = 0u; i < _renderPassesGenericFullScreen.size(); ++i)
   {
@@ -184,6 +186,9 @@ void DefaultRenderProcess::load()
   _INTR_LOG_INFO("Loading renderer config '%s'...",
                  rendererConfig["name"].GetString());
   const rapidjson::Value& renderSteps = rendererConfig["renderSteps"];
+  const rapidjson::Value& uniformBuffers = rendererConfig["uniformBuffers"];
+
+  UniformManager::load(uniformBuffers);
 
   for (uint32_t i = 0u; i < renderSteps.Size(); ++i)
   {
@@ -223,7 +228,7 @@ void DefaultRenderProcess::load()
   }
 }
 
-void DefaultRenderProcess::renderFrame(float p_DeltaT)
+void Default::renderFrame(float p_DeltaT)
 {
   // Resize the swap chain (if necessary)
   RenderSystem::resizeSwapChain();
@@ -242,6 +247,14 @@ void DefaultRenderProcess::renderFrame(float p_DeltaT)
       RenderPass::Shadow::prepareFrustums();
       Core::Resources::FrustumManager::prepareForRendering(
           Core::Resources::FrustumManager::_activeRefs);
+
+      // Update render pass uniform data
+      {
+        UniformManager::resetAllocator();
+        UniformManager::updatePerFrameUniformBufferData(
+            World::getActiveCamera());
+        UniformManager::updateUniformBuffers();
+      }
 
       _activeFrustums.clear();
       _activeFrustums.push_back(
@@ -266,6 +279,7 @@ void DefaultRenderProcess::renderFrame(float p_DeltaT)
   }
 
   RenderSystem::endFrame();
+}
 }
 }
 }

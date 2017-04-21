@@ -20,24 +20,26 @@ namespace Renderer
 {
 namespace Vulkan
 {
-namespace RenderPass
+namespace RenderProcess
 {
-struct GenericFullscreen
+struct UniformBufferDataEntry
 {
-  void init(const rapidjson::Value& p_RenderPassDesc);
-  void destroy();
+  UniformBufferDataEntry(void* p_UniformData, uint32_t p_Size)
+      : uniformData(p_UniformData), size(p_Size)
+  {
+  }
 
-  void render(float p_DeltaT);
+  void* uniformData;
+  uint32_t size;
+};
 
-private:
-  _INTR_STRING _name;
-  Name _perInstanceDataBufferName;
-
-  Resources::FramebufferRef _framebufferRef;
-  Resources::ImageRefArray _imageRefs;
-  Resources::RenderPassRef _renderPassRef;
-  Resources::PipelineRef _pipelineRef;
-  Resources::DrawCallRef _drawCallRef;
+struct UniformManager
+{
+  static void load(const rapidjson::Value& p_UniformBuffers);
+  static void updatePerFrameUniformBufferData(Dod::Ref p_Camera);
+  static void updateUniformBuffers();
+  static void resetAllocator();
+  static UniformBufferDataEntry requestUniformBufferData(const Name& p_Name);
 };
 }
 }

@@ -20,7 +20,9 @@ namespace Renderer
 {
 namespace Vulkan
 {
-struct DefaultRenderProcess
+namespace RenderProcess
+{
+struct Default
 {
   static void load();
   static void renderFrame(float p_DeltaT);
@@ -32,6 +34,7 @@ struct DefaultRenderProcess
 
   // <-
 };
+}
 }
 }
 }
