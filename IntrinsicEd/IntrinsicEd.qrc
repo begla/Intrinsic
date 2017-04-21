@@ -1222,5 +1222,7 @@
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="fira">fonts/FiraSans-Regular.ttf</file>
+        <file alias="fira-medium">fonts/FiraSans-Medium.ttf</file>
+        <file alias="fira-light">fonts/FiraSans-Light.ttf</file>
     </qresource>
 </RCC>
