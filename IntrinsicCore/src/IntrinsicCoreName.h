@@ -27,7 +27,9 @@ struct Name
 
   _INTR_INLINE void setName(const char* p_String)
   {
+#if !defined (INTR_FINAL_BUILD)
     _string = p_String;
+#endif // INTR_FINAL_BUILD
     _hash = Math::hash(_string.c_str(), _string.size());
   }
 
@@ -43,7 +45,9 @@ struct Name
     return !(*this == p_Rhs);
   }
 
+#if !defined (INTR_FINAL_BUILD)
   _INTR_STRING _string;
+#endif // INTR_FINAL_BUILD
   uint32_t _hash;
 };
 }
