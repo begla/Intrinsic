@@ -145,8 +145,12 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
       Components::CameraManager::_inverseProjectionMatrix(p_Camera);
   _uniformDataSource.inverseViewProjectionMatrix =
       Components::CameraManager::_inverseViewProjectionMatrix(p_Camera);
+
+  Components::NodeRef cameraNode =
+      Components::NodeManager::getComponentForEntity(
+          Components::CameraManager::_entity(p_Camera));
   _uniformDataSource.cameraWorldPosition =
-      glm::vec4(Components::NodeManager::_worldPosition(p_Camera), 0.0f);
+      glm::vec4(Components::NodeManager::_worldPosition(cameraNode), 0.0f);
   _uniformDataSource.haltonSamples = glm::ivec4(
       (int32_t)(
           _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].x *
