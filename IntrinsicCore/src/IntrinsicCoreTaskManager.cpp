@@ -111,7 +111,7 @@ void TaskManager::executeTasks()
       _INTR_PROFILE_CPU("TaskManager", "Rendering Tasks");
 
       // Rendering
-      Renderer::Vulkan::DefaultRenderProcess::renderFrame(_lastDeltaT);
+      Renderer::Vulkan::RenderProcess::Default::renderFrame(_lastDeltaT);
     }
 
     {

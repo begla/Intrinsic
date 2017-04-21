@@ -24,16 +24,6 @@ namespace Vulkan
 {
 namespace RenderPass
 {
-namespace
-{
-struct PerInstanceDataGenericFullscreen
-{
-  glm::mat4 invProjMatrix;
-  glm::mat4 invViewProjMatrix;
-  glm::vec4 camPosition;
-};
-}
-
 void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
 {
   using namespace Resources;
@@ -48,7 +38,12 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   const rapidjson::Value& inputs = p_RenderPassDesc["inputs"];
   const rapidjson::Value& outputs = p_RenderPassDesc["outputs"];
   const rapidjson::Value& images = p_RenderPassDesc["images"];
-  const _INTR_STRING renderPassName = p_RenderPassDesc["name"].GetString();
+  _name = p_RenderPassDesc["name"].GetString();
+  _perInstanceDataBufferName =
+      p_RenderPassDesc["perInstanceDataBufferName"].GetString();
+  RenderProcess::UniformBufferDataEntry bufferDataEntry =
+      RenderProcess::UniformManager::requestUniformBufferData(
+          _perInstanceDataBufferName);
 
   // Images
   {
@@ -87,8 +82,7 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   // Pipeline layout
   PipelineLayoutRef pipelineLayout;
   {
-    pipelineLayout = PipelineLayoutManager::createPipelineLayout(
-        renderPassName + +"PipelineLayout");
+    pipelineLayout = PipelineLayoutManager::createPipelineLayout(_name);
     PipelineLayoutManager::resetToDefault(pipelineLayout);
 
     GpuProgramManager::reflectPipelineLayout(
@@ -100,7 +94,7 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
 
   // Render passes
   {
-    _renderPassRef = RenderPassManager::createRenderPass(renderPassName);
+    _renderPassRef = RenderPassManager::createRenderPass(_name);
     RenderPassManager::resetToDefault(_renderPassRef);
 
     for (uint32_t i = 0u; i < outputs.Size(); ++i)
@@ -123,7 +117,7 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
 
   // Pipelines
   {
-    _pipelineRef = PipelineManager::createPipeline(renderPassName);
+    _pipelineRef = PipelineManager::createPipeline(_name);
     PipelineManager::resetToDefault(_pipelineRef);
 
     PipelineManager::_descFragmentProgram(_pipelineRef) =
@@ -145,7 +139,7 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   PipelineManager::createResources(pipelinesToCreate);
 
   // Create framebuffer
-  _framebufferRef = FramebufferManager::createFramebuffer(renderPassName);
+  _framebufferRef = FramebufferManager::createFramebuffer(_name);
   {
     FramebufferManager::resetToDefault(_framebufferRef);
     FramebufferManager::addResourceFlags(
@@ -173,7 +167,7 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   FramebufferManager::createResources(framebuffersToCreate);
 
   // Draw calls
-  _drawCallRef = DrawCallManager::createDrawCall(renderPassName);
+  _drawCallRef = DrawCallManager::createDrawCall(_name);
   {
     DrawCallManager::resetToDefault(_drawCallRef);
     DrawCallManager::addResourceFlags(
@@ -182,11 +176,10 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
     DrawCallManager::_descPipeline(_drawCallRef) = _pipelineRef;
     DrawCallManager::_descVertexCount(_drawCallRef) = 3u;
 
-    DrawCallManager::bindBuffer(_drawCallRef, _N(PerInstance),
-                                GpuProgramType::kFragment,
-                                UniformManager::_perInstanceUniformBuffer,
-                                UboType::kPerInstanceFragment,
-                                sizeof(PerInstanceDataGenericFullscreen));
+    DrawCallManager::bindBuffer(
+        _drawCallRef, _N(PerInstance), GpuProgramType::kFragment,
+        UniformManager::_perInstanceUniformBuffer,
+        UboType::kPerInstanceFragment, bufferDataEntry.size);
 
     for (uint32_t i = 0u; i < inputs.Size(); ++i)
     {
@@ -256,15 +249,12 @@ void GenericFullscreen::render(float p_DeltaT)
       Components::NodeManager::getComponentForEntity(
           Components::CameraManager::_entity(camRef));
 
-  // Update per instance data
-  PerInstanceDataGenericFullscreen perInstanceData = {
-      Components::CameraManager::_inverseProjectionMatrix(camRef),
-      Components::CameraManager::_inverseViewProjectionMatrix(camRef),
-      glm::vec4(Components::NodeManager::_worldPosition(camNodeRef), 0.0f)};
+  const RenderProcess::UniformBufferDataEntry uniformData =
+      RenderProcess::UniformManager::requestUniformBufferData(
+          _perInstanceDataBufferName);
 
   DrawCallManager::allocateAndUpdateUniformMemory(
-      {_drawCallRef}, nullptr, 0u, &perInstanceData,
-      sizeof(PerInstanceDataGenericFullscreen));
+      {_drawCallRef}, nullptr, 0u, uniformData.uniformData, uniformData.size);
 
   RenderSystem::beginRenderPass(_renderPassRef, _framebufferRef,
                                 VK_SUBPASS_CONTENTS_INLINE);

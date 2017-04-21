@@ -659,6 +659,7 @@ mapStringImageLayoutToVkImageLayout(const _INTR_STRING& p_ImageLayout)
       {"DepthStencilAttachment",
        VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL},
       {"DepthStencilReadOnly", VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL},
+      {"ShaderReadOnly", VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
       {"TransferSrc", VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL},
       {"TransferDst", VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL},
       {"Preinitialized", VK_IMAGE_LAYOUT_PREINITIALIZED}};

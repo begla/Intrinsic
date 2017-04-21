@@ -40,6 +40,7 @@
 #include "IntrinsicRendererVulkanSamplers.h"
 #include "IntrinsicRendererVulkanGpuMemoryManager.h"
 #include "IntrinsicRendererVulkanRenderSystem.h"
+#include "IntrinsicRendererVulkanRenderProcessUniformManager.h"
 #include "IntrinsicRendererVulkanRenderProcess.h"
 #include "IntrinsicRendererVulkanDebugging.h"
 #include "IntrinsicRendererVulkanResourcesGpuProgram.h"

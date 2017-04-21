@@ -226,11 +226,6 @@ void PostCombine::render(float p_DeltaT)
       {_drawCallRef}, nullptr, 0u, &perInstanceData,
       sizeof(PerInstanceDataPostCombine));
 
-  ImageManager::insertImageMemoryBarrier(
-      Vulkan::Resources::ImageManager::getResourceByName(_N(Scene)),
-      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
   RenderSystem::beginRenderPass(
       _renderPassRef, _framebufferRefs[RenderSystem::_backbufferIndex],
       VK_SUBPASS_CONTENTS_INLINE);
