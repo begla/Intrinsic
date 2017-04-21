@@ -50,12 +50,11 @@ void main()
 
   const vec2 uv0 = UV0_TRANSFORMED;
 
-  vec4 albedo = texture(albedoTex, uv0);
+  vec4 albedo = texture(albedoTex, clamp(uv0, 0.01, 0.99));
   const vec4 normal = texture(normalTex, uv0);
   const vec4 roughness = texture(roughnessTex, uv0);
 
-  albedo.rgb /= albedo.a;
-  if (albedo.a < 0.5)
+  if (albedo.a < 0.1)
   {
     discard;
   }
