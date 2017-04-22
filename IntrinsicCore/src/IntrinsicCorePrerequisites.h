@@ -152,7 +152,7 @@ case IDCONTINUE : break;                                                       \
 #define _INTR_DBG_BREAK() __debugbreak()
 #define _INTR_ASSERT(_expr)                                                    \
   if (!(_expr))                                                                \
-  _INTR_ERROR_DIALOG(#_expr)
+    _INTR_LOG_ERROR("Assert: " #_expr);
 #else
 #define _INTR_ERROR_DIALOG(_msg)
 #define _INTR_ASSERT(_expr) assert(_expr)

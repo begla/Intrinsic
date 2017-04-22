@@ -96,7 +96,7 @@ void Manager::log(LogLevel::Enum p_LogLevel, const char* p_Message, ...)
   // Call listeners
   for (uint32_t i = 0u; i < _logListeners.size(); ++i)
   {
-    _logListeners[i].callbackFunction(_INTR_STRING(messageBuffer), p_LogLevel);
+    _logListeners[i].callbackFunction(messageBuffer, p_LogLevel);
   }
 }
 }

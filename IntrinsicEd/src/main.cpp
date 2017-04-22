@@ -17,11 +17,9 @@
 
 QSplashScreen* splash = nullptr;
 
-void onLoggedSplashscreen(const _INTR_STRING& p_Message,
-                          Log::LogLevel::Enum p_LogLevel)
+void onLoggedSplashscreen(const char* p_Message, Log::LogLevel::Enum p_LogLevel)
 {
-  splash->showMessage(p_Message.c_str(), Qt::AlignBottom | Qt::AlignLeft,
-                      Qt::white);
+  splash->showMessage(p_Message, Qt::AlignBottom | Qt::AlignLeft, Qt::white);
 }
 
 int main(int argc, char* argv[])
