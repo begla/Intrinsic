@@ -75,11 +75,11 @@
 #include "IntrinsicCorePrerequisites.h"
 
 // Logging
-#include "IntrinsicCoreStlAllocator.h"
 #include "IntrinsicCoreLogManager.h"
 
 // STL allocator include
 #include "IntrinsicCoreTlsfAllocator.h"
+#include "IntrinsicCoreStlAllocator.h"
 
 // Lua related includes
 extern "C" {
