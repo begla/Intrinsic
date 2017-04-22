@@ -15,7 +15,7 @@
 #pragma once
 
 // UI related includes
-#include "ui_IntrinsicEdPropertyEditorEnum.h"
+#include "ui_IntrinsicEdPropertyEditorResourceSelector.h"
 
 class IntrinsicEdPropertyEditorResourceSelector : public QWidget
 {
@@ -37,7 +37,7 @@ signals:
 private:
   void updateFromProperty();
 
-  Ui::IntrinsicEdPropertyEditorEnumClass _ui;
+  Ui::IntrinsicEdPropertyEditorResourceSelectorClass _ui;
   rapidjson::Value* _property;
   rapidjson::Value* _properties;
   rapidjson::Document* _document;
