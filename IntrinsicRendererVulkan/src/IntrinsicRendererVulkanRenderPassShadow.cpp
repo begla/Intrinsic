@@ -169,7 +169,7 @@ void Shadow::init()
     RenderPassManager::resetToDefault(_renderPassRef);
 
     AttachmentDescription shadowBufferAttachment = {
-        Format::kD24UnormS8UInt,
+        (uint8_t)RenderSystem::_depthStencilFormatToUse,
         AttachmentFlags::kClearOnLoad | AttachmentFlags::kClearStencilOnLoad};
     RenderPassManager::_descAttachments(_renderPassRef)
         .push_back(shadowBufferAttachment);
@@ -190,7 +190,7 @@ void Shadow::init()
 
     ImageManager::_descDimensions(_shadowBufferImageRef) = dim;
     ImageManager::_descImageFormat(_shadowBufferImageRef) =
-        Format::kD24UnormS8UInt;
+        RenderSystem::_depthStencilFormatToUse;
     ImageManager::_descImageType(_shadowBufferImageRef) = ImageType::kTexture;
     ImageManager::_descArrayLayerCount(_shadowBufferImageRef) =
         _INTR_MAX_SHADOW_MAP_COUNT;

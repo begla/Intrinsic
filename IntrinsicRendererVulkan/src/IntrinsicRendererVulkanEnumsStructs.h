@@ -243,7 +243,11 @@ enum Enum
   kBC3UNorm,
   kBC3Srgb,
   kR32SFloat,
-  kR32UInt
+  kR32UInt,
+  kD16UnormS8UInt,
+  kD32SFloatS8UInt,
+  kD32SFloat,
+  kD16UNorm
 };
 }
 

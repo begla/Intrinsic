@@ -266,6 +266,9 @@ struct RenderSystem
   static uint32_t _activeBackbufferMask;
 
   // <-
+  static Format::Enum _depthStencilFormatToUse;
+
+  // <-
 
   static LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>
       _visibleDrawCallsPerMaterialPass[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT]
@@ -288,6 +291,7 @@ private:
   static void initVkTempCommandBuffer();
   static void destroyVkCommandBuffers();
   static void initVkSynchronization();
+  static void setupPlatformDependentFormats();
 
   // <-
 
