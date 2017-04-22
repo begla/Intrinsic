@@ -314,10 +314,10 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
   else if (Input::System::getKeyStates()[Input::Key::kCtrl] ==
            Input::KeyState::kPressed)
   {
-    _orbitRadius = glm::max(_orbitRadius -
-                                Editing::_cameraSpeed *
+    _orbitRadius =
+        glm::max(_orbitRadius - Editing::_cameraSpeed *
                                     (_camAngVel.x - _camAngVel.y) * p_DeltaT,
-                            0.1f);
+                 0.1f);
   }
 
   Components::NodeManager::_position(camNodeRef) =
@@ -485,6 +485,8 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
       glm::vec3 newSize = _initialScale;
       glm::vec3 newRotation = glm::vec3(0.0f);
 
+      _gridPosition = snapToGrid(newWorldPos, Editing::_gridSize);
+
       if (_translScaleXAxisSelected)
       {
         newSize.x +=
@@ -511,12 +513,13 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
       }
 
       // Snap to grid
-      _gridPosition = snapToGrid(newWorldPos, Editing::_gridSize);
       newSize = snapToGrid(newSize, Editing::_gridSize);
 
       // Execute Gizmo transformation
       if (Editing::_editingMode == EditingMode::kTranslation)
       {
+        _gridPosition = snapToGrid(newWorldPos, Editing::_gridSize);
+
         if (parentNode.isValid())
         {
           Components::NodeManager::_position(currentEntityNodeRef) =
