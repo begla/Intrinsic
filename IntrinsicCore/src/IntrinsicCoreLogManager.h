@@ -32,7 +32,7 @@ enum Enum
 };
 }
 
-typedef void (*LogCallbackFunction)(const _INTR_STRING&, LogLevel::Enum);
+typedef void (*LogCallbackFunction)(const char*, LogLevel::Enum);
 
 struct LogListenerEntry
 {

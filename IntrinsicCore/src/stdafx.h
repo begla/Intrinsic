@@ -71,12 +71,15 @@
 #include "glm/gtx/quaternion.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 
-// ->::Core related includes
+// Core related includes
 #include "IntrinsicCorePrerequisites.h"
+
+// Logging
+#include "IntrinsicCoreStlAllocator.h"
+#include "IntrinsicCoreLogManager.h"
 
 // STL allocator include
 #include "IntrinsicCoreTlsfAllocator.h"
-#include "IntrinsicCoreStlAllocator.h"
 
 // Lua related includes
 extern "C" {
@@ -121,7 +124,6 @@ using namespace Intrinsic::Core;
 // Core related includes
 #include "IntrinsicCoreTriangleOptimizer.h"
 #include "IntrinsicCoreSettingsManager.h"
-#include "IntrinsicCoreLogManager.h"
 #include "IntrinsicCoreLockFreeStack.h"
 #include "IntrinsicCoreLinearOffsetAllocator.h"
 #include "IntrinsicCoreLockFreeFixedBlockAllocator.h"
