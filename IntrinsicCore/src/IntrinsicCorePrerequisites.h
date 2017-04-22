@@ -54,10 +54,8 @@
 #define _INTR_LOG_ERROR(x, ...)                                                \
   Intrinsic::Core::Log::Manager::log(Intrinsic::Core::Log::LogLevel::kError,   \
                                      x, ##__VA_ARGS__)
-#define _INTR_LOG_PUSH() ++Intrinsic::Core::Log::Manager::_currentIndent
-#define _INTR_LOG_POP()                                                        \
-  _INTR_ASSERT(Intrinsic::Core::Log::Manager::_currentIndent > 0u);            \
-  --Intrinsic::Core::Log::Manager::_currentIndent
+#define _INTR_LOG_PUSH() Intrinsic::Core::Log::Manager::indent()
+#define _INTR_LOG_POP() Intrinsic::Core::Log::Manager::unindent()
 #else
 #define _INTR_LOG_INFO(x, ...)
 #define _INTR_LOG_WARNING(x, ...)
