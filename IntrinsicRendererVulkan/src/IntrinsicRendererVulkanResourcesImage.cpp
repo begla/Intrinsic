@@ -163,7 +163,7 @@ void createTexture(ImageRef p_Ref)
       }
       else
       {
-        _INTR_ASSERT(false);
+        _INTR_ASSERT(false && "Depth/stencil format not supported");
       }
     }
     else
@@ -179,9 +179,22 @@ void createTexture(ImageRef p_Ref)
       }
       else
       {
-        _INTR_ASSERT(false);
+        _INTR_ASSERT(false && "Color format not supported");
       }
     }
+  }
+
+  if ((imageFlags & ImageFlags::kUsageSampled) > 0u)
+  {
+    _INTR_ASSERT((props.optimalTilingFeatures &
+                  VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) > 0u &&
+                 "Image format does not support sampling");
+  }
+  if ((imageFlags & ImageFlags::kUsageStorage) > 0u)
+  {
+    _INTR_ASSERT((props.optimalTilingFeatures &
+                  VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT) > 0u &&
+                 "Image format does not support storing");
   }
 
   imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -643,7 +656,7 @@ void createTextureFromFile(ImageRef p_Ref)
   }
   else
   {
-    _INTR_ASSERT(false);
+    _INTR_ASSERT(false && "Unsupported texture type");
   }
 }
 }
