@@ -17,7 +17,7 @@
 #include "stdafx_editor.h"
 
 // Ui
-#include "ui_IntrinsicEdPropertyEditorEnum.h"
+#include "ui_IntrinsicEdPropertyEditorResourceSelector.h"
 
 IntrinsicEdPropertyEditorResourceSelector::
     IntrinsicEdPropertyEditorResourceSelector(
@@ -59,7 +59,9 @@ void IntrinsicEdPropertyEditorResourceSelector::updateFromProperty()
   const Dod::PropertyCompilerEntry& propCompilerEntry =
       Application::_resourcePropertyCompilerMapping[_resourceManagerName];
 
+  QStringList completionItems;
   _ui.comboBox->addItem("None");
+  completionItems.append("None");
   for (uint32_t i = 0u; i < managerEntry.getActiveResourceCountFunction(); ++i)
   {
     Dod::Ref resourceRef = managerEntry.getActiveResourceAtIndexFunction(i);
@@ -71,6 +73,7 @@ void IntrinsicEdPropertyEditorResourceSelector::updateFromProperty()
     _INTR_STRING propertyName = properties["name"]["value"].GetString();
 
     _ui.comboBox->addItem(propertyName.c_str());
+    completionItems.append(propertyName.c_str());
 
     _INTR_ASSERT(_property);
     rapidjson::Value& prop = *_property;
@@ -79,6 +82,11 @@ void IntrinsicEdPropertyEditorResourceSelector::updateFromProperty()
       _ui.comboBox->setCurrentIndex(i + 1);
     }
   }
+
+  QCompleter* completer = new QCompleter(completionItems);
+  completer->setCaseSensitivity(Qt::CaseInsensitive);
+  completer->setFilterMode(Qt::MatchFlag::MatchContains);
+  _ui.comboBox->setCompleter(completer);
 
   _ui.propertyTitle->setText(_propertyName.c_str());
 }
