@@ -354,7 +354,7 @@ void IntrinsicEd::onLoadEditorSettings()
   restoreState(settings.value("mainWindowState").toByteArray());
 }
 
-void IntrinsicEd::onExit() {}
+void IntrinsicEd::onExit() { exit(0); }
 
 void IntrinsicEd::onLoadWorld()
 {
