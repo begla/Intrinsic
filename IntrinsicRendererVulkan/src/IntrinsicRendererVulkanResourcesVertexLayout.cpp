@@ -25,12 +25,12 @@ namespace Vulkan
 namespace Resources
 {
 void VertexLayoutManager::createResources(
-    const VertexLayoutRefArray& p_VertexLayoutes)
+    const VertexLayoutRefArray& p_VertexLayouts)
 {
-  for (uint32_t vtxLayoutIdx = 0u; vtxLayoutIdx < p_VertexLayoutes.size();
+  for (uint32_t vtxLayoutIdx = 0u; vtxLayoutIdx < p_VertexLayouts.size();
        ++vtxLayoutIdx)
   {
-    VertexLayoutRef vertexLayoutRef = p_VertexLayoutes[vtxLayoutIdx];
+    VertexLayoutRef vertexLayoutRef = p_VertexLayouts[vtxLayoutIdx];
 
     _INTR_ARRAY(VertexAttribute)& vertexAttributes =
         _descVertexAttributes(vertexLayoutRef);
@@ -71,6 +71,18 @@ void VertexLayoutManager::createResources(
         vertexAttributeDesc.location = vtxAttribute.location;
         vertexAttributeDesc.format =
             Helper::mapFormatToVkFormat((Format::Enum)vtxAttribute.format);
+
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(RenderSystem::_vkPhysicalDevice,
+                                            vertexAttributeDesc.format, &props);
+
+        if ((props.bufferFeatures && VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT) == 0u)
+        {
+          _INTR_ASSERT(
+              false &&
+              "Vertex buffer format is not supported on this platform");
+        }
+
         vertexAttributeDesc.offset = vtxAttribute.offset;
       }
     }
