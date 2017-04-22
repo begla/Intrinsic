@@ -386,31 +386,25 @@ _INTR_INLINE void createDefaultMeshVertexLayout(Dod::Ref& p_VertexLayoutToInit)
     attrVtxColor.offset = 0u;
   }
 
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindPos);
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindUv0);
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindNormal);
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindTangent);
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindBinormal);
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindVtxColor);
+  _INTR_ARRAY(VertexBinding)& vertexBindings =
+      Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit);
+  _INTR_ARRAY(VertexAttribute)& vertexAttributes =
+      Resources::VertexLayoutManager::_descVertexAttributes(
+          p_VertexLayoutToInit);
 
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrPos);
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrUv0);
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrNormal);
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrBinormal);
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrTangent);
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrVtxColor);
+  vertexBindings.push_back(bindPos);
+  vertexBindings.push_back(bindUv0);
+  vertexBindings.push_back(bindNormal);
+  vertexBindings.push_back(bindTangent);
+  vertexBindings.push_back(bindBinormal);
+  vertexBindings.push_back(bindVtxColor);
+
+  vertexAttributes.push_back(attrPos);
+  vertexAttributes.push_back(attrUv0);
+  vertexAttributes.push_back(attrNormal);
+  vertexAttributes.push_back(attrBinormal);
+  vertexAttributes.push_back(attrTangent);
+  vertexAttributes.push_back(attrVtxColor);
 }
 
 // <-
