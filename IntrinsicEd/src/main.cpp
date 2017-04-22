@@ -25,8 +25,8 @@ void onLoggedSplashscreen(const char* p_Message, Log::LogLevel::Enum p_LogLevel)
 int main(int argc, char* argv[])
 {
   QApplication a(argc, argv);
-  QCoreApplication::setOrganizationDomain("net");
-  QCoreApplication::setOrganizationName("movingblocks");
+  QCoreApplication::setOrganizationDomain("com");
+  QCoreApplication::setOrganizationName("intrinsic-engine");
   QCoreApplication::setApplicationName("Intrinsic");
   QCoreApplication::setApplicationVersion("1.0.0");
 
