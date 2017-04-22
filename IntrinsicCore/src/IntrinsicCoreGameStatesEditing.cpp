@@ -485,30 +485,35 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
       glm::vec3 newSize = _initialScale;
       glm::vec3 newRotation = glm::vec3(0.0f);
 
+      const float sss =
+          1.0f / Math::calcScreenSpaceScale(
+                     newWorldPos,
+                     Components::CameraManager::_viewProjectionMatrix(camRef),
+                     0.5f);
       _gridPosition = snapToGrid(newWorldPos, Editing::_gridSize);
 
       if (_translScaleXAxisSelected)
       {
         newSize.x +=
             planeIntersectionPoint.x - _initialPosOffset.x - newWorldPos.x;
-        newRotation.x +=
-            planeIntersectionPoint.x - _initialPosOffset.x - newWorldPos.x;
+        newRotation.x += sss * (planeIntersectionPoint.x - _initialPosOffset.x -
+                                newWorldPos.x);
         newWorldPos.x = planeIntersectionPoint.x - _initialPosOffset.x;
       }
       else if (_translScaleYAxisSelected)
       {
         newSize.y +=
             planeIntersectionPoint.y - _initialPosOffset.y - newWorldPos.y;
-        newRotation.y +=
-            planeIntersectionPoint.y - _initialPosOffset.y - newWorldPos.y;
+        newRotation.y += sss * (planeIntersectionPoint.y - _initialPosOffset.y -
+                                newWorldPos.y);
         newWorldPos.y = planeIntersectionPoint.y - _initialPosOffset.y;
       }
       else if (_translScaleZAxisSelected)
       {
         newSize.z +=
             planeIntersectionPoint.z - _initialPosOffset.z - newWorldPos.z;
-        newRotation.z +=
-            planeIntersectionPoint.z - _initialPosOffset.z - newWorldPos.z;
+        newRotation.z += sss * (planeIntersectionPoint.z - _initialPosOffset.z -
+                                newWorldPos.z);
         newWorldPos.z = planeIntersectionPoint.z - _initialPosOffset.z;
       }
 
