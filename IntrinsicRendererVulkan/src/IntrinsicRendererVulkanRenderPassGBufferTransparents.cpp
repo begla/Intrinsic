@@ -54,7 +54,7 @@ void GBufferTransparents::init()
     AttachmentDescription parameter0Attachment = {
         Format::kR16G16B16A16Float, AttachmentFlags::kClearOnLoad};
     AttachmentDescription depthStencilAttachment = {
-        Format::kD24UnormS8UInt,
+        (uint8_t)RenderSystem::_depthStencilFormatToUse,
         AttachmentFlags::kClearOnLoad | AttachmentFlags::kClearStencilOnLoad};
 
     RenderPassManager::_descAttachments(_renderPassRef)
@@ -158,7 +158,8 @@ void GBufferTransparents::updateResolutionDependentResources()
         MemoryPoolType::kResolutionDependentImages;
 
     ImageManager::_descDimensions(_depthImageRef) = dim;
-    ImageManager::_descImageFormat(_depthImageRef) = Format::kD24UnormS8UInt;
+    ImageManager::_descImageFormat(_depthImageRef) =
+        RenderSystem::_depthStencilFormatToUse;
     ImageManager::_descImageType(_depthImageRef) = ImageType::kTexture;
   }
   imgsToCreate.push_back(_depthImageRef);

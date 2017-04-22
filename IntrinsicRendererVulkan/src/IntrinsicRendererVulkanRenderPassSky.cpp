@@ -44,8 +44,8 @@ void Sky::init()
     RenderPassManager::resetToDefault(_renderPassRef);
 
     AttachmentDescription albedoAttachment = {Format::kR16G16B16A16Float, 0u};
-    AttachmentDescription depthStencilAttachment = {Format::kD24UnormS8UInt,
-                                                    0u};
+    AttachmentDescription depthStencilAttachment = {
+        (uint8_t)RenderSystem::_depthStencilFormatToUse, 0u};
 
     RenderPassManager::_descAttachments(_renderPassRef)
         .push_back(albedoAttachment);

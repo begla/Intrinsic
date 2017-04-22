@@ -55,6 +55,7 @@ uint32_t RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex = (uint32_t)-1;
 
 uint32_t RenderSystem::_backbufferIndex = 0u;
 uint32_t RenderSystem::_activeBackbufferMask = 0u;
+Format::Enum RenderSystem::_depthStencilFormatToUse = Format::kD32SFloat;
 
 // <-
 
@@ -125,6 +126,11 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     initOrUpdateVkSwapChain();
     initVkSynchronization();
     initVkCommandBuffers();
+  }
+
+  // Format setup
+  {
+    setupPlatformDependentFormats();
   }
 
   // Init. separate manager
@@ -1105,6 +1111,8 @@ void RenderSystem::initVkSynchronization()
   _INTR_VK_CHECK_RESULT(result);
 }
 
+// <-
+
 void RenderSystem::resizeSwapChain(bool p_Force)
 {
   if (_swapChainUpdatePending &&
@@ -1123,6 +1131,35 @@ void RenderSystem::resizeSwapChain(bool p_Force)
   {
     _timePassedSinceLastSwapChainUpdate += TaskManager::_lastDeltaT;
   }
+}
+
+// <-
+
+void RenderSystem::setupPlatformDependentFormats()
+{
+  static _INTR_ARRAY(Format::Enum)
+      depthFormats = {Format::kD24UnormS8UInt, Format::kD32SFloatS8UInt,
+                      Format::kD16UnormS8UInt};
+
+  for (uint32_t i = 0u; i < depthFormats.size(); ++i)
+  {
+    const Format::Enum format = depthFormats[i];
+    const VkFormat vkFormat = Helper::mapFormatToVkFormat(format);
+
+    VkFormatProperties formatProps;
+    vkGetPhysicalDeviceFormatProperties(_vkPhysicalDevice, vkFormat,
+                                        &formatProps);
+
+    if ((formatProps.optimalTilingFeatures &
+         VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) > 0u)
+    {
+      _depthStencilFormatToUse = format;
+      return;
+    }
+  }
+
+  _INTR_ASSERT(false &&
+               "Failed to find a working depth format for this platform");
 }
 
 // <-

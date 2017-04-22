@@ -272,7 +272,7 @@ struct ImageManager
   {
     VkImageSubresourceRange range;
     range.aspectMask =
-        _descImageFormat(p_ImageRef) != Format::kD24UnormS8UInt
+        _descImageFormat(p_ImageRef) != RenderSystem::_depthStencilFormatToUse
             ? VK_IMAGE_ASPECT_COLOR_BIT
             : (VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
     range.baseMipLevel = 0u;
@@ -296,7 +296,7 @@ struct ImageManager
   {
     VkImageSubresourceRange range;
     range.aspectMask =
-        _descImageFormat(p_ImageRef) != Format::kD24UnormS8UInt
+        _descImageFormat(p_ImageRef) != RenderSystem::_depthStencilFormatToUse
             ? VK_IMAGE_ASPECT_COLOR_BIT
             : (VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
     range.baseMipLevel = p_MipLevel;

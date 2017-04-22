@@ -126,8 +126,9 @@ void Debug::init()
     PipelineLayoutManager::resetToDefault(_debugLinePipelineLayout);
 
     GpuProgramManager::reflectPipelineLayout(
-        8u, {Resources::GpuProgramManager::getResourceByName("debug_line.vert"),
-             GpuProgramManager::getResourceByName("debug_line.frag")},
+        8u,
+        {Resources::GpuProgramManager::getResourceByName("debug_line.vert"),
+         GpuProgramManager::getResourceByName("debug_line.frag")},
         _debugLinePipelineLayout);
 
     pipelineLayoutsToCreate.push_back(_debugLinePipelineLayout);
@@ -142,8 +143,8 @@ void Debug::init()
     AttachmentDescription normalAttachment = {Format::kR16G16B16A16Float, 0u};
     AttachmentDescription parameter0Attachment = {Format::kR16G16B16A16Float,
                                                   0u};
-    AttachmentDescription depthStencilAttachment = {Format::kD24UnormS8UInt,
-                                                    0u};
+    AttachmentDescription depthStencilAttachment = {
+        (uint8_t)RenderSystem::_depthStencilFormatToUse, 0u};
 
     RenderPassManager::_descAttachments(_renderPassRef)
         .push_back(albedoAttachment);

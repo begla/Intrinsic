@@ -233,6 +233,14 @@ _INTR_INLINE VkFormat mapFormatToVkFormat(Format::Enum p_Format)
 
   case Format::kD24UnormS8UInt:
     return VK_FORMAT_D24_UNORM_S8_UINT;
+  case Format::kD32SFloatS8UInt:
+    return VK_FORMAT_D32_SFLOAT_S8_UINT;
+  case Format::kD32SFloat:
+    return VK_FORMAT_D32_SFLOAT;
+  case Format::kD16UNorm:
+    return VK_FORMAT_D16_UNORM;
+  case Format::kD16UnormS8UInt:
+    return VK_FORMAT_D16_UNORM_S8_UINT;
 
   case Format::kB8G8R8A8UNorm:
     return VK_FORMAT_B8G8R8A8_UNORM;
@@ -270,6 +278,14 @@ _INTR_INLINE bool isFormatDepthStencilFormat(Format::Enum p_Format)
   switch (p_Format)
   {
   case Format::kD24UnormS8UInt:
+    return true;
+  case Format::kD32SFloatS8UInt:
+    return true;
+  case Format::kD32SFloat:
+    return true;
+  case Format::kD16UNorm:
+    return true;
+  case Format::kD16UnormS8UInt:
     return true;
   }
 

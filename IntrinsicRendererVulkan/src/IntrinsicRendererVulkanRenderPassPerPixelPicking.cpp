@@ -51,7 +51,7 @@ void PerPixelPicking::init()
     AttachmentDescription pickingAttachment = {Format::kR32UInt,
                                                AttachmentFlags::kClearOnLoad};
     AttachmentDescription depthStencilAttachment = {
-        Format::kD24UnormS8UInt,
+        (uint8_t)RenderSystem::_depthStencilFormatToUse,
         AttachmentFlags::kClearOnLoad | AttachmentFlags::kClearStencilOnLoad};
 
     RenderPassManager::_descAttachments(_renderPassRef)
@@ -125,7 +125,7 @@ void PerPixelPicking::updateResolutionDependentResources()
     ImageManager::_descDimensions(_pickingDepthImageRef) =
         glm::uvec3(_perPixelPickingSize, 1u);
     ImageManager::_descImageFormat(_pickingDepthImageRef) =
-        Format::kD24UnormS8UInt;
+        RenderSystem::_depthStencilFormatToUse;
     ImageManager::_descImageType(_pickingDepthImageRef) = ImageType::kTexture;
   }
   imgsToCreate.push_back(_pickingDepthImageRef);
