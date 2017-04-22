@@ -306,7 +306,7 @@ _INTR_INLINE void createDefaultMeshVertexLayout(Dod::Ref& p_VertexLayoutToInit)
   VertexAttribute attrPos = {};
   {
     attrPos.binding = 0u;
-    attrPos.format = Format::kR16G16B16Float;
+    attrPos.format = Format::kR16G16B16A16Float;
     attrPos.location = 0u;
     attrPos.offset = 0u;
   }
@@ -336,7 +336,7 @@ _INTR_INLINE void createDefaultMeshVertexLayout(Dod::Ref& p_VertexLayoutToInit)
   VertexAttribute attrNormal = {};
   {
     attrNormal.binding = 2u;
-    attrNormal.format = Format::kR16G16B16Float;
+    attrNormal.format = Format::kR16G16B16A16Float;
     attrNormal.location = 2u;
     attrNormal.offset = 0u;
   }
@@ -351,7 +351,7 @@ _INTR_INLINE void createDefaultMeshVertexLayout(Dod::Ref& p_VertexLayoutToInit)
   VertexAttribute attrTangent = {};
   {
     attrTangent.binding = 3u;
-    attrTangent.format = Format::kR16G16B16Float;
+    attrTangent.format = Format::kR16G16B16A16Float;
     attrTangent.location = 3u;
     attrTangent.offset = 0u;
   }
@@ -366,7 +366,7 @@ _INTR_INLINE void createDefaultMeshVertexLayout(Dod::Ref& p_VertexLayoutToInit)
   VertexAttribute attrBinormal = {};
   {
     attrBinormal.binding = 4u;
-    attrBinormal.format = Format::kR16G16B16Float;
+    attrBinormal.format = Format::kR16G16B16A16Float;
     attrBinormal.location = 4u;
     attrBinormal.offset = 0u;
   }
