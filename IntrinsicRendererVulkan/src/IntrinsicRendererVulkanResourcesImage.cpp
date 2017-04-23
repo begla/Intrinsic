@@ -115,8 +115,10 @@ void createTexture(ImageRef p_Ref)
   _INTR_ASSERT(dimensions.x >= 1.0f && dimensions.y >= 1.0f &&
                dimensions.z >= 1.0f);
 
-  bool isDepthTarget = vkFormat == VK_FORMAT_D24_UNORM_S8_UINT;
-  bool isStencilTarget = vkFormat == VK_FORMAT_D24_UNORM_S8_UINT;
+  bool isDepthTarget =
+      Helper::isFormatDepthFormat(ImageManager::_descImageFormat(p_Ref));
+  bool isStencilTarget =
+      Helper::isFormatDepthStencilFormat(ImageManager::_descImageFormat(p_Ref));
 
   VkImageType vkImageType = VK_IMAGE_TYPE_1D;
   VkImageViewType vkImageViewTypeSubResource = VK_IMAGE_VIEW_TYPE_1D;
