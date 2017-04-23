@@ -85,7 +85,10 @@ _INTR_ARRAY(ResourceReleaseEntry) RenderSystem::_resourcesToFree;
 
 void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 {
-  _INTR_LOG_INFO("Inititializing Vulkan Renderer...");
+  _INTR_PROFILE_AUTO("Init. Vulkan Render System");
+
+  _INTR_LOG_INFO("Inititializing Vulkan Render System...");
+  _INTR_LOG_PUSH();
 
   // Init render states
   {
@@ -95,6 +98,7 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
   // Init. Vulkan
   {
     _INTR_LOG_INFO("Using Vulkan SDK version 1.0.%u.x...", VK_HEADER_VERSION);
+    _INTR_PROFILE_AUTO("Init. Vulkan");
 
     initVkInstance();
     initVkDevice();
@@ -112,10 +116,25 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
   }
 
   {
-    GpuProgramManager::compileAllShaders();
-    GpuProgramManager::createAllResources();
+    _INTR_PROFILE_AUTO("Create Resources");
+
+    {
+      _INTR_PROFILE_AUTO("Compile Shaders");
+      GpuProgramManager::compileAllShaders();
+    }
+
+    {
+      _INTR_PROFILE_AUTO("Create GPU Program Resources");
+      GpuProgramManager::createAllResources();
+    }
+
     RenderPassManager::createAllResources();
-    ImageManager::createAllResources();
+
+    {
+      _INTR_PROFILE_AUTO("Create Image Resources");
+      ImageManager::createAllResources();
+    }
+
     VertexLayoutManager::createAllResources();
     PipelineLayoutManager::createAllResources();
     PipelineManager::createAllResources();
@@ -141,6 +160,8 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
   // Init. render passes
   {
+    _INTR_PROFILE_AUTO("Init. Render Passes");
+
     RenderPass::GBuffer::init();
     RenderPass::GBufferTransparents::init();
     RenderPass::Sky::init();
@@ -158,11 +179,15 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
   }
 
   {
+    _INTR_PROFILE_AUTO("Init. Materials");
+
     MaterialManager::initMaterialPasses();
     MaterialManager::createAllResources();
   }
 
   updateResolutionDependentResources();
+
+  _INTR_LOG_POP();
 }
 
 // <-
@@ -231,6 +256,8 @@ void RenderSystem::releaseQueuedResources()
 
 void RenderSystem::updateResolutionDependentResources()
 {
+  _INTR_PROFILE_AUTO("Update Res. Dep. Resources");
+
   // Recreate all pipelines (to update the view port size)
   PipelineManager::createAllResources();
 

@@ -43,6 +43,10 @@
 #define _INTR_MAX_PLAYER_COMPONENT_COUNT 8
 #define _INTR_MAX_POST_EFFECT_CONTROLLER_COMPONENT_COUNT 1024
 
+// Various
+#define _INTR_CONCAT_(x, y) x##y
+#define _INTR_CONCAT(x, y) _INTR_CONCAT_(x, y)
+
 // Logging
 #if defined(_INTR_LOGGING_ENABLED)
 #define _INTR_LOG_INFO(x, ...)                                                 \
@@ -63,19 +67,6 @@
 #define _INTR_LOG_PUSH()
 #define _INTR_LOG_POP()
 #endif // _INTR_LOGGING_ENABLED
-
-// Timing macros
-#if defined(_INTR_PROFILING_ENABLED)
-#define _INTR_PROFILE_START() TimingHelper::timerStart()
-#define _INTR_PROFILE_END(x)                                                   \
-  {                                                                            \
-    const float timePassed = Intrinsic::Core::TimingHelper::timerEnd();        \
-    _INTR_LOG_INFO("%s finished in %.4f ms", x, timePassed);                   \
-  }
-#else
-#define _INTR_PROFILE_START()
-#define _INTR_PROFILE_END(x)
-#endif // _INTR_PROFILING_ENABLED
 
 // Names
 #define _N(x) Name(#x)
@@ -116,6 +107,24 @@
 #define _INTR_OSTRINGSTREAM                                                    \
   std::basic_ostringstream<char, std::char_traits<char>,                       \
                            Intrinsic::Core::StlAllocator<char>>
+
+// Timing macros
+#if defined(_INTR_PROFILING_ENABLED)
+#define _INTR_PROFILE_START() TimingHelper::timerStart()
+#define _INTR_PROFILE_END(x)                                                   \
+  {                                                                            \
+    const uint32_t msPassed = Intrinsic::Core::TimingHelper::timerEnd();       \
+    _INTR_LOG_INFO("%s finished in %ums", x, msPassed);                        \
+  }
+
+#define _INTR_PROFILE_AUTO(x)                                                  \
+  TimingHelper::AutoTimer _INTR_CONCAT(timer, __COUNTER__) =                   \
+      TimingHelper::AutoTimer(x)
+#else
+#define _INTR_PROFILE_START()
+#define _INTR_PROFILE_END(x) i
+#define _INTR_PROFILE_AUTO(x)
+#endif // _INTR_PROFILING_ENABLED
 
 // Sorting
 #define _INTR_SORT(a, b, c) std::sort(a, b, c)
