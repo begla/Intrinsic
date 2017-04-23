@@ -281,16 +281,31 @@ _INTR_INLINE bool isFormatDepthStencilFormat(Format::Enum p_Format)
     return true;
   case Format::kD32SFloatS8UInt:
     return true;
-  case Format::kD32SFloat:
-    return true;
-  case Format::kD16UNorm:
-    return true;
   case Format::kD16UnormS8UInt:
     return true;
   }
 
   return false;
 };
+
+_INTR_INLINE bool isFormatDepthFormat(Format::Enum p_Format)
+{
+  switch (p_Format)
+  {
+  case Format::kD24UnormS8UInt:
+    return true;
+  case Format::kD32SFloatS8UInt:
+    return true;
+  case Format::kD16UnormS8UInt:
+    return true;
+  case Format::kD32SFloat:
+    return true;
+  case Format::kD16UNorm:
+    return true;
+  }
+
+  return false;
+}
 
 // <-
 
