@@ -139,8 +139,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionShow_Debug_Context_Menu"/>
-   <addaction name="separator"/>
    <addaction name="actionShow_Debug_Geometry_Context_Menu"/>
+   <addaction name="actionOpen_Microprofile"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -509,7 +509,7 @@
    </property>
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/tacho</normaloff>:/Icons/tacho</iconset>
+     <normaloff>:/Icons/icons/cc/white/png/lighting_icon&amp;16.png</normaloff>:/Icons/icons/cc/white/png/lighting_icon&amp;16.png</iconset>
    </property>
    <property name="text">
     <string>Show Debug Geometry Context Menu</string>
@@ -562,6 +562,18 @@
    </property>
    <property name="toolTip">
     <string>Reload Settings and Renderer Config</string>
+   </property>
+  </action>
+  <action name="actionOpen_Microprofile">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/tacho</normaloff>:/Icons/tacho</iconset>
+   </property>
+   <property name="text">
+    <string>Open Microprofile</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Microprofile</string>
    </property>
   </action>
  </widget>
