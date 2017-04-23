@@ -215,6 +215,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
   QObject::connect(_ui.actionShow_PhysX_Debug_Geometry, SIGNAL(triggered()),
                    this, SLOT(onDebugGeometryChanged()));
+  QObject::connect(_ui.actionOpen_Microprofile, SIGNAL(triggered()), this,
+                   SLOT(onOpenMicroprofile()));
   QObject::connect(_ui.actionShow_World_Bounding_Spheres, SIGNAL(triggered()),
                    this, SLOT(onDebugGeometryChanged()));
 
@@ -641,6 +643,11 @@ void IntrinsicEd::onGizmoSizeChanged(double p_Value)
 void IntrinsicEd::onCameraSpeedChanged(double p_Value)
 {
   GameStates::Editing::_cameraSpeed = (float)p_Value;
+}
+
+void IntrinsicEd::onOpenMicroprofile()
+{
+  QDesktopServices::openUrl(QUrl("http://127.0.0.1:1338"));
 }
 
 void updateStatusBar(QStatusBar* p_StatusBar)
