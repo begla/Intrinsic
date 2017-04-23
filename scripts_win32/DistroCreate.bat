@@ -4,7 +4,9 @@ mkdir distro
 
 robocopy app/ distro/ *.dll
 robocopy app/ distro/ Intrinsic.exe
+robocopy app/ distro/ Intrinsic.pdb
 robocopy app/ distro/ IntrinsicEd.exe
+robocopy app/ distro/ IntrinsicEd.pdb
 robocopy app/ distro/ renderer_config.json
 robocopy app/ distro/ renderer_config_simple.json
 robocopy app/ distro/ settings.json

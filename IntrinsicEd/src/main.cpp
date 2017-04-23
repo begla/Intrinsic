@@ -15,6 +15,10 @@
 #include "stdafx.h"
 #include "stdafx_editor.h"
 
+#if defined(_WIN32)
+#include "IntrinsicCoreCrashDumpGeneratorWin32.h"
+#endif // _WIN32
+
 QSplashScreen* splash = nullptr;
 
 void onLoggedSplashscreen(const char* p_Message, Log::LogLevel::Enum p_LogLevel)
@@ -22,7 +26,7 @@ void onLoggedSplashscreen(const char* p_Message, Log::LogLevel::Enum p_LogLevel)
   splash->showMessage(p_Message, Qt::AlignBottom | Qt::AlignLeft, Qt::white);
 }
 
-int main(int argc, char* argv[])
+int _main(int argc, char* argv[])
 {
   QApplication a(argc, argv);
   QCoreApplication::setOrganizationDomain("com");
@@ -48,3 +52,20 @@ int main(int argc, char* argv[])
 
   return w.enterMainLoop();
 }
+
+#if defined(_WIN32)
+int main(int argc, char* argv[])
+{
+  __try
+  {
+    return _main(argc, argv);
+  }
+  __except (Intrinsic::Core::CrashDumpGeneratorWin32::GenerateDump(
+      GetExceptionInformation()))
+  {
+    return -1;
+  }
+}
+#else
+int main(int argc, char* argv[]) { return _main(argc, argv); }
+#endif // _WIN32

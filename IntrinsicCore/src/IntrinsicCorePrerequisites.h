@@ -147,17 +147,23 @@ case IDCONTINUE : break;                                                       \
     \
 }                                                                       \
   }
+#define _INTR_ERROR_DIALOG_SIMPLE(_msg)                                        \
+  {                                                                            \
+    MessageBox(NULL, _msg, "Error", MB_ICONERROR | MB_OK);                     \
+  }
 #define _INTR_DBG_BREAK() __debugbreak()
 #define _INTR_ASSERT(_expr)                                                    \
   if (!(_expr))                                                                \
     _INTR_LOG_ERROR("Assert: " #_expr);
 #else
 #define _INTR_ERROR_DIALOG(_msg)
+#define _INTR_ERROR_DIALOG_SIMPLE(_msg)
 #define _INTR_ASSERT(_expr) assert(_expr)
 #define _INTR_DBG_BREAK()
 #endif // _WIN32
 #else
 #define _INTR_ERROR_DIALOG(_msg)
+#define _INTR_ERROR_DIALOG_SIMPLE(_msg)
 #define _INTR_IS_DEBUGGER_ATTACHED()
 #define _INTR_ASSERT(_expr)
 #define _INTR_DBG_BREAK()

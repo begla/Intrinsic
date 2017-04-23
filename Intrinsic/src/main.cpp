@@ -19,7 +19,11 @@
 #pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif // _MSC_VER
 
-int main(int argc, char* argv[])
+#if defined(_WIN32)
+#include "IntrinsicCoreCrashDumpGeneratorWin32.h"
+#endif // _WIN32
+
+int _main(int argc, char* argv[])
 {
   // Loading settings file
   Settings::Manager::loadSettings();
@@ -89,3 +93,20 @@ int main(int argc, char* argv[])
 
   return 0;
 }
+
+#if defined(_WIN32)
+int main(int argc, char* argv[])
+{
+  __try
+  {
+    return _main(argc, argv);
+  }
+  __except (Intrinsic::Core::CrashDumpGeneratorWin32::GenerateDump(
+      GetExceptionInformation()))
+  {
+    return -1;
+  }
+}
+#else
+int main(int argc, char* argv[]) { return _main(argc, argv); }
+#endif // _WIN32
