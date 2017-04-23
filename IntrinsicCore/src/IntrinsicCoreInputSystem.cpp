@@ -124,7 +124,8 @@ void System::processKeyReleaseEvent(const KeyEvent& p_Event)
 
 void System::processMouseMoveEvent(const MouseMoveEvent& p_Event)
 {
-  if (_lastMousePos != p_Event.pos)
+  if (_lastMousePos != p_Event.pos || _lastMousePosRel != p_Event.posRel ||
+      _lastMousePosViewport != p_Event.posViewport)
   {
     Resources::QueuedEventData eventData;
     eventData.mouseEvent.pos[0] = p_Event.pos.x;

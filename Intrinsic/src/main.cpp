@@ -36,8 +36,7 @@ int _main(int argc, char* argv[])
   SDL_DisplayMode displayMode;
   SDL_GetCurrentDisplayMode(0, &displayMode);
 
-  uint32_t windowFlags =
-      SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_GRABBED;
+  uint32_t windowFlags = SDL_WINDOW_RESIZABLE;
   if (Settings::Manager::_windowMode == Settings::WindowMode::kFullscreen)
   {
     windowFlags |= SDL_WINDOW_FULLSCREEN;
@@ -84,7 +83,9 @@ int _main(int argc, char* argv[])
   GameStates::Manager::activateGameState(GameStates::GameState::kMain);
 
   SDL_ShowWindow(sdlWindow);
-  SDL_SetRelativeMouseMode(SDL_TRUE);
+
+  int result = SDL_SetRelativeMouseMode(SDL_TRUE);
+  _INTR_ASSERT(result == 0 && "Failed to set relative mouse mode");
 
   while (Application::_running)
   {
