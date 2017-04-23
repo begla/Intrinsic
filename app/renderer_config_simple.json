@@ -19,6 +19,12 @@
 			"type" : "RenderPassSky"
 		},
 		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferAlbedo",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
 			"type" : "RenderPassGenericFullscreen",
 			"images" : [
 			],
