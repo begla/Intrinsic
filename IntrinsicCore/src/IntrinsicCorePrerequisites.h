@@ -122,7 +122,7 @@
       TimingHelper::AutoTimer(x)
 #else
 #define _INTR_PROFILE_START()
-#define _INTR_PROFILE_END(x) i
+#define _INTR_PROFILE_END(x)
 #define _INTR_PROFILE_AUTO(x)
 #endif // _INTR_PROFILING_ENABLED
 
