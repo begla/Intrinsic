@@ -25,6 +25,6 @@ Intrinsic.files
 Intrinsic.includes
 
 app/assets/*
-!app/assets/shaders
+!app/crash_dumps/*
 
 app/Intrinsic.log
