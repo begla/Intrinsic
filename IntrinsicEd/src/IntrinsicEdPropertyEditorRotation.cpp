@@ -67,7 +67,7 @@ void IntrinsicEdPropertyEditorRotation::updateFromProperty()
   {
     const glm::quat quat =
         glm::quat(prop["values"][3].GetFloat(), prop["values"][0].GetFloat(),
-                  prop["values"][1].GetFloat(), prop["values"][3].GetFloat());
+                  prop["values"][1].GetFloat(), prop["values"][2].GetFloat());
     euler = glm::eulerAngles(quat);
   }
   else if (strcmp(prop["type"].GetString(), "vec3") == 0u)
