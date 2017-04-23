@@ -532,8 +532,11 @@ void RenderSystem::initVkDevice()
     vkGetPhysicalDeviceMemoryProperties(_vkPhysicalDevice,
                                         &_vkPhysicalDeviceMemoryProperties);
 
-    _INTR_LOG_INFO("Using physical device %s (Driver %u)...",
-                   physDeviceProps.deviceName, physDeviceProps.driverVersion);
+    _INTR_LOG_INFO("Using physical device %s (Driver Ver. %u, API Ver. %u, "
+                   "Vendor ID %u, Device ID %u, Device Type %u)...",
+                   physDeviceProps.deviceName, physDeviceProps.driverVersion,
+                   physDeviceProps.apiVersion, physDeviceProps.vendorID,
+                   physDeviceProps.deviceID, physDeviceProps.deviceType);
   }
 
   // Find graphics _AND_ compute queue
@@ -552,24 +555,19 @@ void RenderSystem::initVkDevice()
     vkGetPhysicalDeviceQueueFamilyProperties(_vkPhysicalDevice, &queueCount,
                                              queueProps.data());
 
-    uint32_t graphicsComputeQueue;
-    for (graphicsComputeQueue = 0; graphicsComputeQueue < queueCount;
-         graphicsComputeQueue++)
+    for (uint32_t queueIdx = 0; queueIdx < queueCount; queueIdx++)
     {
-      if ((queueProps[graphicsComputeQueue].queueFlags &
-           VK_QUEUE_GRAPHICS_BIT) > 0u &&
-          (queueProps[graphicsComputeQueue].queueFlags & VK_QUEUE_COMPUTE_BIT) >
-              0u)
+      if ((queueProps[queueIdx].queueFlags & VK_QUEUE_GRAPHICS_BIT) > 0u &&
+          (queueProps[queueIdx].queueFlags & VK_QUEUE_COMPUTE_BIT) > 0u)
       {
-        _INTR_LOG_INFO("Using queue #%u for graphics and compute...",
-                       graphicsComputeQueue);
+        _INTR_LOG_INFO("Using queue #%u for graphics and compute...", queueIdx);
+        _vkGraphicsAndComputeQueueFamilyIndex = queueIdx;
         break;
       }
     }
-    _INTR_ASSERT(graphicsComputeQueue < queueCount &&
-                 "Unable to locate a matching queue");
 
-    _vkGraphicsAndComputeQueueFamilyIndex = graphicsComputeQueue;
+    _INTR_ASSERT(_vkGraphicsAndComputeQueueFamilyIndex != (uint32_t)-1 &&
+                 "Unable to locate a matching queue");
   }
 
   // Setup device queue
