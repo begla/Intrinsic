@@ -75,7 +75,7 @@ void Main::update(float p_DeltaT)
       if (camCtrlRef.isValid())
       {
         static const float camSpeed = 2.0f;
-        static const float camSpeedMouse = 0.5f;
+        static const float camSpeedMouse = 0.75f;
 
         glm::vec3& targetEulerAngles =
             Components::CameraControllerManager::_descTargetEulerAngles(
@@ -103,9 +103,9 @@ void Main::update(float p_DeltaT)
         static const float jumpSpeed = 20.0f;
 
         const float actualMovedSpeed =
-            moveSpeed * (1.0f +
-                         runMultiplier * Input::System::getVirtualKeyState(
-                                             Input::VirtualKey::kRun));
+            moveSpeed *
+            (1.0f + runMultiplier * Input::System::getVirtualKeyState(
+                                        Input::VirtualKey::kRun));
 
         glm::vec3 moveVector = glm::vec3(0.0f);
         {
@@ -125,9 +125,9 @@ void Main::update(float p_DeltaT)
           moveVector += glm::vec3(-Input::System::getVirtualKeyState(
                                       Input::VirtualKey::kMoveHorizontal),
                                   0.0f, 0.0f);
-          moveVector +=
-              glm::vec3(0.0f, 0.0f, -Input::System::getVirtualKeyState(
-                                        Input::VirtualKey::kMoveVertical));
+          moveVector += glm::vec3(0.0f, 0.0f,
+                                  -Input::System::getVirtualKeyState(
+                                      Input::VirtualKey::kMoveVertical));
         }
 
         moveVector = camOrient * moveVector;
