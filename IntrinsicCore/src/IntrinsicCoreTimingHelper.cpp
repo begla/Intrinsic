@@ -23,20 +23,34 @@ namespace Core
 {
 namespace TimingHelper
 {
-uint32_t previousCounter[_INTR_MAX_TIMER_COUNT] = {};
+uint64_t previousCounter[_INTR_MAX_TIMER_COUNT] = {};
 uint32_t currentTimerIndex = 0u;
 
 void timerStart()
 {
-  previousCounter[currentTimerIndex] = SDL_GetTicks();
+  previousCounter[currentTimerIndex] = getMicroseconds();
   ++currentTimerIndex;
 }
 
 uint32_t timerEnd()
 {
   --currentTimerIndex;
-  return SDL_GetTicks() - previousCounter[currentTimerIndex];
+  return (getMicroseconds() - previousCounter[currentTimerIndex]) / 1000u;
 }
+
+void sleep(uint32_t p_Ms)
+{
+  std::this_thread::sleep_for(std::chrono::milliseconds(p_Ms));
+};
+
+uint64_t getMicroseconds()
+{
+  return std::chrono::duration_cast<std::chrono::microseconds>(
+             std::chrono::high_resolution_clock::now().time_since_epoch())
+      .count();
+}
+
+uint64_t getMilliseconds() { return getMicroseconds() / 1000u; }
 }
 }
 }

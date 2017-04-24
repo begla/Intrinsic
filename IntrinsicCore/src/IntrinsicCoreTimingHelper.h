@@ -22,6 +22,9 @@ namespace TimingHelper
 {
 void timerStart();
 uint32_t timerEnd();
+void sleep(uint32_t p_Ms);
+uint64_t getMicroseconds();
+uint64_t getMilliseconds();
 
 struct AutoTimer
 {
