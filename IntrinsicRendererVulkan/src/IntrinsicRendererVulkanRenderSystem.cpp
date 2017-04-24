@@ -1208,6 +1208,7 @@ void RenderSystem::beginFrame()
 
   {
     _INTR_PROFILE_CPU("Render System", "Wait For Previous Frame");
+
     waitForFrame(_backbufferIndex);
   }
 
