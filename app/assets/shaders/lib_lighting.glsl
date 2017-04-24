@@ -99,7 +99,7 @@ vec4 calcPosLS(vec3 posVS, uint shadowMapIdx, mat4 shadowViewProjMatrix[PSSM_SPL
   posLS.xy *= 0.5;
   posLS.xy += 0.5;
 
-  const float splitBias[] = { 0.00001, 0.0002, 0.001, 0.0025 };
+  const float splitBias[] = { 0.000025, 0.0002, 0.001, 0.0025 };
   posLS.z -= splitBias[shadowMapIdx];
 
   return posLS;
