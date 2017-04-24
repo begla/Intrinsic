@@ -103,10 +103,10 @@
 			"perInstanceDataBufferName" : "PerInstanceDataPostCombine",
 			"inputs" : [
 				["Image", "Scene", "sceneTex", "Fragment", "NearestClamp"],
-				["Image", "BloomSummed", "bloomTex", "Fragment", "NearestClamp"],
+				["Image", "BloomSummed", "bloomTex", "Fragment", "LinearClamp"],
 				["Image", "lens_dirt", "lensDirtTex", "Fragment", "NearestClamp"],
 				["Image", "film_grain_noise", "filmGrainTex", "Fragment", "NearestClamp"],
-				["Image", "LensFlare", "lensFlareTex", "Fragment", "NearestClamp"],
+				["Image", "LensFlare", "lensFlareTex", "Fragment", "LinearClamp"],
 				["Buffer", "BloomLumBuffer", "AvgLum", "Fragment"]
 			],
 			"outputs" : [
