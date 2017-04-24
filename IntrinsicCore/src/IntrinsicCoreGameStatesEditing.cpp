@@ -30,7 +30,6 @@ namespace GameStates
 {
 namespace
 {
-glm::vec2 _lastMousePos = glm::vec2();
 bool _rightMouseButtonPressed = false;
 bool _leftMouseButtonPressed = false;
 
@@ -45,6 +44,7 @@ glm::quat _initialOrientation = glm::quat();
 glm::vec3 _translScalePlaneNormal = glm::vec3(0.0f);
 
 float _lastGizmoScale = 1.0f;
+const float _mouseSens = glm::half_pi<float>() * 0.02f;
 
 // Grid
 glm::vec3 _gridPosition = glm::vec3(0.0f);
@@ -253,7 +253,6 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
       Components::NodeManager::getComponentForEntity(
           Components::CameraManager::_entity(camRef));
 
-  static const float mouseSens = glm::half_pi<float>() * 8.0f;
   static const float damping = 0.005f;
 
   glm::vec3& camRotEuler = Components::CameraManager::_descEulerAngles(camRef);
@@ -281,13 +280,10 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
     }
     else
     {
-      const glm::vec2 mouseVelocity =
-          mouseSens *
-          (Input::System::getLastMousePosViewport() - _lastMousePos);
+      const glm::vec2& mouseVelocity =
+          _mouseSens * Input::System::getLastMousePosRel();
       _camAngVel += glm::vec3(mouseVelocity.x, mouseVelocity.y, 0.0f);
     }
-
-    _lastMousePos = Input::System::getLastMousePosViewport();
   }
   else
   {
@@ -320,6 +316,9 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
                  0.1f);
   }
 
+  camRot = Components::NodeManager::_worldOrientation(camNodeRef) *
+           glm::quat(camRotEuler);
+
   Components::NodeManager::_position(camNodeRef) =
       _orbitCamCenter + camRot * glm::vec3(0.0f, 0.0f, -_orbitRadius);
   Components::NodeManager::updateTransforms(camNodeRef);
@@ -345,7 +344,6 @@ _INTR_INLINE void updateCameraFreeFlight(float p_DeltaT)
       Components::NodeManager::getComponentForEntity(
           Components::CameraManager::_entity(camRef));
 
-  static const float mouseSens = glm::half_pi<float>() * 8.0f;
   static const float damping = 0.005f;
 
   glm::vec3& camRotEuler = Components::CameraManager::_descEulerAngles(camRef);
@@ -359,13 +357,10 @@ _INTR_INLINE void updateCameraFreeFlight(float p_DeltaT)
     }
     else
     {
-      const glm::vec2 mouseVelocity =
-          mouseSens *
-          (Input::System::getLastMousePosViewport() - _lastMousePos);
+      const glm::vec2& mouseVelocity =
+          _mouseSens * Input::System::getLastMousePosRel();
       _camAngVel += glm::vec3(mouseVelocity.y, -mouseVelocity.x, 0.0f);
     }
-
-    _lastMousePos = Input::System::getLastMousePosViewport();
   }
   else
   {
