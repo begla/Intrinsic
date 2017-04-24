@@ -1,4 +1,4 @@
-->
+// ->
 // Copyright (c) 2016 Benjamin Glatzel
 // Author: Benjamin Glatzel
 // <-
@@ -11,7 +11,7 @@
 // Ui
 #include "ui_IntrinsicEd.h"
 
-    IntrinsicEdNodeView* IntrinsicEd::_nodeView = nullptr;
+IntrinsicEdNodeView* IntrinsicEd::_nodeView = nullptr;
 IntrinsicEdPropertyView* IntrinsicEd::_propertyView = nullptr;
 IntrinsicEdManagerWindowGpuProgram* IntrinsicEd::_managerWindowGpuProgram =
     nullptr;
@@ -653,23 +653,12 @@ void IntrinsicEd::onOpenMicroprofile()
 void updateStatusBar(QStatusBar* p_StatusBar)
 {
   static float timeSinceLastStatusBarUpdate = 0.0f;
-  static uint32_t frameIdx = 0u;
-  static float lastDeltaTs[60] = {};
-
-  lastDeltaTs[frameIdx] = TaskManager::_lastDeltaT;
-
-  float smoothedDeltaT = 0.0f;
-  for (uint32_t i = 0u; i < 60u; ++i)
-  {
-    smoothedDeltaT += lastDeltaTs[i];
-  }
-  smoothedDeltaT /= 60.0f;
 
   if (timeSinceLastStatusBarUpdate > 0.1f)
   {
     QColor color;
 
-    const float fps = std::round(1.0f / smoothedDeltaT);
+    const float fps = std::round(1.0f / TaskManager::_lastDeltaT);
 
     if (fps >= 60.0f)
       color.setRgb(0, 255, 0);
@@ -684,7 +673,7 @@ void updateStatusBar(QStatusBar* p_StatusBar)
 
     _INTR_STRING statucBarText =
         StringUtil::toString<float>(fps) + " FPS / " +
-        StringUtil::toString<float>(1.0f / fps * 1000.0f) + " ms";
+        StringUtil::toString<float>(TaskManager::_lastDeltaT) + " ms";
     p_StatusBar->showMessage(statucBarText.c_str());
     timeSinceLastStatusBarUpdate = 0.0f;
   }
@@ -692,8 +681,6 @@ void updateStatusBar(QStatusBar* p_StatusBar)
   {
     timeSinceLastStatusBarUpdate += TaskManager::_lastDeltaT;
   }
-
-  frameIdx = (frameIdx + 1u) % 60u;
 }
 
 void IntrinsicEd::closeEvent(QCloseEvent*)
