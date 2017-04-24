@@ -4,7 +4,7 @@
   "rendererConfig" : "renderer_config.json",
   "rendererValidationEnabled": false,
 
-  "targetFrameRate": 0.016667,
+  "targetFrameRate": 0.016,
   
   "windowMode": 0,
   "presentMode": 2,
