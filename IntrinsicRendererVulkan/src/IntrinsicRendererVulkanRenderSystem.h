@@ -267,14 +267,7 @@ struct RenderSystem
 
   // <-
   static Format::Enum _depthStencilFormatToUse;
-
-  // <-
-
-  static LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>
-      _visibleDrawCallsPerMaterialPass[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT]
-                                      [MaterialPass::kCount];
-  static LockFreeStack<Core::Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT>
-      _visibleMeshComponents[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT];
+  ;
 
 private:
   static void initManagers();

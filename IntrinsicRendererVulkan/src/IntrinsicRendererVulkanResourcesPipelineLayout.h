@@ -156,6 +156,19 @@ struct PipelineLayoutManager
     }
   }
 
+  // <-
+
+  _INTR_INLINE static void destroyPipelineLayoutsAndResources(
+      const PipelineLayoutRefArray& p_PipelineLayouts)
+  {
+    destroyResources(p_PipelineLayouts);
+
+    for (uint32_t i = 0u; i < p_PipelineLayouts.size(); ++i)
+    {
+      destroyPipelineLayout(p_PipelineLayouts[i]);
+    }
+  }
+
   static VkDescriptorSet
   allocateAndWriteDescriptorSet(PipelineLayoutRef p_Ref,
                                 const _INTR_ARRAY(BindingInfo) & p_BindInfos);

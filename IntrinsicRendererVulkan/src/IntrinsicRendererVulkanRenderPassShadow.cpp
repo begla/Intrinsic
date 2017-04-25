@@ -280,12 +280,12 @@ void Shadow::render(float p_DeltaT)
 
     static DrawCallRefArray visibleDrawCalls;
     visibleDrawCalls.clear();
-    RenderSystem::_visibleDrawCallsPerMaterialPass[frustumIdx]
-                                                  [MaterialPass::kShadow]
-                                                      .copy(visibleDrawCalls);
-    RenderSystem::_visibleDrawCallsPerMaterialPass[frustumIdx]
-                                                  [MaterialPass::kShadowFoliage]
-                                                      .copy(visibleDrawCalls);
+    RenderProcess::Default::_visibleDrawCallsPerMaterialPass
+        [frustumIdx][MaterialManager::getMaterialPassId(_N(Shadow))]
+            .copy(visibleDrawCalls);
+    RenderProcess::Default::_visibleDrawCallsPerMaterialPass
+        [frustumIdx][MaterialManager::getMaterialPassId(_N(ShadowFoliage))]
+            .copy(visibleDrawCalls);
 
     DrawCallManager::sortDrawCallsFrontToBack(visibleDrawCalls);
 

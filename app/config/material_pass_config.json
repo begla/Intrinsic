@@ -1,0 +1,172 @@
+{
+  "name" : "Default",
+  "boundResources" : [
+    {
+      "name": "GBuffer",
+      "resources" : [
+        ["Buffer", "PerInstance", "PerInstance", "Vertex"],
+        ["Buffer", "PerInstance", "PerInstance", "Fragment"],
+        ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
+        ["Image", "MaterialAlbedo", "albedoTex", "Fragment"],
+        ["Image", "MaterialNormal", "normalTex", "Fragment"],
+        ["Image", "MaterialRoughness", "roughnessTex", "Fragment"]
+      ]
+    },
+    {
+      "name": "Debug",
+      "resources" : [
+        ["Buffer", "PerInstance", "PerInstance", "Vertex"],
+        ["Buffer", "PerInstance", "PerInstance", "Fragment"]
+      ]
+    },
+    {
+      "name": "GBufferSky",
+      "resources" : [
+        ["Buffer", "PerInstance", "PerInstance", "Vertex"],
+        ["Buffer", "PerInstance", "PerInstance", "Fragment"],
+        ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
+        ["Image", "MaterialAlbedo", "albedoTex", "Fragment"]
+      ]
+    },
+    {
+      "name": "GBufferWater",
+      "resources" : [
+        ["Buffer", "PerInstance", "PerInstance", "Vertex"],
+        ["Buffer", "PerInstance", "PerInstance", "Fragment"],
+        ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
+        ["Image", "MaterialAlbedo", "albedoTex", "Fragment"],
+        ["Image", "MaterialNormal", "normalTex", "Fragment"],
+        ["Image", "MaterialRoughness", "roughnessTex", "Fragment"],
+        ["Image", "MaterialFoam", "foamTex", "Fragment"],
+        ["Image", "GBufferDepth", "gbufferDepthTex", "Fragment"]
+      ]
+    },
+    {
+      "name": "GBufferLayered",
+      "resources" : [
+        ["Buffer", "PerInstance", "PerInstance", "Vertex"],
+        ["Buffer", "PerInstance", "PerInstance", "Fragment"],
+        ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
+        ["Image", "MaterialAlbedo", "albedoTex0", "Fragment"],
+        ["Image", "MaterialNormal", "normalTex0", "Fragment"],
+        ["Image", "MaterialRoughness", "roughnessTex0", "Fragment"],
+        ["Image", "MaterialAlbedo1", "albedoTex1", "Fragment"],
+        ["Image", "MaterialNormal1", "normalTex1", "Fragment"],
+        ["Image", "MaterialRoughness1", "roughnessTex1", "Fragment"],
+        ["Image", "MaterialAlbedo2", "albedoTex2", "Fragment"],
+        ["Image", "MaterialNormal2", "normalTex2", "Fragment"],
+        ["Image", "MaterialRoughness2", "roughnessTex2", "Fragment"],
+        ["Image", "MaterialBlendMask", "blendMaskTex", "Fragment"]
+      ]
+    },
+    {
+      "name": "PerPixelPicking",
+      "resources" : [
+        ["Buffer", "PerInstance", "PerInstance", "Vertex"],
+        ["Buffer", "PerInstance", "PerInstance", "Fragment"],
+        ["Buffer", "PerMaterial", "PerMaterial", "Fragment"]
+      ]
+    },
+    {
+      "name": "Shadow",
+      "resources" : [
+        ["Buffer", "PerInstance", "PerInstance", "Vertex"]
+      ]
+    },
+    {
+      "name": "ShadowFoliage",
+      "resources" : [
+        ["Buffer", "PerInstance", "PerInstance", "Vertex"],
+        ["Buffer", "PerInstance", "PerInstance", "Fragment"],
+        ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
+        ["Image", "MaterialAlbedo", "albedoTex", "Fragment"]
+      ]
+    }
+  ],
+  "materialPasses" : [
+    {
+      "name" : "GBufferDefault",
+      "baseVertexGpuProgram" : "gbuffer.vert",
+      "baseFragmentGpuProgram" : "gbuffer.frag",
+      "renderPass" : "GBuffer",
+      "blendStates" : ["Default", "Default", "Default"],
+      "boundResources" : "GBuffer"
+    },
+    {
+      "name" : "Shadow",
+      "baseVertexGpuProgram" : "shadow.vert",
+      "renderPass" : "Shadow",
+      "viewportSize": "ShadowMap",
+      "boundResources" : "Shadow"
+    },
+    {
+      "name" : "GBufferSky",
+      "baseVertexGpuProgram" : "sky.vert",
+      "baseFragmentGpuProgram" : "sky.frag",
+      "renderPass" : "GBufferSky",
+      "blendStates" : ["Default"],
+      "depthStencilState" : "DefaultNoWrite",
+      "rasterizationState" : "InvertedCulling",
+      "boundResources" : "GBufferSky"
+    },
+    {
+      "name" : "DebugGizmo",
+      "baseVertexGpuProgram" : "gizmo.vert",
+      "baseFragmentGpuProgram" : "gizmo.frag",
+      "renderPass" : "Debug",
+      "blendStates" : ["Default", "Default", "Default"],
+      "boundResources" : "Debug"
+    },
+    {
+      "name" : "DebugGrid",
+      "baseVertexGpuProgram" : "grid.vert",
+      "baseFragmentGpuProgram" : "grid.frag",
+      "renderPass" : "Debug",
+      "blendStates" : ["Default", "Default", "Default"],
+      "boundResources" : "Debug"
+    },
+    {
+      "name" : "GBufferFoliage",
+      "baseVertexGpuProgram" : "foliage.vert",
+      "baseFragmentGpuProgram" : "foliage.frag",
+      "renderPass" : "GBufferFoliage",
+      "blendStates" : ["Default", "Default", "Default"],
+      "rasterizationState" : "DoubleSided",
+      "boundResources" : "GBuffer"
+    },
+    {
+      "name" : "ShadowFoliage",
+      "baseVertexGpuProgram" : "shadow_foliage.vert",
+      "baseFragmentGpuProgram" : "shadow_foliage.frag",
+      "renderPass" : "Shadow",
+      "viewportSize": "ShadowMap",
+      "rasterizationState" : "DoubleSided",
+      "boundResources" : "ShadowFoliage"
+    },
+    {
+      "name" : "GBufferWater",
+      "baseVertexGpuProgram" : "gbuffer_water.vert",
+      "baseFragmentGpuProgram" : "gbuffer_water.frag",
+      "renderPass" : "GBufferTransparents",
+      "blendStates" : ["Default", "Default", "Default"],
+      "boundResources" : "GBufferWater"
+    },
+    {
+      "name" : "GBufferLayered",
+      "baseVertexGpuProgram" : "gbuffer_layered.vert",
+      "baseFragmentGpuProgram" : "gbuffer_layered.frag",
+      "renderPass" : "GBuffer",
+      "blendStates" : ["Default", "Default", "Default"],
+      "boundResources" : "GBufferLayered"
+    },
+    {
+      "name" : "PerPixelPicking",
+      "baseVertexGpuProgram" : "per_pixel_picking.vert",
+      "baseFragmentGpuProgram" : "per_pixel_picking.frag",
+      "renderPass" : "PerPixelPicking",
+      "viewportSize" : "PerPixelPicking",
+      "blendStates" : ["Default"],
+      "boundResources" : "PerPixelPicking"
+    }
+  ]
+}

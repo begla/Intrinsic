@@ -201,11 +201,12 @@ void GBuffer::render(float p_DeltaT)
 
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
-  RenderSystem::_visibleDrawCallsPerMaterialPass[0u][MaterialPass::kSurface]
-      .copy(visibleDrawCalls);
-  RenderSystem::_visibleDrawCallsPerMaterialPass[0u]
-                                                [MaterialPass::kSurfaceLayered]
-                                                    .copy(visibleDrawCalls);
+  RenderProcess::Default::_visibleDrawCallsPerMaterialPass
+      [0u][MaterialManager::getMaterialPassId(_N(GBuffer))]
+          .copy(visibleDrawCalls);
+  RenderProcess::Default::_visibleDrawCallsPerMaterialPass
+      [0u][MaterialManager::getMaterialPassId(_N(GBufferLayered))]
+          .copy(visibleDrawCalls);
 
   DrawCallManager::sortDrawCallsFrontToBack(visibleDrawCalls);
 

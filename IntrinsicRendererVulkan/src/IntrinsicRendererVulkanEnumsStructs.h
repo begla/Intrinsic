@@ -66,62 +66,6 @@ enum Enum
 };
 }
 
-namespace MaterialPass
-{
-enum Enum
-{
-  kSurface,
-  kShadow,
-
-  kSky,
-
-  kDebugGizmo,
-  kDebugGrid,
-
-  kFoliage,
-  kShadowFoliage,
-
-  kSurfaceWater,
-  kSurfaceLayered,
-
-  kPerPixelPicking,
-
-  kCount,
-  kNone
-};
-}
-
-namespace MaterialPassFlags
-{
-enum Flags
-{
-  kSurface = (1u << MaterialPass::kSurface),
-  kShadow = (1u << MaterialPass::kShadow),
-
-  kSky = (1u << MaterialPass::kSky),
-
-  kDebugGizmo = (1u << MaterialPass::kDebugGizmo),
-  kDebugGrid = (1u << MaterialPass::kDebugGrid),
-
-  kFoliage = (1u << MaterialPass::kFoliage),
-  kShadowFoliage = (1u << MaterialPass::kShadowFoliage),
-
-  kSurfaceWater = (1u << MaterialPass::kSurfaceWater),
-  kSurfaceLayered = (1u << MaterialPass::kSurfaceLayered),
-
-  kPerPixelPicking = (1u << MaterialPass::kPerPixelPicking),
-
-  kShadowedSurface = kSurface | kShadow,
-  kShadowedFoliage = kFoliage | kShadowFoliage,
-  kShadowedSurfaceLayered = kSurfaceLayered | kShadow,
-
-  kShadowedSurfaceWithPicking = kSurface | kShadow | kPerPixelPicking,
-  kShadowedFoliageWithPicking = kFoliage | kShadowFoliage | kPerPixelPicking,
-  kShadowedSurfaceLayeredWithPicking =
-      kSurfaceLayered | kShadow | kPerPixelPicking
-};
-}
-
 struct ResourceReleaseEntry
 {
   Intrinsic::Core::Name typeName;

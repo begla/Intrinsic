@@ -67,6 +67,7 @@ struct Manager
   static PresentMode::Enum _presentMode;
 
   static _INTR_STRING _rendererConfig;
+  static _INTR_STRING _materialPassConfig;
 };
 }
 }

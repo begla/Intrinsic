@@ -195,9 +195,9 @@ void PerPixelPicking::render(float p_DeltaT)
 
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
-  RenderSystem::_visibleDrawCallsPerMaterialPass[0u]
-                                                [MaterialPass::kPerPixelPicking]
-                                                    .copy(visibleDrawCalls);
+  RenderProcess::Default::_visibleDrawCallsPerMaterialPass
+      [0u][MaterialManager::getMaterialPassId(_N(PerPixelPicking))]
+          .copy(visibleDrawCalls);
 
   if (visibleDrawCalls.empty())
   {

@@ -25,8 +25,25 @@ namespace Vulkan
 namespace Resources
 {
 // Static members
-PipelineRef MaterialManager::_pipelines[MaterialPass::kCount];
-PipelineRef MaterialManager::_pipelineLayouts[MaterialPass::kCount];
+_INTR_ARRAY(MaterialPass::MaterialPass) MaterialManager::_materialPasses;
+_INTR_ARRAY(MaterialPass::BoundResources)
+MaterialManager::_materialPassBoundResources;
+_INTR_HASH_MAP(Name, MaterialResourceFunction)
+MaterialManager::_materialResourceFunctionMapping = {
+    {_N(MaterialAlbedo), MaterialManager::_descAlbedoTextureName},
+    {_N(MaterialNormal), MaterialManager::_descNormalTextureName},
+    {_N(MaterialRoughness), MaterialManager::_descPbrTextureName},
+    {_N(MaterialFoam), MaterialManager::_descFoamTextureName},
+    {_N(MaterialAlbedo1), MaterialManager::_descAlbedo1TextureName},
+    {_N(MaterialAlbedo2), MaterialManager::_descAlbedo2TextureName},
+    {_N(MaterialNormal1), MaterialManager::_descNormal1TextureName},
+    {_N(MaterialNormal2), MaterialManager::_descNormal2TextureName},
+    {_N(MaterialRoughness1), MaterialManager::_descPbr1TextureName},
+    {_N(MaterialRoughness2), MaterialManager::_descPbr2TextureName},
+    {_N(MaterialBlendMask), MaterialManager::_descBlendMaskTextureName}};
+_INTR_HASH_MAP(Name, uint8_t) MaterialManager::_materialPassMapping;
+_INTR_ARRAY(Dod::Ref) MaterialManager::_materialPassPipelines;
+_INTR_ARRAY(Dod::Ref) MaterialManager::_materialPassPipelineLayouts;
 
 // <-
 
@@ -64,411 +81,6 @@ void MaterialManager::init()
   }
 
   _defaultResourceName = _N(default);
-}
-
-void MaterialManager::initMaterialPasses()
-{
-  PipelineRefArray pipelinesToCreate;
-  PipelineLayoutRefArray pipelineLayoutsToCreate;
-
-  // Surface
-  {
-    _pipelineLayouts[MaterialPass::kSurface] =
-        PipelineLayoutManager::createPipelineLayout(_N(MaterialPassSurface));
-    PipelineLayoutManager::resetToDefault(
-        _pipelineLayouts[MaterialPass::kSurface]);
-
-    GpuProgramManager::reflectPipelineLayout(
-        _INTR_MAX_DRAW_CALL_COUNT,
-        {Resources::GpuProgramManager::getResourceByName("gbuffer.vert"),
-         GpuProgramManager::getResourceByName("gbuffer.frag")},
-        _pipelineLayouts[MaterialPass::kSurface]);
-
-    pipelineLayoutsToCreate.push_back(_pipelineLayouts[MaterialPass::kSurface]);
-  }
-
-  // Surface (Layered)
-  {
-    _pipelineLayouts[MaterialPass::kSurfaceLayered] =
-        PipelineLayoutManager::createPipelineLayout(_N(MaterialPassSurface));
-    PipelineLayoutManager::resetToDefault(
-        _pipelineLayouts[MaterialPass::kSurfaceLayered]);
-
-    GpuProgramManager::reflectPipelineLayout(
-        _INTR_MAX_DRAW_CALL_COUNT,
-        {Resources::GpuProgramManager::getResourceByName(
-             "gbuffer_layered.vert"),
-         GpuProgramManager::getResourceByName("gbuffer_layered.frag")},
-        _pipelineLayouts[MaterialPass::kSurfaceLayered]);
-
-    pipelineLayoutsToCreate.push_back(
-        _pipelineLayouts[MaterialPass::kSurfaceLayered]);
-  }
-
-  // Surface (Water)
-  {
-    _pipelineLayouts[MaterialPass::kSurfaceWater] =
-        PipelineLayoutManager::createPipelineLayout(_N(MaterialPassSurface));
-    PipelineLayoutManager::resetToDefault(
-        _pipelineLayouts[MaterialPass::kSurfaceWater]);
-
-    GpuProgramManager::reflectPipelineLayout(
-        _INTR_MAX_DRAW_CALL_COUNT,
-        {Resources::GpuProgramManager::getResourceByName("gbuffer_water.vert"),
-         GpuProgramManager::getResourceByName("gbuffer_water.frag")},
-        _pipelineLayouts[MaterialPass::kSurfaceWater]);
-
-    pipelineLayoutsToCreate.push_back(
-        _pipelineLayouts[MaterialPass::kSurfaceWater]);
-  }
-
-  // Shadow
-  {
-    _pipelineLayouts[MaterialPass::kShadow] =
-        PipelineLayoutManager::createPipelineLayout(_N(MaterialPassShadow));
-    PipelineLayoutManager::resetToDefault(
-        _pipelineLayouts[MaterialPass::kShadow]);
-
-    GpuProgramManager::reflectPipelineLayout(
-        _INTR_MAX_DRAW_CALL_COUNT,
-        {Resources::GpuProgramManager::getResourceByName("shadow.vert")},
-        _pipelineLayouts[MaterialPass::kShadow]);
-
-    pipelineLayoutsToCreate.push_back(_pipelineLayouts[MaterialPass::kShadow]);
-  }
-
-  // Shadow foliage
-  {
-    _pipelineLayouts[MaterialPass::kShadowFoliage] =
-        PipelineLayoutManager::createPipelineLayout(
-            _N(MaterialPassShadowFoliage));
-    PipelineLayoutManager::resetToDefault(
-        _pipelineLayouts[MaterialPass::kShadowFoliage]);
-
-    GpuProgramManager::reflectPipelineLayout(
-        _INTR_MAX_DRAW_CALL_COUNT,
-        {Resources::GpuProgramManager::getResourceByName("shadow_foliage.vert"),
-         GpuProgramManager::getResourceByName("shadow_foliage.frag")},
-        _pipelineLayouts[MaterialPass::kShadowFoliage]);
-
-    pipelineLayoutsToCreate.push_back(
-        _pipelineLayouts[MaterialPass::kShadowFoliage]);
-  }
-
-  // Per Pixel Picking
-  {
-    _pipelineLayouts[MaterialPass::kPerPixelPicking] =
-        PipelineLayoutManager::createPipelineLayout(
-            _N(MaterialPassPerPixelPicking));
-    PipelineLayoutManager::resetToDefault(
-        _pipelineLayouts[MaterialPass::kPerPixelPicking]);
-
-    GpuProgramManager::reflectPipelineLayout(
-        _INTR_MAX_DRAW_CALL_COUNT,
-        {Resources::GpuProgramManager::getResourceByName(
-             "per_pixel_picking.vert"),
-         GpuProgramManager::getResourceByName("per_pixel_picking.frag")},
-        _pipelineLayouts[MaterialPass::kPerPixelPicking]);
-
-    pipelineLayoutsToCreate.push_back(
-        _pipelineLayouts[MaterialPass::kPerPixelPicking]);
-  }
-
-  {
-    _pipelineLayouts[MaterialPass::kDebugGizmo] =
-        _pipelineLayouts[MaterialPass::kSurface];
-    _pipelineLayouts[MaterialPass::kDebugGrid] =
-        _pipelineLayouts[MaterialPass::kSurface];
-    _pipelineLayouts[MaterialPass::kSky] =
-        _pipelineLayouts[MaterialPass::kSurface];
-    _pipelineLayouts[MaterialPass::kFoliage] =
-        _pipelineLayouts[MaterialPass::kSurface];
-  }
-
-  // Surface
-  {
-    PipelineRef& pipeline = _pipelines[MaterialPass::kSurface];
-    pipeline = PipelineManager::createPipeline(_N(MaterialPassSurface));
-    PipelineManager::resetToDefault(pipeline);
-
-    PipelineManager::_descFragmentProgram(pipeline) =
-        GpuProgramManager::getResourceByName("gbuffer.frag");
-    PipelineManager::_descVertexProgram(pipeline) =
-        GpuProgramManager::getResourceByName("gbuffer.vert");
-    PipelineManager::_descRenderPass(pipeline) =
-        RenderPassManager::getResourceByName(_N(GBuffer));
-    PipelineManager::_descPipelineLayout(pipeline) =
-        _pipelineLayouts[MaterialPass::kSurface];
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-
-    PipelineManager::_descBlendStates(pipeline).clear();
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-
-    pipelinesToCreate.push_back(pipeline);
-  }
-
-  // Surface (Layered)
-  {
-    PipelineRef& pipeline = _pipelines[MaterialPass::kSurfaceLayered];
-    pipeline = PipelineManager::createPipeline(_N(MaterialPassSurface));
-    PipelineManager::resetToDefault(pipeline);
-
-    PipelineManager::_descFragmentProgram(pipeline) =
-        GpuProgramManager::getResourceByName("gbuffer_layered.frag");
-    PipelineManager::_descVertexProgram(pipeline) =
-        GpuProgramManager::getResourceByName("gbuffer_layered.vert");
-    PipelineManager::_descRenderPass(pipeline) =
-        RenderPassManager::getResourceByName(_N(GBuffer));
-    PipelineManager::_descPipelineLayout(pipeline) =
-        _pipelineLayouts[MaterialPass::kSurfaceLayered];
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-
-    PipelineManager::_descBlendStates(pipeline).clear();
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-
-    pipelinesToCreate.push_back(pipeline);
-  }
-
-  // Surface (Water)
-  {
-    PipelineRef& pipeline = _pipelines[MaterialPass::kSurfaceWater];
-    pipeline = PipelineManager::createPipeline(_N(MaterialPassSurface));
-    PipelineManager::resetToDefault(pipeline);
-
-    PipelineManager::_descFragmentProgram(pipeline) =
-        GpuProgramManager::getResourceByName("gbuffer_water.frag");
-    PipelineManager::_descVertexProgram(pipeline) =
-        GpuProgramManager::getResourceByName("gbuffer_water.vert");
-    PipelineManager::_descRenderPass(pipeline) =
-        RenderPassManager::getResourceByName(_N(GBufferTransparents));
-    PipelineManager::_descPipelineLayout(pipeline) =
-        _pipelineLayouts[MaterialPass::kSurfaceWater];
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-
-    PipelineManager::_descBlendStates(pipeline).clear();
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-
-    pipelinesToCreate.push_back(pipeline);
-  }
-
-  // Shadow (Foliage)
-  {
-    PipelineRef& pipeline = _pipelines[MaterialPass::kShadowFoliage];
-    pipeline = PipelineManager::createPipeline(_N(MaterialPassShadow));
-    PipelineManager::resetToDefault(pipeline);
-
-    PipelineManager::_descFragmentProgram(pipeline) =
-        GpuProgramManager::getResourceByName("shadow_foliage.frag");
-    PipelineManager::_descVertexProgram(pipeline) =
-        GpuProgramManager::getResourceByName("shadow_foliage.vert");
-    PipelineManager::_descRenderPass(pipeline) =
-        RenderPassManager::getResourceByName(_N(Shadow));
-    PipelineManager::_descPipelineLayout(pipeline) =
-        _pipelineLayouts[MaterialPass::kShadowFoliage];
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-    PipelineManager::_descRasterizationState(pipeline) =
-        RasterizationStates::kDoubleSided;
-    PipelineManager::_descScissorRenderSize(pipeline) = RenderSize::kCustom;
-    PipelineManager::_descViewportRenderSize(pipeline) = RenderSize::kCustom;
-    PipelineManager::_descAbsoluteScissorDimensions(pipeline) =
-        RenderPass::Shadow::_shadowMapSize;
-    PipelineManager::_descAbsoluteViewportDimensions(pipeline) =
-        RenderPass::Shadow::_shadowMapSize;
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-    PipelineManager::_descBlendStates(pipeline).clear();
-
-    pipelinesToCreate.push_back(pipeline);
-  }
-
-  // Shadow
-  {
-    PipelineRef& pipeline = _pipelines[MaterialPass::kShadow];
-    pipeline = PipelineManager::createPipeline(_N(MaterialPassShadow));
-    PipelineManager::resetToDefault(pipeline);
-
-    PipelineManager::_descVertexProgram(pipeline) =
-        GpuProgramManager::getResourceByName("shadow.vert");
-    PipelineManager::_descRenderPass(pipeline) =
-        RenderPassManager::getResourceByName(_N(Shadow));
-    PipelineManager::_descPipelineLayout(pipeline) =
-        _pipelineLayouts[MaterialPass::kShadow];
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-    PipelineManager::_descScissorRenderSize(pipeline) = RenderSize::kCustom;
-    PipelineManager::_descViewportRenderSize(pipeline) = RenderSize::kCustom;
-    PipelineManager::_descAbsoluteScissorDimensions(pipeline) =
-        RenderPass::Shadow::_shadowMapSize;
-    PipelineManager::_descAbsoluteViewportDimensions(pipeline) =
-        RenderPass::Shadow::_shadowMapSize;
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-    PipelineManager::_descBlendStates(pipeline).clear();
-
-    pipelinesToCreate.push_back(pipeline);
-  }
-
-  // Gizmo
-  {
-    PipelineRef& pipeline = _pipelines[MaterialPass::kDebugGizmo];
-    pipeline = PipelineManager::createPipeline(_N(MaterialPassGizmo));
-    PipelineManager::resetToDefault(pipeline);
-
-    PipelineManager::_descFragmentProgram(pipeline) =
-        GpuProgramManager::getResourceByName("gizmo.frag");
-    PipelineManager::_descVertexProgram(pipeline) =
-        GpuProgramManager::getResourceByName("gizmo.vert");
-    PipelineManager::_descRenderPass(pipeline) =
-        RenderPassManager::getResourceByName(_N(GBuffer));
-    PipelineManager::_descPipelineLayout(pipeline) =
-        _pipelineLayouts[MaterialPass::kDebugGizmo];
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-
-    PipelineManager::_descBlendStates(pipeline).clear();
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-
-    pipelinesToCreate.push_back(pipeline);
-  }
-
-  // Grid
-  {
-    PipelineRef& pipeline = _pipelines[MaterialPass::kDebugGrid];
-    pipeline = PipelineManager::createPipeline(_N(MaterialPassGrid));
-    PipelineManager::resetToDefault(pipeline);
-
-    PipelineManager::_descFragmentProgram(pipeline) =
-        GpuProgramManager::getResourceByName("grid.frag");
-    PipelineManager::_descVertexProgram(pipeline) =
-        GpuProgramManager::getResourceByName("grid.vert");
-    PipelineManager::_descRenderPass(pipeline) =
-        RenderPassManager::getResourceByName(_N(GBuffer));
-    PipelineManager::_descPipelineLayout(pipeline) =
-        _pipelineLayouts[MaterialPass::kDebugGrid];
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-
-    PipelineManager::_descBlendStates(pipeline).clear();
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-
-    pipelinesToCreate.push_back(pipeline);
-  }
-
-  // Sky
-  {
-    PipelineRef& pipeline = _pipelines[MaterialPass::kSky];
-    pipeline = PipelineManager::createPipeline(_N(MaterialPassSky));
-    PipelineManager::resetToDefault(pipeline);
-
-    PipelineManager::_descFragmentProgram(pipeline) =
-        GpuProgramManager::getResourceByName("sky.frag");
-    PipelineManager::_descVertexProgram(pipeline) =
-        GpuProgramManager::getResourceByName("sky.vert");
-    PipelineManager::_descRenderPass(pipeline) =
-        RenderPassManager::getResourceByName(_N(Sky));
-    PipelineManager::_descPipelineLayout(pipeline) =
-        _pipelineLayouts[MaterialPass::kSky];
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-    PipelineManager::_descDepthStencilState(pipeline) =
-        DepthStencilStates::kDefaultNoWrite;
-    PipelineManager::_descRasterizationState(pipeline) =
-        RasterizationStates::kInvertedCulling;
-
-    PipelineManager::_descBlendStates(pipeline).clear();
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-
-    pipelinesToCreate.push_back(pipeline);
-  }
-
-  // Foliage
-  {
-    PipelineRef& pipeline = _pipelines[MaterialPass::kFoliage];
-    pipeline = PipelineManager::createPipeline(_N(MaterialPassFoliage));
-    PipelineManager::resetToDefault(pipeline);
-
-    PipelineManager::_descFragmentProgram(pipeline) =
-        GpuProgramManager::getResourceByName("foliage.frag");
-    PipelineManager::_descVertexProgram(pipeline) =
-        GpuProgramManager::getResourceByName("foliage.vert");
-    PipelineManager::_descRenderPass(pipeline) =
-        RenderPassManager::getResourceByName(_N(Foliage));
-    PipelineManager::_descPipelineLayout(pipeline) =
-        _pipelineLayouts[MaterialPass::kFoliage];
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-    PipelineManager::_descRasterizationState(pipeline) =
-        RasterizationStates::kDoubleSided;
-
-    PipelineManager::_descBlendStates(pipeline).clear();
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-    PipelineManager::_descBlendStates(pipeline).push_back(
-        BlendStates::kDefault);
-
-    pipelinesToCreate.push_back(pipeline);
-  }
-
-  // Per Pixel Picking
-  {
-    PipelineRef& pipeline = _pipelines[MaterialPass::kPerPixelPicking];
-    pipeline = PipelineManager::createPipeline(_N(MaterialPassPerPixelPicking));
-    PipelineManager::resetToDefault(pipeline);
-
-    PipelineManager::_descFragmentProgram(pipeline) =
-        GpuProgramManager::getResourceByName("per_pixel_picking.frag");
-    PipelineManager::_descVertexProgram(pipeline) =
-        GpuProgramManager::getResourceByName("per_pixel_picking.vert");
-    PipelineManager::_descRenderPass(pipeline) =
-        RenderPassManager::getResourceByName(_N(PerPixelPicking));
-    PipelineManager::_descPipelineLayout(pipeline) =
-        _pipelineLayouts[MaterialPass::kPerPixelPicking];
-    PipelineManager::_descScissorRenderSize(pipeline) = RenderSize::kCustom;
-    PipelineManager::_descViewportRenderSize(pipeline) = RenderSize::kCustom;
-    PipelineManager::_descAbsoluteScissorDimensions(pipeline) =
-        RenderPass::PerPixelPicking::_perPixelPickingSize;
-    PipelineManager::_descAbsoluteViewportDimensions(pipeline) =
-        RenderPass::PerPixelPicking::_perPixelPickingSize;
-    PipelineManager::_descVertexLayout(pipeline) =
-        VertexLayoutManager::getResourceByName(_N(Mesh));
-
-    pipelinesToCreate.push_back(pipeline);
-  }
-
-  PipelineLayoutManager::createResources(pipelineLayoutsToCreate);
-  PipelineManager::createResources(pipelinesToCreate);
 }
 
 void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
@@ -579,6 +191,245 @@ void MaterialManager::destroyResources(const MaterialRefArray& p_Materials)
       materialBufferEntryIdx = (uint32_t)-1;
     }
   }
+}
+
+// <-
+
+void MaterialManager::loadMaterialPassConfig()
+{
+  const _INTR_STRING materialPassConfigFilePath =
+      "config/" + Settings::Manager::_materialPassConfig;
+
+  rapidjson::Document materialPassConfig;
+  {
+    FILE* fp = fopen(materialPassConfigFilePath.c_str(), "rb");
+
+    if (fp == nullptr)
+    {
+      _INTR_LOG_WARNING("Failed to load renderer config from file '%s'...",
+                        Settings::Manager::_rendererConfig.c_str());
+      return;
+    }
+
+    char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+    {
+      rapidjson::FileReadStream is(fp, readBuffer, 65536u);
+      materialPassConfig.ParseStream(is);
+      fclose(fp);
+    }
+    Tlsf::MainAllocator::free(readBuffer);
+  }
+
+  _INTR_LOG_INFO("Loading material pass config '%s'...",
+                 materialPassConfig["name"].GetString());
+
+  // Cleanup existing material pass data
+  _materialPasses.clear();
+  _materialPassBoundResources.clear();
+
+  Resources::PipelineManager::destroyPipelinesAndResources(
+      _materialPassPipelines);
+  _materialPassPipelines.clear();
+  Resources::PipelineLayoutManager::destroyPipelineLayoutsAndResources(
+      _materialPassPipelineLayouts);
+  _materialPassPipelineLayouts.clear();
+
+  // Load bound resources
+  {
+    rapidjson::Value& boundResourcesDesc = materialPassConfig["boundResources"];
+
+    for (uint32_t boundResourcesIdx = 0u;
+         boundResourcesIdx < boundResourcesDesc.Size(); ++boundResourcesIdx)
+    {
+      rapidjson::Value& boundResourceDesc =
+          boundResourcesDesc[boundResourcesIdx];
+      rapidjson::Value& resourceEntriesDesc = boundResourceDesc["resources"];
+
+      MaterialPass::BoundResources boundResources = {};
+      {
+        boundResources.name = boundResourceDesc["name"].GetString();
+
+        for (uint32_t resourceEntryIdx = 0u;
+             resourceEntryIdx < resourceEntriesDesc.Size(); ++resourceEntryIdx)
+        {
+          rapidjson::Value& resourceEntryDesc =
+              resourceEntriesDesc[resourceEntryIdx];
+
+          MaterialPass::BoundResourceEntry entry = {};
+          {
+            entry.resourceName = resourceEntryDesc[1].GetString();
+            entry.shaderStage = Helper::mapStringGpuProgramTypeToGpuProgramType(
+                resourceEntryDesc[3].GetString());
+            entry.slotName = resourceEntryDesc[2].GetString();
+
+            if (resourceEntryDesc[0] == "Buffer")
+              entry.type = MaterialPass::BoundResourceType::kBuffer;
+            else if (resourceEntryDesc[0] == "Image")
+              entry.type = MaterialPass::BoundResourceType::kImage;
+            else
+              _INTR_ASSERT(false && "Bound resource type unknown");
+          }
+
+          boundResources.boundResourceEntries.push_back(entry);
+        }
+      }
+
+      _materialPassBoundResources.push_back(std::move(boundResources));
+    }
+  }
+
+  // Load material passes
+  {
+    rapidjson::Value& materialPassesDesc = materialPassConfig["materialPasses"];
+
+    for (uint32_t i = 0u; i < materialPassesDesc.Size(); ++i)
+    {
+      rapidjson::Value& materialPassDesc = materialPassesDesc[i];
+      const Name materialPassName = materialPassDesc["name"].GetString();
+
+      MaterialPass::MaterialPass matPass = {};
+      {
+        for (uint32_t i = 0u; i < _materialPassBoundResources.size(); ++i)
+        {
+          if (_materialPassBoundResources[i].name ==
+              materialPassDesc["boundResources"].GetString())
+          {
+            matPass.boundResoucesIdx = i;
+            break;
+          }
+        }
+
+        // Pipeline layout
+        Resources::PipelineLayoutRef pipelineLayoutRef;
+        {
+          pipelineLayoutRef =
+              PipelineLayoutManager::createPipelineLayout(materialPassName);
+          PipelineLayoutManager::resetToDefault(pipelineLayoutRef);
+
+          GpuProgramRefArray programsToReflect;
+          if (materialPassDesc.HasMember("baseFragmentGpuProgram"))
+          {
+            GpuProgramRef fragmentProgram =
+                Resources::GpuProgramManager::getResourceByName(
+                    materialPassDesc["baseFragmentGpuProgram"].GetString());
+            programsToReflect.push_back(fragmentProgram);
+          }
+          if (materialPassDesc.HasMember("baseVertexGpuProgram"))
+          {
+            GpuProgramRef vertexProgram =
+                Resources::GpuProgramManager::getResourceByName(
+                    materialPassDesc["baseVertexGpuProgram"].GetString());
+            programsToReflect.push_back(vertexProgram);
+          }
+
+          GpuProgramManager::reflectPipelineLayout(
+              _INTR_MAX_DRAW_CALL_COUNT, programsToReflect, pipelineLayoutRef);
+
+          _materialPassPipelineLayouts.push_back(pipelineLayoutRef);
+          matPass.pipelineLayoutIdx =
+              (uint8_t)(_materialPassPipelineLayouts.size() - 1u);
+        }
+
+        // Pipeline
+        PipelineRef pipelineRef;
+        {
+          pipelineRef = PipelineManager::createPipeline(materialPassName);
+          PipelineManager::resetToDefault(pipelineRef);
+
+          if (materialPassDesc.HasMember("baseFragmentGpuProgram"))
+          {
+            PipelineManager::_descFragmentProgram(pipelineRef) =
+                GpuProgramManager::getResourceByName(
+                    materialPassDesc["baseFragmentGpuProgram"].GetString());
+          }
+          if (materialPassDesc.HasMember("baseVertexGpuProgram"))
+          {
+            PipelineManager::_descVertexProgram(pipelineRef) =
+                GpuProgramManager::getResourceByName(
+                    materialPassDesc["baseVertexGpuProgram"].GetString());
+          }
+          PipelineManager::_descRenderPass(pipelineRef) =
+              RenderPassManager::getResourceByName(
+                  materialPassDesc["renderPass"].GetString());
+          PipelineManager::_descPipelineLayout(pipelineRef) = pipelineLayoutRef;
+          PipelineManager::_descVertexLayout(pipelineRef) =
+              VertexLayoutManager::getResourceByName(_N(Mesh));
+
+          if (materialPassDesc.HasMember("viewportSize"))
+          {
+            PipelineManager::_descScissorRenderSize(pipelineRef) =
+                RenderSize::kCustom;
+            PipelineManager::_descViewportRenderSize(pipelineRef) =
+                RenderSize::kCustom;
+
+            glm::uvec2 dim = RenderSystem::_backbufferDimensions;
+            if (materialPassDesc["viewportSize"] == "ShadowMap")
+            {
+              dim = RenderPass::Shadow::_shadowMapSize;
+            }
+            else if (materialPassDesc["viewportSize"] == "PerPixelPicking")
+            {
+              dim = RenderPass::PerPixelPicking::_perPixelPickingSize;
+            }
+            else
+            {
+              _INTR_ASSERT(false && "Unknown view port size");
+            }
+
+            PipelineManager::_descAbsoluteScissorDimensions(pipelineRef) = dim;
+            PipelineManager::_descAbsoluteViewportDimensions(pipelineRef) = dim;
+          }
+
+          // TODO: Clean this up
+          if (materialPassDesc.HasMember("rasterizationState"))
+          {
+            if (materialPassDesc["rasterizationState"] == "InvertedCulling")
+            {
+              PipelineManager::_descRasterizationState(pipelineRef) =
+                  RasterizationStates::kInvertedCulling;
+            }
+            else if (materialPassDesc["rasterizationState"] == "DoubleSided")
+            {
+              PipelineManager::_descRasterizationState(pipelineRef) =
+                  RasterizationStates::kDoubleSided;
+            }
+          }
+
+          if (materialPassDesc.HasMember("depthStencilState"))
+          {
+            if (materialPassDesc["depthStencilState"] == "DefaultNoWrite")
+            {
+              PipelineManager::_descDepthStencilState(pipelineRef) =
+                  DepthStencilStates::kDefaultNoWrite;
+            }
+          }
+
+          PipelineManager::_descBlendStates(pipelineRef).clear();
+          if (materialPassDesc.HasMember("blendStates"))
+          {
+            for (uint32_t i = 0u; i < materialPassDesc["blendStates"].Size();
+                 ++i)
+            {
+              PipelineManager::_descBlendStates(pipelineRef)
+                  .push_back(BlendStates::kDefault);
+            }
+          }
+
+          _materialPassPipelines.push_back(pipelineRef);
+          matPass.pipelineIdx = (uint8_t)(_materialPassPipelines.size() - 1u);
+        }
+
+        _materialPasses.push_back(matPass);
+        _materialPassMapping[materialPassName] =
+            (uint8_t)(_materialPasses.size() - 1u);
+      }
+    }
+  }
+
+  PipelineLayoutManager::createResources(_materialPassPipelineLayouts);
+  PipelineManager::createResources(_materialPassPipelineLayouts);
+
+  DrawCallManager::_drawCallsPerMaterialPass.resize(_materialPasses.size());
 }
 }
 }
