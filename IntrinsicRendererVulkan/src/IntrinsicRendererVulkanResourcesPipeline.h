@@ -189,7 +189,7 @@ struct PipelineManager
   // <-
 
   _INTR_INLINE static void
-  destroyPipelinesAndResources(const FramebufferRefArray& p_Pipelines)
+  destroyPipelinesAndResources(const PipelineRefArray& p_Pipelines)
   {
     destroyResources(p_Pipelines);
 

@@ -34,6 +34,7 @@ uint32_t Manager::_screenResolutionWidth = 1280u;
 uint32_t Manager::_screenResolutionHeight = 720u;
 PresentMode::Enum Manager::_presentMode = PresentMode::kFifo;
 _INTR_STRING Manager::_rendererConfig = "renderer_config.json";
+_INTR_STRING Manager::_materialPassConfig = "material_pass_config.json";
 
 namespace
 {
@@ -96,6 +97,7 @@ void Manager::loadSettings()
       _rendererFlags &= ~RendererFlags::kValidationEnabled;
 
     readSetting(doc, _N(rendererConfig), _rendererConfig);
+    readSetting(doc, _N(materialPassConfig), _materialPassConfig);
     readSetting(doc, _N(targetFrameRate), _targetFrameRate);
     readSetting(doc, _N(windowMode), (uint32_t&)_windowMode);
     readSetting(doc, _N(screenResolutionWidth), _screenResolutionWidth);

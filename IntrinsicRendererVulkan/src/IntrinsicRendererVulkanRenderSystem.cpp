@@ -57,14 +57,6 @@ uint32_t RenderSystem::_backbufferIndex = 0u;
 uint32_t RenderSystem::_activeBackbufferMask = 0u;
 Format::Enum RenderSystem::_depthStencilFormatToUse = Format::kD32SFloat;
 
-// <-
-
-LockFreeStack<Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT> RenderSystem::
-    _visibleDrawCallsPerMaterialPass[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT]
-                                    [MaterialPass::kCount];
-LockFreeStack<Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT>
-    RenderSystem::_visibleMeshComponents[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT];
-
 // Private static members
 VkCommandPool RenderSystem::_vkPrimaryCommandPool;
 _INTR_ARRAY(VkCommandPool) RenderSystem::_vkSecondaryCommandPools;
@@ -181,7 +173,7 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
   {
     _INTR_PROFILE_AUTO("Init. Materials");
 
-    MaterialManager::initMaterialPasses();
+    MaterialManager::loadMaterialPassConfig();
     MaterialManager::createAllResources();
   }
 

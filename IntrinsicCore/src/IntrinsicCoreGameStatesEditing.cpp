@@ -582,7 +582,8 @@ void Editing::init()
             _N(TranslateGizmo), meshRefGizmo,
             Renderer::Vulkan::Resources::MaterialManager::getResourceByName(
                 _N(gizmo)),
-            Renderer::Vulkan::MaterialPass::kDebugGizmo,
+            Renderer::Vulkan::Resources::MaterialManager::getMaterialPassId(
+                _N(DebugGizmo)),
             sizeof(PerInstanceDataGizmoVertex),
             sizeof(PerInstanceDataGizmoFragment));
     drawCallsToCreate.push_back(_drawCallRefGizmo);
@@ -592,7 +593,8 @@ void Editing::init()
             _N(Grid), meshRefGrid,
             Renderer::Vulkan::Resources::MaterialManager::getResourceByName(
                 _N(grid)),
-            Renderer::Vulkan::MaterialPass::kDebugGrid,
+            Renderer::Vulkan::Resources::MaterialManager::getMaterialPassId(
+                _N(DebugGrid)),
             sizeof(PerInstanceDataGridVertex),
             sizeof(PerInstanceDataGridFragment));
     drawCallsToCreate.push_back(_drawCallRefGrid);

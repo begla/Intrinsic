@@ -174,6 +174,11 @@ _INTR_INLINE void executeRenderSteps(float p_DeltaT)
 
 // Static members
 Dod::RefArray Default::_activeFrustums;
+LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>
+    RenderProcess::Default::_visibleDrawCallsPerMaterialPass
+        [_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT][_INTR_MAX_MATERIAL_PASS_COUNT];
+LockFreeStack<Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT> RenderProcess::Default::
+    _visibleMeshComponents[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT];
 
 // <-
 
@@ -188,11 +193,14 @@ void Default::load()
 
   rapidjson::Document rendererConfig;
   {
-    FILE* fp = fopen(Settings::Manager::_rendererConfig.c_str(), "rb");
+    const _INTR_STRING rendererConfigFilePath =
+        "config/" + Settings::Manager::_rendererConfig;
+
+    FILE* fp = fopen(rendererConfigFilePath.c_str(), "rb");
 
     if (fp == nullptr)
     {
-      _INTR_LOG_WARNING("Failed to load resources from file '%s'...",
+      _INTR_LOG_WARNING("Failed to load renderer config from file '%s'...",
                         Settings::Manager::_rendererConfig.c_str());
       return;
     }
@@ -208,6 +216,7 @@ void Default::load()
 
   _INTR_LOG_INFO("Loading renderer config '%s'...",
                  rendererConfig["name"].GetString());
+
   const rapidjson::Value& renderSteps = rendererConfig["renderSteps"];
   const rapidjson::Value& uniformBuffers = rendererConfig["uniformBuffers"];
 

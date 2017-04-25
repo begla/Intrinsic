@@ -40,7 +40,7 @@ void Sky::init()
 
   // Render passes
   {
-    _renderPassRef = RenderPassManager::createRenderPass(_N(Sky));
+    _renderPassRef = RenderPassManager::createRenderPass(_N(GBufferSky));
     RenderPassManager::resetToDefault(_renderPassRef);
 
     AttachmentDescription albedoAttachment = {Format::kR16G16B16A16Float, 0u};
@@ -81,7 +81,7 @@ void Sky::updateResolutionDependentResources()
                               RenderSystem::_backbufferDimensions.y);
 
   // Create framebuffer
-  _framebufferRef = FramebufferManager::createFramebuffer(_N(Sky));
+  _framebufferRef = FramebufferManager::createFramebuffer(_N(GBufferSky));
   {
     FramebufferManager::resetToDefault(_framebufferRef);
     FramebufferManager::addResourceFlags(
@@ -114,8 +114,9 @@ void Sky::render(float p_DeltaT)
 
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
-  RenderSystem::_visibleDrawCallsPerMaterialPass[0u][MaterialPass::kSky].copy(
-      visibleDrawCalls);
+  RenderProcess::Default::_visibleDrawCallsPerMaterialPass
+      [0u][MaterialManager::getMaterialPassId(_N(GBufferSky))]
+          .copy(visibleDrawCalls);
 
   if (visibleDrawCalls.empty())
   {

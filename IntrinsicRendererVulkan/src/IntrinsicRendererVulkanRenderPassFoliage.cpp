@@ -43,7 +43,7 @@ void Foliage::init()
 
   // Render passes
   {
-    _renderPassRef = RenderPassManager::createRenderPass(_N(Foliage));
+    _renderPassRef = RenderPassManager::createRenderPass(_N(GBufferFoliage));
     RenderPassManager::resetToDefault(_renderPassRef);
 
     AttachmentDescription albedoAttachment = {Format::kR16G16B16A16Float, 0u};
@@ -93,7 +93,7 @@ void Foliage::updateResolutionDependentResources()
                               RenderSystem::_backbufferDimensions.y);
 
   // Create framebuffer
-  _framebufferRef = FramebufferManager::createFramebuffer(_N(Foliage));
+  _framebufferRef = FramebufferManager::createFramebuffer(_N(GBufferFoliage));
   {
     FramebufferManager::resetToDefault(_framebufferRef);
     FramebufferManager::addResourceFlags(
@@ -130,8 +130,9 @@ void Foliage::render(float p_DeltaT)
 
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
-  RenderSystem::_visibleDrawCallsPerMaterialPass[0u][MaterialPass::kFoliage]
-      .copy(visibleDrawCalls);
+  RenderProcess::Default::_visibleDrawCallsPerMaterialPass
+      [0u][MaterialManager::getMaterialPassId(_N(GBufferFoliage))]
+          .copy(visibleDrawCalls);
 
   if (visibleDrawCalls.empty())
   {
@@ -150,7 +151,7 @@ void Foliage::render(float p_DeltaT)
   {
     DrawCallDispatcher::queueDrawCalls(visibleDrawCalls, _renderPassRef,
                                        _framebufferRef);
-    _INTR_PROFILE_COUNTER_SET("Dispatched Draw Calls (Foliage)",
+    _INTR_PROFILE_COUNTER_SET("Dispatched Draw Calls (GBuffer Foliage)",
                               DrawCallDispatcher::_dispatchedDrawCallCount);
   }
   RenderSystem::endRenderPass(_renderPassRef);

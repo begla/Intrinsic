@@ -204,9 +204,9 @@ void GBufferTransparents::render(float p_DeltaT)
 
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
-  RenderSystem::_visibleDrawCallsPerMaterialPass[0u]
-                                                [MaterialPass::kSurfaceWater]
-                                                    .copy(visibleDrawCalls);
+  RenderProcess::Default::_visibleDrawCallsPerMaterialPass
+      [0u][MaterialManager::getMaterialPassId(_N(GBufferWater))]
+          .copy(visibleDrawCalls);
 
   DrawCallManager::sortDrawCallsBackToFront(visibleDrawCalls);
 

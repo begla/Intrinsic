@@ -245,7 +245,7 @@ struct DrawCallManager
     _descVertexBuffers(p_Ref).clear();
     _descIndexBuffer(p_Ref) = BufferRef();
     _descMaterial(p_Ref) = Dod::Ref();
-    _descMaterialPass(p_Ref) = MaterialPass::kNone;
+    _descMaterialPass(p_Ref) = 0u;
     _descMeshComponent(p_Ref) = Dod::Ref();
   }
 
@@ -336,7 +336,6 @@ struct DrawCallManager
 
       // Remove from per material pass array
       uint8_t materialPass = _descMaterialPass(drawCallRef);
-      if (materialPass != MaterialPass::kNone)
       {
         uint32_t dcCount =
             (uint32_t)_drawCallsPerMaterialPass[materialPass].size();
@@ -500,8 +499,7 @@ struct DrawCallManager
   // <-
 
   // Static members
-  static _INTR_ARRAY(DrawCallRef)
-      _drawCallsPerMaterialPass[MaterialPass::kCount];
+  static _INTR_ARRAY(_INTR_ARRAY(DrawCallRef)) _drawCallsPerMaterialPass;
 };
 }
 }

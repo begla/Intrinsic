@@ -24,6 +24,7 @@ namespace Resources
 {
 typedef Dod::Ref MaterialRef;
 typedef Dod::RefArray MaterialRefArray;
+typedef Name& (*MaterialResourceFunction)(Dod::Ref);
 
 struct PerMaterialDataVertex
 {
@@ -38,6 +39,39 @@ struct PerMaterialDataFragment
 
   uint32_t data0[4];
 };
+
+namespace MaterialPass
+{
+namespace BoundResourceType
+{
+enum Enum
+{
+  kImage,
+  kBuffer
+};
+}
+
+struct MaterialPass
+{
+  uint8_t pipelineIdx;
+  uint8_t pipelineLayoutIdx;
+  uint8_t boundResoucesIdx;
+};
+
+struct BoundResourceEntry
+{
+  uint8_t type;
+  uint8_t shaderStage;
+  Name resourceName;
+  Name slotName;
+};
+
+struct BoundResources
+{
+  Name name;
+  _INTR_ARRAY(BoundResourceEntry) boundResourceEntries;
+};
+}
 
 struct MaterialData : Dod::Resources::ResourceDataBase
 {
@@ -144,7 +178,7 @@ struct MaterialManager
     _descPbrBias(p_Ref) = glm::vec3(0.0f);
     _descUvAnimation(p_Ref) = glm::vec2(0.0f);
 
-    _descMaterialPassMask(p_Ref) = MaterialPassFlags::kShadowedSurface;
+    _descMaterialPassMask(p_Ref) = 3u; // Shadowed surface
   }
 
   _INTR_INLINE static void destroyMaterial(MaterialRef p_Ref)
@@ -196,9 +230,10 @@ struct MaterialManager
 
     // Surface / Foliage properties
     if ((_descMaterialPassMask(p_Ref) &
-         (MaterialPassFlags::kSurface | MaterialPassFlags::kFoliage |
-          MaterialPassFlags::kSurfaceWater |
-          MaterialPassFlags::kSurfaceLayered)) != 0u)
+         (getMaterialPassFlag(_N(GBuffer)) |
+          getMaterialPassFlag(_N(GBufferFoliage)) |
+          getMaterialPassFlag(_N(GBufferWater)) |
+          getMaterialPassFlag(_N(GBufferLayered)))) != 0u)
     {
       p_Properties.AddMember(
           "normalTextureName",
@@ -219,8 +254,8 @@ struct MaterialManager
     }
 
     // Surface (Layered)
-    if ((_descMaterialPassMask(p_Ref) & (MaterialPassFlags::kSurfaceLayered)) !=
-        0u)
+    if ((_descMaterialPassMask(p_Ref) &
+         getMaterialPassFlag(_N(GBufferLayered))) != 0u)
     {
       p_Properties.AddMember("albedo1TextureName",
                              _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
@@ -267,8 +302,8 @@ struct MaterialManager
     }
 
     // Surface (Water)
-    if ((_descMaterialPassMask(p_Ref) & (MaterialPassFlags::kSurfaceWater)) !=
-        0u)
+    if ((_descMaterialPassMask(p_Ref) &
+         getMaterialPassFlag(_N(GBufferWater))) != 0u)
     {
       p_Properties.AddMember("foamTextureName",
                              _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
@@ -395,6 +430,17 @@ struct MaterialManager
   static void createResources(const MaterialRefArray& p_Materials);
   static void destroyResources(const MaterialRefArray& p_Materials);
 
+  _INTR_INLINE static uint8_t getMaterialPassId(const Name& p_Name)
+  {
+    return _materialPassMapping[p_Name];
+  }
+  _INTR_INLINE static uint32_t getMaterialPassFlag(const Name& p_Name)
+  {
+    return (1u << getMaterialPassId(p_Name));
+  }
+
+  static void loadMaterialPassConfig();
+
   // Getter/Setter
   // ->
 
@@ -493,8 +539,14 @@ struct MaterialManager
 
   // <-
 
-  static PipelineRef _pipelines[MaterialPass::kCount];
-  static PipelineRef _pipelineLayouts[MaterialPass::kCount];
+  static _INTR_ARRAY(MaterialPass::MaterialPass) _materialPasses;
+  static _INTR_ARRAY(Dod::Ref) _materialPassPipelines;
+  static _INTR_ARRAY(Dod::Ref) _materialPassPipelineLayouts;
+  static _INTR_HASH_MAP(Name, uint8_t) _materialPassMapping;
+
+  static _INTR_ARRAY(MaterialPass::BoundResources) _materialPassBoundResources;
+  static _INTR_HASH_MAP(Name, MaterialResourceFunction)
+      _materialResourceFunctionMapping;
 };
 }
 }
