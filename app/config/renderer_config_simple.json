@@ -10,33 +10,20 @@
 	],
 	"renderSteps" : [
 		{
-			"type" : "RenderPassGBuffer"
-		},
-		{
-			"type" : "RenderPassFoliage"
-		},
-		{
-			"type" : "RenderPassSky"
-		},
-		{
-			"type" : "ImageMemoryBarrier",
-			"image" : "GBufferAlbedo",
-			"sourceImageLayout" : "ColorAttachment",
-			"targetImageLayout" : "ShaderReadOnly"
-		},
-		{
-			"type" : "RenderPassGenericFullscreen",
+			"type" : "RenderPassGenericMesh",
 			"images" : [
+				{
+					"name" : "GBufferDepth",
+					"renderSize" : "Full",
+					"imageFormat" : "Depth"
+				}
 			],
-			"name" : "PostCombine",
-			"fragmentGpuProgram" : "blit.frag",
-			"viewportRenderSize" : "Full",
-			"perInstanceDataBufferName" : "Dummy",
-			"inputs" : [
-				["Image", "GBufferAlbedo", "inputTex", "Fragment", "NearestClamp"]
-			],
+			"name" : "GBuffer",
+			"materialPasses" : ["GBuffer", "GBufferLayered"],
+			"renderOrder" : "FrontToBack",
 			"outputs" : [
-				["Image", "Backbuffer"]
+				["Image", "Backbuffer", [0.2, 0.4, 1.0, 1.0]],
+				["Image", "GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
 			]
 		}
 	]
