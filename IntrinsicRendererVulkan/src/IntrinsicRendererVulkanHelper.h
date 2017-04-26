@@ -230,6 +230,8 @@ _INTR_INLINE VkFormat mapFormatToVkFormat(Format::Enum p_Format)
     return VK_FORMAT_R32_SFLOAT;
   case Format::kR32UInt:
     return VK_FORMAT_R32_UINT;
+  case Format::kB10G11R11UFloat:
+    return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
 
   case Format::kD24UnormS8UInt:
     return VK_FORMAT_D24_UNORM_S8_UINT;
@@ -620,7 +622,8 @@ _INTR_INLINE static Format::Enum mapFormat(const _INTR_STRING& p_Format)
                  {"D32SFloatS8UInt", Format::kD32SFloatS8UInt},
                  {"D32SFloat", Format::kD32SFloat},
                  {"D16UNorm", Format::kD16UNorm},
-                 {"R16G16B16A16Float", Format::kR16G16B16A16Float}};
+                 {"R16G16B16A16Float", Format::kR16G16B16A16Float},
+                 {"B10G11R11UFloat", Format::kB10G11R11UFloat}};
 
   auto format = formats.find(p_Format);
   if (format != formats.end())
