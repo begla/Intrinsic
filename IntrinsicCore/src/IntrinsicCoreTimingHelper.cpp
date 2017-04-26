@@ -35,7 +35,8 @@ void timerStart()
 uint32_t timerEnd()
 {
   --currentTimerIndex;
-  return (getMicroseconds() - previousCounter[currentTimerIndex]) / 1000u;
+  return (uint32_t)(getMicroseconds() - previousCounter[currentTimerIndex]) /
+         1000u;
 }
 
 void sleep(uint32_t p_Ms)
