@@ -33,6 +33,8 @@ private:
   Resources::PipelineRef _pipelineRef;
   Resources::PipelineLayoutRef _pipelineLayoutRef;
   Resources::DrawCallRef _drawCallRef;
+
+  Name _perInstanceDataBufferName;
 };
 }
 }

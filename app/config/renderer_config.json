@@ -18,7 +18,62 @@
 	],
 	"renderSteps" : [
 		{
-			"type" : "RenderPassGBuffer"
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferAlbedo",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferNormal",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferParameter0",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferDepth",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "DepthStencilAttachment"
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"images" : [
+				{
+					"name" : "GBufferAlbedo",
+					"renderSize" : "Full",
+					"imageFormat" : "R16G16B16A16Float"
+				},
+				{
+					"name" : "GBufferNormal",
+					"renderSize" : "Full",
+					"imageFormat" : "R16G16B16A16Float"
+				},
+				{
+					"name" : "GBufferParameter0",
+					"renderSize" : "Full",
+					"imageFormat" : "R16G16B16A16Float"
+				},
+				{
+					"name" : "GBufferDepth",
+					"renderSize" : "Full",
+					"imageFormat" : "Depth"
+				}
+			],
+			"name" : "GBuffer",
+			"materialPasses" : ["GBuffer", "GBufferLayered"],
+			"renderOrder" : "FrontToBack",
+			"outputs" : [
+				["Image", "GBufferAlbedo", [0.0, 0.0, 0.0, 0.0]],
+				["Image", "GBufferNormal", [0.0, 0.0, 0.0, 0.0]],
+				["Image", "GBufferParameter0", [0.0, 0.0, 0.0, 0.0]],
+				["Image", "GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
+			]
 		},
 		{
 			"type" : "RenderPassFoliage"

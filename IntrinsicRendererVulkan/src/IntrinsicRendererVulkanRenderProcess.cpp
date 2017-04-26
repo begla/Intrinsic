@@ -36,9 +36,9 @@ enum Enum
   kImageMemoryBarrier,
 
   kRenderPassGenericFullscreen,
+  kRenderPassGenericMesh,
 
   // TODO: Port me
-  kRenderPassGBuffer,
   kRenderPassFoliage,
   kRenderPassSky,
   kRenderPassDebug,
@@ -54,7 +54,6 @@ enum Enum
 
 _INTR_HASH_MAP(Name, RenderStepType::Enum)
 _renderStepTypeMapping = {
-    {"RenderPassGBuffer", RenderStepType::kRenderPassGBuffer},
     {"RenderPassFoliage", RenderStepType::kRenderPassFoliage},
     {"RenderPassSky", RenderStepType::kRenderPassSky},
     {"RenderPassDebug", RenderStepType::kRenderPassDebug},
@@ -76,8 +75,6 @@ struct RenderPassInterface
 
 _INTR_HASH_MAP(RenderStepType::Enum, RenderPassInterface)
 _renderStepFunctionMapping = {
-    {RenderStepType::kRenderPassGBuffer,
-     {RenderPass::GBuffer::render, RenderPass::GBuffer::onReinitRendering}},
     {RenderStepType::kRenderPassFoliage,
      {RenderPass::Foliage::render, RenderPass::Foliage::onReinitRendering}},
     {RenderStepType::kRenderPassSky,
@@ -129,6 +126,7 @@ struct RenderStep
 };
 
 _INTR_ARRAY(RenderPass::GenericFullscreen) _renderPassesGenericFullScreen;
+_INTR_ARRAY(RenderPass::GenericMesh) _renderPassesGenericMesh;
 _INTR_ARRAY(RenderStep) _renderSteps;
 
 _INTR_INLINE void executeRenderSteps(float p_DeltaT)
@@ -143,6 +141,9 @@ _INTR_INLINE void executeRenderSteps(float p_DeltaT)
     {
     case RenderStepType::kRenderPassGenericFullscreen:
       _renderPassesGenericFullScreen[step.getIndex()].render(p_DeltaT);
+      continue;
+    case RenderStepType::kRenderPassGenericMesh:
+      _renderPassesGenericMesh[step.getIndex()].render(p_DeltaT);
       continue;
     case RenderStepType::kImageMemoryBarrier:
       ImageManager::insertImageMemoryBarrier(
@@ -177,11 +178,20 @@ LockFreeStack<Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT> RenderProcess::Default::
 
 void Default::loadRendererConfig()
 {
-  for (uint32_t i = 0u; i < _renderPassesGenericFullScreen.size(); ++i)
+  // Destroy render passes
   {
-    _renderPassesGenericFullScreen[i].destroy();
+    for (uint32_t i = 0u; i < _renderPassesGenericFullScreen.size(); ++i)
+    {
+      _renderPassesGenericFullScreen[i].destroy();
+    }
+    _renderPassesGenericFullScreen.clear();
+    for (uint32_t i = 0u; i < _renderPassesGenericMesh.size(); ++i)
+    {
+      _renderPassesGenericMesh[i].destroy();
+    }
+    _renderPassesGenericMesh.clear();
   }
-  _renderPassesGenericFullScreen.clear();
+
   _renderSteps.clear();
 
   rapidjson::Document rendererConfig;
@@ -239,6 +249,16 @@ void Default::loadRendererConfig()
       _renderSteps.push_back(
           RenderStep(RenderStepType::kRenderPassGenericFullscreen,
                      (uint8_t)_renderPassesGenericFullScreen.size() - 1u));
+    }
+    else if (renderStepDesc["type"] == "RenderPassGenericMesh")
+    {
+      _renderPassesGenericMesh.push_back(RenderPass::GenericMesh());
+      RenderPass::GenericMesh& renderPass = _renderPassesGenericMesh.back();
+      renderPass.init(renderStepDesc);
+
+      _renderSteps.push_back(
+          RenderStep(RenderStepType::kRenderPassGenericMesh,
+                     (uint8_t)_renderPassesGenericMesh.size() - 1u));
     }
     else if (_renderStepTypeMapping.find(renderStepDesc["type"].GetString()) !=
              _renderStepTypeMapping.end())

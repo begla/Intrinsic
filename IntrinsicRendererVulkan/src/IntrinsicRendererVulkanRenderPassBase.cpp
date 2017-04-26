@@ -35,8 +35,31 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
   const rapidjson::Value& outputs = p_RenderPassDesc["outputs"];
   const rapidjson::Value& images = p_RenderPassDesc["images"];
   _name = p_RenderPassDesc["name"].GetString();
-  _perInstanceDataBufferName =
-      p_RenderPassDesc["perInstanceDataBufferName"].GetString();
+
+  for (uint32_t i = 0u; i < outputs.Size(); ++i)
+  {
+    const rapidjson::Value& outputDesc = outputs[i];
+
+    VkClearValue clearValue = {};
+    if (outputs.Size() > 2u)
+    {
+      const rapidjson::Value& clearColorDesc = outputDesc[2u];
+
+      if (clearColorDesc.Size() > 1u)
+      {
+        clearValue.color.float32[0] = clearColorDesc[0].GetFloat();
+        clearValue.color.float32[1] = clearColorDesc[1].GetFloat();
+        clearValue.color.float32[2] = clearColorDesc[2].GetFloat();
+        clearValue.color.float32[3] = clearColorDesc[3].GetFloat();
+      }
+      else
+      {
+        clearValue.depthStencil.depth = clearColorDesc[0].GetFloat();
+      }
+    }
+
+    _clearValues.push_back(clearValue);
+  }
 
   // Images
   {
@@ -56,8 +79,14 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
             RenderSystem::getAbsoluteRenderSize(
                 Helper::mapRenderSize(image["renderSize"].GetString())),
             1u);
-        ImageManager::_descImageFormat(imageRef) =
-            Helper::mapFormat(image["imageFormat"].GetString());
+
+        const rapidjson::Value& imageFormat = image["imageFormat"];
+        if (imageFormat == "Depth")
+          ImageManager::_descImageFormat(imageRef) =
+              RenderSystem::_depthStencilFormatToUse;
+        else
+          ImageManager::_descImageFormat(imageRef) =
+              Helper::mapFormat(imageFormat.GetString());
         ImageManager::_descImageType(imageRef) = ImageType::kTexture;
       }
       _imageRefs.push_back(imageRef);
@@ -68,9 +97,6 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
   }
   ImageManager::createResources(imagesToCreate);
 
-  const _INTR_STRING fragGpuProgramName =
-      p_RenderPassDesc["fragmentGpuProgram"].GetString();
-
   // Render passes
   {
     _renderPassRef = RenderPassManager::createRenderPass(_name);
@@ -80,28 +106,28 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
     {
       for (uint32_t i = 0u; i < outputs.Size(); ++i)
       {
-        const rapidjson::Value& output = outputs[i];
+        const rapidjson::Value& outputDesc = outputs[i];
 
         ImageRef imageRef =
-            ImageManager::_getResourceByName(output[1].GetString());
+            ImageManager::_getResourceByName(outputDesc[1].GetString());
 
         AttachmentDescription colorAttachment = {
-            (uint8_t)ImageManager::_descImageFormat(imageRef), (uint8_t)i};
+            (uint8_t)ImageManager::_descImageFormat(imageRef),
+            outputDesc.Size() > 2u ? AttachmentFlags::kClearOnLoad : 0u};
         RenderPassManager::_descAttachments(_renderPassRef)
             .push_back(colorAttachment);
       }
     }
     else
     {
-      AttachmentDescription sceneAttachment = {Format::kB8G8R8A8Srgb, 0u};
+      AttachmentDescription sceneAttachment = {
+          Format::kB8G8R8A8Srgb,
+          outputs[0].Size() > 2u ? AttachmentFlags::kClearOnLoad : 0u};
       RenderPassManager::_descAttachments(_renderPassRef)
           .push_back(sceneAttachment);
     }
   }
   renderpassesToCreate.push_back(_renderPassRef);
-
-  RenderSize::Enum viewportRenderSize =
-      Helper::mapRenderSize(p_RenderPassDesc["viewportRenderSize"].GetString());
 
   RenderPassManager::createResources(renderpassesToCreate);
 
@@ -192,6 +218,8 @@ void Base::destroy()
   FramebufferManager::destroyFramebuffersAndResources(framebuffersToDestroy);
   ImageManager::destroyImagesAndResources(imagesToDestroy);
   RenderPassManager::destroyRenderPassesAndResources(renderPassesToDestroy);
+
+  _clearValues.clear();
 }
 }
 }

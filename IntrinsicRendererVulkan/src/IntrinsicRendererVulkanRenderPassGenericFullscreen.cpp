@@ -35,6 +35,9 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   DrawCallRefArray drawCallsToCreate;
 
   const rapidjson::Value& inputs = p_RenderPassDesc["inputs"];
+
+  _perInstanceDataBufferName =
+      p_RenderPassDesc["perInstanceDataBufferName"].GetString();
   RenderProcess::UniformBufferDataEntry bufferDataEntry =
       RenderProcess::UniformManager::requestUniformBufferData(
           _perInstanceDataBufferName);
@@ -137,10 +140,13 @@ void GenericFullscreen::destroy()
 
   if (_drawCallRef.isValid())
     drawCallsToDestroy.push_back(_drawCallRef);
+  _drawCallRef = DrawCallRef();
   if (_pipelineLayoutRef.isValid())
     pipelineLayoutsToDestroy.push_back(_pipelineLayoutRef);
+  _pipelineLayoutRef = PipelineLayoutRef();
   if (_pipelineRef.isValid())
     pipelinesToDestroy.push_back(_pipelineRef);
+  _pipelineRef = PipelineRef();
 
   PipelineManager::destroyPipelinesAndResources(pipelinesToDestroy);
   PipelineLayoutManager::destroyPipelineLayoutsAndResources(
@@ -173,7 +179,8 @@ void GenericFullscreen::render(float p_DeltaT)
       _renderPassRef,
       _framebufferRefs[RenderSystem::_backbufferIndex %
                        _framebufferRefs.size()],
-      VK_SUBPASS_CONTENTS_INLINE);
+      VK_SUBPASS_CONTENTS_INLINE, (uint32_t)_clearValues.size(),
+      _clearValues.data());
   {
     RenderSystem::dispatchDrawCall(_drawCallRef,
                                    RenderSystem::getPrimaryCommandBuffer());

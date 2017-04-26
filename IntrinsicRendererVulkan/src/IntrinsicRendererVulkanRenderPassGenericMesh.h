@@ -22,14 +22,20 @@ namespace Vulkan
 {
 namespace RenderPass
 {
-struct GBuffer
+struct GenericMesh : Base
 {
-  static void init();
-  static void onReinitRendering();
+  void init(const rapidjson::Value& p_RenderPassDesc);
+  void destroy();
 
-  static void destroy();
+  void render(float p_DeltaT);
 
-  static void render(float p_DeltaT);
+private:
+  Resources::PipelineRef _pipelineRef;
+  Resources::PipelineLayoutRef _pipelineLayoutRef;
+  Resources::DrawCallRef _drawCallRef;
+
+  _INTR_ARRAY(uint8_t) _materialPassIds;
+  RenderOrder::Enum _renderOrder;
 };
 }
 }
