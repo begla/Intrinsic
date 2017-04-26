@@ -220,6 +220,15 @@ enum Enum
 };
 }
 
+namespace RenderOrder
+{
+enum Enum
+{
+  kFrontToBack,
+  kBackToFront
+};
+}
+
 struct VertexBinding
 {
   uint32_t stride;
