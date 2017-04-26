@@ -594,11 +594,33 @@ _INTR_INLINE static uint32_t computeGpuMemoryTypeIdx(uint32_t p_TypeBits,
 
 // <-
 
-_INTR_INLINE static Format::Enum
-mapStringFormatToFormat(const _INTR_STRING& p_Format)
+_INTR_INLINE static Format::Enum mapFormat(const _INTR_STRING& p_Format)
 {
   static _INTR_HASH_MAP(Name, Format::Enum)
-      formats = {{"R16G16B16A16Float", Format::kR16G16B16A16Float}};
+      formats = {{"R32G32B32SFloat", Format::kR32G32B32SFloat},
+                 {"R32G32B32A32SFloat", Format::kR32G32B32A32SFloat},
+                 {"R32G32SFloat", Format::kR32G32SFloat},
+                 {"R16G16B16Float", Format::kR16G16B16Float},
+                 {"R16G16Float", Format::kR16G16Float},
+                 {"B8G8R8A8UNorm", Format::kB8G8R8A8UNorm},
+                 {"BC1RGBUNorm", Format::kBC1RGBUNorm},
+                 {"BC1RGBSrgb", Format::kBC1RGBSrgb},
+                 {"BC2UNorm", Format::kBC2UNorm},
+                 {"BC2Srgb", Format::kBC2Srgb},
+                 {"BC5UNorm", Format::kBC5UNorm},
+                 {"BC5SNorm", Format::kBC5SNorm},
+                 {"D24UnormS8UInt", Format::kD24UnormS8UInt},
+                 {"B8G8R8A8Srgb", Format::kB8G8R8A8Srgb},
+                 {"BC6UFloat", Format::kBC6UFloat},
+                 {"BC3UNorm", Format::kBC3UNorm},
+                 {"BC3Srgb", Format::kBC3Srgb},
+                 {"R32SFloat", Format::kR32SFloat},
+                 {"R32UInt", Format::kR32UInt},
+                 {"D16UnormS8UInt", Format::kD16UnormS8UInt},
+                 {"D32SFloatS8UInt", Format::kD32SFloatS8UInt},
+                 {"D32SFloat", Format::kD32SFloat},
+                 {"D16UNorm", Format::kD16UNorm},
+                 {"R16G16B16A16Float", Format::kR16G16B16A16Float}};
 
   auto format = formats.find(p_Format);
   if (format != formats.end())
@@ -613,7 +635,7 @@ mapStringFormatToFormat(const _INTR_STRING& p_Format)
 // <-
 
 _INTR_INLINE static RenderSize::Enum
-mapStringRenderSizeToRenderSize(const _INTR_STRING& p_RenderSize)
+mapRenderSize(const _INTR_STRING& p_RenderSize)
 {
   static _INTR_HASH_MAP(Name, RenderSize::Enum)
       renderSizes = {{"Full", RenderSize::kFull},
@@ -633,7 +655,7 @@ mapStringRenderSizeToRenderSize(const _INTR_STRING& p_RenderSize)
 // <-
 
 _INTR_INLINE static GpuProgramType::Enum
-mapStringGpuProgramTypeToGpuProgramType(const _INTR_STRING& p_GpuProgramType)
+mapGpuProgramType(const _INTR_STRING& p_GpuProgramType)
 {
   static _INTR_HASH_MAP(Name, GpuProgramType::Enum)
       gpuProgramTypes = {{"Fragment", GpuProgramType::kFragment},
@@ -652,8 +674,7 @@ mapStringGpuProgramTypeToGpuProgramType(const _INTR_STRING& p_GpuProgramType)
 
 // <-
 
-_INTR_INLINE static Samplers::Enum
-mapStringSamplerToSampler(const _INTR_STRING& p_Sampler)
+_INTR_INLINE static Samplers::Enum mapSampler(const _INTR_STRING& p_Sampler)
 {
   static _INTR_HASH_MAP(Name, Samplers::Enum)
       samplers = {{"LinearClamp", Samplers::kLinearClamp},
@@ -675,7 +696,7 @@ mapStringSamplerToSampler(const _INTR_STRING& p_Sampler)
 // <-
 
 _INTR_INLINE static VkImageLayout
-mapStringImageLayoutToVkImageLayout(const _INTR_STRING& p_ImageLayout)
+mapImageLayout(const _INTR_STRING& p_ImageLayout)
 {
   static _INTR_HASH_MAP(Name, VkImageLayout) imageLayouts = {
       {"Undefined", VK_IMAGE_LAYOUT_UNDEFINED},
@@ -697,6 +718,46 @@ mapStringImageLayoutToVkImageLayout(const _INTR_STRING& p_ImageLayout)
 
   _INTR_ASSERT(false && "Image layout not supported/found");
   return VK_IMAGE_LAYOUT_GENERAL;
+}
+
+// <-
+
+_INTR_INLINE static DepthStencilStates::Enum
+mapDepthStencilState(const _INTR_STRING& p_DepthStencilState)
+{
+  static _INTR_HASH_MAP(Name, DepthStencilStates::Enum) depthStencilStates = {
+      {"Default", DepthStencilStates::kDefault},
+      {"DefaultNoDepthTestAndWrite",
+       DepthStencilStates::kDefaultNoDepthTestAndWrite},
+      {"DefaultNoWrite", DepthStencilStates::kDefaultNoWrite},
+      {"DefaultNoDepthTest", DepthStencilStates::kDefaultNoDepthTest}};
+
+  auto depthStencilState = depthStencilStates.find(p_DepthStencilState);
+  if (depthStencilState != depthStencilStates.end())
+  {
+    return depthStencilState->second;
+  }
+
+  _INTR_ASSERT(false && "Depth stencil state not supported/found");
+  return DepthStencilStates::kDefault;
+}
+
+// <-
+
+_INTR_INLINE static BlendStates::Enum
+mapBlendState(const _INTR_STRING& p_BlendSate)
+{
+  static _INTR_HASH_MAP(Name, BlendStates::Enum)
+      blendStates = {{"Default", BlendStates::kDefault}};
+
+  auto blendState = blendStates.find(p_BlendSate);
+  if (blendState != blendStates.end())
+  {
+    return blendState->second;
+  }
+
+  _INTR_ASSERT(false && "Blend state not supported/found");
+  return BlendStates::kDefault;
 }
 }
 }

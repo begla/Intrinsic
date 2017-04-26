@@ -258,8 +258,8 @@ void MaterialManager::loadMaterialPassConfig()
           MaterialPass::BoundResourceEntry entry = {};
           {
             entry.resourceName = resourceEntryDesc[1].GetString();
-            entry.shaderStage = Helper::mapStringGpuProgramTypeToGpuProgramType(
-                resourceEntryDesc[3].GetString());
+            entry.shaderStage =
+                Helper::mapGpuProgramType(resourceEntryDesc[3].GetString());
             entry.slotName = resourceEntryDesc[2].GetString();
 
             if (resourceEntryDesc[0] == "Buffer")
@@ -380,7 +380,6 @@ void MaterialManager::loadMaterialPassConfig()
             PipelineManager::_descAbsoluteViewportDimensions(pipelineRef) = dim;
           }
 
-          // TODO: Clean this up
           if (materialPassDesc.HasMember("rasterizationState"))
           {
             if (materialPassDesc["rasterizationState"] == "InvertedCulling")
@@ -397,21 +396,22 @@ void MaterialManager::loadMaterialPassConfig()
 
           if (materialPassDesc.HasMember("depthStencilState"))
           {
-            if (materialPassDesc["depthStencilState"] == "DefaultNoWrite")
-            {
-              PipelineManager::_descDepthStencilState(pipelineRef) =
-                  DepthStencilStates::kDefaultNoWrite;
-            }
+            PipelineManager::_descDepthStencilState(pipelineRef) =
+                Helper::mapDepthStencilState(
+                    materialPassDesc["depthStencilState"].GetString());
           }
 
           PipelineManager::_descBlendStates(pipelineRef).clear();
           if (materialPassDesc.HasMember("blendStates"))
           {
-            for (uint32_t i = 0u; i < materialPassDesc["blendStates"].Size();
-                 ++i)
+            rapidjson::Value& blendStatesDesc = materialPassDesc["blendStates"];
+
+            for (uint32_t i = 0u; i < blendStatesDesc.Size(); ++i)
             {
+              rapidjson::Value& blendStateDesc = blendStatesDesc[i];
+
               PipelineManager::_descBlendStates(pipelineRef)
-                  .push_back(BlendStates::kDefault);
+                  .push_back(Helper::mapBlendState(blendStateDesc.GetString()));
             }
           }
 
