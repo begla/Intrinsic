@@ -22,8 +22,16 @@ namespace RenderPass
 {
 struct Base
 {
+  void init(const rapidjson::Value& p_RenderPassDesc);
+  void destroy();
 
-  static void onReinitRendering();
+protected:
+  _INTR_STRING _name;
+  Name _perInstanceDataBufferName;
+
+  Resources::FramebufferRefArray _framebufferRefs;
+  Resources::RenderPassRef _renderPassRef;
+  Resources::ImageRefArray _imageRefs;
 };
 }
 }

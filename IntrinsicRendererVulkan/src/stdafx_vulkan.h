@@ -55,6 +55,7 @@
 #include "IntrinsicRendererVulkanResourcesMaterial.h"
 #include "IntrinsicRendererVulkanUniformManager.h"
 #include "IntrinsicRendererVulkanMaterialBuffer.h"
+#include "IntrinsicRendererVulkanRenderPassBase.h"
 #include "IntrinsicRendererVulkanResourcesDrawCall.h"
 #include "IntrinsicRendererVulkanResourcesComputeCall.h"
 #include "IntrinsicRendererVulkanRenderPassGBuffer.h"

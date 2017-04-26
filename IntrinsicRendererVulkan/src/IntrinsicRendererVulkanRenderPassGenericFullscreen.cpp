@@ -28,52 +28,16 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
 {
   using namespace Resources;
 
-  ImageRefArray imagesToCreate;
+  Base::init(p_RenderPassDesc);
+
   PipelineRefArray pipelinesToCreate;
   PipelineLayoutRefArray pipelineLayoutsToCreate;
-  RenderPassRefArray renderpassesToCreate;
-  FramebufferRefArray framebuffersToCreate;
   DrawCallRefArray drawCallsToCreate;
 
   const rapidjson::Value& inputs = p_RenderPassDesc["inputs"];
-  const rapidjson::Value& outputs = p_RenderPassDesc["outputs"];
-  const rapidjson::Value& images = p_RenderPassDesc["images"];
-  _name = p_RenderPassDesc["name"].GetString();
-  _perInstanceDataBufferName =
-      p_RenderPassDesc["perInstanceDataBufferName"].GetString();
   RenderProcess::UniformBufferDataEntry bufferDataEntry =
       RenderProcess::UniformManager::requestUniformBufferData(
           _perInstanceDataBufferName);
-
-  // Images
-  {
-    for (uint32_t i = 0u; i < images.Size(); ++i)
-    {
-      const rapidjson::Value& image = images[i];
-
-      ImageRef imageRef = ImageManager::createImage(image["name"].GetString());
-      {
-        ImageManager::resetToDefault(imageRef);
-        ImageManager::addResourceFlags(
-            imageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
-        ImageManager::_descMemoryPoolType(imageRef) =
-            MemoryPoolType::kResolutionDependentImages;
-
-        ImageManager::_descDimensions(imageRef) = glm::uvec3(
-            RenderSystem::getAbsoluteRenderSize(
-                Helper::mapRenderSize(image["renderSize"].GetString())),
-            1u);
-        ImageManager::_descImageFormat(imageRef) =
-            Helper::mapFormat(image["imageFormat"].GetString());
-        ImageManager::_descImageType(imageRef) = ImageType::kTexture;
-      }
-      _imageRefs.push_back(imageRef);
-    }
-
-    imagesToCreate.insert(imagesToCreate.end(), _imageRefs.begin(),
-                          _imageRefs.end());
-  }
-  ImageManager::createResources(imagesToCreate);
 
   const _INTR_STRING fragGpuProgramName =
       p_RenderPassDesc["fragmentGpuProgram"].GetString();
@@ -90,35 +54,6 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
         pipelineLayout);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayout);
-
-  // Render passes
-  {
-    _renderPassRef = RenderPassManager::createRenderPass(_name);
-    RenderPassManager::resetToDefault(_renderPassRef);
-
-    if (outputs[0][1] != "Backbuffer")
-    {
-      for (uint32_t i = 0u; i < outputs.Size(); ++i)
-      {
-        const rapidjson::Value& output = outputs[i];
-
-        ImageRef imageRef =
-            ImageManager::_getResourceByName(output[1].GetString());
-
-        AttachmentDescription colorAttachment = {
-            (uint8_t)ImageManager::_descImageFormat(imageRef), (uint8_t)i};
-        RenderPassManager::_descAttachments(_renderPassRef)
-            .push_back(colorAttachment);
-      }
-    }
-    else
-    {
-      AttachmentDescription sceneAttachment = {Format::kB8G8R8A8Srgb, 0u};
-      RenderPassManager::_descAttachments(_renderPassRef)
-          .push_back(sceneAttachment);
-    }
-  }
-  renderpassesToCreate.push_back(_renderPassRef);
 
   RenderSize::Enum viewportRenderSize =
       Helper::mapRenderSize(p_RenderPassDesc["viewportRenderSize"].GetString());
@@ -143,66 +78,7 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   pipelinesToCreate.push_back(_pipelineRef);
 
   PipelineLayoutManager::createResources(pipelineLayoutsToCreate);
-  RenderPassManager::createResources(renderpassesToCreate);
   PipelineManager::createResources(pipelinesToCreate);
-
-  // Create framebuffer
-  if (outputs[0][1] != "Backbuffer")
-  {
-    FramebufferRef framebufferRef =
-        FramebufferManager::createFramebuffer(_name);
-    {
-      FramebufferManager::resetToDefault(framebufferRef);
-      FramebufferManager::addResourceFlags(
-          framebufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
-
-      glm::uvec3 dim = glm::vec3(0u);
-      for (uint32_t i = 0u; i < outputs.Size(); ++i)
-      {
-        ImageRef outputImage =
-            ImageManager::getResourceByName(outputs[i][1].GetString());
-        FramebufferManager::_descAttachedImages(framebufferRef)
-            .push_back(outputImage);
-
-        _INTR_ASSERT((dim == glm::uvec3(0u) ||
-                      dim == ImageManager::_descDimensions(outputImage)) &&
-                     "Dimensions of all outputs must be identical");
-        dim = ImageManager::_descDimensions(outputImage);
-      }
-
-      FramebufferManager::_descDimensions(framebufferRef) = dim;
-      FramebufferManager::_descRenderPass(framebufferRef) = _renderPassRef;
-    }
-    framebuffersToCreate.push_back(framebufferRef);
-    _framebufferRefs.push_back(framebufferRef);
-  }
-  else
-  {
-    for (uint32_t i = 0u; i < (uint32_t)RenderSystem::_vkSwapchainImages.size();
-         ++i)
-    {
-      FramebufferRef fbRef = FramebufferManager::createFramebuffer(_name);
-      {
-        FramebufferManager::resetToDefault(fbRef);
-        FramebufferManager::addResourceFlags(
-            fbRef, Dod::Resources::ResourceFlags::kResourceVolatile);
-
-        FramebufferManager::_descAttachedImages(fbRef).push_back(
-            ImageManager::getResourceByName(_INTR_STRING("Backbuffer") +
-                                            StringUtil::toString<uint32_t>(i)));
-
-        FramebufferManager::_descDimensions(fbRef) =
-            glm::uvec2(RenderSystem::_backbufferDimensions.x,
-                       RenderSystem::_backbufferDimensions.y);
-        FramebufferManager::_descRenderPass(fbRef) = _renderPassRef;
-      }
-
-      framebuffersToCreate.push_back(fbRef);
-      _framebufferRefs.push_back(fbRef);
-    }
-  }
-
-  FramebufferManager::createResources(framebuffersToCreate);
 
   // Draw calls
   _drawCallRef = DrawCallManager::createDrawCall(_name);
@@ -253,25 +129,23 @@ void GenericFullscreen::destroy()
 {
   using namespace Resources;
 
-  DrawCallRefArray imagesToDestroy;
-  DrawCallRefArray framebuffersToDestroy;
+  Base::destroy();
+
   DrawCallRefArray drawCallsToDestroy;
+  PipelineLayoutRefArray pipelineLayoutsToDestroy;
+  PipelineRefArray pipelinesToDestroy;
 
   if (_drawCallRef.isValid())
     drawCallsToDestroy.push_back(_drawCallRef);
-  if (!_framebufferRefs.empty())
-    framebuffersToDestroy.insert(framebuffersToDestroy.end(),
-                                 _framebufferRefs.begin(),
-                                 _framebufferRefs.end());
-  _framebufferRefs.clear();
-  if (!_imageRefs.empty())
-    imagesToDestroy.insert(imagesToDestroy.end(), _imageRefs.begin(),
-                           _imageRefs.end());
-  _imageRefs.clear();
+  if (_pipelineLayoutRef.isValid())
+    pipelineLayoutsToDestroy.push_back(_pipelineLayoutRef);
+  if (_pipelineRef.isValid())
+    pipelinesToDestroy.push_back(_pipelineRef);
 
+  PipelineManager::destroyPipelinesAndResources(pipelinesToDestroy);
+  PipelineLayoutManager::destroyPipelineLayoutsAndResources(
+      pipelineLayoutsToDestroy);
   DrawCallManager::destroyDrawCallsAndResources(drawCallsToDestroy);
-  FramebufferManager::destroyFramebuffersAndResources(framebuffersToDestroy);
-  ImageManager::destroyImagesAndResources(imagesToDestroy);
 }
 
 // <-

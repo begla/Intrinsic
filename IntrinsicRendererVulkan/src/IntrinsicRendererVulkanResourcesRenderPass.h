@@ -137,6 +137,19 @@ struct RenderPassManager
     }
   }
 
+  // <-
+
+  _INTR_INLINE static void
+  destroyRenderPassesAndResources(const RenderPassRefArray& p_RenderPasses)
+  {
+    destroyResources(p_RenderPasses);
+
+    for (uint32_t i = 0u; i < p_RenderPasses.size(); ++i)
+    {
+      destroyRenderPass(p_RenderPasses[i]);
+    }
+  }
+
   // Getter/Setter
   // ->
 
