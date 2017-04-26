@@ -147,7 +147,6 @@ struct MaterialManager
                                           _INTR_MAX_MATERIAL_COUNT>
 {
   static void init();
-  static void initMaterialPasses();
 
   _INTR_INLINE static MaterialRef createMaterial(const Name& p_Name)
   {
