@@ -59,13 +59,12 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
         ImageManager::_descMemoryPoolType(imageRef) =
             MemoryPoolType::kResolutionDependentImages;
 
-        ImageManager::_descDimensions(imageRef) =
-            glm::uvec3(RenderSystem::getAbsoluteRenderSize(
-                           Helper::mapStringRenderSizeToRenderSize(
-                               image["renderSize"].GetString())),
-                       1u);
+        ImageManager::_descDimensions(imageRef) = glm::uvec3(
+            RenderSystem::getAbsoluteRenderSize(
+                Helper::mapRenderSize(image["renderSize"].GetString())),
+            1u);
         ImageManager::_descImageFormat(imageRef) =
-            Helper::mapStringFormatToFormat(image["imageFormat"].GetString());
+            Helper::mapFormat(image["imageFormat"].GetString());
         ImageManager::_descImageType(imageRef) = ImageType::kTexture;
       }
       _imageRefs.push_back(imageRef);
@@ -121,8 +120,8 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   }
   renderpassesToCreate.push_back(_renderPassRef);
 
-  RenderSize::Enum viewportRenderSize = Helper::mapStringRenderSizeToRenderSize(
-      p_RenderPassDesc["viewportRenderSize"].GetString());
+  RenderSize::Enum viewportRenderSize =
+      Helper::mapRenderSize(p_RenderPassDesc["viewportRenderSize"].GetString());
 
   // Pipelines
   {
@@ -227,10 +226,9 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
       {
         DrawCallManager::bindImage(
             _drawCallRef, input[2].GetString(),
-            Helper::mapStringGpuProgramTypeToGpuProgramType(
-                input[3].GetString()),
+            Helper::mapGpuProgramType(input[3].GetString()),
             ImageManager::getResourceByName(input[1].GetString()),
-            Helper::mapStringSamplerToSampler(input[4].GetString()));
+            Helper::mapSampler(input[4].GetString()));
       }
       else if (strcmp(input[0].GetString(), "Buffer") == 0u)
       {
@@ -239,10 +237,8 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
 
         DrawCallManager::bindBuffer(
             _drawCallRef, input[2].GetString(),
-            Helper::mapStringGpuProgramTypeToGpuProgramType(
-                input[3].GetString()),
-            bufferRef, UboType::kInvalidUbo,
-            BufferManager::_descSizeInBytes(bufferRef));
+            Helper::mapGpuProgramType(input[3].GetString()), bufferRef,
+            UboType::kInvalidUbo, BufferManager::_descSizeInBytes(bufferRef));
       }
     }
 

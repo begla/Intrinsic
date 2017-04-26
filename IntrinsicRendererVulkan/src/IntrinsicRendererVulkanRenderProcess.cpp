@@ -230,9 +230,9 @@ void Default::load()
     {
       _renderSteps.push_back(
           RenderStep(RenderStepType::kImageMemoryBarrier,
-                     Helper::mapStringImageLayoutToVkImageLayout(
+                     Helper::mapImageLayout(
                          renderStepDesc["sourceImageLayout"].GetString()),
-                     Helper::mapStringImageLayoutToVkImageLayout(
+                     Helper::mapImageLayout(
                          renderStepDesc["targetImageLayout"].GetString()),
                      renderStepDesc["image"].GetString()));
     }
