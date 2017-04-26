@@ -192,6 +192,7 @@ enum Enum
   kD32SFloatS8UInt,
   kD32SFloat,
   kD16UNorm,
+  kB10G11R11UFloat,
 
   kCount
 };

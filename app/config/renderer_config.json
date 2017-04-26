@@ -56,7 +56,7 @@
 				{
 					"name" : "Scene",
 					"renderSize" : "Full",
-					"imageFormat" : "R16G16B16A16Float"
+					"imageFormat" : "B10G11R11UFloat"
 				}
 			],
 			"name" : "PreCombine",
