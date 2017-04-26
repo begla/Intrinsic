@@ -252,7 +252,7 @@ struct ImageManager
   // <-
 
   _INTR_INLINE static void
-  destroyImagesAndResources(const FramebufferRefArray& p_Images)
+  destroyImagesAndResources(const ImageRefArray& p_Images)
   {
     destroyResources(p_Images);
 
