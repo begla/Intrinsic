@@ -277,7 +277,7 @@ void VolumetricLighting::init()
 
 // <-
 
-void VolumetricLighting::updateResolutionDependentResources() {}
+void VolumetricLighting::onReinitRendering() {}
 
 // <-
 

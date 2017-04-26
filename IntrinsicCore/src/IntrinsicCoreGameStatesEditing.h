@@ -46,6 +46,7 @@ enum Enum
 struct Editing
 {
   static void init();
+  static void onReinitRendering();
 
   static void activate();
   static void deativate();

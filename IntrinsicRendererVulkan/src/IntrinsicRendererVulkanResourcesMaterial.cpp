@@ -227,6 +227,14 @@ void MaterialManager::loadMaterialPassConfig()
   _materialPasses.clear();
   _materialPassBoundResources.clear();
 
+  for (uint32_t matPassIdx = 0u; matPassIdx < _materialPasses.size();
+       ++matPassIdx)
+  {
+    for (uint32_t i = 0u; i < _INTR_MAX_FRUSTUMS_PER_FRAME_COUNT; ++i)
+      RenderProcess::Default::_visibleDrawCallsPerMaterialPass[i][matPassIdx]
+          .clear();
+  }
+
   Resources::PipelineManager::destroyPipelinesAndResources(
       _materialPassPipelines);
   _materialPassPipelines.clear();
@@ -427,7 +435,7 @@ void MaterialManager::loadMaterialPassConfig()
   }
 
   PipelineLayoutManager::createResources(_materialPassPipelineLayouts);
-  PipelineManager::createResources(_materialPassPipelineLayouts);
+  PipelineManager::createResources(_materialPassPipelines);
 
   DrawCallManager::_drawCallsPerMaterialPass.resize(_materialPasses.size());
 }

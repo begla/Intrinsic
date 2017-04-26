@@ -43,6 +43,8 @@ struct DrawCallParallelTaskSet : enki::ITaskSet
     for (uint32_t dcIdx = _rangeStart; dcIdx < _rangeEnd; ++dcIdx)
     {
       Resources::DrawCallRef drawCallRef = (*_visibleDrawCallRefs)[dcIdx];
+      _INTR_ASSERT(Resources::DrawCallManager::isAlive(drawCallRef));
+
       Resources::PipelineRef pipelineRef =
           Resources::DrawCallManager::_descPipeline(drawCallRef);
       Resources::PipelineLayoutRef pipelineLayoutRef =

@@ -384,10 +384,7 @@ private:
   // <-
 
   static void releaseQueuedResources();
-
-  // <-
-
-  static void updateResolutionDependentResources();
+  static void reinitRendering();
 
   // <-
 

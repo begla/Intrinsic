@@ -33,7 +33,7 @@ struct DebugStageFlags
 struct Debug
 {
   static void init();
-  static void updateResolutionDependentResources();
+  static void onReinitRendering();
   static void destroy();
 
   static void renderLine(const glm::vec3& p_Pos0, const glm::vec3& p_Pos1,

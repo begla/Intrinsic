@@ -69,7 +69,7 @@ void Foliage::init()
 
 // <-
 
-void Foliage::updateResolutionDependentResources()
+void Foliage::onReinitRendering()
 {
   using namespace Resources;
 

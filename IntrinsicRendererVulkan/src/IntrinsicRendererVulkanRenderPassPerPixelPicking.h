@@ -25,7 +25,7 @@ namespace RenderPass
 struct PerPixelPicking
 {
   static void init();
-  static void updateResolutionDependentResources();
+  static void onReinitRendering();
   static void destroy();
   static void render(float p_DeltaT);
 

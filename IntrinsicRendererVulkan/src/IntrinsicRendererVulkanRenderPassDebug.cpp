@@ -185,7 +185,7 @@ void Debug::init()
 
 // <-
 
-void Debug::updateResolutionDependentResources()
+void Debug::onReinitRendering()
 {
   using namespace Resources;
 

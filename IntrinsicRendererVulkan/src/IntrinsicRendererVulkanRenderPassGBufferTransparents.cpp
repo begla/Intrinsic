@@ -73,7 +73,7 @@ void GBufferTransparents::init()
 
 // <-
 
-void GBufferTransparents::updateResolutionDependentResources()
+void GBufferTransparents::onReinitRendering()
 {
   using namespace Resources;
 

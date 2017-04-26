@@ -36,7 +36,7 @@ void DrawCallManager::createResources(const DrawCallRefArray& p_DrawCalls)
   {
     DrawCallRef drawCallRef = p_DrawCalls[dcIdx];
 
-    _INTR_ARRAY(BindingInfo)& bindInfs = _descBindInfos(drawCallRef);
+    _INTR_ARRAY(BindingInfo)& bindInfos = _descBindInfos(drawCallRef);
     PipelineRef pipelineRef = _descPipeline(drawCallRef);
     PipelineLayoutRef pipelineLayout =
         Resources::PipelineManager::_descPipelineLayout(pipelineRef);
@@ -47,7 +47,7 @@ void DrawCallManager::createResources(const DrawCallRefArray& p_DrawCalls)
     _INTR_ASSERT(descSet == VK_NULL_HANDLE);
 
     descSet = Resources::PipelineLayoutManager::allocateAndWriteDescriptorSet(
-        pipelineLayout, bindInfs);
+        pipelineLayout, bindInfos);
 
     // Defaults for now
     _indexBufferOffset(drawCallRef) = 0ull;
@@ -58,8 +58,6 @@ void DrawCallManager::createResources(const DrawCallRefArray& p_DrawCalls)
     {
       vtxBuffers[i] = BufferManager::_vkBuffer(descVtxBuffers[i]);
     }
-
-    _INTR_ARRAY(BindingInfo)& bindInfos = _descBindInfos(drawCallRef);
 
     uint32_t dynamicOffsetCount = 0u;
     for (uint32_t bindIdx = 0u; bindIdx < (uint32_t)bindInfos.size(); ++bindIdx)
@@ -193,6 +191,10 @@ DrawCallRef DrawCallManager::createDrawCallForMesh(
   {
     _descPipeline(drawCallMesh) = MaterialManager::_materialPassPipelines
         [MaterialManager::_materialPasses[p_MaterialPass].pipelineIdx];
+
+    _INTR_ASSERT(Renderer::Vulkan::Resources::PipelineManager::_vkPipeline(
+        _descPipeline(drawCallMesh)));
+
     _descVertexBuffers(drawCallMesh) =
         Core::Resources::MeshManager::_vertexBuffersPerSubMesh(p_Mesh)[0];
     _descIndexBuffer(drawCallMesh) =

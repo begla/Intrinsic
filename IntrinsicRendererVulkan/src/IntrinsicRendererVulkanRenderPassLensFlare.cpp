@@ -126,7 +126,7 @@ void LensFlare::init()
 
 // <-
 
-void LensFlare::updateResolutionDependentResources()
+void LensFlare::onReinitRendering()
 {
   using namespace Resources;
 

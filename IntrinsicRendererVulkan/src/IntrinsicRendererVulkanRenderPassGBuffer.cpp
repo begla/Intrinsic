@@ -72,7 +72,7 @@ void GBuffer::init()
 
 // <-
 
-void GBuffer::updateResolutionDependentResources()
+void GBuffer::onReinitRendering()
 {
   using namespace Resources;
 

@@ -59,7 +59,7 @@ void Sky::init()
 
 // <-
 
-void Sky::updateResolutionDependentResources()
+void Sky::onReinitRendering()
 {
   using namespace Resources;
 
