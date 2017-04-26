@@ -119,7 +119,7 @@ struct DrawCallParallelTaskSet : enki::ITaskSet
   uint32_t _secondaryCmdBufferIdx;
   Resources::DrawCallRefArray* _visibleDrawCallRefs;
   Resources::FramebufferRef _framebufferRef;
-  Resources::FramebufferRef _renderPassRef;
+  Resources::RenderPassRef _renderPassRef;
 
   uint32_t _rangeStart;
   uint32_t _rangeEnd;
