@@ -172,12 +172,11 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
   {
     _INTR_PROFILE_AUTO("Init. Materials");
-
-    MaterialManager::loadMaterialPassConfig();
     MaterialManager::createAllResources();
   }
 
-  updateResolutionDependentResources();
+  RenderProcess::Default::loadRendererConfig();
+  MaterialManager::loadMaterialPassConfig();
 
   _INTR_LOG_POP();
 }
@@ -186,7 +185,7 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
 void RenderSystem::onViewportChanged() { _swapChainUpdatePending = true; }
 
-// <-
+//<-
 
 void RenderSystem::releaseQueuedResources()
 {
@@ -246,24 +245,28 @@ void RenderSystem::releaseQueuedResources()
   }
 }
 
-void RenderSystem::updateResolutionDependentResources()
+void RenderSystem::reinitRendering()
 {
-  _INTR_PROFILE_AUTO("Update Res. Dep. Resources");
-
-  // Recreate all pipelines (to update the view port size)
-  PipelineManager::createAllResources();
+  _INTR_PROFILE_AUTO("Reinit. Rendering");
 
   // Reset allocators
   GpuMemoryManager::resetAllocator(MemoryPoolType::kResolutionDependentBuffers);
   GpuMemoryManager::resetAllocator(MemoryPoolType::kResolutionDependentImages);
 
-  RenderProcess::Default::load();
+  // Update from config files
+  RenderProcess::Default::loadRendererConfig();
+  MaterialManager::loadMaterialPassConfig();
 
-  // Recreate all mesh draw calls (might use resources of the render passes)
+  // Recreate draw calls
+  GameStates::Editing::onReinitRendering();
+
   Components::MeshManager::destroyResources(
       Components::MeshManager::_activeRefs);
   Components::MeshManager::createResources(
       Components::MeshManager::_activeRefs);
+
+  // Recreate all pipelines (to update the view port size)
+  PipelineManager::createAllResources();
 }
 
 // <-
@@ -1139,7 +1142,7 @@ void RenderSystem::resizeSwapChain(bool p_Force)
     vkDeviceWaitIdle(_vkDevice);
 
     initOrUpdateVkSwapChain();
-    updateResolutionDependentResources();
+    reinitRendering();
 
     _swapChainUpdatePending = false;
     _timePassedSinceLastSwapChainUpdate = 0.0f;

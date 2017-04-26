@@ -222,7 +222,7 @@ void Shadow::init()
 
 // <-
 
-void Shadow::updateResolutionDependentResources() {}
+void Shadow::onReinitRendering() {}
 
 // <-
 

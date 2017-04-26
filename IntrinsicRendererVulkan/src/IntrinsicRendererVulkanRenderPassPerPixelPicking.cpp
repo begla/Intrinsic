@@ -66,7 +66,7 @@ void PerPixelPicking::init()
 
 // <-
 
-void PerPixelPicking::updateResolutionDependentResources()
+void PerPixelPicking::onReinitRendering()
 {
   using namespace Resources;
 

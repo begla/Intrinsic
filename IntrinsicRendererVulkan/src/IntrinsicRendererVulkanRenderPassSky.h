@@ -25,7 +25,7 @@ namespace RenderPass
 struct Sky
 {
   static void init();
-  static void updateResolutionDependentResources();
+  static void onReinitRendering();
 
   static void destroy();
 

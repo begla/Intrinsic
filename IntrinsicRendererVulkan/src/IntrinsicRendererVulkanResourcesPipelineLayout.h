@@ -122,39 +122,8 @@ struct PipelineLayoutManager
     createResources(_activeRefs);
   }
 
-  static void createResources(const PipelineLayoutRefArray& p_Pipelinelayouts);
-
-  _INTR_INLINE static void
-  destroyResources(const PipelineLayoutRefArray& p_Pipelinelayouts)
-  {
-    for (uint32_t i = 0u; i < p_Pipelinelayouts.size(); ++i)
-    {
-      PipelineLayoutRef ref = p_Pipelinelayouts[i];
-
-      VkPipelineLayout& pipelineLayout = _vkPipelineLayout(ref);
-      if (pipelineLayout != VK_NULL_HANDLE)
-      {
-        vkDestroyPipelineLayout(RenderSystem::_vkDevice, pipelineLayout,
-                                nullptr);
-        pipelineLayout = VK_NULL_HANDLE;
-      }
-
-      VkDescriptorSetLayout& descSetLayout = _vkDescriptorSetLayout(ref);
-      if (descSetLayout != VK_NULL_HANDLE)
-      {
-        vkDestroyDescriptorSetLayout(RenderSystem::_vkDevice, descSetLayout,
-                                     nullptr);
-        descSetLayout = VK_NULL_HANDLE;
-      }
-
-      VkDescriptorPool& descPool = _vkDescriptorPool(ref);
-      if (descPool != VK_NULL_HANDLE)
-      {
-        vkDestroyDescriptorPool(RenderSystem::_vkDevice, descPool, nullptr);
-        descPool = VK_NULL_HANDLE;
-      }
-    }
-  }
+  static void createResources(const PipelineLayoutRefArray& p_PipelineLayouts);
+  static void destroyResources(const PipelineLayoutRefArray& p_PipelineLayouts);
 
   // <-
 

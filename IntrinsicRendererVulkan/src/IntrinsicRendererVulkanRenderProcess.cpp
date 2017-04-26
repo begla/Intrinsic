@@ -71,44 +71,37 @@ _renderStepTypeMapping = {
 struct RenderPassInterface
 {
   RenderPassRenderFunction render;
-  RenderPassUpdateResDepResFunction updateResolutionDependentResources;
+  RenderPassUpdateResDepResFunction onReinitRendering;
 };
 
 _INTR_HASH_MAP(RenderStepType::Enum, RenderPassInterface)
 _renderStepFunctionMapping = {
     {RenderStepType::kRenderPassGBuffer,
-     {RenderPass::GBuffer::render,
-      RenderPass::GBuffer::updateResolutionDependentResources}},
+     {RenderPass::GBuffer::render, RenderPass::GBuffer::onReinitRendering}},
     {RenderStepType::kRenderPassFoliage,
-     {RenderPass::Foliage::render,
-      RenderPass::Foliage::updateResolutionDependentResources}},
+     {RenderPass::Foliage::render, RenderPass::Foliage::onReinitRendering}},
     {RenderStepType::kRenderPassSky,
-     {RenderPass::Sky::render,
-      RenderPass::Sky::updateResolutionDependentResources}},
+     {RenderPass::Sky::render, RenderPass::Sky::onReinitRendering}},
     {RenderStepType::kRenderPassDebug,
-     {RenderPass::Debug::render,
-      RenderPass::Debug::updateResolutionDependentResources}},
+     {RenderPass::Debug::render, RenderPass::Debug::onReinitRendering}},
     {RenderStepType::kRenderPassGBufferTransparents,
      {RenderPass::GBufferTransparents::render,
-      RenderPass::GBufferTransparents::updateResolutionDependentResources}},
+      RenderPass::GBufferTransparents::onReinitRendering}},
     {RenderStepType::kRenderPassPerPixelPicking,
      {RenderPass::PerPixelPicking::render,
-      RenderPass::PerPixelPicking::updateResolutionDependentResources}},
+      RenderPass::PerPixelPicking::onReinitRendering}},
     {RenderStepType::kRenderPassShadow,
-     {RenderPass::Shadow::render,
-      RenderPass::Shadow::updateResolutionDependentResources}},
+     {RenderPass::Shadow::render, RenderPass::Shadow::onReinitRendering}},
     {RenderStepType::kRenderPassLighting,
-     {RenderPass::Lighting::render,
-      RenderPass::Lighting::updateResolutionDependentResources}},
+     {RenderPass::Lighting::render, RenderPass::Lighting::onReinitRendering}},
     {RenderStepType::kRenderPassVolumetricLighting,
      {RenderPass::VolumetricLighting::render,
-      RenderPass::VolumetricLighting::updateResolutionDependentResources}},
+      RenderPass::VolumetricLighting::onReinitRendering}},
     {RenderStepType::kRenderPassBloom,
-     {RenderPass::Bloom::render,
-      RenderPass::Bloom::updateResolutionDependentResources}},
+     {RenderPass::Bloom::render, RenderPass::Bloom::onReinitRendering}},
     {RenderStepType::kRenderPassLensFlare,
      {RenderPass::LensFlare::render,
-      RenderPass::LensFlare::updateResolutionDependentResources}}};
+      RenderPass::LensFlare::onReinitRendering}}};
 
 struct RenderStep
 {
@@ -182,7 +175,7 @@ LockFreeStack<Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT> RenderProcess::Default::
 
 // <-
 
-void Default::load()
+void Default::loadRendererConfig()
 {
   for (uint32_t i = 0u; i < _renderPassesGenericFullScreen.size(); ++i)
   {
@@ -254,7 +247,7 @@ void Default::load()
           RenderStep(_renderStepTypeMapping[renderStepDesc["type"].GetString()],
                      (uint8_t)-1);
       _renderStepFunctionMapping[(RenderStepType::Enum)renderStep.getType()]
-          .updateResolutionDependentResources();
+          .onReinitRendering();
       _renderSteps.push_back(renderStep);
     }
     else

@@ -567,12 +567,23 @@ float Editing::_cameraSpeed = 150.0f;
 
 // <-
 
-void Editing::init()
+void Editing::init() {}
+
+void Editing::onReinitRendering()
 {
   Resources::MeshRef meshRefGizmo =
       Resources::MeshManager::getResourceByName(_N(TranslateGizmo));
   Resources::MeshRef meshRefGrid =
       Resources::MeshManager::getResourceByName(_N(Plane));
+
+  Renderer::Vulkan::Resources::DrawCallRefArray drawCallsToDestroy;
+  if (_drawCallRefGizmo.isValid())
+    drawCallsToDestroy.push_back(_drawCallRefGizmo);
+  if (_drawCallRefGrid.isValid())
+    drawCallsToDestroy.push_back(_drawCallRefGrid);
+
+  Renderer::Vulkan::Resources::DrawCallManager::destroyDrawCallsAndResources(
+      drawCallsToDestroy);
 
   // Draw calls
   Renderer::Vulkan::Resources::DrawCallRefArray drawCallsToCreate;
@@ -664,7 +675,7 @@ void Editing::updatePerInstanceData()
       perInstanceDataVertex.normalMatrix =
           Components::CameraManager::_viewMatrix(camRef);
 
-      // Hightlight gizmo axis
+      // Highlight gizmo axis
       {
         const Components::NodeRef camNodeRef =
             Components::NodeManager::getComponentForEntity(

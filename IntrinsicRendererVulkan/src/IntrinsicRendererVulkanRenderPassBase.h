@@ -23,7 +23,7 @@ namespace RenderPass
 struct Base
 {
 
-  static void updateResolutionDependentResources();
+  static void onReinitRendering();
 };
 }
 }

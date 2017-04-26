@@ -157,7 +157,7 @@ void Lighting::init()
 
 // <-
 
-void Lighting::updateResolutionDependentResources()
+void Lighting::onReinitRendering()
 {
   using namespace Resources;
 

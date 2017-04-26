@@ -25,7 +25,7 @@ namespace RenderPass
 struct GBufferTransparents
 {
   static void init();
-  static void updateResolutionDependentResources();
+  static void onReinitRendering();
 
   static void destroy();
 

@@ -24,7 +24,7 @@ namespace RenderProcess
 {
 struct Default
 {
-  static void load();
+  static void loadRendererConfig();
   static void renderFrame(float p_DeltaT);
 
   // Static members
