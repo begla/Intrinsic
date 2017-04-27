@@ -4,6 +4,7 @@
         "name": "grid.vert",
         "gpuProgramName": "grid.vert.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 0
     }
 }

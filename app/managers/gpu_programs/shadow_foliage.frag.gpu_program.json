@@ -4,6 +4,7 @@
         "name": "shadow_foliage.frag",
         "gpuProgramName": "shadow_foliage.frag.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 1
     }
 }

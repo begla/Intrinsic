@@ -4,6 +4,7 @@
         "name": "fullscreen_triangle.vert",
         "gpuProgramName": "fullscreen_triangle.vert.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 0
     }
 }

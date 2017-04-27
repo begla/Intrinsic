@@ -4,6 +4,7 @@
         "name": "grid.frag",
         "gpuProgramName": "grid.frag.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 1
     }
 }

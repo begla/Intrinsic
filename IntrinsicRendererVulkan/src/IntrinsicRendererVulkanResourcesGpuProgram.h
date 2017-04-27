@@ -36,6 +36,7 @@ struct GpuProgramData : Dod::Resources::ResourceDataBase
     descGpuProgramName.resize(_INTR_MAX_GPU_PROGRAM_COUNT);
     descEntryPoint.resize(_INTR_MAX_GPU_PROGRAM_COUNT);
     descGpuProgramType.resize(_INTR_MAX_GPU_PROGRAM_COUNT);
+    descPreprocessorDefines.resize(_INTR_MAX_GPU_PROGRAM_COUNT);
 
     spirvBuffer.resize(_INTR_MAX_GPU_PROGRAM_COUNT);
     vkShaderModule.resize(_INTR_MAX_GPU_PROGRAM_COUNT);
@@ -45,6 +46,7 @@ struct GpuProgramData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(_INTR_STRING) descGpuProgramName;
   _INTR_ARRAY(_INTR_STRING) descEntryPoint;
   _INTR_ARRAY(uint8_t) descGpuProgramType;
+  _INTR_ARRAY(_INTR_STRING) descPreprocessorDefines;
 
   _INTR_ARRAY(SpirvBuffer) spirvBuffer;
   _INTR_ARRAY(VkShaderModule) vkShaderModule;
@@ -74,6 +76,7 @@ struct GpuProgramManager
     _descEntryPoint(p_Ref) = "";
     _descGpuProgramType(p_Ref) = GpuProgramType::kVertex;
     _spirvBuffer(p_Ref).clear();
+    _descPreprocessorDefines(p_Ref) == "";
   }
 
   // <-
@@ -107,11 +110,18 @@ struct GpuProgramManager
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(GpuProgram),
                           _N(string), _descEntryPoint(p_Ref), false, false),
         p_Document.GetAllocator());
+    p_Properties.AddMember("preprocessorDefines",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(GpuProgram), _N(string),
+                                             _descPreprocessorDefines(p_Ref),
+                                             false, false),
+                           p_Document.GetAllocator());
     p_Properties.AddMember(
-        "gpuProgramType", _INTR_CREATE_PROP_ENUM(
-                              p_Document, p_GenerateDesc, _N(GpuProgram),
-                              _N(enum), _descGpuProgramType(p_Ref),
-                              "Vertex,Fragment,Geometry,Compute", false, false),
+        "gpuProgramType",
+        _INTR_CREATE_PROP_ENUM(p_Document, p_GenerateDesc, _N(GpuProgram),
+                               _N(enum), _descGpuProgramType(p_Ref),
+                               "Vertex,Fragment,Geometry,Compute", false,
+                               false),
         p_Document.GetAllocator());
   }
 
@@ -130,6 +140,9 @@ struct GpuProgramManager
     if (p_Properties.HasMember("entryPoint"))
       _descEntryPoint(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["entryPoint"]);
+    if (p_Properties.HasMember("preprocessorDefines"))
+      _descPreprocessorDefines(p_Ref) =
+          JsonHelper::readPropertyString(p_Properties["preprocessorDefines"]);
     if (p_Properties.HasMember("gpuProgramType"))
       _descGpuProgramType(p_Ref) =
           (GpuProgramType::Enum)JsonHelper::readPropertyEnum(
@@ -163,9 +176,10 @@ struct GpuProgramManager
 
   // <-
 
-  static void compileShaders(GpuProgramRefArray p_Refs);
-  static void compileShader(GpuProgramRef p_Ref);
-  static void compileAllShaders();
+  static void compileShaders(GpuProgramRefArray p_Refs,
+                             bool p_ForceRecompile = false);
+  static void compileShader(GpuProgramRef p_Ref, bool p_ForceRecompile = false);
+  static void compileAllShaders(bool p_ForceRecompile = false);
 
   // <-
 
@@ -226,6 +240,11 @@ struct GpuProgramManager
   _INTR_INLINE static uint8_t& _descGpuProgramType(GpuProgramRef p_Ref)
   {
     return _data.descGpuProgramType[p_Ref._id];
+  }
+  _INTR_INLINE static _INTR_STRING&
+  _descPreprocessorDefines(GpuProgramRef p_Ref)
+  {
+    return _data.descPreprocessorDefines[p_Ref._id];
   }
 
   // Int. resources

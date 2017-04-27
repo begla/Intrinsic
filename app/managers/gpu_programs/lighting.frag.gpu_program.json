@@ -4,6 +4,7 @@
         "name": "lighting.frag",
         "gpuProgramName": "lighting.frag.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 1
     }
 }

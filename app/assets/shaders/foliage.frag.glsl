@@ -18,8 +18,15 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
+/* __PREPROCESSOR DEFINES__ */
+
 #include "lib_math.glsl"
 #include "surface_fragment.inc.glsl"
+
+#if defined (PRE_PASS)
+# undef OUTPUT
+# define OUTPUT
+#endif // PRE_PASS
 
 // Ubos
 PER_MATERIAL_UBO();
@@ -36,7 +43,7 @@ layout (location = 3) in vec3 inColor;
 layout (location = 4) in vec2 inUV0;
 
 // Output
-OUTPUT();
+OUTPUT
 
 void main()
 { 
@@ -59,9 +66,11 @@ void main()
     discard;
   }
 
+#if !defined (PRE_PASS)
   outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, 1.0); // Albedo
   outNormal.rg = encodeNormal(normalize(TBN * (normal.xyz * 2.0 - 1.0)));
   outNormal.b = roughness.g + uboPerMaterial.pbrBias.g; // Specular
   outNormal.a = max(roughness.b + uboPerMaterial.pbrBias.b, 0.05); // Roughness
   outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 0.0, 0.0); // Metal Mask / Material Buffer Idx
+#endif // PRE_PASS
 }

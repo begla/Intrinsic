@@ -4,6 +4,7 @@
         "name": "foliage.vert",
         "gpuProgramName": "foliage.vert.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 0
     }
 }

@@ -4,6 +4,7 @@
         "name": "gbuffer.vert",
         "gpuProgramName": "gbuffer.vert.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 0
     }
 }

@@ -4,6 +4,7 @@
         "name": "post_combine.frag",
         "gpuProgramName": "post_combine.frag.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 1
     }
 }

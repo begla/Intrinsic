@@ -4,6 +4,7 @@
         "name": "post_bloom_add.comp",
         "gpuProgramName": "post_bloom_add.comp.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 3
     }
 }

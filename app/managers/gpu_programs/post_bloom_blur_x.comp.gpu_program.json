@@ -4,6 +4,7 @@
         "name": "post_bloom_blur_x.comp",
         "gpuProgramName": "post_bloom_blur_x.comp.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 3
     }
 }
