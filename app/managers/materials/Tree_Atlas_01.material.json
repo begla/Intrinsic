@@ -14,7 +14,7 @@
             0.0,
             0.0
         ],
-        "translucencyThickness": 1.0,
+        "translucencyThickness": 2.5,
         "normalTextureName": "Tree_Atlas_01_NRM",
         "pbrTextureName": "Tree_Atlas_01_PBR",
         "pbrBias": [
