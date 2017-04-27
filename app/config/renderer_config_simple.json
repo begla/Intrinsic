@@ -22,8 +22,8 @@
 			"materialPasses" : ["GBuffer", "GBufferLayered"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
-				["Image", "Backbuffer", [0.2, 0.4, 1.0, 1.0]],
-				["Image", "GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
+				["Backbuffer", [0.2, 0.4, 1.0, 1.0]],
+				["GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
 			]
 		}
 	]
