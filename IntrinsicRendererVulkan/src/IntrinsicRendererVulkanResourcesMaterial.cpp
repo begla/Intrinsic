@@ -297,6 +297,15 @@ void MaterialManager::loadMaterialPassConfig()
 
       MaterialPass::MaterialPass matPass = {};
       {
+        RenderPassRef renderPassRef = RenderPassManager::_getResourceByName(
+            materialPassDesc["renderPass"].GetString());
+
+        if (!renderPassRef.isValid())
+        {
+          _materialPasses.push_back(MaterialPass::MaterialPass());
+          continue;
+        }
+
         for (uint32_t i = 0u; i < _materialPassBoundResources.size(); ++i)
         {
           if (_materialPassBoundResources[i].name ==
@@ -356,9 +365,7 @@ void MaterialManager::loadMaterialPassConfig()
                 GpuProgramManager::getResourceByName(
                     materialPassDesc["baseVertexGpuProgram"].GetString());
           }
-          PipelineManager::_descRenderPass(pipelineRef) =
-              RenderPassManager::getResourceByName(
-                  materialPassDesc["renderPass"].GetString());
+          PipelineManager::_descRenderPass(pipelineRef) = renderPassRef;
           PipelineManager::_descPipelineLayout(pipelineRef) = pipelineLayoutRef;
           PipelineManager::_descVertexLayout(pipelineRef) =
               VertexLayoutManager::getResourceByName(_N(Mesh));
