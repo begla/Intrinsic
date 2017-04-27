@@ -206,6 +206,9 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   QObject::connect(_ui.actionCompile_Shaders, SIGNAL(triggered()), this,
                    SLOT(onCompileShaders()));
 
+  QObject::connect(_ui.actionRecompile_Shaders, SIGNAL(triggered()), this,
+                   SLOT(onRecompileShaders()));
+
   _propertyView = new IntrinsicEdPropertyView();
   addDockWidget(Qt::RightDockWidgetArea, _propertyView);
 
@@ -940,6 +943,12 @@ void IntrinsicEd::onCompileShaders()
 {
   Intrinsic::Renderer::Vulkan::Resources::GpuProgramManager::
       compileAllShaders();
+}
+
+void IntrinsicEd::onRecompileShaders()
+{
+  Intrinsic::Renderer::Vulkan::Resources::GpuProgramManager::compileAllShaders(
+      true);
 }
 
 int IntrinsicEd::enterMainLoop()
