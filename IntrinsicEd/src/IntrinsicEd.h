@@ -86,6 +86,7 @@ public slots:
   void onDebugGeometryChanged();
   void onOpenMicroprofile();
   void onCompileShaders();
+  void onRecompileShaders();
 
 private:
   QByteArray _tempStoredGeometry;

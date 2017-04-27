@@ -63,6 +63,7 @@
      <string>Tools</string>
     </property>
     <addaction name="actionCompile_Shaders"/>
+    <addaction name="actionRecompile_Shaders"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -590,6 +591,15 @@
    </property>
    <property name="text">
     <string>Compile Shaders</string>
+   </property>
+  </action>
+  <action name="actionRecompile_Shaders">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Recompile Shaders</string>
    </property>
   </action>
  </widget>
