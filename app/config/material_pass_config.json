@@ -167,6 +167,15 @@
       "viewportSize" : "PerPixelPicking",
       "blendStates" : ["Default"],
       "boundResources" : "PerPixelPicking"
+    },
+    {
+      "name" : "GBufferFoliagePrePass",
+      "baseVertexGpuProgram" : "foliage.vert",
+      "baseFragmentGpuProgram" : "foliage_prepass.frag",
+      "renderPass" : "GBufferPrePassFoliage",
+      "blendStates" : ["Default", "Default", "Default"],
+      "rasterizationState" : "DoubleSided",
+      "boundResources" : "GBuffer"
     }
   ]
 }
