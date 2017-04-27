@@ -353,7 +353,7 @@ void LensFlare::render(float p_DeltaT)
       _imageRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
       VK_IMAGE_LAYOUT_GENERAL);
 
-  static const uint32_t blurPassCount = 4u;
+  static const uint32_t blurPassCount = 2u;
   for (uint32_t i = 0u; i < blurPassCount; ++i)
   {
     dispatchBlur(RenderSystem::getPrimaryCommandBuffer());
