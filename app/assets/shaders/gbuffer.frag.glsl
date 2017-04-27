@@ -36,7 +36,7 @@ layout (location = 3) in vec3 inColor;
 layout (location = 4) in vec2 inUV0;
 
 // Output
-OUTPUT();
+OUTPUT
 
 void main()
 { 

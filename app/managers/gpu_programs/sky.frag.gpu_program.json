@@ -4,6 +4,7 @@
         "name": "sky.frag",
         "gpuProgramName": "sky.frag.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 1
     }
 }

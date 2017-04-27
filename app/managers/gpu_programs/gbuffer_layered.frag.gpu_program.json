@@ -4,6 +4,7 @@
         "name": "gbuffer_layered.frag",
         "gpuProgramName": "gbuffer_layered.frag.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 1
     }
 }

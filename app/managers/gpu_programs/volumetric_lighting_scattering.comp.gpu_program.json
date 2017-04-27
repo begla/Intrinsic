@@ -4,6 +4,7 @@
         "name": "volumetric_lighting_scattering.comp",
         "gpuProgramName": "volumetric_lighting_scattering.comp.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 3
     }
 }

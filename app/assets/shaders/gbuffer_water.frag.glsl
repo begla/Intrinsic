@@ -39,7 +39,7 @@ layout (location = 4) in vec2 inUV0;
 layout (location = 5) in vec4 inPosition;
 
 // Output
-OUTPUT();
+OUTPUT
 
 void main()
 { 

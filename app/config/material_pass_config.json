@@ -173,7 +173,7 @@
       "baseVertexGpuProgram" : "foliage.vert",
       "baseFragmentGpuProgram" : "foliage_prepass.frag",
       "renderPass" : "GBufferPrePassFoliage",
-      "blendStates" : ["Default", "Default", "Default"],
+      "blendStates" : [],
       "rasterizationState" : "DoubleSided",
       "boundResources" : "GBuffer"
     }

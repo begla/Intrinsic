@@ -4,6 +4,7 @@
         "name": "pre_combine.frag",
         "gpuProgramName": "pre_combine.frag.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 1
     }
 }

@@ -4,6 +4,7 @@
         "name": "shadow.vert",
         "gpuProgramName": "shadow.vert.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 0
     }
 }

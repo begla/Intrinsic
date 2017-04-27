@@ -4,6 +4,7 @@
         "name": "foliage.frag",
         "gpuProgramName": "foliage.frag.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 1
     }
 }

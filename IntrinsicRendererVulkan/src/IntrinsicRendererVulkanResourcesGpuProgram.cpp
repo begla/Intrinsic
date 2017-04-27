@@ -301,7 +301,8 @@ void GpuProgramManager::reflectPipelineLayout(
       std::move(bindingDecs);
 }
 
-void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs)
+void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
+                                       bool p_ForceRecompile)
 {
   _INTR_LOG_INFO("Loading/Compiling GPU Programs...");
 
@@ -337,12 +338,34 @@ void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs)
       inFileStream.close();
       glslString = contents.str();
 
+      // Add pre processor defines
+      {
+        _INTR_ARRAY(_INTR_STRING) preProcessorDefines;
+        StringUtil::split(_descPreprocessorDefines(ref), ";",
+                          preProcessorDefines);
+
+        _INTR_STRING defineStr;
+        for (uint32_t i = 0u; i < preProcessorDefines.size(); ++i)
+        {
+          _INTR_LOG_INFO("Adding preprocessor #define '%s'...",
+                         preProcessorDefines[i].c_str());
+          defineStr += preProcessorDefines[i] + "\n";
+        }
+
+        StringUtil::replace(glslString, "/* __PREPROCESSOR DEFINES__ */",
+                            defineStr);
+      }
+
       shaderHash =
           Math::hash(glslString.c_str(), sizeof(char) * glslString.length());
-      if (isShaderUpToDate(shaderHash, fileName.c_str()))
+
+      if (!p_ForceRecompile)
       {
-        loadShaderFromCache(fileName.c_str(), spirvBuffer);
-        continue;
+        if (isShaderUpToDate(shaderHash, fileName.c_str()))
+        {
+          loadShaderFromCache(fileName.c_str(), spirvBuffer);
+          continue;
+        }
       }
     }
     else
@@ -422,13 +445,17 @@ void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs)
   PipelineManager::createResources(changedPipelines);
 }
 
-void GpuProgramManager::compileShader(GpuProgramRef p_Ref)
+void GpuProgramManager::compileShader(GpuProgramRef p_Ref,
+                                      bool p_ForceRecompile)
 {
   GpuProgramRefArray refs = {p_Ref};
-  compileShaders(refs);
+  compileShaders(refs, p_ForceRecompile);
 }
 
-void GpuProgramManager::compileAllShaders() { compileShaders(_activeRefs); }
+void GpuProgramManager::compileAllShaders(bool p_ForceRecompile)
+{
+  compileShaders(_activeRefs, p_ForceRecompile);
+}
 
 // <-
 

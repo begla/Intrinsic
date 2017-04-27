@@ -4,6 +4,7 @@
         "name": "per_pixel_picking.vert",
         "gpuProgramName": "per_pixel_picking.vert.glsl",
         "entryPoint": "main",
+        "preprocessorDefines": "",
         "gpuProgramType": 0
     }
 }
