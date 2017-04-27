@@ -203,6 +203,9 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    SIGNAL(triggered()), this,
                    SLOT(onShowDebugGeometryContextMenu()));
 
+  QObject::connect(_ui.actionCompile_Shaders, SIGNAL(triggered()), this,
+                   SLOT(onCompileShaders()));
+
   _propertyView = new IntrinsicEdPropertyView();
   addDockWidget(Qt::RightDockWidgetArea, _propertyView);
 
@@ -931,6 +934,12 @@ void IntrinsicEd::onDebugGeometryChanged()
         ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
             kWorldBoundingSpheres;
   }
+}
+
+void IntrinsicEd::onCompileShaders()
+{
+  Intrinsic::Renderer::Vulkan::Resources::GpuProgramManager::
+      compileAllShaders();
 }
 
 int IntrinsicEd::enterMainLoop()

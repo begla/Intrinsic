@@ -58,9 +58,16 @@
     <addaction name="separator"/>
     <addaction name="actionAssets"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionCompile_Shaders"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuManagers"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="windowTitle">
@@ -574,6 +581,15 @@
    </property>
    <property name="toolTip">
     <string>Open Microprofile</string>
+   </property>
+  </action>
+  <action name="actionCompile_Shaders">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Compile Shaders</string>
    </property>
   </action>
  </widget>

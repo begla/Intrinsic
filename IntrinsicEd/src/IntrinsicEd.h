@@ -85,6 +85,7 @@ public slots:
   void onShowCreateContextMenu();
   void onDebugGeometryChanged();
   void onOpenMicroprofile();
+  void onCompileShaders();
 
 private:
   QByteArray _tempStoredGeometry;
