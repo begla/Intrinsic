@@ -6,12 +6,12 @@
         "imageFormat": 7,
         "flags": 16,
         "dimensions": [
-            1024.0,
-            576.0,
+            5184.0,
+            3456.0,
             1.0
         ],
         "arrayLayerCount": 1,
-        "mipLevelCount": 11,
+        "mipLevelCount": 13,
         "fileName": "lens_dirt.dds"
     }
 }

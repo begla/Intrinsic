@@ -60,14 +60,14 @@ void main()
   const vec4 lensDirt = textureLod(lensDirtTex, inUV0, 0.0).rgba;
   const vec4 lensFlare = textureLod(lensFlareTex, inUV0, 0.0).rgba;
 
-  const float lensDirtLumThreshold = 0.3;
-  const float lensDirtIntens = 0.75;
-  const float toneMappingLumTarget = 0.4;
+  const float lensDirtLumThreshold = 0.2;
+  const float lensDirtIntens = 0.9;
+  const float toneMappingLumTarget = 0.5;
   const float toneMappingMaxExposure = 3.0;
-  const float bloomFactor = 0.5;
+  const float bloomFactor = 1.0;
   const float filmGrainBias = 0.0;
-  const float filmGrainMax = 0.5;
-  const float lensFlareFactor = 0.5;
+  const float filmGrainMax = 0.8;
+  const float lensFlareFactor = 1.0;
 
   const float exposure = min(toneMappingLumTarget / avgLum[0], toneMappingMaxExposure);
 
@@ -86,8 +86,7 @@ void main()
   // Tonemapping
   outColor.rgb *= exposure;
   outColor.rgb = tonemap(outColor.rgb);
-
-  vec3 whiteScale = 1.0/tonemap(vec3(W, W, W));
+  vec3 whiteScale = 1.0/tonemap(vec3(W));
   outColor.rgb *= whiteScale;
 }
  
