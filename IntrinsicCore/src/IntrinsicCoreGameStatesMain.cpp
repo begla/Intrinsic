@@ -58,6 +58,9 @@ void Main::update(float p_DeltaT)
   for (uint32_t i = 0u; i < Components::PlayerManager::_activeRefs.size(); ++i)
   {
     Components::PlayerRef playerRef = Components::PlayerManager::_activeRefs[i];
+    Components::NodeRef playerNodeRef =
+        Components::NodeManager::getComponentForEntity(
+            Components::PlayerManager::_entity(playerRef));
 
     if (Components::PlayerManager::_descPlayerId(playerRef) == 0u)
     {
@@ -96,44 +99,55 @@ void Main::update(float p_DeltaT)
             camSpeedMouse * Input::System::getLastMousePosRel().y * p_DeltaT;
       }
 
+      static const float moveSpeed = 8.0f;
+      static const float runMultiplier = 0.5f;
+      static const float jumpSpeed = 20.0f;
+
+      const float actualMovedSpeed =
+          moveSpeed * (1.0f + runMultiplier * Input::System::getVirtualKeyState(
+                                                  Input::VirtualKey::kRun));
+
+      glm::vec3 moveVector = glm::vec3(0.0f);
+      {
+        moveVector +=
+            Input::System::getVirtualKeyState(Input::VirtualKey::kMoveUp) *
+            glm::vec3(0.0f, 0.0f, 1.0f);
+        moveVector +=
+            Input::System::getVirtualKeyState(Input::VirtualKey::kMoveDown) *
+            glm::vec3(0.0f, 0.0f, -1.0f);
+        moveVector +=
+            Input::System::getVirtualKeyState(Input::VirtualKey::kMoveRight) *
+            glm::vec3(-1.0f, 0.0f, 0.0f);
+        moveVector +=
+            Input::System::getVirtualKeyState(Input::VirtualKey::kMoveLeft) *
+            glm::vec3(1.0f, 0.0f, 0.0f);
+
+        moveVector += glm::vec3(-Input::System::getVirtualKeyState(
+                                    Input::VirtualKey::kMoveHorizontal),
+                                0.0f, 0.0f);
+        moveVector += glm::vec3(0.0f, 0.0f,
+                                -Input::System::getVirtualKeyState(
+                                    Input::VirtualKey::kMoveVertical));
+      }
+
+      moveVector = camOrient * moveVector;
+      moveVector.y = 0.0f;
+      moveVector *= actualMovedSpeed;
+
+      // Rotate the player into the direction of the move vector
+
+      const float movVecLen = glm::length(moveVector);
+
+      if (movVecLen > _INTR_EPSILON)
+      {
+        const glm::vec3 playerOrientation = moveVector / movVecLen;
+        Components::NodeManager::_orientation(playerNodeRef) =
+            glm::rotation(glm::vec3(0.0, 0.0, 1.0), playerOrientation);
+        Components::NodeManager::updateTransforms(playerNodeRef);
+      }
+
       if (charCtrlRef.isValid())
       {
-        static const float moveSpeed = 8.0f;
-        static const float runMultiplier = 0.5f;
-        static const float jumpSpeed = 20.0f;
-
-        const float actualMovedSpeed =
-            moveSpeed *
-            (1.0f + runMultiplier * Input::System::getVirtualKeyState(
-                                        Input::VirtualKey::kRun));
-
-        glm::vec3 moveVector = glm::vec3(0.0f);
-        {
-          moveVector +=
-              Input::System::getVirtualKeyState(Input::VirtualKey::kMoveUp) *
-              glm::vec3(0.0f, 0.0f, 1.0f);
-          moveVector +=
-              Input::System::getVirtualKeyState(Input::VirtualKey::kMoveDown) *
-              glm::vec3(0.0f, 0.0f, -1.0f);
-          moveVector +=
-              Input::System::getVirtualKeyState(Input::VirtualKey::kMoveRight) *
-              glm::vec3(-1.0f, 0.0f, 0.0f);
-          moveVector +=
-              Input::System::getVirtualKeyState(Input::VirtualKey::kMoveLeft) *
-              glm::vec3(1.0f, 0.0f, 0.0f);
-
-          moveVector += glm::vec3(-Input::System::getVirtualKeyState(
-                                      Input::VirtualKey::kMoveHorizontal),
-                                  0.0f, 0.0f);
-          moveVector += glm::vec3(0.0f, 0.0f,
-                                  -Input::System::getVirtualKeyState(
-                                      Input::VirtualKey::kMoveVertical));
-        }
-
-        moveVector = camOrient * moveVector;
-        moveVector.y = 0.0f;
-        moveVector *= actualMovedSpeed;
-
         if (Components::CharacterControllerManager::isGrounded(charCtrlRef) &&
             Input::System::getVirtualKeyState(Input::VirtualKey::kJump) > 0.0f)
         {
