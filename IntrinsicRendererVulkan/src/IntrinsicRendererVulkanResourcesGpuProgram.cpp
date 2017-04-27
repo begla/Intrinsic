@@ -70,11 +70,11 @@ TBuiltInResource _defaultResource;
 rapidjson::Document _shaderCache = rapidjson::Document(rapidjson::kObjectType);
 // <-
 
-bool isShaderUpToDate(uint32_t p_ShaderHash, const char* p_FilePath)
+bool isShaderUpToDate(uint32_t p_ShaderHash, const char* p_GpuProgramName)
 {
-  if (_shaderCache.HasMember(p_FilePath))
+  if (_shaderCache.HasMember(p_GpuProgramName))
   {
-    return _shaderCache[p_FilePath].GetUint() == p_ShaderHash;
+    return _shaderCache[p_GpuProgramName].GetUint() == p_ShaderHash;
   }
 
   return false;
@@ -119,21 +119,21 @@ void saveShaderCache()
   Tlsf::MainAllocator::free(writeBuffer);
 }
 
-void addShaderToCache(uint32_t p_ShaderHash, const _INTR_STRING& p_FileName,
+void addShaderToCache(uint32_t p_ShaderHash, const char* p_GpuProgramName,
                       const SpirvBuffer& p_SpirvBuffer)
 {
-  if (_shaderCache.HasMember(p_FileName.c_str()))
+  if (_shaderCache.HasMember(p_GpuProgramName))
   {
-    _shaderCache[p_FileName.c_str()].SetUint(p_ShaderHash);
+    _shaderCache[p_GpuProgramName].SetUint(p_ShaderHash);
   }
   else
   {
     rapidjson::Value fileName =
-        rapidjson::Value(p_FileName.c_str(), _shaderCache.GetAllocator());
+        rapidjson::Value(p_GpuProgramName, _shaderCache.GetAllocator());
     _shaderCache.AddMember(fileName, p_ShaderHash, _shaderCache.GetAllocator());
   }
 
-  _INTR_STRING cacheFileName = _shaderCachePath + p_FileName + ".cached";
+  _INTR_STRING cacheFileName = _shaderCachePath + p_GpuProgramName + ".cached";
   _INTR_OFSTREAM of(cacheFileName.c_str(), std::ofstream::binary);
   of.write((const char*)p_SpirvBuffer.data(),
            p_SpirvBuffer.size() * sizeof(uint32_t));
@@ -142,10 +142,10 @@ void addShaderToCache(uint32_t p_ShaderHash, const _INTR_STRING& p_FileName,
   saveShaderCache();
 }
 
-void loadShaderFromCache(const _INTR_STRING& p_FileName,
+void loadShaderFromCache(const char* p_GpuProgranName,
                          SpirvBuffer& p_SpirvBuffer)
 {
-  _INTR_STRING cacheFileName = _shaderCachePath + p_FileName + ".cached";
+  _INTR_STRING cacheFileName = _shaderCachePath + p_GpuProgranName + ".cached";
   _INTR_IFSTREAM ifs(cacheFileName.c_str(), std::ifstream::binary);
 
   ifs.seekg(0, ifs.end);
@@ -311,6 +311,8 @@ void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
   for (uint32_t gpIdx = 0u; gpIdx < p_Refs.size(); ++gpIdx)
   {
     GpuProgramRef ref = p_Refs[gpIdx];
+    const _INTR_STRING gpuProgramName =
+        "gpu_program_" + StringUtil::toString(_name(ref)._hash);
 
     SpirvBuffer& spirvBuffer = _spirvBuffer(ref);
     spirvBuffer.clear();
@@ -361,20 +363,20 @@ void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
 
       if (!p_ForceRecompile)
       {
-        if (isShaderUpToDate(shaderHash, fileName.c_str()))
+        if (isShaderUpToDate(shaderHash, gpuProgramName.c_str()))
         {
-          loadShaderFromCache(fileName.c_str(), spirvBuffer);
+          loadShaderFromCache(gpuProgramName.c_str(), spirvBuffer);
           continue;
         }
       }
     }
     else
     {
-      loadShaderFromCache(fileName.c_str(), spirvBuffer);
+      loadShaderFromCache(gpuProgramName.c_str(), spirvBuffer);
       continue;
     }
 
-    _INTR_LOG_INFO("Compiling GPU program '%s'...", _name(ref)._string.c_str());
+    _INTR_LOG_INFO("Compiling GPU program '%s'...", );
 
     const char* glslStringChar = glslString.c_str();
     shader.setStrings(&glslStringChar, 1);
@@ -387,7 +389,7 @@ void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
       _INTR_LOG_WARNING(shader.getInfoDebugLog());
 
       // Try to load the previous shader from the cache
-      loadShaderFromCache(fileName.c_str(), spirvBuffer);
+      loadShaderFromCache(gpuProgramName.c_str(), spirvBuffer);
       continue;
     }
 
@@ -400,7 +402,7 @@ void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
       _INTR_LOG_WARNING(shader.getInfoDebugLog());
 
       // Try to load the previous shader from the cache
-      loadShaderFromCache(fileName.c_str(), spirvBuffer);
+      loadShaderFromCache(gpuProgramName.c_str(), spirvBuffer);
       continue;
     }
 
@@ -408,7 +410,7 @@ void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
     _INTR_LOG_WARNING(shader.getInfoDebugLog());
 
     glslang::GlslangToSpv(*program.getIntermediate(stage), spirvBuffer);
-    addShaderToCache(shaderHash, fileName.c_str(), spirvBuffer);
+    addShaderToCache(shaderHash, gpuProgramName.c_str(), spirvBuffer);
 
     changedGpuPrograms.push_back(ref);
   }
