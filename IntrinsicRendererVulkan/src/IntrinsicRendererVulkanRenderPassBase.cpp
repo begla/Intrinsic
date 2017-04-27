@@ -41,7 +41,7 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
     const rapidjson::Value& outputDesc = outputs[i];
 
     VkClearValue clearValue = {};
-    if (outputs.Size() > 1u)
+    if (outputDesc.Size() > 1u)
     {
       const rapidjson::Value& clearColorDesc = outputDesc[1u];
 

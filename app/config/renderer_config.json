@@ -69,23 +69,144 @@
 			"materialPasses" : ["GBuffer", "GBufferLayered"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
-				["GBufferAlbedo", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferAlbedo", [0.0, 0.0, 0.0, 1.0]],
 				["GBufferNormal", [0.0, 0.0, 0.0, 0.0]],
 				["GBufferParameter0", [0.0, 0.0, 0.0, 0.0]],
-				["GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
+				["GBufferDepth", [1.0]]
 			]
 		},
 		{
-			"type" : "RenderPassFoliage"
+			"type" : "RenderPassGenericMesh",
+			"images" : [],
+			"name" : "GBufferFoliage",
+			"materialPasses" : ["GBufferFoliage"],
+			"renderOrder" : "FrontToBack",
+			"outputs" : [
+				["GBufferAlbedo"],
+				["GBufferNormal"],
+				["GBufferParameter0"],
+				["GBufferDepth"]
+			]
 		},
 		{
-			"type" : "RenderPassSky"
+			"type" : "RenderPassGenericMesh",
+			"images" : [],
+			"name" : "GBufferSky",
+			"materialPasses" : ["GBufferSky"],
+			"renderOrder" : "BackToFront",
+			"outputs" : [
+				["GBufferAlbedo"],
+				["GBufferDepth"]
+			]
 		},
 		{
 			"type" : "RenderPassDebug"
 		},
 		{
-			"type" : "RenderPassGBufferTransparents"
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferAlbedo",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferNormal",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferParameter0",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferDepth",
+			"sourceImageLayout" : "DepthStencilAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsAlbedo",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsNormal",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsParameter0",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsDepth",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "DepthStencilAttachment"
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"images" : [
+				{
+					"name" : "GBufferTransparentsAlbedo",
+					"renderSize" : "Full",
+					"imageFormat" : "R16G16B16A16Float"
+				},
+				{
+					"name" : "GBufferTransparentsNormal",
+					"renderSize" : "Full",
+					"imageFormat" : "R16G16B16A16Float"
+				},
+				{
+					"name" : "GBufferTransparentsParameter0",
+					"renderSize" : "Full",
+					"imageFormat" : "R16G16B16A16Float"
+				},
+				{
+					"name" : "GBufferTransparentsDepth",
+					"renderSize" : "Full",
+					"imageFormat" : "Depth"
+				}
+			],
+			"name" : "GBufferTransparents",
+			"materialPasses" : ["GBufferWater"],
+			"renderOrder" : "BackToFront",
+			"outputs" : [
+				["GBufferTransparentsAlbedo", [0.0, 0.0, 0.0, 1.0]],
+				["GBufferTransparentsNormal", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferTransparentsParameter0", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferTransparentsDepth", [1.0]]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsAlbedo",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsNormal",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsParameter0",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsDepth",
+			"sourceImageLayout" : "DepthStencilAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
 		},
 		{
 			"type" : "RenderPassPerPixelPicking"
