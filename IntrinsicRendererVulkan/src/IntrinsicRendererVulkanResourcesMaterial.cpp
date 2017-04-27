@@ -302,6 +302,10 @@ void MaterialManager::loadMaterialPassConfig()
 
         if (!renderPassRef.isValid())
         {
+          _INTR_LOG_WARNING(
+              "Render pass '%s' not found, skipping material pass '%s'...",
+              materialPassDesc["renderPass"].GetString(),
+              materialPassDesc["name"].GetString());
           _materialPasses.push_back(MaterialPass::MaterialPass());
           continue;
         }
