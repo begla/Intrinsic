@@ -41,9 +41,9 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
     const rapidjson::Value& outputDesc = outputs[i];
 
     VkClearValue clearValue = {};
-    if (outputs.Size() > 2u)
+    if (outputs.Size() > 1u)
     {
-      const rapidjson::Value& clearColorDesc = outputDesc[2u];
+      const rapidjson::Value& clearColorDesc = outputDesc[1u];
 
       if (clearColorDesc.Size() > 1u)
       {
@@ -102,18 +102,18 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
     _renderPassRef = RenderPassManager::createRenderPass(_name);
     RenderPassManager::resetToDefault(_renderPassRef);
 
-    if (outputs[0][1] != "Backbuffer")
+    if (outputs[0][0] != "Backbuffer")
     {
       for (uint32_t i = 0u; i < outputs.Size(); ++i)
       {
         const rapidjson::Value& outputDesc = outputs[i];
 
         ImageRef imageRef =
-            ImageManager::_getResourceByName(outputDesc[1].GetString());
+            ImageManager::_getResourceByName(outputDesc[0].GetString());
 
         AttachmentDescription colorAttachment = {
             (uint8_t)ImageManager::_descImageFormat(imageRef),
-            outputDesc.Size() > 2u ? AttachmentFlags::kClearOnLoad : 0u};
+            outputDesc.Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
         RenderPassManager::_descAttachments(_renderPassRef)
             .push_back(colorAttachment);
       }
@@ -122,7 +122,7 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
     {
       AttachmentDescription sceneAttachment = {
           Format::kB8G8R8A8Srgb,
-          outputs[0].Size() > 2u ? AttachmentFlags::kClearOnLoad : 0u};
+          outputs[0].Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
       RenderPassManager::_descAttachments(_renderPassRef)
           .push_back(sceneAttachment);
     }
@@ -132,7 +132,7 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
   RenderPassManager::createResources(renderpassesToCreate);
 
   // Create framebuffer
-  if (outputs[0][1] != "Backbuffer")
+  if (outputs[0][0] != "Backbuffer")
   {
     FramebufferRef framebufferRef =
         FramebufferManager::createFramebuffer(_name);
@@ -145,7 +145,7 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
       for (uint32_t i = 0u; i < outputs.Size(); ++i)
       {
         ImageRef outputImage =
-            ImageManager::getResourceByName(outputs[i][1].GetString());
+            ImageManager::getResourceByName(outputs[i][0].GetString());
         FramebufferManager::_descAttachedImages(framebufferRef)
             .push_back(outputImage);
 

@@ -69,10 +69,10 @@
 			"materialPasses" : ["GBuffer", "GBufferLayered"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
-				["Image", "GBufferAlbedo", [0.0, 0.0, 0.0, 0.0]],
-				["Image", "GBufferNormal", [0.0, 0.0, 0.0, 0.0]],
-				["Image", "GBufferParameter0", [0.0, 0.0, 0.0, 0.0]],
-				["Image", "GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
+				["GBufferAlbedo", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferNormal", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferParameter0", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
 			]
 		},
 		{
@@ -133,7 +133,7 @@
 				["Image", "VolumetricLightingScatteringBuffer", "volumetricLightingScatteringBufferTex", "Fragment", "LinearClamp"]
 			],
 			"outputs" : [
-				["Image", "Scene"]
+				["Scene"]
 			]
 		},
 		{
@@ -165,7 +165,7 @@
 				["Buffer", "BloomLumBuffer", "AvgLum", "Fragment"]
 			],
 			"outputs" : [
-				["Image", "Backbuffer"]
+				["Backbuffer"]
 			]
 		}
 	]
