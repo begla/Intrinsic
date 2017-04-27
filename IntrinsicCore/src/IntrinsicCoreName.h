@@ -35,6 +35,15 @@ struct Name
 
   _INTR_INLINE bool isValid() const { return _hash != 0u; }
 
+  _INTR_INLINE _INTR_STRING getString() const
+  {
+#if !defined(INTR_FINAL_BUILD)
+    return _string;
+#else
+    return StringUtil::toString(_hash);
+#endif // INTR_FINAL_BUILD
+  }
+
   _INTR_INLINE bool operator==(const Name& p_Rhs) const
   {
     return _hash == p_Rhs._hash;
