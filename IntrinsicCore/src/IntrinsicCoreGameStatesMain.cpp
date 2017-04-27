@@ -130,21 +130,9 @@ void Main::update(float p_DeltaT)
                                     Input::VirtualKey::kMoveVertical));
       }
 
-      moveVector = camOrient * moveVector;
+      moveVector = camOrient * glm::normalize(moveVector);
       moveVector.y = 0.0f;
       moveVector *= actualMovedSpeed;
-
-      // Rotate the player into the direction of the move vector
-
-      const float movVecLen = glm::length(moveVector);
-
-      if (movVecLen > _INTR_EPSILON)
-      {
-        const glm::vec3 playerOrientation = moveVector / movVecLen;
-        Components::NodeManager::_orientation(playerNodeRef) =
-            glm::rotation(glm::vec3(0.0, 0.0, 1.0), playerOrientation);
-        Components::NodeManager::updateTransforms(playerNodeRef);
-      }
 
       if (charCtrlRef.isValid())
       {
@@ -155,6 +143,21 @@ void Main::update(float p_DeltaT)
         }
 
         Components::CharacterControllerManager::move(charCtrlRef, moveVector);
+
+        // Rotate the player into the direction of the move vector
+        glm::vec3 actualMoveVector =
+            Components::CharacterControllerManager::_internalMoveVector(
+                charCtrlRef);
+        actualMoveVector.y = 0.0f;
+        const float movVecLen = glm::length(actualMoveVector);
+
+        if (movVecLen > _INTR_EPSILON)
+        {
+          const glm::vec3 playerOrientation = actualMoveVector / movVecLen;
+          Components::NodeManager::_orientation(playerNodeRef) =
+              glm::rotation(glm::vec3(0.0, 0.0, 1.0), playerOrientation);
+          Components::NodeManager::updateTransforms(playerNodeRef);
+        }
       }
     }
 
