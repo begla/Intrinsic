@@ -14,7 +14,7 @@
             0.0,
             0.0
         ],
-        "translucencyThickness": 0.0,
+        "translucencyThickness": 1.0,
         "normalTextureName": "default_NRM",
         "pbrTextureName": "default_PBR",
         "pbrBias": [

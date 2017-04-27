@@ -46,11 +46,11 @@ void main()
     ns = -1.0;
   }
 
-  const mat3 TBN = mat3(inTangent, inBinormal, inNormal);
+  const mat3 TBN = mat3(inTangent, inBinormal, ns * inNormal);
 
-  const vec2 uv0 = UV0_TRANSFORMED;
+  const vec2 uv0 = clamp(UV0_TRANSFORMED, 0.001, 0.999);
 
-  vec4 albedo = texture(albedoTex, clamp(uv0, 0.001, 0.999));
+  const vec4 albedo = texture(albedoTex, uv0);
   const vec4 normal = texture(normalTex, uv0);
   const vec4 roughness = texture(roughnessTex, uv0);
 
@@ -60,7 +60,7 @@ void main()
   }
 
   outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, 1.0); // Albedo
-  outNormal.rg = encodeNormal(ns * normalize(TBN * (normal.xyz * 2.0 - 1.0)));
+  outNormal.rg = encodeNormal(normalize(TBN * (normal.xyz * 2.0 - 1.0)));
   outNormal.b = roughness.g + uboPerMaterial.pbrBias.g; // Specular
   outNormal.a = max(roughness.b + uboPerMaterial.pbrBias.b, 0.05); // Roughness
   outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 0.0, 0.0); // Metal Mask / Material Buffer Idx
