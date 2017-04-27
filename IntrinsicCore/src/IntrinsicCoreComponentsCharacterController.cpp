@@ -119,7 +119,7 @@ void CharacterControllerManager::updateControllers(
     {
       glm::vec2 dampedXzMovement =
           glm::vec2(internalMoveVector.x, internalMoveVector.z);
-      Math::dampSimple(dampedXzMovement, 0.01f, p_DeltaT);
+      Math::dampSimple(dampedXzMovement, 0.005f, p_DeltaT);
       internalMoveVector.x = dampedXzMovement.x;
       internalMoveVector.z = dampedXzMovement.y;
     }
