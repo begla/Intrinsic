@@ -98,7 +98,7 @@ void main()
 
     // Water fog
     const float waterFogDensity = 50.0;
-    const float waterFogMaxBlendFactor = 1.0;
+    const float waterFogMaxBlendFactor = 0.9;
     const vec3 waterFogColor0 = vec3(0.2, 0.5, 1.0);
     const vec3 waterFogColor1 = vec3(0.0, 0.0, 0.0);
 
