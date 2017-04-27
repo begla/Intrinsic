@@ -376,7 +376,8 @@ void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
       continue;
     }
 
-    _INTR_LOG_INFO("Compiling GPU program '%s'...", );
+    _INTR_LOG_INFO("Compiling GPU program '%s'...",
+                   _descGpuProgramName(ref).c_str());
 
     const char* glslStringChar = glslString.c_str();
     shader.setStrings(&glslStringChar, 1);
