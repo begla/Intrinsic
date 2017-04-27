@@ -438,6 +438,13 @@ void GpuProgramManager::createResources(const GpuProgramRefArray& p_Refs)
   {
     GpuProgramRef ref = p_Refs[i];
     const SpirvBuffer& spirvBuffer = _spirvBuffer(ref);
+
+    // No spirv buffer? Retrieve it from the cache or compile the shader
+    if (spirvBuffer.empty())
+    {
+      compileShader(ref);
+    }
+
     VkShaderModule& module = _vkShaderModule(ref);
 
     // Shader module
