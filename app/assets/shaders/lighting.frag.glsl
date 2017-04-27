@@ -109,9 +109,9 @@ void main()
   outColor.rgb += shadowAttenuation * calcLighting(d) * lightColor;
 
   // Translucency
-  const float translDistortion = 1.0;
-  const float translPower = 3.0;
-  const float translScale = 5.0;
+  const float translDistortion = 0.2;
+  const float translPower = 12.0;
+  const float translScale = 1.0;
   const vec3 translAmbient = vec3(0.0);
   const float translThickness = matParams.translucencyThickness;
 
@@ -120,7 +120,7 @@ void main()
   vec3 transl = (translDot + translAmbient) * translThickness;
   vec3 translColor = d.diffuseColor * lightColor * transl;
 
-  outColor.rgb += shadowAttenuation * translColor;
+  outColor.rgb += translColor;
 
   outColor.a = 1.0;
 }
