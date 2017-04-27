@@ -442,19 +442,6 @@ void Debug::render(float p_DeltaT)
   }
   RenderSystem::endRenderPass(_renderPassRef);
 
-  ImageManager::insertImageMemoryBarrier(
-      _albedoImageRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-  ImageManager::insertImageMemoryBarrier(
-      _normalImageRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-  ImageManager::insertImageMemoryBarrier(
-      _parameter0ImageRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-  ImageManager::insertImageMemoryBarrier(
-      _depthImageRef, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
   // Reset the current line count to zero
   _currentLineVertexCount = 0u;
 }

@@ -38,11 +38,7 @@ enum Enum
   kRenderPassGenericFullscreen,
   kRenderPassGenericMesh,
 
-  // TODO: Port me
-  kRenderPassFoliage,
-  kRenderPassSky,
   kRenderPassDebug,
-  kRenderPassGBufferTransparents,
   kRenderPassPerPixelPicking,
   kRenderPassShadow,
   kRenderPassLighting,
@@ -54,11 +50,7 @@ enum Enum
 
 _INTR_HASH_MAP(Name, RenderStepType::Enum)
 _renderStepTypeMapping = {
-    {"RenderPassFoliage", RenderStepType::kRenderPassFoliage},
-    {"RenderPassSky", RenderStepType::kRenderPassSky},
     {"RenderPassDebug", RenderStepType::kRenderPassDebug},
-    {"RenderPassGBufferTransparents",
-     RenderStepType::kRenderPassGBufferTransparents},
     {"RenderPassPerPixelPicking", RenderStepType::kRenderPassPerPixelPicking},
     {"RenderPassShadow", RenderStepType::kRenderPassShadow},
     {"RenderPassLighting", RenderStepType::kRenderPassLighting},
@@ -75,15 +67,8 @@ struct RenderPassInterface
 
 _INTR_HASH_MAP(RenderStepType::Enum, RenderPassInterface)
 _renderStepFunctionMapping = {
-    {RenderStepType::kRenderPassFoliage,
-     {RenderPass::Foliage::render, RenderPass::Foliage::onReinitRendering}},
-    {RenderStepType::kRenderPassSky,
-     {RenderPass::Sky::render, RenderPass::Sky::onReinitRendering}},
     {RenderStepType::kRenderPassDebug,
      {RenderPass::Debug::render, RenderPass::Debug::onReinitRendering}},
-    {RenderStepType::kRenderPassGBufferTransparents,
-     {RenderPass::GBufferTransparents::render,
-      RenderPass::GBufferTransparents::onReinitRendering}},
     {RenderStepType::kRenderPassPerPixelPicking,
      {RenderPass::PerPixelPicking::render,
       RenderPass::PerPixelPicking::onReinitRendering}},

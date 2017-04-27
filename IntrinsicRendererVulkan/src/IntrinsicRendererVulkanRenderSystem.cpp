@@ -154,9 +154,6 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
   {
     _INTR_PROFILE_AUTO("Init. Render Passes");
 
-    RenderPass::GBufferTransparents::init();
-    RenderPass::Sky::init();
-    RenderPass::Foliage::init();
     RenderPass::Shadow::init();
 
     RenderPass::Lighting::init();
