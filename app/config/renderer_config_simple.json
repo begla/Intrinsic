@@ -10,6 +10,12 @@
 	],
 	"renderSteps" : [
 		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferDepth",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "DepthStencilAttachment"
+		},
+		{
 			"type" : "RenderPassGenericMesh",
 			"images" : [
 				{
@@ -22,8 +28,20 @@
 			"materialPasses" : ["GBuffer", "GBufferLayered"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
-				["Backbuffer", [0.2, 0.4, 1.0, 1.0]],
+				["Backbuffer", [0.4, 0.4, 1.0, 1.0]],
 				["GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
+			]
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"images" : [
+			],
+			"name" : "GBufferFoliage",
+			"materialPasses" : ["GBufferFoliage"],
+			"renderOrder" : "FrontToBack",
+			"outputs" : [
+				["Backbuffer"],
+				["GBufferDepth"]
 			]
 		}
 	]

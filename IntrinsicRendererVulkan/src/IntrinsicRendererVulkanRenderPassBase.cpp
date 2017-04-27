@@ -36,9 +36,10 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
   const rapidjson::Value& images = p_RenderPassDesc["images"];
   _name = p_RenderPassDesc["name"].GetString();
 
-  for (uint32_t i = 0u; i < outputs.Size(); ++i)
+  for (uint32_t backBufferIdx = 0u; backBufferIdx < outputs.Size();
+       ++backBufferIdx)
   {
-    const rapidjson::Value& outputDesc = outputs[i];
+    const rapidjson::Value& outputDesc = outputs[backBufferIdx];
 
     VkClearValue clearValue = {};
     if (outputDesc.Size() > 1u)
@@ -102,29 +103,29 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
     _renderPassRef = RenderPassManager::createRenderPass(_name);
     RenderPassManager::resetToDefault(_renderPassRef);
 
-    if (outputs[0][0] != "Backbuffer")
+    for (uint32_t i = 0u; i < outputs.Size(); ++i)
     {
-      for (uint32_t i = 0u; i < outputs.Size(); ++i)
+      const rapidjson::Value& outputDesc = outputs[i];
+
+      ImageRef imageRef =
+          ImageManager::_getResourceByName(outputDesc[0].GetString());
+
+      if (outputs[i][0] != "Backbuffer")
       {
-        const rapidjson::Value& outputDesc = outputs[i];
-
-        ImageRef imageRef =
-            ImageManager::_getResourceByName(outputDesc[0].GetString());
-
         AttachmentDescription colorAttachment = {
             (uint8_t)ImageManager::_descImageFormat(imageRef),
             outputDesc.Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
         RenderPassManager::_descAttachments(_renderPassRef)
             .push_back(colorAttachment);
       }
-    }
-    else
-    {
-      AttachmentDescription sceneAttachment = {
-          Format::kB8G8R8A8Srgb,
-          outputs[0].Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
-      RenderPassManager::_descAttachments(_renderPassRef)
-          .push_back(sceneAttachment);
+      else
+      {
+        AttachmentDescription sceneAttachment = {
+            Format::kB8G8R8A8Srgb,
+            outputs[0].Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
+        RenderPassManager::_descAttachments(_renderPassRef)
+            .push_back(sceneAttachment);
+      }
     }
   }
   renderpassesToCreate.push_back(_renderPassRef);
@@ -132,8 +133,12 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
   RenderPassManager::createResources(renderpassesToCreate);
 
   // Create framebuffer
-  if (outputs[0][0] != "Backbuffer")
+
+  for (uint32_t backBufferIdx = 0u;
+       backBufferIdx < (uint32_t)RenderSystem::_vkSwapchainImages.size();
+       ++backBufferIdx)
   {
+
     FramebufferRef framebufferRef =
         FramebufferManager::createFramebuffer(_name);
     {
@@ -144,15 +149,31 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
       glm::uvec3 dim = glm::vec3(0u);
       for (uint32_t i = 0u; i < outputs.Size(); ++i)
       {
-        ImageRef outputImage =
-            ImageManager::getResourceByName(outputs[i][0].GetString());
-        FramebufferManager::_descAttachedImages(framebufferRef)
-            .push_back(outputImage);
+        if (outputs[i][0] != "Backbuffer")
+        {
+          ImageRef outputImage =
+              ImageManager::getResourceByName(outputs[i][0].GetString());
+          FramebufferManager::_descAttachedImages(framebufferRef)
+              .push_back(outputImage);
 
-        _INTR_ASSERT((dim == glm::uvec3(0u) ||
-                      dim == ImageManager::_descDimensions(outputImage)) &&
-                     "Dimensions of all outputs must be identical");
-        dim = ImageManager::_descDimensions(outputImage);
+          _INTR_ASSERT((dim == glm::uvec3(0u) ||
+                        dim == ImageManager::_descDimensions(outputImage)) &&
+                       "Dimensions of all outputs must be identical");
+          dim = ImageManager::_descDimensions(outputImage);
+        }
+        else
+        {
+          ImageRef outputImage = ImageManager::getResourceByName(
+              _INTR_STRING("Backbuffer") +
+              StringUtil::toString<uint32_t>(backBufferIdx));
+          FramebufferManager::_descAttachedImages(framebufferRef)
+              .push_back(outputImage);
+
+          _INTR_ASSERT((dim == glm::uvec3(0u) ||
+                        dim == ImageManager::_descDimensions(outputImage)) &&
+                       "Dimensions of all outputs must be identical");
+          dim = ImageManager::_descDimensions(outputImage);
+        }
       }
 
       FramebufferManager::_descDimensions(framebufferRef) = dim;
@@ -160,31 +181,6 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
     }
     framebuffersToCreate.push_back(framebufferRef);
     _framebufferRefs.push_back(framebufferRef);
-  }
-  else
-  {
-    for (uint32_t i = 0u; i < (uint32_t)RenderSystem::_vkSwapchainImages.size();
-         ++i)
-    {
-      FramebufferRef fbRef = FramebufferManager::createFramebuffer(_name);
-      {
-        FramebufferManager::resetToDefault(fbRef);
-        FramebufferManager::addResourceFlags(
-            fbRef, Dod::Resources::ResourceFlags::kResourceVolatile);
-
-        FramebufferManager::_descAttachedImages(fbRef).push_back(
-            ImageManager::getResourceByName(_INTR_STRING("Backbuffer") +
-                                            StringUtil::toString<uint32_t>(i)));
-
-        FramebufferManager::_descDimensions(fbRef) =
-            glm::uvec2(RenderSystem::_backbufferDimensions.x,
-                       RenderSystem::_backbufferDimensions.y);
-        FramebufferManager::_descRenderPass(fbRef) = _renderPassRef;
-      }
-
-      framebuffersToCreate.push_back(fbRef);
-      _framebufferRefs.push_back(fbRef);
-    }
   }
 
   FramebufferManager::createResources(framebuffersToCreate);
