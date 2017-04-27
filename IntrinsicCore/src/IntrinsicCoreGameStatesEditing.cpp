@@ -572,9 +572,9 @@ void Editing::init() {}
 void Editing::onReinitRendering()
 {
   Resources::MeshRef meshRefGizmo =
-      Resources::MeshManager::getResourceByName(_N(TranslateGizmo));
+      Resources::MeshManager::getResourceByName(_N(gizmo_translate));
   Resources::MeshRef meshRefGrid =
-      Resources::MeshManager::getResourceByName(_N(Plane));
+      Resources::MeshManager::getResourceByName(_N(plane));
 
   Renderer::Vulkan::Resources::DrawCallRefArray drawCallsToDestroy;
   if (_drawCallRefGizmo.isValid())
@@ -590,7 +590,7 @@ void Editing::onReinitRendering()
   {
     _drawCallRefGizmo =
         Renderer::Vulkan::Resources::DrawCallManager::createDrawCallForMesh(
-            _N(TranslateGizmo), meshRefGizmo,
+            _N(gizmo_translate), meshRefGizmo,
             Renderer::Vulkan::Resources::MaterialManager::getResourceByName(
                 _N(gizmo)),
             Renderer::Vulkan::Resources::MaterialManager::getMaterialPassId(
