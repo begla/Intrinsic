@@ -153,7 +153,7 @@ IntrinsicEdManagerWindowBase::makeResourceNameUnique(const char* p_Name)
           _resourceManagerEntry.getActiveResourceAtIndexFunction(i);
 
       rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-      _propertyCompilerEntry.compileFunction(resource, false, properties, doc);
+      _propertyCompilerEntry.compileFunction(resource, true, properties, doc);
 
       if (properties["name"]["value"].GetString() == newResourceName)
       {
@@ -206,7 +206,7 @@ void IntrinsicEdManagerWindowBase::onCloneResource()
     rapidjson::Document doc;
     rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
 
-    _propertyCompilerEntry.compileFunction(templateResourceRef, false,
+    _propertyCompilerEntry.compileFunction(templateResourceRef, true,
                                            properties, doc);
     properties["name"]["value"].SetString(
         makeResourceNameUnique(properties["name"]["value"].GetString()).c_str(),
