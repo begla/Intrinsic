@@ -1,0 +1,9 @@
+{
+    "name": "foliage_prepass.frag",
+    "properties": {
+        "name": "foliage_prepass.frag",
+        "gpuProgramName": "foliage.frag.glsl",
+        "entryPoint": "main",
+        "gpuProgramType": 1
+    }
+}

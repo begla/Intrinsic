@@ -78,6 +78,16 @@
 		{
 			"type" : "RenderPassGenericMesh",
 			"images" : [],
+			"name" : "GBufferPrePassFoliage",
+			"materialPasses" : ["GBufferFoliagePrePass"],
+			"renderOrder" : "FrontToBack",
+			"outputs" : [
+				["GBufferDepth"]
+			]
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"images" : [],
 			"name" : "GBufferFoliage",
 			"materialPasses" : ["GBufferFoliage"],
 			"renderOrder" : "FrontToBack",
