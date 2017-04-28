@@ -182,10 +182,9 @@ void CharacterControllerManager::updateControllers(
 void CharacterControllerManager::createResources(
     const CharacterControllerRefArray& p_CharacterControllers)
 {
-  for (uint32_t meshIdx = 0u; meshIdx < p_CharacterControllers.size();
-       ++meshIdx)
+  for (uint32_t cctIdx = 0u; cctIdx < p_CharacterControllers.size(); ++cctIdx)
   {
-    CharacterControllerRef charCtrlRef = p_CharacterControllers[meshIdx];
+    CharacterControllerRef charCtrlRef = p_CharacterControllers[cctIdx];
 
     physx::PxController*& pxController = _pxController(charCtrlRef);
     _INTR_ASSERT(pxController == nullptr);
@@ -216,10 +215,9 @@ void CharacterControllerManager::createResources(
 void CharacterControllerManager::destroyResources(
     const CharacterControllerRefArray& p_CharacterControllers)
 {
-  for (uint32_t meshIdx = 0u; meshIdx < p_CharacterControllers.size();
-       ++meshIdx)
+  for (uint32_t cctIdx = 0u; cctIdx < p_CharacterControllers.size(); ++cctIdx)
   {
-    CharacterControllerRef charCtrlRef = p_CharacterControllers[meshIdx];
+    CharacterControllerRef charCtrlRef = p_CharacterControllers[cctIdx];
     physx::PxController*& pxController = _pxController(charCtrlRef);
     _INTR_ASSERT(pxController);
 
