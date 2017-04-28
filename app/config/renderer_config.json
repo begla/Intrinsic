@@ -276,6 +276,12 @@
 			"targetImageLayout" : "ShaderReadOnly"
 		},
 		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneDownSampled",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
 			"type" : "RenderPassGenericFullscreen",
 			"images" : [
 				{
@@ -297,6 +303,12 @@
 		},
 		{
 			"type" : "RenderPassBloom"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlare",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
 		},
 		{
 			"type" : "RenderPassGenericFullscreen",
@@ -335,6 +347,24 @@
 			"outputs" : [
 			]
 		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlare",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneBlurred",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneBlurredPingPong",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
 		// Generate blurred half res. scene image
 		{
 			"type" : "RenderPassGenericBlur",
@@ -356,6 +386,12 @@
 			"targetImage" : "SceneBlurred",
 			"outputs" : [
 			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneBlurred",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
 		},
 		{
 			"type" : "RenderPassGenericFullscreen",
