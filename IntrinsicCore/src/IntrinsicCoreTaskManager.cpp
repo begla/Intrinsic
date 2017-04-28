@@ -73,6 +73,14 @@ void TaskManager::executeTasks()
       GameStates::Manager::update(_lastDeltaT);
     }
 
+    // Scripts
+    {
+      _INTR_PROFILE_CPU("Scripts", "Tick Scripts");
+
+      Components::ScriptManager::tickScripts(
+          Components::ScriptManager::_activeRefs, _lastDeltaT);
+    }
+
     // Physics
     {
       _INTR_PROFILE_CPU("Physics", "Simulate And Update");
@@ -92,6 +100,14 @@ void TaskManager::executeTasks()
       Components::RigidBodyManager::updateActorsFromNodes(
           Components::RigidBodyManager::_activeRefs);
       Physics::System::renderLineDebugGeometry();
+    }
+
+    // Swarms
+    {
+      _INTR_PROFILE_CPU("Components", "Swarms");
+
+      Components::SwarmManager::updateSwarms(
+          Components::SwarmManager::_activeRefs, _lastDeltaT);
     }
 
     // Post effect system

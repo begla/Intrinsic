@@ -1176,7 +1176,7 @@
         <file>icons/cc/white/png/user_icon&amp;24.png</file>
         <file>icons/cc/white/png/user_icon&amp;32.png</file>
         <file>icons/cc/white/png/user_icon&amp;48.png</file>
-        <file>icons/cc/white/png/users_icon&amp;16.png</file>
+        <file alias="users">icons/cc/white/png/users_icon&amp;16.png</file>
         <file>icons/cc/white/png/users_icon&amp;24.png</file>
         <file>icons/cc/white/png/users_icon&amp;32.png</file>
         <file>icons/cc/white/png/users_icon&amp;48.png</file>

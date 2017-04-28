@@ -113,6 +113,7 @@ void Application::initManagers()
     Components::PostEffectVolumeManager::init();
     Components::RigidBodyManager::init();
     Components::CharacterControllerManager::init();
+    Components::SwarmManager::init();
     Components::CameraControllerManager::init();
     Components::PlayerManager::init();
   }
