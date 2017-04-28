@@ -63,6 +63,7 @@ sudo apt install git cmake ninja-build libsdl2-dev
    ```
 
 2. Download and install the Vulkan SDK
+
     Add environment variables to your .zshrc or .bashrc:
     ```
     # Vulkan SDK  
@@ -87,11 +88,8 @@ sudo apt install git cmake ninja-build libsdl2-dev
 
 4. Download and install Autodesk FBX SDK  
 5. Go to the `scripts_linux` folder in the Intrinsic repository dir
-6. Execute `ConfigAndBuildDependencies`
-7. Execute `Config_Release`
-8. Execute `Build`
-9. Execute `Run_Release`
-10. You're all set - yey!
+6. Execute following scripts: `ConfigAndBuildDependencies`, `Config_Release`, `Build` and last but not least `Run_Release`
+7. You're all set - yey!
 
 # Build Status
 
