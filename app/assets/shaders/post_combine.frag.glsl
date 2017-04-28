@@ -26,11 +26,13 @@ layout (binding = 0) uniform PerInstance
 } uboPerInstance;
 
 layout (binding = 1) uniform sampler2D sceneTex;
-layout (binding = 2) uniform sampler2D bloomTex;
-layout (binding = 3) uniform sampler2D lensDirtTex;
-layout (binding = 4) uniform sampler2D filmGrainTex;
-layout (binding = 5) uniform sampler2D lensFlareTex;
-layout (binding = 6) buffer AvgLum
+layout (binding = 2) uniform sampler2D sceneBlurredTex;
+layout (binding = 3) uniform sampler2D bloomTex;
+layout (binding = 4) uniform sampler2D lensDirtTex;
+layout (binding = 5) uniform sampler2D filmGrainTex;
+layout (binding = 6) uniform sampler2D lensFlareTex;
+layout (binding = 7) uniform sampler2D depthBufferTex;
+layout (binding = 8) buffer AvgLum
 {
   float avgLum[];
 };
@@ -55,14 +57,25 @@ void main()
 {
   const vec2 framebufferSize = vec2(textureSize(sceneTex, 0));
 
-  const vec4 scene = textureLod(sceneTex, inUV0, 0.0).rgba;
+  vec4 scene = textureLod(sceneTex, inUV0, 0.0).rgba;
+  const vec4 sceneBlurred = textureLod(sceneBlurredTex, inUV0, 0.0).rgba;
+  const float depth = textureLod(depthBufferTex, inUV0, 0.0).r;
+
+  // TODO
+  const vec4 camParams = vec4(1.0, 10000.0, 1.0, 1.0 / 10000.0);
+  const float linDepth = linearizeDepth(depth, camParams.x, camParams.y) * camParams.y;
+
+  // DoF fake
+  const float blurFactor = clamp((linDepth - 500.0) / 50.0, 0.0, 1.0);
+  scene = mix(scene, sceneBlurred, blurFactor);
+
   const vec4 bloom = textureLod(bloomTex, inUV0, 0.0).rgba;
   const vec4 lensDirt = textureLod(lensDirtTex, inUV0, 0.0).rgba;
   const vec4 lensFlare = textureLod(lensFlareTex, inUV0, 0.0).rgba;
 
   const float lensDirtLumThreshold = 0.2;
   const float lensDirtIntens = 0.9;
-  const float toneMappingLumTarget = 0.5;
+  const float toneMappingLumTarget = 0.6;
   const float toneMappingMaxExposure = 3.0;
   const float bloomFactor = 1.0;
   const float filmGrainBias = 0.0;
@@ -77,6 +90,8 @@ void main()
   outColor.rgb += lensFlare.rgb * lensFlareFactor;
   // Lens dirt
   outColor.rgb += lensDirtIntens * lensDirt.rgb * clamp(max(bloom.a - lensDirtLumThreshold, 0.0), 0.0, 1.0);
+  // Vignette
+  outColor.rgb *= 1.0 - clamp(length(inUV0 * 2.0 - 1.0) - 0.5, 0.0, 1.0);
 
   // Film grain
   const vec4 grain = texelFetch(filmGrainTex, 

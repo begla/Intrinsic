@@ -47,10 +47,10 @@ void main()
 
   const float ghostDisp = 0.1;
   const uint numGhosts = 8;
-  const float haloWidth = 0.25;
-  const float distortionFactor = 2.0;
-  const float brightnessBias = 8.0;
-  const float brightnessMax = 2.0;
+  const float haloWidth = 0.5;
+  const float distortionFactor = 3.0;
+  const float brightnessBias = 6.0;
+  const float brightnessMax = 1.0;
 
   const vec2 ghostDir = (vec2(0.5) - uv0) * ghostDisp;
   const vec3 distortion = vec3(-texelSize.x * distortionFactor, 0.0, texelSize.x * distortionFactor);

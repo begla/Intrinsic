@@ -86,8 +86,12 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
           ImageManager::_descImageFormat(imageRef) =
               RenderSystem::_depthStencilFormatToUse;
         else
+        {
           ImageManager::_descImageFormat(imageRef) =
               Helper::mapFormat(imageFormat.GetString());
+          ImageManager::_descImageFlags(imageRef) |= ImageFlags::kUsageStorage;
+        }
+
         ImageManager::_descImageType(imageRef) = ImageType::kTexture;
       }
       _imageRefs.push_back(imageRef);
@@ -99,6 +103,7 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
   ImageManager::createResources(imagesToCreate);
 
   // Render passes
+  if (!outputs.Empty())
   {
     _renderPassRef = RenderPassManager::createRenderPass(_name);
     RenderPassManager::resetToDefault(_renderPassRef);
@@ -127,60 +132,63 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
             .push_back(sceneAttachment);
       }
     }
+
+    renderpassesToCreate.push_back(_renderPassRef);
   }
-  renderpassesToCreate.push_back(_renderPassRef);
 
   RenderPassManager::createResources(renderpassesToCreate);
 
   // Create framebuffer
-
-  for (uint32_t backBufferIdx = 0u;
-       backBufferIdx < (uint32_t)RenderSystem::_vkSwapchainImages.size();
-       ++backBufferIdx)
+  if (!outputs.Empty())
   {
-
-    FramebufferRef framebufferRef =
-        FramebufferManager::createFramebuffer(_name);
+    for (uint32_t backBufferIdx = 0u;
+         backBufferIdx < (uint32_t)RenderSystem::_vkSwapchainImages.size();
+         ++backBufferIdx)
     {
-      FramebufferManager::resetToDefault(framebufferRef);
-      FramebufferManager::addResourceFlags(
-          framebufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
 
-      glm::uvec3 dim = glm::vec3(0u);
-      for (uint32_t i = 0u; i < outputs.Size(); ++i)
+      FramebufferRef framebufferRef =
+          FramebufferManager::createFramebuffer(_name);
       {
-        if (outputs[i][0] != "Backbuffer")
-        {
-          ImageRef outputImage =
-              ImageManager::getResourceByName(outputs[i][0].GetString());
-          FramebufferManager::_descAttachedImages(framebufferRef)
-              .push_back(outputImage);
+        FramebufferManager::resetToDefault(framebufferRef);
+        FramebufferManager::addResourceFlags(
+            framebufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
 
-          _INTR_ASSERT((dim == glm::uvec3(0u) ||
-                        dim == ImageManager::_descDimensions(outputImage)) &&
-                       "Dimensions of all outputs must be identical");
-          dim = ImageManager::_descDimensions(outputImage);
-        }
-        else
+        glm::uvec3 dim = glm::vec3(0u);
+        for (uint32_t i = 0u; i < outputs.Size(); ++i)
         {
-          ImageRef outputImage = ImageManager::getResourceByName(
-              _INTR_STRING("Backbuffer") +
-              StringUtil::toString<uint32_t>(backBufferIdx));
-          FramebufferManager::_descAttachedImages(framebufferRef)
-              .push_back(outputImage);
+          if (outputs[i][0] != "Backbuffer")
+          {
+            ImageRef outputImage =
+                ImageManager::getResourceByName(outputs[i][0].GetString());
+            FramebufferManager::_descAttachedImages(framebufferRef)
+                .push_back(outputImage);
 
-          _INTR_ASSERT((dim == glm::uvec3(0u) ||
-                        dim == ImageManager::_descDimensions(outputImage)) &&
-                       "Dimensions of all outputs must be identical");
-          dim = ImageManager::_descDimensions(outputImage);
+            _INTR_ASSERT((dim == glm::uvec3(0u) ||
+                          dim == ImageManager::_descDimensions(outputImage)) &&
+                         "Dimensions of all outputs must be identical");
+            dim = ImageManager::_descDimensions(outputImage);
+          }
+          else
+          {
+            ImageRef outputImage = ImageManager::getResourceByName(
+                _INTR_STRING("Backbuffer") +
+                StringUtil::toString<uint32_t>(backBufferIdx));
+            FramebufferManager::_descAttachedImages(framebufferRef)
+                .push_back(outputImage);
+
+            _INTR_ASSERT((dim == glm::uvec3(0u) ||
+                          dim == ImageManager::_descDimensions(outputImage)) &&
+                         "Dimensions of all outputs must be identical");
+            dim = ImageManager::_descDimensions(outputImage);
+          }
         }
+
+        FramebufferManager::_descDimensions(framebufferRef) = dim;
+        FramebufferManager::_descRenderPass(framebufferRef) = _renderPassRef;
       }
-
-      FramebufferManager::_descDimensions(framebufferRef) = dim;
-      FramebufferManager::_descRenderPass(framebufferRef) = _renderPassRef;
+      framebuffersToCreate.push_back(framebufferRef);
+      _framebufferRefs.push_back(framebufferRef);
     }
-    framebuffersToCreate.push_back(framebufferRef);
-    _framebufferRefs.push_back(framebufferRef);
   }
 
   FramebufferManager::createResources(framebuffersToCreate);

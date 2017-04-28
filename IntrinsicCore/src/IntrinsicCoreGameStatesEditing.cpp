@@ -310,10 +310,10 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
   else if (Input::System::getKeyStates()[Input::Key::kCtrl] ==
            Input::KeyState::kPressed)
   {
-    _orbitRadius =
-        glm::max(_orbitRadius - Editing::_cameraSpeed *
+    _orbitRadius = glm::max(_orbitRadius -
+                                Editing::_cameraSpeed *
                                     (_camAngVel.x - _camAngVel.y) * p_DeltaT,
-                 0.1f);
+                            0.1f);
   }
 
   camRot = Components::NodeManager::_worldOrientation(camNodeRef) *
