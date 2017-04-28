@@ -214,7 +214,7 @@ void MaterialManager::loadMaterialPassConfig()
     char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
     {
       rapidjson::FileReadStream is(fp, readBuffer, 65536u);
-      materialPassConfig.ParseStream(is);
+      materialPassConfig.ParseStream<rapidjson::kParseCommentsFlag>(is);
       fclose(fp);
     }
     Tlsf::MainAllocator::free(readBuffer);

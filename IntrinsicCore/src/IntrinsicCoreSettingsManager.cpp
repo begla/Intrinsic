@@ -82,7 +82,7 @@ void Manager::loadSettings()
   char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
   {
     rapidjson::FileReadStream is(fp, readBuffer, 65536u);
-    doc.ParseStream(is);
+    doc.ParseStream<rapidjson::kParseCommentsFlag>(is);
     fclose(fp);
   }
   Tlsf::MainAllocator::free(readBuffer);
