@@ -126,6 +126,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     _categoryToIconMapping["Camera"] = ":Icons/film";
     _categoryToIconMapping["CameraController"] = ":Icons/film";
     _categoryToIconMapping["CharacterController"] = ":Icons/user";
+    _categoryToIconMapping["Swarm"] = ":Icons/users";
     _categoryToIconMapping["Player"] = ":Icons/user";
     _categoryToIconMapping["RigidBody"] = ":Icons/cube";
     _categoryToIconMapping["PostEffectVolume"] = ":Icons/picture";
@@ -135,6 +136,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     _componentToIconMapping["Camera"] = ":Icons/film";
     _componentToIconMapping["CameraController"] = ":Icons/film";
     _componentToIconMapping["CharacterController"] = ":Icons/user";
+    _componentToIconMapping["Swarm"] = ":Icons/users";
     _componentToIconMapping["Player"] = ":Icons/user";
     _componentToIconMapping["Node"] = ":Icons/target";
     _componentToIconMapping["Mesh"] = ":Icons/user";

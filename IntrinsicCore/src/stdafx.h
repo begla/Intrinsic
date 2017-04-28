@@ -146,6 +146,7 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreResourcesPostEffect.h"
 #include "IntrinsicCoreComponentsNode.h"
 #include "IntrinsicCoreComponentsMesh.h"
+#include "IntrinsicCoreComponentsSwarm.h"
 #include "IntrinsicCoreComponentsRigidBody.h"
 #include "IntrinsicCoreComponentsCamera.h"
 #include "IntrinsicCoreComponentsCameraController.h"
