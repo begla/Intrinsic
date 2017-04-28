@@ -6,7 +6,7 @@
 
   "rendererValidationEnabled": false,
 
-  "targetFrameRate": 0.0,
+  "targetFrameRate": 0.016,
   
   "windowMode": 0,
   "presentMode": 2,
