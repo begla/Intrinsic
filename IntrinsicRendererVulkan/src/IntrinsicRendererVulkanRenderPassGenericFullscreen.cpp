@@ -77,6 +77,8 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
         DepthStencilStates::kDefaultNoDepthTestAndWrite;
     PipelineManager::_descViewportRenderSize(_pipelineRef) =
         (uint8_t)viewportRenderSize;
+    PipelineManager::_descScissorRenderSize(_pipelineRef) =
+        (uint8_t)viewportRenderSize;
   }
   pipelinesToCreate.push_back(_pipelineRef);
 
@@ -176,9 +178,8 @@ void GenericFullscreen::render(float p_DeltaT)
       {_drawCallRef}, nullptr, 0u, uniformData.uniformData, uniformData.size);
 
   RenderSystem::beginRenderPass(
-      _renderPassRef,
-      _framebufferRefs[RenderSystem::_backbufferIndex %
-                       _framebufferRefs.size()],
+      _renderPassRef, _framebufferRefs[RenderSystem::_backbufferIndex %
+                                       _framebufferRefs.size()],
       VK_SUBPASS_CONTENTS_INLINE, (uint32_t)_clearValues.size(),
       _clearValues.data());
   {

@@ -14,6 +14,12 @@
 			"entries" : [
 				"HaltonSamples"
 			]
+		},
+		{
+			"name" : "Dummy",
+			"entries" : [
+				"CameraWorldPosition"
+			]
 		}
 	],
 	"renderSteps" : [
@@ -45,6 +51,22 @@
 			"type" : "RenderPassGenericMesh",
 			"images" : [
 				{
+					"name" : "GBufferDepth",
+					"renderSize" : "Full",
+					"imageFormat" : "Depth"
+				}
+			],
+			"name" : "GBufferPrePassFoliage",
+			"materialPasses" : ["GBufferFoliagePrePass"],
+			"renderOrder" : "FrontToBack",
+			"outputs" : [
+				["GBufferDepth"]
+			]
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"images" : [
+				{
 					"name" : "GBufferAlbedo",
 					"renderSize" : "Full",
 					"imageFormat" : "R16G16B16A16Float"
@@ -58,44 +80,16 @@
 					"name" : "GBufferParameter0",
 					"renderSize" : "Full",
 					"imageFormat" : "R16G16B16A16Float"
-				},
-				{
-					"name" : "GBufferDepth",
-					"renderSize" : "Full",
-					"imageFormat" : "Depth"
 				}
 			],
 			"name" : "GBuffer",
-			"materialPasses" : ["GBuffer", "GBufferLayered"],
+			"materialPasses" : ["GBuffer", "GBufferLayered", "GBufferFoliage"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
 				["GBufferAlbedo", [0.0, 0.0, 0.0, 1.0]],
 				["GBufferNormal", [0.0, 0.0, 0.0, 0.0]],
 				["GBufferParameter0", [0.0, 0.0, 0.0, 0.0]],
 				["GBufferDepth", [1.0]]
-			]
-		},
-		{
-			"type" : "RenderPassGenericMesh",
-			"images" : [],
-			"name" : "GBufferPrePassFoliage",
-			"materialPasses" : ["GBufferFoliagePrePass"],
-			"renderOrder" : "FrontToBack",
-			"outputs" : [
-				["GBufferDepth"]
-			]
-		},
-		{
-			"type" : "RenderPassGenericMesh",
-			"images" : [],
-			"name" : "GBufferFoliage",
-			"materialPasses" : ["GBufferFoliage"],
-			"renderOrder" : "FrontToBack",
-			"outputs" : [
-				["GBufferAlbedo"],
-				["GBufferNormal"],
-				["GBufferParameter0"],
-				["GBufferDepth"]
 			]
 		},
 		{
@@ -268,16 +262,87 @@
 			]
 		},
 		{
-			"type" : "RenderPassBloom"
-		},
-		{
-			"type" : "RenderPassLensFlare"
-		},
-		{
 			"type" : "ImageMemoryBarrier",
 			"image" : "Scene",
 			"sourceImageLayout" : "ColorAttachment",
 			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"images" : [
+				{
+					"name" : "SceneDownSampled",
+					"renderSize" : "Half",
+					"imageFormat" : "B10G11R11UFloat"
+				}
+			],
+			"name" : "DownSampleScene",
+			"fragmentGpuProgram" : "blit.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "Dummy",
+			"inputs" : [
+				["Image", "Scene", "inputTex", "Fragment", "LinearClamp"]
+			],
+			"outputs" : [
+				["SceneDownSampled"]
+			]
+		},
+		{
+			"type" : "RenderPassBloom"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"images" : [
+				{
+					"name" : "LensFlare",
+					"renderSize" : "Quarter",
+					"imageFormat" : "B10G11R11UFloat"
+				}
+			],
+			"name" : "LensFlare",
+			"fragmentGpuProgram" : "lens_flare.frag",
+			"viewportRenderSize" : "Quarter",
+			"perInstanceDataBufferName" : "Dummy",
+			"inputs" : [
+				["Image", "BloomBright", "brightnessTex", "Fragment", "LinearClamp"],
+				["Image", "lens_flare", "lensFlareTex", "Fragment", "LinearClamp"]
+			],
+			"outputs" : [
+				["LensFlare"]
+			]
+		},
+		{
+			"type" : "RenderPassGenericBlur",
+			"images" : [
+				{
+					"name" : "LensFlarePingPong",
+					"renderSize" : "Quarter",
+					"imageFormat" : "B10G11R11UFloat"
+				}
+			],
+			"name" : "BlurLensFlares",
+			"sourceImage" : "LensFlare",
+			"pingPongImage" : "LensFlarePingPong",
+			"targetImage" : "LensFlare"
+		},
+		{
+			"type" : "RenderPassGenericBlur",
+			"images" : [
+				{
+					"name" : "SceneBlurred",
+					"renderSize" : "Half",
+					"imageFormat" : "B10G11R11UFloat"
+				},
+				{
+					"name" : "SceneBlurredPingPong",
+					"renderSize" : "Half",
+					"imageFormat" : "B10G11R11UFloat"
+				}
+			],
+			"name" : "BlurScene",
+			"sourceImage" : "SceneDownSampled",
+			"pingPongImage" : "SceneBlurredPingPong",
+			"targetImage" : "SceneBlurred"
 		},
 		{
 			"type" : "RenderPassGenericFullscreen",
@@ -289,10 +354,12 @@
 			"perInstanceDataBufferName" : "PerInstanceDataPostCombine",
 			"inputs" : [
 				["Image", "Scene", "sceneTex", "Fragment", "NearestClamp"],
+				["Image", "SceneBlurred", "sceneBlurredTex", "Fragment", "LinearClamp"],
 				["Image", "BloomSummed", "bloomTex", "Fragment", "LinearClamp"],
 				["Image", "lens_dirt", "lensDirtTex", "Fragment", "NearestClamp"],
 				["Image", "film_grain_noise", "filmGrainTex", "Fragment", "NearestClamp"],
 				["Image", "LensFlare", "lensFlareTex", "Fragment", "LinearClamp"],
+				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"],
 				["Buffer", "BloomLumBuffer", "AvgLum", "Fragment"]
 			],
 			"outputs" : [

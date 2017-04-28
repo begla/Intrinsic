@@ -37,14 +37,14 @@ enum Enum
 
   kRenderPassGenericFullscreen,
   kRenderPassGenericMesh,
+  kRenderPassGenericBlur,
 
   kRenderPassDebug,
   kRenderPassPerPixelPicking,
   kRenderPassShadow,
   kRenderPassLighting,
   kRenderPassVolumetricLighting,
-  kRenderPassBloom,
-  kRenderPassLensFlare
+  kRenderPassBloom
 };
 }
 
@@ -56,8 +56,7 @@ _renderStepTypeMapping = {
     {"RenderPassLighting", RenderStepType::kRenderPassLighting},
     {"RenderPassVolumetricLighting",
      RenderStepType::kRenderPassVolumetricLighting},
-    {"RenderPassBloom", RenderStepType::kRenderPassBloom},
-    {"RenderPassLensFlare", RenderStepType::kRenderPassLensFlare}};
+    {"RenderPassBloom", RenderStepType::kRenderPassBloom}};
 
 struct RenderPassInterface
 {
@@ -80,10 +79,7 @@ _renderStepFunctionMapping = {
      {RenderPass::VolumetricLighting::render,
       RenderPass::VolumetricLighting::onReinitRendering}},
     {RenderStepType::kRenderPassBloom,
-     {RenderPass::Bloom::render, RenderPass::Bloom::onReinitRendering}},
-    {RenderStepType::kRenderPassLensFlare,
-     {RenderPass::LensFlare::render,
-      RenderPass::LensFlare::onReinitRendering}}};
+     {RenderPass::Bloom::render, RenderPass::Bloom::onReinitRendering}}};
 
 struct RenderStep
 {
@@ -111,6 +107,7 @@ struct RenderStep
 };
 
 _INTR_ARRAY(RenderPass::GenericFullscreen) _renderPassesGenericFullScreen;
+_INTR_ARRAY(RenderPass::GenericBlur) _renderPassesGenericBlur;
 _INTR_ARRAY(RenderPass::GenericMesh) _renderPassesGenericMesh;
 _INTR_ARRAY(RenderStep) _renderSteps;
 
@@ -126,6 +123,9 @@ _INTR_INLINE void executeRenderSteps(float p_DeltaT)
     {
     case RenderStepType::kRenderPassGenericFullscreen:
       _renderPassesGenericFullScreen[step.getIndex()].render(p_DeltaT);
+      continue;
+    case RenderStepType::kRenderPassGenericBlur:
+      _renderPassesGenericBlur[step.getIndex()].render(p_DeltaT);
       continue;
     case RenderStepType::kRenderPassGenericMesh:
       _renderPassesGenericMesh[step.getIndex()].render(p_DeltaT);
@@ -234,6 +234,16 @@ void Default::loadRendererConfig()
       _renderSteps.push_back(
           RenderStep(RenderStepType::kRenderPassGenericFullscreen,
                      (uint8_t)_renderPassesGenericFullScreen.size() - 1u));
+    }
+    else if (renderStepDesc["type"] == "RenderPassGenericBlur")
+    {
+      _renderPassesGenericBlur.push_back(RenderPass::GenericBlur());
+      RenderPass::GenericBlur& renderPass = _renderPassesGenericBlur.back();
+      renderPass.init(renderStepDesc);
+
+      _renderSteps.push_back(
+          RenderStep(RenderStepType::kRenderPassGenericBlur,
+                     (uint8_t)_renderPassesGenericBlur.size() - 1u));
     }
     else if (renderStepDesc["type"] == "RenderPassGenericMesh")
     {

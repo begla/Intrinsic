@@ -160,7 +160,6 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     RenderPass::VolumetricLighting::init();
 
     RenderPass::Bloom::init();
-    RenderPass::LensFlare::init();
 
     RenderPass::Debug::init();
     RenderPass::PerPixelPicking::init();

@@ -129,7 +129,7 @@
       "name" : "GBufferFoliage",
       "baseVertexGpuProgram" : "foliage.vert",
       "baseFragmentGpuProgram" : "foliage.frag",
-      "renderPass" : "GBufferFoliage",
+      "renderPass" : "GBuffer",
       "blendStates" : ["Default", "Default", "Default"],
       "rasterizationState" : "DoubleSided",
       "boundResources" : "GBuffer"
