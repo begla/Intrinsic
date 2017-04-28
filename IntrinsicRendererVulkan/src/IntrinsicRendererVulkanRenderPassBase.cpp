@@ -36,10 +36,10 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
   const rapidjson::Value& images = p_RenderPassDesc["images"];
   _name = p_RenderPassDesc["name"].GetString();
 
-  for (uint32_t backBufferIdx = 0u; backBufferIdx < outputs.Size();
-       ++backBufferIdx)
+  for (uint32_t clearValueIdx = 0u; clearValueIdx < outputs.Size();
+       ++clearValueIdx)
   {
-    const rapidjson::Value& outputDesc = outputs[backBufferIdx];
+    const rapidjson::Value& outputDesc = outputs[clearValueIdx];
 
     VkClearValue clearValue = {};
     if (outputDesc.Size() > 1u)
@@ -57,9 +57,10 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
       {
         clearValue.depthStencil.depth = clearColorDesc[0].GetFloat();
       }
-    }
 
-    _clearValues.push_back(clearValue);
+      _clearValues.resize(clearValueIdx + 1u);
+      _clearValues[clearValueIdx] = clearValue;
+    }
   }
 
   // Images
