@@ -15,7 +15,7 @@
 // Precompiled header file
 #include "stdafx.h"
 
-#define BOID_COUNT 1024u
+#define BOID_COUNT 256u
 
 namespace Intrinsic
 {
@@ -89,7 +89,7 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
 
         static const float boidAcc = 10.0f;
         static const float boidMinDistSqr = 4.0f * 4.0f;
-        static const float distanceRuleWeight = 2.0f;
+        static const float distanceRuleWeight = 0.05f;
         static const float targetRuleWeight = 0.9f;
         static const float minTargetDist = 2.0f;
         static const float matchVelWeight = 0.01f;
@@ -108,12 +108,9 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
         }
 
         // Keep a distance
-        for (uint32_t boidCompareNum = 0u; boidCompareNum < boidsToCheck;
-             ++boidCompareNum)
+        for (uint32_t boidToCompareIdx = 0u; boidToCompareIdx < boids.size();
+             ++boidToCompareIdx)
         {
-          const uint32_t boidToCompareIdx =
-              Math::calcRandomNumber() % boids.size();
-
           if (boidToCompareIdx == boidIdx)
             continue;
 
