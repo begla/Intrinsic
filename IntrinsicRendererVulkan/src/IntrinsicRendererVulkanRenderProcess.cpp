@@ -196,7 +196,7 @@ void Default::loadRendererConfig()
     char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
     {
       rapidjson::FileReadStream is(fp, readBuffer, 65536u);
-      rendererConfig.ParseStream(is);
+      rendererConfig.ParseStream<rapidjson::kParseCommentsFlag>(is);
       fclose(fp);
     }
     Tlsf::MainAllocator::free(readBuffer);

@@ -22,6 +22,8 @@
 			]
 		}
 	],
+	// GBuffer passes
+	// ->
 	"renderSteps" : [
 		{
 			"type" : "ImageMemoryBarrier",
@@ -212,9 +214,12 @@
 			"sourceImageLayout" : "DepthStencilAttachment",
 			"targetImageLayout" : "ShaderReadOnly"
 		},
+		// <-
 		{
 			"type" : "RenderPassPerPixelPicking"
 		},
+		// Lighting passes
+		// ->
 		{
 			"type" : "RenderPassShadow"
 		},
@@ -230,6 +235,9 @@
 			"sourceImageLayout" : "Undefined",
 			"targetImageLayout" : "ColorAttachment"
 		},
+		// <-
+		// Post processing
+		// ->
 		{
 			"type" : "RenderPassGenericFullscreen",
 			"images" : [
@@ -325,6 +333,7 @@
 			"pingPongImage" : "LensFlarePingPong",
 			"targetImage" : "LensFlare"
 		},
+		// Generate blurred half res. scene image
 		{
 			"type" : "RenderPassGenericBlur",
 			"images" : [
@@ -366,5 +375,6 @@
 				["Backbuffer"]
 			]
 		}
+		// <-
 	]
 }
