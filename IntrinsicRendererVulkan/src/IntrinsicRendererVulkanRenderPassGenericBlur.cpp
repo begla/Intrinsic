@@ -32,7 +32,7 @@ void GenericBlur::init(const rapidjson::Value& p_RenderPassDesc)
 
   ComputeCallRefArray computeCallsToCreate;
 
-  const glm::vec2 dim = Resources::ImageManager::_descDimensions(
+  const glm::uvec3 dim = Resources::ImageManager::_descDimensions(
       Resources::ImageManager::getResourceByName(
           p_RenderPassDesc["sourceImage"].GetString()));
 
