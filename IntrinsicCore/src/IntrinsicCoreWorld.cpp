@@ -192,8 +192,9 @@ void World::destroyNodeFull(Components::NodeRef p_Ref)
 
 void World::destroy()
 {
-  destroyNodeFull(_rootNode);
+  Components::NodeRef currentRootNode = _rootNode;
   _rootNode = Components::NodeRef();
+  destroyNodeFull(currentRootNode);
 }
 
 void World::save(const _INTR_STRING& p_FilePath)
@@ -236,6 +237,9 @@ void World::save(const _INTR_STRING& p_FilePath)
       ++nodeStackCount;
     }
 
+    // Don't serialize spawned objects
+    if ((Components::NodeManager::_flags(currentNodeRef) &
+         Components::NodeFlags::Flags::kSpawned) == 0u)
     {
       rapidjson::Value node = rapidjson::Value(rapidjson::kObjectType);
       rapidjson::Value name = rapidjson::Value(

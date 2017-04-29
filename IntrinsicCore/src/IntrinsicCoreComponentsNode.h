@@ -15,8 +15,8 @@
 #pragma once
 
 /** \file
-* Contains the Node Component Manager.
-*/
+ * Contains the Node Component Manager.
+ */
 
 namespace Intrinsic
 {
@@ -24,6 +24,14 @@ namespace Core
 {
 namespace Components
 {
+namespace NodeFlags
+{
+enum Flags
+{
+  kSpawned = 0x01u,
+};
+}
+
 typedef Dod::Ref NodeRef;
 typedef _INTR_ARRAY(NodeRef) NodeRefArray;
 
@@ -35,6 +43,8 @@ struct NodeData : Dod::Components::ComponentDataBase
   NodeData()
       : Dod::Components::ComponentDataBase(_INTR_MAX_NODE_COMPONENT_COUNT)
   {
+    flags.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
+
     position.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     orientation.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     size.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
@@ -57,6 +67,8 @@ struct NodeData : Dod::Components::ComponentDataBase
     prevSibling.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     nextSibling.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
   }
+
+  _INTR_ARRAY(uint32_t) flags;
 
   _INTR_ARRAY(glm::vec3) position;
   _INTR_ARRAY(glm::quat) orientation;
@@ -100,6 +112,7 @@ struct NodeManager
     _firstChild(p_Ref) = NodeRef();
     _prevSibling(p_Ref) = NodeRef();
     _nextSibling(p_Ref) = NodeRef();
+    _flags(p_Ref) = 0u;
 
     _position(p_Ref) = _worldPosition(p_Ref) = glm::vec3();
     _orientation(p_Ref) = _worldOrientation(p_Ref) =
@@ -500,6 +513,12 @@ struct NodeManager
   }
 
   // <-
+
+  /// The node flags
+  _INTR_INLINE static uint32_t& _flags(NodeRef p_Ref)
+  {
+    return _data.flags[p_Ref._id];
+  }
 
   /// The (local) position.
   _INTR_INLINE static glm::vec3& _position(NodeRef p_Ref)

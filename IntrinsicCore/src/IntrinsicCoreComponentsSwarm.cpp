@@ -199,6 +199,9 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
       Components::NodeRef nodeRef =
           Components::NodeManager::createNode(entityRef);
       Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
+
+      Components::NodeManager::_flags(nodeRef) |=
+          Components::NodeFlags::kSpawned;
       Components::NodeManager::_size(nodeRef) = glm::vec3(0.45f, 0.45f, 0.45f);
 
       Components::MeshRef meshRef =
@@ -211,7 +214,8 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
               Components::SwarmManager::_entity(swarmRef));
 
       Components::SwarmManager::_boids(swarmRef).push_back(
-          {Components::NodeManager::_position(swarmNodeRef), glm::vec3(0.0f)});
+          {Components::NodeManager::_worldPosition(swarmNodeRef),
+           glm::vec3(0.0f)});
       Components::SwarmManager::_nodes(swarmRef).push_back(nodeRef);
       meshComponentsToCreate.push_back(meshRef);
     }
@@ -230,9 +234,13 @@ void SwarmManager::destroyResources(const SwarmRefArray& p_Swarms)
     _INTR_ARRAY(Boid)& boids = Components::SwarmManager::_boids(swarmRef);
     NodeRefArray& nodes = Components::SwarmManager::_nodes(swarmRef);
 
-    for (uint32_t i = 0u; i < nodes.size(); ++i)
+    if (World::getRootNode().isValid())
     {
-      World::destroyNodeFull(nodes[i]);
+      for (uint32_t i = 0u; i < nodes.size(); ++i)
+      {
+
+        World::destroyNodeFull(nodes[i]);
+      }
     }
 
     boids.clear();
