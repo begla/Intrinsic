@@ -88,6 +88,13 @@ void IntrinsicEdNodeViewTreeWidget::onPopulateNodeTree()
   {
     Components::NodeRef nodeRef =
         Components::NodeManager::getSortedNodeAtIndex(i);
+
+    // Hide spawned nodes
+    // TODO: Visualize them separately
+    if ((Components::NodeManager::_flags(nodeRef) &
+         Components::NodeFlags::Flags::kSpawned) > 0u)
+      continue;
+
     const Name& name =
         Entity::EntityManager::_name(Components::NodeManager::_entity(nodeRef));
 
