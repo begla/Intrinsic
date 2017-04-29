@@ -645,9 +645,20 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
 
 void createTextureFromFile(ImageRef p_Ref)
 {
-  gli::texture tex = gli::load(
-      ("media/textures/" + ImageManager::_descFileName(p_Ref)).c_str());
+  _INTR_STRING texturePath =
+      "media/textures/" + ImageManager::_descFileName(p_Ref);
 
+  // Check if the texture exists - if not, use the checkerboard texture as a
+  // fallback instead
+  if (!Util::fileExists(texturePath.c_str()))
+  {
+    _INTR_LOG_WARNING(
+        "Texture '%s' not found, using checkerboard texture instead...",
+        texturePath.c_str());
+    texturePath = "media/textures/checkerboard.dds";
+  }
+
+  gli::texture tex = gli::load(texturePath.c_str());
   if (tex.target() == gli::target::TARGET_2D)
   {
     createTextureFromFile2D(p_Ref, tex);
