@@ -78,6 +78,15 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
         Components::NodeManager::getComponentForEntity(
             Components::SwarmManager::_entity(swarmRef));
 
+    float groundPlaneHeight = -10000000.0f;
+
+    physx::PxRaycastHit hit;
+    const Math::Ray ray = {currentCenterOfMass, glm::vec3(0.0f, -1.0f, 0.0f)};
+    if (PhysxHelper::raycast(ray, hit, 1000.0f))
+    {
+      groundPlaneHeight = (ray.o + hit.distance * ray.d).y + 1.0f;
+    }
+
     // Simulate boids and apply position to node
     glm::vec3 newCenterOfMass = glm::vec3(0.0f);
     glm::vec3 newAvgVelocity = glm::vec3(0.0f);
@@ -91,10 +100,11 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
         static const float boidMinDistSqr = 4.0f * 4.0f;
         static const float distanceRuleWeight = 0.05f;
         static const float targetRuleWeight = 0.9f;
-        static const float minTargetDist = 2.0f;
+        static const float minTargetDist = 4.0f;
         static const float matchVelWeight = 0.01f;
         static const float centerOfMassWeight = 0.8f;
-        static const float maxVel = 15.0f;
+        static const float groundPlaneWeight = 5.0f;
+        static const float maxVel = 30.0f;
         static uint32_t boidsToCheck = 10u;
 
         // Fly towards center of mass
@@ -141,6 +151,15 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
                         p_DeltaT * targetRuleWeight;
         }
 
+        // Avoid the ground plane
+        {
+          if (boid.pos.y < groundPlaneHeight)
+          {
+            boid.vel.y = 0.0f;
+            boid.pos.y = groundPlaneHeight;
+          }
+        }
+
         newCenterOfMass += boid.pos;
 
         float velLen = glm::length(boid.vel);
@@ -180,7 +199,7 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
       Components::NodeRef nodeRef =
           Components::NodeManager::createNode(entityRef);
       Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
-      Components::NodeManager::_size(nodeRef) = glm::vec3(0.25f, 0.25f, 0.25f);
+      Components::NodeManager::_size(nodeRef) = glm::vec3(0.45f, 0.45f, 0.45f);
 
       Components::MeshRef meshRef =
           Components::MeshManager::createMesh(entityRef);
