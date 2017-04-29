@@ -167,7 +167,7 @@ struct MaterialManager
     _descPbr1TextureName(p_Ref) = _N(default_PBR);
     _descPbr2TextureName(p_Ref) = _N(default_PBR);
 
-    _descBlendMaskTextureName(p_Ref) = _N(checkerboard);
+    _descBlendMaskTextureName(p_Ref) = _N(white);
     _descFoamTextureName(p_Ref) = _N(checkerboard);
     _descFoamFadeDistance(p_Ref) = 1.0f;
     _descRefractionFactor(p_Ref) = 0.0f;
@@ -250,6 +250,17 @@ struct MaterialManager
           _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Properties_Surface),
                             "vec3", _descPbrBias(p_Ref), false, false),
           p_Document.GetAllocator());
+    }
+
+    if ((_descMaterialPassMask(p_Ref) &
+         getMaterialPassFlag(_N(GBufferFoliage))) != 0u)
+    {
+      p_Properties.AddMember("blendMaskTextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Textures_Layered), "string",
+                                               _descBlendMaskTextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
     }
 
     // Surface (Layered)

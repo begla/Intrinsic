@@ -34,6 +34,7 @@ PER_INSTANCE_UBO();
 
 // Bindings
 BINDINGS();
+layout (binding = 6) uniform sampler2D blendMaskTex;
 
 // Input
 layout (location = 0) in vec3 inNormal;
@@ -41,6 +42,7 @@ layout (location = 1) in vec3 inTangent;
 layout (location = 2) in vec3 inBinormal;
 layout (location = 3) in vec3 inColor;
 layout (location = 4) in vec2 inUV0;
+layout (location = 5) in vec3 inWorldPosition;
 
 // Output
 OUTPUT
@@ -57,7 +59,13 @@ void main()
 
   const vec2 uv0 = clamp(UV0_TRANSFORMED, 0.001, 0.999);
 
-  const vec4 albedo = texture(albedoTex, uv0);
+  const vec2 blendScale = vec2(25.0);
+  const vec2 blendLookupUV = mod(abs(inWorldPosition.xz), blendScale) / blendScale;
+  const vec4 blendMask = texture(blendMaskTex, blendLookupUV);
+
+  vec4 albedo = texture(albedoTex, uv0);
+  albedo.rgb *= blendMask.rgb;
+
   const vec4 normal = texture(normalTex, uv0);
   const vec4 roughness = texture(roughnessTex, uv0);
 

@@ -21,6 +21,7 @@
             0.0,
             0.0,
             0.0
-        ]
+        ],
+        "blendMaskTextureName": "foliage_blend_mask_01"
     }
 }
