@@ -1,0 +1,26 @@
+{
+    "name": "grass_01",
+    "properties": {
+        "name": "grass_01",
+        "materialPassMask": 1632,
+        "albedoTextureName": "grass_atlas_01",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 2.5,
+        "normalTextureName": "grass_atlas_01_NRM",
+        "pbrTextureName": "default_PBR",
+        "pbrBias": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    }
+}
