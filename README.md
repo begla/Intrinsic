@@ -147,3 +147,7 @@ Intrinsic also uses the following tools in binary format:
 * NVTT (see https://developer.nvidia.com/gpu-accelerated-texture-compression)
 * Cloc (see http://cloc.sourceforge.net)
 * 7za (see http://www.7-zip.org/download.html)
+
+HDR cubemaps downloaded from:
+
+* http://www.hdrlabs.com/sibl/archive.html

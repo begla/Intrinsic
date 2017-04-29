@@ -128,6 +128,7 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreLinearOffsetAllocator.h"
 #include "IntrinsicCoreLockFreeFixedBlockAllocator.h"
 #include "IntrinsicStringUtil.h"
+#include "IntrinsicUtil.h"
 #include "IntrinsicCoreSimd.h"
 #include "IntrinsicCoreMath.h"
 #include "IntrinsicCoreName.h"
