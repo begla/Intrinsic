@@ -77,6 +77,7 @@ enum Enum
   k9,
 
   kF,
+  kT,
 
   kMouseLeft,
   kMouseRight,

@@ -310,10 +310,10 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
   else if (Input::System::getKeyStates()[Input::Key::kCtrl] ==
            Input::KeyState::kPressed)
   {
-    _orbitRadius = glm::max(_orbitRadius -
-                                Editing::_cameraSpeed *
+    _orbitRadius =
+        glm::max(_orbitRadius - Editing::_cameraSpeed *
                                     (_camAngVel.x - _camAngVel.y) * p_DeltaT,
-                            0.1f);
+                 0.1f);
   }
 
   camRot = Components::NodeManager::_worldOrientation(camNodeRef) *
@@ -957,6 +957,30 @@ void Editing::update(float p_DeltaT)
     Components::NodeManager::_position(camNodeRef) =
         (1.0f - blendFactor) * Components::NodeManager::_position(camNodeRef) +
         blendFactor * newPosition;
+  }
+
+  // Snap/align currently selected object to the ground
+  if (Input::System::getKeyStates()[Input::Key::kT] ==
+          Input::KeyState::kPressed &&
+      _currentlySelectedEntity.isValid())
+  {
+    Components::NodeRef nodeRef =
+        Components::NodeManager::getComponentForEntity(
+            _currentlySelectedEntity);
+
+    physx::PxRaycastHit hit;
+    const Math::Ray ray = {Components::NodeManager::_worldPosition(nodeRef),
+                           glm::vec3(0.0f, -1.0f, 0.0f)};
+    if (PhysxHelper::raycast(ray, hit, 1000.0f))
+    {
+      Components::NodeManager::_position(nodeRef) =
+          glm::vec3(hit.position.x, hit.position.y, hit.position.z);
+      Components::NodeManager::_orientation(nodeRef) =
+          glm::rotation(glm::vec3(0.0f, 1.0f, 0.0f),
+                        glm::vec3(hit.normal.x, hit.normal.y, hit.normal.z));
+
+      Components::NodeManager::updateTransforms(nodeRef);
+    }
   }
 
   if (Input::System::getKeyStates()[Input::Key::kAlt] ==
