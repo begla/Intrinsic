@@ -38,12 +38,14 @@ layout (location = 1) out vec3 outTangent;
 layout (location = 2) out vec3 outBinormal;
 layout (location = 3) out vec3 outColor;
 layout (location = 4) out vec2 outUV0;
+layout (location = 5) out vec3 outWorldPosition;
 
 void main()
 { 
   vec3 localPos = inPosition.xyz;
   const vec3 worldPos = (uboPerInstance.worldMatrix * vec4(inPosition.xyz, 1.0)).xyz;
   const vec3 worldNormal = normalize((uboPerInstance.worldMatrix * vec4(inNormal.xyz, 0.0)).xyz);
+  outWorldPosition = worldPos;
 
   applyWind(worldPos, worldNormal, inColor.r, uboPerInstance.data0.w, localPos);
   gl_Position = uboPerInstance.worldViewProjMatrix * vec4(localPos, 1.0);

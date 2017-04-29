@@ -13,6 +13,18 @@
       ]
     },
     {
+      "name": "GBufferFoliage",
+      "resources" : [
+        ["Buffer", "PerInstance", "PerInstance", "Vertex"],
+        ["Buffer", "PerInstance", "PerInstance", "Fragment"],
+        ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
+        ["Image", "MaterialAlbedo", "albedoTex", "Fragment"],
+        ["Image", "MaterialNormal", "normalTex", "Fragment"],
+        ["Image", "MaterialRoughness", "roughnessTex", "Fragment"],
+        ["Image", "MaterialBlendMask", "blendMaskTex", "Fragment"]
+      ]
+    },
+    {
       "name": "Debug",
       "resources" : [
         ["Buffer", "PerInstance", "PerInstance", "Vertex"],
@@ -132,7 +144,7 @@
       "renderPass" : "GBuffer",
       "blendStates" : ["Default", "Default", "Default"],
       "rasterizationState" : "DoubleSided",
-      "boundResources" : "GBuffer"
+      "boundResources" : "GBufferFoliage"
     },
     {
       "name" : "ShadowFoliage",
@@ -175,7 +187,7 @@
       "renderPass" : "GBufferPrePassFoliage",
       "blendStates" : [],
       "rasterizationState" : "DoubleSided",
-      "boundResources" : "GBuffer"
+      "boundResources" : "GBufferFoliage"
     }
   ]
 }
