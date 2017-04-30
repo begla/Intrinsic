@@ -53,12 +53,26 @@ vec3 tonemap(vec3 x)
    return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
 }
 
+vec3 sampleColorOffsets(sampler2D scene, vec2 uv0, vec3 offsets, vec2 framebufferSize)
+{
+  const vec2 direction = uv0 * 2.0 - 1.0;
+  offsets *= clamp(length(direction) - 0.3, 0.0, 1.0);
+
+  const vec2 pixelSize = 1.0 / framebufferSize;
+
+  return vec3(textureLod(scene, uv0 - direction * offsets.x * pixelSize, 0.0).r, 
+    textureLod(scene, uv0 - direction * offsets.y * pixelSize, 0.0).g, 
+    textureLod(scene, uv0 - direction * offsets.z * pixelSize, 0.0).b);
+}
+
 void main()
 {
   const vec2 framebufferSize = vec2(textureSize(sceneTex, 0));
 
-  vec4 scene = textureLod(sceneTex, inUV0, 0.0).rgba;
-  const vec4 sceneBlurred = textureLod(sceneBlurredTex, inUV0, 0.0).rgba;
+  // Chromatic abberation
+  const vec3 colorOffsets = 5.0 * vec3(1, 2, 3);
+  vec3 scene = sampleColorOffsets(sceneTex, inUV0, colorOffsets, framebufferSize);
+  const vec3 sceneBlurred = textureLod(sceneBlurredTex, inUV0, 0.0).rgb;
   const float depth = textureLod(depthBufferTex, inUV0, 0.0).r;
 
   // TODO
@@ -79,7 +93,7 @@ void main()
   const float toneMappingMaxExposure = 3.0;
   const float bloomFactor = 1.0;
   const float filmGrainBias = 0.0;
-  const float filmGrainMax = 0.8;
+  const float filmGrainMax = 1.0;
   const float lensFlareFactor = 1.0;
 
   const float exposure = min(toneMappingLumTarget / avgLum[0], toneMappingMaxExposure);
