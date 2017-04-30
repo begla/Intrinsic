@@ -173,7 +173,7 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
         boid.pos += boid.vel * p_DeltaT;
         Components::NodeManager::_position(nodeRef) = boid.pos;
         Components::NodeManager::_orientation(nodeRef) = glm::rotation(
-            glm::normalize(boid.vel + 0.01f), glm::vec3(0.0f, 0.0f, -1.0f));
+            glm::vec3(0.0f, 0.0f, 1.0f), glm::normalize(boid.vel + 0.01f));
       }
 
       Components::NodeManager::updateTransforms(nodes);
