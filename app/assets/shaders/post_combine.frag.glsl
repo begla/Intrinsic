@@ -75,7 +75,7 @@ void main()
 
   const float lensDirtLumThreshold = 0.2;
   const float lensDirtIntens = 0.9;
-  const float toneMappingLumTarget = 0.6;
+  const float toneMappingLumTarget = 0.7;
   const float toneMappingMaxExposure = 3.0;
   const float bloomFactor = 1.0;
   const float filmGrainBias = 0.0;
@@ -103,5 +103,18 @@ void main()
   outColor.rgb = tonemap(outColor.rgb);
   vec3 whiteScale = 1.0/tonemap(vec3(W));
   outColor.rgb *= whiteScale;
+
+  // Bleach Bypass
+  {
+    vec3 lumCoeff = vec3(0.25, 0.65, 0.1);
+    float lum = dot(lumCoeff, outColor.rgb);
+    vec3 blend = vec3(lum);
+    float L = min(1.0, max(0.0, 10.0 * (lum - 0.45)));
+    vec3 result1 = 2.0 * outColor.rgb * blend;
+    vec3 result2 = 1.0 - 2.0 * (1.0 - blend) * (1.0 - outColor.rgb);
+
+    const float strength = 0.5;
+    outColor.rgb = mix(outColor.rgb, mix(result1, result2, L), strength);
+  }
 }
  
