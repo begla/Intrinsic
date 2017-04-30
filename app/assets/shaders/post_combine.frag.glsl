@@ -72,6 +72,7 @@ void main()
   // Chromatic abberation
   const vec3 colorOffsets = 5.0 * vec3(1, 2, 3);
   vec3 scene = sampleColorOffsets(sceneTex, inUV0, colorOffsets, framebufferSize);
+
   const vec3 sceneBlurred = textureLod(sceneBlurredTex, inUV0, 0.0).rgb;
   const float depth = textureLod(depthBufferTex, inUV0, 0.0).r;
 
