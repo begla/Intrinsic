@@ -611,14 +611,16 @@ void IntrinsicEdNodeViewTreeWidget::onCurrentlySelectedEntityChanged(
     if (nodeRef.isValid())
     {
       QTreeWidgetItem* item = _nodeToItemMap[nodeRef];
-      _INTR_ASSERT(item);
 
-      item->setSelected(true);
-      onItemSelected(item, nullptr);
-
-      if (item->parent())
+      if (item)
       {
-        expandAllParents(item->parent());
+        item->setSelected(true);
+        onItemSelected(item, nullptr);
+
+        if (item->parent())
+        {
+          expandAllParents(item->parent());
+        }
       }
     }
   }
