@@ -86,6 +86,9 @@ void IntrinsicEdPropertyEditorRotation::updateFromProperty()
     _ui.yaw->blockSignals(true);
     _ui.pitch->blockSignals(true);
     _ui.roll->blockSignals(true);
+    _ui.sYaw->blockSignals(true);
+    _ui.sPitch->blockSignals(true);
+    _ui.sRoll->blockSignals(true);
     _ui.yaw->setValue(glm::degrees(euler.x));
     _ui.pitch->setValue(glm::degrees(euler.y));
     _ui.roll->setValue(glm::degrees(euler.z));
@@ -95,6 +98,9 @@ void IntrinsicEdPropertyEditorRotation::updateFromProperty()
     _ui.yaw->blockSignals(false);
     _ui.pitch->blockSignals(false);
     _ui.roll->blockSignals(false);
+    _ui.sYaw->blockSignals(false);
+    _ui.sPitch->blockSignals(false);
+    _ui.sRoll->blockSignals(false);
   }
 
   _ui.propertyTitle->setText(_propertyName.c_str());
