@@ -47,6 +47,7 @@ struct NodeData : Dod::Components::ComponentDataBase
 
     position.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     orientation.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
+    eulerAngles.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     size.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
 
     worldPosition.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
@@ -72,6 +73,7 @@ struct NodeData : Dod::Components::ComponentDataBase
 
   _INTR_ARRAY(glm::vec3) position;
   _INTR_ARRAY(glm::quat) orientation;
+  _INTR_ARRAY(glm::vec3) eulerAngles;
   _INTR_ARRAY(glm::vec3) size;
 
   _INTR_ARRAY(glm::vec3) worldPosition;
@@ -390,9 +392,9 @@ struct NodeManager
                                              _position(p_Ref), false, false),
                            p_Document.GetAllocator());
     p_Properties.AddMember(
-        "localOrient",
+        "localOrientEuler",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(NodeLocalTransform),
-                          _N(rotation), _orientation(p_Ref), false, false),
+                          _N(rotation), _eulerAngles(p_Ref), false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember("localSize",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
@@ -430,6 +432,13 @@ struct NodeManager
     {
       _orientation(p_Ref) =
           JsonHelper::readPropertyQuat(p_Properties["localOrient"]);
+      _eulerAngles(p_Ref) = glm::eulerAngles(_orientation(p_Ref));
+    }
+    else if (p_Properties.HasMember("localOrientEuler"))
+    {
+      _eulerAngles(p_Ref) =
+          JsonHelper::readPropertyVec3(p_Properties["localOrientEuler"]);
+      _orientation(p_Ref) = glm::quat(_eulerAngles(p_Ref));
     }
     if (p_Properties.HasMember("localSize"))
     {
@@ -529,6 +538,11 @@ struct NodeManager
   _INTR_INLINE static glm::quat& _orientation(NodeRef p_Ref)
   {
     return _data.orientation[p_Ref._id];
+  }
+  /// The (local) orientation.
+  _INTR_INLINE static glm::vec3& _eulerAngles(NodeRef p_Ref)
+  {
+    return _data.eulerAngles[p_Ref._id];
   }
   /// The (local) size.
   _INTR_INLINE static glm::vec3& _size(NodeRef p_Ref)
