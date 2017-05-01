@@ -102,7 +102,7 @@ void main()
   // Bloom
   outColor = vec4(scene.rgb + bloomFactor * bloom.rgb, 1.0);
   // Lens flares
-  outColor.rgb += lensFlare.rgb * lensFlareFactor;
+  outColor.rgb += lensFlare.rgb * lensFlareFactor * lensDirt.rgb;
   // Lens dirt
   outColor.rgb += lensDirtIntens * lensDirt.rgb * clamp(max(bloom.a - lensDirtLumThreshold, 0.0), 0.0, 1.0);
   // Vignette
