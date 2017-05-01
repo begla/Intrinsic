@@ -364,13 +364,10 @@ void IntrinsicEdPropertyView::updatePropertyView()
     rapidjson::Value& currentProperties =
         _propertyDocument[entry.propertyCompilerEntryIdx];
 
-    if (currentProperties.HasMember(entry.propertyName.c_str()))
-    {
-      entry.propertyEditor->init(&_propertyDocument, &currentProperties,
-                                 &currentProperties[entry.propertyName.c_str()],
-                                 entry.propertyName.c_str());
-      entry.propertyEditor->updateFromProperty();
-    }
+    entry.propertyEditor->init(&_propertyDocument, &currentProperties,
+                               &currentProperties[entry.propertyName.c_str()],
+                               entry.propertyName.c_str());
+    entry.propertyEditor->updateFromProperty();
   }
 }
 
