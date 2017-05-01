@@ -111,65 +111,65 @@ void setupLuaState(sol::state* p_State)
     p_State->new_usertype<Dod::Ref>("Ref", "isValid", &Dod::Ref::isValid);
   }
 
-  {// Entity API
-   {entityTable["getEntityByName"] = &Entity::EntityManager::getEntityByName;
-  entityTable["createEntity"] = &Entity::EntityManager::createEntity;
-  entityTable["isAlive"] = &Entity::EntityManager::isAlive;
-}
-
-// World API
-{
-  worldTable["getRootNode"] = &World::getRootNode;
-  worldTable["setRootNode"] = &World::setRootNode;
-  worldTable["getActiveCamera"] = &World::getActiveCamera;
-  worldTable["setActiveCamera"] = &World::setActiveCamera;
-
-  worldTable["destroyNodeFull"] = &World::destroyNodeFull;
-  worldTable["cloneNodeFull"] = &World::cloneNodeFull;
-}
-}
-
-{
-  // Mesh component API
+  // Entity API
   {
-    meshComponentTable["getComponentForEntity"] =
-        &Components::MeshManager::getComponentForEntity;
-    meshComponentTable["destroyResources"] =
-        (void (*)(Components::MeshRef)) &
-        Components::MeshManager::destroyResources;
-    meshComponentTable["createResources"] =
-        (void (*)(Components::MeshRef)) &
-        Components::MeshManager::createResources;
-    meshComponentTable["createMesh"] = &Components::MeshManager::createMesh;
-
-    meshComponentTable["getMeshName"] = &Components::MeshManager::getMeshName;
-    meshComponentTable["setMeshName"] = &Components::MeshManager::setMeshName;
+    entityTable["getEntityByName"] = &Entity::EntityManager::getEntityByName;
+    entityTable["createEntity"] = &Entity::EntityManager::createEntity;
+    entityTable["isAlive"] = &Entity::EntityManager::isAlive;
   }
 
-  // Node API
+  // World API
   {
-    nodeComponentTable["getComponentForEntity"] =
-        &Components::NodeManager::getComponentForEntity;
-    nodeComponentTable["createNode"] = &Components::NodeManager::createNode;
-    nodeComponentTable["attachChild"] = &Components::NodeManager::attachChild;
+    worldTable["getRootNode"] = &World::getRootNode;
+    worldTable["setRootNode"] = &World::setRootNode;
+    worldTable["getActiveCamera"] = &World::getActiveCamera;
+    worldTable["setActiveCamera"] = &World::setActiveCamera;
 
-    nodeComponentTable["rebuildTree"] = &Components::NodeManager::rebuildTree;
-    nodeComponentTable["rebuildTreeAndUpdateTransforms"] =
-        &Components::NodeManager::rebuildTreeAndUpdateTransforms;
-    nodeComponentTable["updateTransforms"] =
-        (void (*)(Components::NodeRef)) &
-        Components::NodeManager::updateTransforms;
-
-    nodeComponentTable["getPosition"] = &Components::NodeManager::getPosition;
-    nodeComponentTable["setPosition"] = &Components::NodeManager::setPosition;
-    nodeComponentTable["getOrientation"] =
-        &Components::NodeManager::getOrientation;
-    nodeComponentTable["setOrientation"] =
-        &Components::NodeManager::setOrientation;
-    nodeComponentTable["getSize"] = &Components::NodeManager::getSize;
-    nodeComponentTable["setSize"] = &Components::NodeManager::setSize;
+    worldTable["destroyNodeFull"] = &World::destroyNodeFull;
+    worldTable["cloneNodeFull"] = &World::cloneNodeFull;
   }
-}
+
+  {
+    // Mesh component API
+    {
+      meshComponentTable["getComponentForEntity"] =
+          &Components::MeshManager::getComponentForEntity;
+      meshComponentTable["destroyResources"] =
+          (void (*)(Components::MeshRef)) &
+          Components::MeshManager::destroyResources;
+      meshComponentTable["createResources"] =
+          (void (*)(Components::MeshRef)) &
+          Components::MeshManager::createResources;
+      meshComponentTable["createMesh"] = &Components::MeshManager::createMesh;
+
+      meshComponentTable["getMeshName"] = &Components::MeshManager::getMeshName;
+      meshComponentTable["setMeshName"] = &Components::MeshManager::setMeshName;
+    }
+
+    // Node API
+    {
+      nodeComponentTable["getComponentForEntity"] =
+          &Components::NodeManager::getComponentForEntity;
+      nodeComponentTable["createNode"] = &Components::NodeManager::createNode;
+      nodeComponentTable["attachChild"] = &Components::NodeManager::attachChild;
+
+      nodeComponentTable["rebuildTree"] = &Components::NodeManager::rebuildTree;
+      nodeComponentTable["rebuildTreeAndUpdateTransforms"] =
+          &Components::NodeManager::rebuildTreeAndUpdateTransforms;
+      nodeComponentTable["updateTransforms"] =
+          (void (*)(Components::NodeRef)) &
+          Components::NodeManager::updateTransforms;
+
+      nodeComponentTable["getPosition"] = &Components::NodeManager::getPosition;
+      nodeComponentTable["setPosition"] = &Components::NodeManager::setPosition;
+      nodeComponentTable["getOrientation"] =
+          &Components::NodeManager::getOrientation;
+      nodeComponentTable["setOrientation"] =
+          &Components::NodeManager::setOrientation;
+      nodeComponentTable["getSize"] = &Components::NodeManager::getSize;
+      nodeComponentTable["setSize"] = &Components::NodeManager::setSize;
+    }
+  }
 }
 
 void ScriptManager::init()

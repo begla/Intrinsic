@@ -1,0 +1,14 @@
+[
+	{
+		"name" : "A",
+		"nodes" : ["PathA1", "PathA2", "PathA3", "PathA4", "PathA5", "PathA6", "PathA7", "PathA8"]
+	},
+	{
+		"name" : "B",
+		"nodes" : ["PathB1", "PathB2", "PathB3"]
+	},
+	{
+		"name" : "C",
+		"nodes" : ["PathC1", "PathC2", "PathC3", "PathC4"]
+	}
+]

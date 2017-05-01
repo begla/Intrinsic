@@ -162,6 +162,7 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreSystemEventProviderSDL.h"
 #include "IntrinsicCoreGameStatesEditing.h"
 #include "IntrinsicCoreGameStatesMain.h"
+#include "IntrinsicCoreGameStatesBenchmark.h"
 #include "IntrinsicCoreGameStatesManager.h"
 #include "IntrinsicCoreResourcesScript.h"
 #include "IntrinsicCoreComponentsScript.h"

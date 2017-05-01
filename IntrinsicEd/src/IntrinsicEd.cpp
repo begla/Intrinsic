@@ -175,6 +175,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    SLOT(onMainGameState()));
   QObject::connect(_ui.actionEditingGameState, SIGNAL(triggered()), this,
                    SLOT(onEditingGameState()));
+  QObject::connect(_ui.actionBenchmarkGameState, SIGNAL(triggered()), this,
+                   SLOT(onBenchmarkGameState()));
 
   QObject::connect(_ui.actionCreateCube, SIGNAL(triggered()), this,
                    SLOT(onCreateCube()));
@@ -448,6 +450,7 @@ void IntrinsicEd::onMainGameState()
 {
   _ui.actionEditingGameState->setChecked(false);
   _ui.actionMainGameState->setChecked(true);
+  _ui.actionBenchmarkGameState->setChecked(false);
 
   GameStates::Manager::activateGameState(GameStates::GameState::kMain);
   SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -457,8 +460,20 @@ void IntrinsicEd::onEditingGameState()
 {
   _ui.actionEditingGameState->setChecked(true);
   _ui.actionMainGameState->setChecked(false);
+  _ui.actionBenchmarkGameState->setChecked(false);
 
   GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
+
+  SDL_SetRelativeMouseMode(SDL_FALSE);
+}
+
+void IntrinsicEd::onBenchmarkGameState()
+{
+  _ui.actionBenchmarkGameState->setChecked(true);
+  _ui.actionEditingGameState->setChecked(false);
+  _ui.actionMainGameState->setChecked(false);
+
+  GameStates::Manager::activateGameState(GameStates::GameState::kBenchmark);
 
   SDL_SetRelativeMouseMode(SDL_FALSE);
 }

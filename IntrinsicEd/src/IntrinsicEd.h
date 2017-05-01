@@ -71,6 +71,7 @@ public slots:
   void onEditingModeScale();
   void onEditingGameState();
   void onMainGameState();
+  void onBenchmarkGameState();
   void onGridSizeChanged(double p_Value);
   void onGizmoSizeChanged(double p_Value);
   void onCameraSpeedChanged(double p_Value);
