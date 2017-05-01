@@ -443,24 +443,83 @@ void RenderSystem::initVkInstance()
   appInfo.pEngineName = "Intrinsic";
   appInfo.apiVersion = VK_API_VERSION_1_0;
 
-  _INTR_ARRAY(const char*) enabledExtensions;
+  _INTR_ARRAY(const char*) extensionsToEnable;
   {
-    enabledExtensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+    extensionsToEnable.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
-    enabledExtensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+    extensionsToEnable.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #elif defined(VK_USE_PLATFORM_XLIB_KHR)
-    enabledExtensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+    extensionsToEnable.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
 #endif // VK_USE_PLATFORM_WIN32_KHR
   }
 
-  _INTR_ARRAY(const char*) enabledLayers;
+  _INTR_ARRAY(const char*) layersToEnable;
+  if ((Settings::Manager::_rendererFlags &
+       Settings::RendererFlags::kValidationEnabled) > 0u)
   {
-    if ((Settings::Manager::_rendererFlags &
-         Settings::RendererFlags::kValidationEnabled) > 0u)
+    layersToEnable.push_back("VK_LAYER_LUNARG_standard_validation");
+    extensionsToEnable.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+  }
+
+  uint32_t availableLayerCount = 0u;
+  vkEnumerateInstanceLayerProperties(&availableLayerCount, nullptr);
+  _INTR_ARRAY(VkLayerProperties) availableLayers;
+  availableLayers.resize(availableLayerCount);
+  vkEnumerateInstanceLayerProperties(&availableLayerCount,
+                                     availableLayers.data());
+
+  _INTR_ARRAY(const char*) enabledLayers;
+  for (uint32_t i = 0u; i < availableLayerCount; ++i)
+  {
+    VkLayerProperties& layerProperty = availableLayers[i];
+    _INTR_LOG_INFO("Found available Vulkan layer '%s'...",
+                   layerProperty.layerName);
+
+    for (uint32_t i = 0u; i < layersToEnable.size(); ++i)
     {
-      enabledLayers.push_back("VK_LAYER_LUNARG_standard_validation");
-      enabledExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+      if (strcmp(layerProperty.layerName, layersToEnable[i]) == 0u)
+      {
+        _INTR_LOG_INFO("Enabaling Vulkan layer '%s'...",
+                       layerProperty.layerName);
+        enabledLayers.push_back(layersToEnable[i]);
+      }
     }
+  }
+
+  if (enabledLayers.size() != layersToEnable.size())
+  {
+    _INTR_LOG_WARNING("Failed to enable some Vulkan layers...");
+  }
+
+  uint32_t availableExtensionCount = 0u;
+  vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount,
+                                         nullptr);
+  _INTR_ARRAY(VkExtensionProperties) availableExtensions;
+  availableExtensions.resize(availableExtensionCount);
+  vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount,
+                                         availableExtensions.data());
+
+  _INTR_ARRAY(const char*) enabledExtensions;
+  for (uint32_t i = 0u; i < availableExtensionCount; ++i)
+  {
+    VkExtensionProperties& extensionProperty = availableExtensions[i];
+    _INTR_LOG_INFO("Found available Vulkan extension '%s'...",
+                   extensionProperty.extensionName);
+
+    for (uint32_t i = 0u; i < extensionsToEnable.size(); ++i)
+    {
+      if (strcmp(extensionProperty.extensionName, extensionsToEnable[i]) == 0u)
+      {
+        _INTR_LOG_INFO("Enabaling Vulkan extension '%s'...",
+                       extensionProperty.extensionName);
+        enabledExtensions.push_back(extensionsToEnable[i]);
+      }
+    }
+  }
+
+  if (enabledExtensions.size() != extensionsToEnable.size())
+  {
+    _INTR_LOG_WARNING("Failed to enable some Vulkan extensions...");
   }
 
   VkInstanceCreateInfo instanceCreateInfo = {};
