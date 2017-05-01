@@ -207,7 +207,9 @@ case IDCONTINUE : break;                                                       \
 #if defined(_INTR_PROFILING_ENABLED)
 #define _INTR_PROFILE_CPU(_group, _name)                                       \
   MICROPROFILE_SCOPEI(_group, _name, 0xff00ff)
-#define _INTR_PROFILE_GPU(_name) MICROPROFILE_SCOPEGPUI(_name, 0xff00ff)
+#define _INTR_PROFILE_GPU(_name)                                               \
+  MICROPROFILE_SCOPEGPUI(_name, 0xff00ff);                                     \
+  _INTR_PROFILE_GPU_MARKER_REGION(_name)
 #define _INTR_PROFILE_COUNTER_ADD(_name, _count)                               \
   MICROPROFILE_COUNTER_ADD(_name, _count)
 #define _INTR_PROFILE_COUNTER_SET(_name, _count)                               \

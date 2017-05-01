@@ -644,8 +644,9 @@ void RenderSystem::initVkDevice()
 
     for (auto& ext : extensions)
     {
-      if (!strcmp(ext.extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+      if (strcmp(ext.extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME) == 0u)
       {
+        _INTR_LOG_INFO("Enabling debug markers...");
         debugMarkerExtPresent = true;
       }
     }
