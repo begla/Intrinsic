@@ -28,6 +28,7 @@ _INTR_STRING Manager::_assetMeshPath =
 _INTR_STRING Manager::_assetTexturePath =
     "../../Intrinsic_Assets/app/assets/textures";
 uint32_t Manager::_rendererFlags = 0u;
+uint32_t Manager::_initialGameState = 0u;
 float Manager::_targetFrameRate = 0.016f;
 WindowMode::Enum Manager::_windowMode = WindowMode::kWindowed;
 uint32_t Manager::_screenResolutionWidth = 1280u;
