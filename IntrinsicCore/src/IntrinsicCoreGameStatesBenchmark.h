@@ -20,27 +20,13 @@ namespace Core
 {
 namespace GameStates
 {
-namespace GameState
+struct Benchmark
 {
-enum Enum
-{
-  kNone,
-  kEditing,
-  kMain,
-  kBenchmark
-};
-}
+  static void init();
+  static void activate();
+  static void deativate();
 
-struct Manager
-{
-  static void activateGameState(GameState::Enum p_GameState);
-  static void deactivateGameState();
   static void update(float p_DeltaT);
-
-  static GameState::Enum getActiveGameState() { return _activeGameState; }
-
-private:
-  static GameState::Enum _activeGameState;
 };
 }
 }

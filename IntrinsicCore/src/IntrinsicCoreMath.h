@@ -654,6 +654,31 @@ _INTR_INLINE glm::vec3 wrapEuler(const glm::vec3& p_Euler)
              2.0f -
          glm::pi<float>();
 }
+
+// <-
+
+_INTR_INLINE glm::vec3 bezierQuadratic(const _INTR_ARRAY(glm::vec3) p_Points,
+                                       float p_Perc)
+{
+  _INTR_ASSERT(p_Points.size() >= 3u);
+
+  _INTR_ARRAY(glm::vec3) interpPoints;
+  interpPoints.resize(p_Points.size());
+  memcpy(interpPoints.data(), p_Points.data(),
+         sizeof(glm::vec3) * p_Points.size());
+  uint32_t numPoints = (uint32_t)p_Points.size() - 1u;
+
+  while (numPoints > 0u)
+  {
+    for (uint32_t i = 0u; i < numPoints; ++i)
+    {
+      interpPoints[i] = glm::mix(interpPoints[i], interpPoints[i + 1], p_Perc);
+    }
+    --numPoints;
+  }
+
+  return interpPoints[0];
+}
 }
 }
 }
