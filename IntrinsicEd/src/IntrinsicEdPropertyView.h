@@ -17,6 +17,13 @@
 // UI related includes
 #include "ui_IntrinsicEdPropertyView.h"
 
+struct PropertyEntry
+{
+  IntrinsicEdPropertyEditorBase* propertyEditor;
+  uint32_t propertyCompilerEntryIdx;
+  _INTR_STRING propertyName;
+};
+
 class IntrinsicEdPropertyView : public QDockWidget
 {
   Q_OBJECT
@@ -34,6 +41,7 @@ public:
 
   void clearPropertyView();
   void clearAndUpdatePropertyView();
+  void updatePropertyView();
 
 public slots:
   void onValueChanged(rapidjson::Value& p_Properties);
@@ -53,4 +61,5 @@ private:
 
   _INTR_HASH_MAP(_INTR_STRING, bool) _categoryCollapsedState;
   _INTR_STRING _currentCategory;
+  _INTR_ARRAY(PropertyEntry) _propertyEntries;
 };

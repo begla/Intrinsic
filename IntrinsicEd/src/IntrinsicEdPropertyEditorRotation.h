@@ -17,7 +17,7 @@
 // UI related includes
 #include "ui_IntrinsicEdPropertyEditorRotation.h"
 
-class IntrinsicEdPropertyEditorRotation : public QWidget
+class IntrinsicEdPropertyEditorRotation : public IntrinsicEdPropertyEditorBase
 {
   Q_OBJECT
 
@@ -40,8 +40,4 @@ private:
   void updateFromProperty();
 
   Ui::IntrinsicEdPropertyEditorRotationClass _ui;
-  rapidjson::Value* _property;
-  rapidjson::Value* _properties;
-  rapidjson::Document* _document;
-  _INTR_STRING _propertyName;
 };

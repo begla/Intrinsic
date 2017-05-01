@@ -23,9 +23,8 @@ IntrinsicEdPropertyEditorVec4::IntrinsicEdPropertyEditorVec4(
     rapidjson::Document* p_Document, rapidjson::Value* p_CurrentProperties,
     rapidjson::Value* p_CurrentProperty, const char* p_PropertyName,
     QWidget* parent)
-    : QWidget(parent), _property(p_CurrentProperty),
-      _propertyName(p_PropertyName), _properties(p_CurrentProperties),
-      _document(p_Document)
+    : IntrinsicEdPropertyEditorBase(p_Document, p_CurrentProperties,
+                                    p_CurrentProperty, p_PropertyName, parent)
 {
   _ui.setupUi(this);
   updateFromProperty();
@@ -55,10 +54,26 @@ void IntrinsicEdPropertyEditorVec4::updateFromProperty()
     _ui.w->setReadOnly(true);
   }
 
-  _ui.x->setValue(prop["values"][0].GetFloat());
-  _ui.y->setValue(prop["values"][1].GetFloat());
-  _ui.z->setValue(prop["values"][2].GetFloat());
-  _ui.w->setValue(prop["values"][3].GetFloat());
+  bool changed = prop["values"][0].GetFloat() != _ui.x->value() ||
+                 prop["values"][1].GetFloat() != _ui.y->value() ||
+                 prop["values"][2].GetFloat() != _ui.z->value() ||
+                 prop["values"][3].GetFloat() != _ui.w->value();
+
+  if (changed)
+  {
+    _ui.x->blockSignals(true);
+    _ui.y->blockSignals(true);
+    _ui.z->blockSignals(true);
+    _ui.w->blockSignals(true);
+    _ui.x->setValue(prop["values"][0].GetFloat());
+    _ui.y->setValue(prop["values"][1].GetFloat());
+    _ui.z->setValue(prop["values"][2].GetFloat());
+    _ui.w->setValue(prop["values"][3].GetFloat());
+    _ui.x->blockSignals(false);
+    _ui.y->blockSignals(false);
+    _ui.z->blockSignals(false);
+    _ui.w->blockSignals(false);
+  }
 
   _ui.propertyTitle->setText(_propertyName.c_str());
 }
@@ -68,10 +83,18 @@ void IntrinsicEdPropertyEditorVec4::onValueChanged()
   _INTR_ASSERT(_property);
   rapidjson::Value& prop = *_property;
 
-  prop["values"][0].SetFloat((float)_ui.x->value());
-  prop["values"][1].SetFloat((float)_ui.y->value());
-  prop["values"][2].SetFloat((float)_ui.z->value());
-  prop["values"][3].SetFloat((float)_ui.w->value());
+  bool changed = prop["values"][0].GetFloat() != _ui.x->value() ||
+                 prop["values"][1].GetFloat() != _ui.y->value() ||
+                 prop["values"][2].GetFloat() != _ui.z->value() ||
+                 prop["values"][3].GetFloat() != _ui.w->value();
 
-  emit valueChanged(*_properties);
+  if (changed)
+  {
+    prop["values"][0].SetFloat((float)_ui.x->value());
+    prop["values"][1].SetFloat((float)_ui.y->value());
+    prop["values"][2].SetFloat((float)_ui.z->value());
+    prop["values"][3].SetFloat((float)_ui.w->value());
+
+    emit valueChanged(*_properties);
+  }
 }
