@@ -164,6 +164,7 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
   }
 
   clearPropertyView();
+  _propertyEntries.clear();
 
   const char* categories[16] = {};
   uint32_t categoryCount = 0u;
@@ -265,7 +266,7 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
 
         const char* editor = prop["editor"].GetString();
 
-        QWidget* propertyEditor = nullptr;
+        IntrinsicEdPropertyEditorBase* propertyEditor = nullptr;
         if (strcmp(editor, "vec2") == 0u)
         {
           propertyEditor = new IntrinsicEdPropertyEditorVec2(
@@ -328,6 +329,8 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
                            SLOT(onValueChanged(rapidjson::Value&)));
 
           _ui.scrollAreaWidgetContents->layout()->addWidget(propertyEditor);
+          _propertyEntries.push_back(
+              {propertyEditor, pi, it->name.GetString()});
         }
       }
     }
@@ -336,6 +339,39 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
   QSpacerItem* spacer =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
   _ui.scrollAreaWidgetContents->layout()->addItem(spacer);
+}
+
+void IntrinsicEdPropertyView::updatePropertyView()
+{
+  for (uint32_t ci = 0u; ci < _currentPropertyCompilerEntries.size(); ++ci)
+  {
+    rapidjson::Value& currentProperties = _propertyDocument[ci];
+    currentProperties.RemoveAllMembers();
+
+    Dod::PropertyCompilerEntry& compilerEntry =
+        _currentPropertyCompilerEntries[ci];
+
+    // Compile properties
+    {
+      compilerEntry.compileFunction(compilerEntry.ref, true, currentProperties,
+                                    _propertyDocument);
+    }
+  }
+
+  for (uint32_t i = 0u; i < _propertyEntries.size(); ++i)
+  {
+    const PropertyEntry& entry = _propertyEntries[i];
+    rapidjson::Value& currentProperties =
+        _propertyDocument[entry.propertyCompilerEntryIdx];
+
+    if (currentProperties.HasMember(entry.propertyName.c_str()))
+    {
+      entry.propertyEditor->init(&_propertyDocument, &currentProperties,
+                                 &currentProperties[entry.propertyName.c_str()],
+                                 entry.propertyName.c_str());
+      entry.propertyEditor->updateFromProperty();
+    }
+  }
 }
 
 void IntrinsicEdPropertyView::clearPropertySet()

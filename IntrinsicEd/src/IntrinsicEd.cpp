@@ -961,6 +961,7 @@ int IntrinsicEd::enterMainLoop()
 
     TaskManager::executeTasks();
     updateStatusBar(_ui.statusBar);
+    _propertyView->updatePropertyView();
   }
 
   return 0;

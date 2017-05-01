@@ -24,11 +24,12 @@ IntrinsicEdPropertyEditorResourceSelector::
         rapidjson::Document* p_Document, rapidjson::Value* p_CurrentProperties,
         rapidjson::Value* p_CurrentProperty, const char* p_PropertyName,
         const char* p_ResourceManagerName, QWidget* parent)
-    : QWidget(parent), _property(p_CurrentProperty),
-      _properties(p_CurrentProperties), _propertyName(p_PropertyName),
-      _document(p_Document), _resourceManagerName(p_ResourceManagerName)
+    : IntrinsicEdPropertyEditorBase(p_Document, p_CurrentProperties,
+                                    p_CurrentProperty, p_PropertyName, parent),
+      _resourceManagerName(p_ResourceManagerName)
 {
   _ui.setupUi(this);
+  updateComboBoxItems();
   updateFromProperty();
 
   QObject::connect(_ui.comboBox, SIGNAL(currentIndexChanged(int)), this,
@@ -40,18 +41,9 @@ IntrinsicEdPropertyEditorResourceSelector::
 {
 }
 
-void IntrinsicEdPropertyEditorResourceSelector::updateFromProperty()
+void IntrinsicEdPropertyEditorResourceSelector::updateComboBoxItems()
 {
-  using namespace Intrinsic::Core;
-
-  _INTR_ASSERT(_property);
-  const rapidjson::Value& prop = *_property;
-
-  if (prop["readOnly"].GetBool())
-  {
-    _ui.comboBox->setEditable(false);
-  }
-
+  _ui.comboBox->blockSignals(true);
   _ui.comboBox->clear();
 
   const Dod::Resources::ResourceManagerEntry& managerEntry =
@@ -88,6 +80,39 @@ void IntrinsicEdPropertyEditorResourceSelector::updateFromProperty()
   completer->setFilterMode(Qt::MatchFlag::MatchContains);
   _ui.comboBox->setCompleter(completer);
 
+  _ui.comboBox->blockSignals(false);
+}
+
+void IntrinsicEdPropertyEditorResourceSelector::updateFromProperty()
+{
+  using namespace Intrinsic::Core;
+
+  _INTR_ASSERT(_property);
+  const rapidjson::Value& prop = *_property;
+
+  if (prop["readOnly"].GetBool())
+  {
+    _ui.comboBox->setEditable(false);
+  }
+
+  _ui.comboBox->blockSignals(true);
+  for (uint32_t i = 0u; i < (uint32_t)_ui.comboBox->count(); ++i)
+  {
+    const _INTR_STRING itemText =
+        _ui.comboBox->itemText(i).toStdString().c_str();
+
+    if (prop["value"] == itemText.c_str())
+    {
+      if (_ui.comboBox->currentIndex() != i)
+      {
+        const char* tttt = prop["value"].GetString();
+        _ui.comboBox->setCurrentIndex(i);
+        break;
+      }
+    }
+  }
+  _ui.comboBox->blockSignals(false);
+
   _ui.propertyTitle->setText(_propertyName.c_str());
 }
 
@@ -96,17 +121,28 @@ void IntrinsicEdPropertyEditorResourceSelector::onValueChanged()
   _INTR_ASSERT(_property);
   rapidjson::Value& prop = *_property;
 
+  QString currentItemText =
+      _ui.comboBox->itemText(_ui.comboBox->currentIndex());
+
+  bool changed = false;
   if (_ui.comboBox->currentIndex() != 0)
   {
-    prop["value"].SetString(_ui.comboBox->itemText(_ui.comboBox->currentIndex())
-                                .toStdString()
-                                .c_str(),
-                            _document->GetAllocator());
+    if (prop["value"] != currentItemText.toStdString().c_str())
+    {
+      prop["value"].SetString(currentItemText.toStdString().c_str(),
+                              _document->GetAllocator());
+      changed = true;
+    }
   }
   else
   {
-    prop["value"].SetString("");
+    if (prop["value"] != "")
+    {
+      prop["value"].SetString("");
+      changed = true;
+    }
   }
 
-  emit valueChanged(*_properties);
+  if (changed)
+    emit valueChanged(*_properties);
 }

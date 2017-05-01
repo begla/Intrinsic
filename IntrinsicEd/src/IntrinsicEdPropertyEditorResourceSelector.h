@@ -17,7 +17,8 @@
 // UI related includes
 #include "ui_IntrinsicEdPropertyEditorResourceSelector.h"
 
-class IntrinsicEdPropertyEditorResourceSelector : public QWidget
+class IntrinsicEdPropertyEditorResourceSelector
+    : public IntrinsicEdPropertyEditorBase
 {
   Q_OBJECT
 
@@ -25,7 +26,7 @@ public:
   IntrinsicEdPropertyEditorResourceSelector(
       rapidjson::Document* p_Document, rapidjson::Value* p_CurrentProperties,
       rapidjson::Value* p_CurrentProperty, const char* p_PropertyName,
-      const char* p_PropertyManagerName, QWidget* parent = nullptr);
+      const char* p_ResourceManagerName, QWidget* parent = nullptr);
   ~IntrinsicEdPropertyEditorResourceSelector();
 
 public slots:
@@ -35,12 +36,9 @@ signals:
   void valueChanged(rapidjson::Value& p_Properties);
 
 private:
+  void updateComboBoxItems();
   void updateFromProperty();
 
   Ui::IntrinsicEdPropertyEditorResourceSelectorClass _ui;
-  rapidjson::Value* _property;
-  rapidjson::Value* _properties;
-  rapidjson::Document* _document;
-  _INTR_STRING _propertyName;
   _INTR_STRING _resourceManagerName;
 };

@@ -23,9 +23,8 @@ IntrinsicEdPropertyEditorRotation::IntrinsicEdPropertyEditorRotation(
     rapidjson::Document* p_Document, rapidjson::Value* p_CurrentProperties,
     rapidjson::Value* p_CurrentProperty, const char* p_PropertyName,
     QWidget* parent)
-    : QWidget(parent), _properties(p_CurrentProperties),
-      _property(p_CurrentProperty), _propertyName(p_PropertyName),
-      _document(p_Document)
+    : IntrinsicEdPropertyEditorBase(p_Document, p_CurrentProperties,
+                                    p_CurrentProperty, p_PropertyName, parent)
 {
   _ui.setupUi(this);
   updateFromProperty();
@@ -78,12 +77,25 @@ void IntrinsicEdPropertyEditorRotation::updateFromProperty()
                   glm::radians(glm::mod(prop["values"][2].GetFloat(), 360.0f)));
   }
 
-  _ui.yaw->setValue(glm::degrees(euler.x));
-  _ui.pitch->setValue(glm::degrees(euler.y));
-  _ui.roll->setValue(glm::degrees(euler.z));
-  _ui.sYaw->setValue(glm::degrees(euler.x));
-  _ui.sPitch->setValue(glm::degrees(euler.y));
-  _ui.sRoll->setValue(glm::degrees(euler.z));
+  bool changed = _ui.yaw->value() != glm::degrees(euler.x) ||
+                 _ui.pitch->value() != glm::degrees(euler.y) ||
+                 _ui.roll->value() != glm::degrees(euler.z);
+
+  if (changed)
+  {
+    _ui.yaw->blockSignals(true);
+    _ui.pitch->blockSignals(true);
+    _ui.roll->blockSignals(true);
+    _ui.yaw->setValue(glm::degrees(euler.x));
+    _ui.pitch->setValue(glm::degrees(euler.y));
+    _ui.roll->setValue(glm::degrees(euler.z));
+    _ui.sYaw->setValue(glm::degrees(euler.x));
+    _ui.sPitch->setValue(glm::degrees(euler.y));
+    _ui.sRoll->setValue(glm::degrees(euler.z));
+    _ui.yaw->blockSignals(false);
+    _ui.pitch->blockSignals(false);
+    _ui.roll->blockSignals(false);
+  }
 
   _ui.propertyTitle->setText(_propertyName.c_str());
 }
@@ -101,22 +113,40 @@ void IntrinsicEdPropertyEditorRotation::onValueChanged()
                                     glm::radians(_ui.pitch->value()),
                                     glm::radians(_ui.roll->value()));
 
+  bool changed = false;
   if (strcmp(prop["type"].GetString(), "quat") == 0u)
   {
     const glm::quat quat = glm::quat(euler);
-    prop["values"][0].SetFloat(quat.x);
-    prop["values"][1].SetFloat(quat.y);
-    prop["values"][2].SetFloat(quat.z);
-    prop["values"][3].SetFloat(quat.w);
+
+    changed = prop["values"][0].GetFloat() != quat.x ||
+              prop["values"][1].GetFloat() != quat.y ||
+              prop["values"][2].GetFloat() != quat.z ||
+              prop["values"][3].GetFloat() != quat.w;
+
+    if (changed)
+    {
+      prop["values"][0].SetFloat(quat.x);
+      prop["values"][1].SetFloat(quat.y);
+      prop["values"][2].SetFloat(quat.z);
+      prop["values"][3].SetFloat(quat.w);
+    }
   }
   else if (strcmp(prop["type"].GetString(), "vec3") == 0u)
   {
-    prop["values"][0].SetFloat(glm::degrees(euler.x));
-    prop["values"][1].SetFloat(glm::degrees(euler.y));
-    prop["values"][2].SetFloat(glm::degrees(euler.z));
+    changed = prop["values"][0].GetFloat() != glm::degrees(euler.x) ||
+              prop["values"][1].GetFloat() != glm::degrees(euler.y) ||
+              prop["values"][2].GetFloat() != glm::degrees(euler.z);
+
+    if (changed)
+    {
+      prop["values"][0].SetFloat(glm::degrees(euler.x));
+      prop["values"][1].SetFloat(glm::degrees(euler.y));
+      prop["values"][2].SetFloat(glm::degrees(euler.z));
+    }
   }
 
-  emit valueChanged(*_properties);
+  if (changed)
+    emit valueChanged(*_properties);
 }
 
 void IntrinsicEdPropertyEditorRotation::onSliderValueChanged()

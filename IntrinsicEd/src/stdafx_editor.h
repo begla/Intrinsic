@@ -26,6 +26,7 @@
 #include "IntrinsicEd.h"
 #include "IntrinsicEdNodeViewTreeWidget.h"
 #include "IntrinsicEdNodeView.h"
+#include "IntrinsicEdPropertyEditorBase.h"
 #include "IntrinsicEdPropertyView.h"
 #include "IntrinsicEdPropertyEditorVec2.h"
 #include "IntrinsicEdPropertyEditorVec3.h"

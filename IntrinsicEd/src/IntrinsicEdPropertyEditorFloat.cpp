@@ -23,9 +23,8 @@ IntrinsicEdPropertyEditorFloat::IntrinsicEdPropertyEditorFloat(
     rapidjson::Document* p_Document, rapidjson::Value* p_CurrentProperties,
     rapidjson::Value* p_CurrentProperty, const char* p_PropertyName,
     QWidget* parent)
-    : QWidget(parent), _properties(p_CurrentProperties),
-      _property(p_CurrentProperty), _propertyName(p_PropertyName),
-      _document(p_Document)
+    : IntrinsicEdPropertyEditorBase(p_Document, p_CurrentProperties,
+                                    p_CurrentProperty, p_PropertyName, parent)
 {
   _ui.setupUi(this);
   updateFromProperty();
@@ -46,7 +45,12 @@ void IntrinsicEdPropertyEditorFloat::updateFromProperty()
     _ui.value->setReadOnly(true);
   }
 
-  _ui.value->setValue(prop["value"].GetFloat());
+  if (prop["value"].GetFloat() != _ui.value->value())
+  {
+    _ui.value->blockSignals(true);
+    _ui.value->setValue(prop["value"].GetFloat());
+    _ui.value->blockSignals(false);
+  }
 
   _ui.propertyTitle->setText(_propertyName.c_str());
 }
@@ -56,7 +60,10 @@ void IntrinsicEdPropertyEditorFloat::onValueChanged()
   _INTR_ASSERT(_property);
   rapidjson::Value& prop = *_property;
 
-  prop["value"].SetFloat((float)_ui.value->value());
+  if (prop["value"].GetFloat() != _ui.value->value())
+  {
+    prop["value"].SetFloat((float)_ui.value->value());
 
-  emit valueChanged(*_properties);
+    emit valueChanged(*_properties);
+  }
 }
