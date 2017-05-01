@@ -644,6 +644,16 @@ _INTR_INLINE uint32_t megaBytesToBytes(float p_MegaBytes)
 {
   return (uint32_t)(p_MegaBytes * 1024.0f * 1024.0f);
 }
+
+// <-
+
+_INTR_INLINE glm::vec3 wrapEuler(const glm::vec3& p_Euler)
+{
+  return glm::mod(p_Euler * 0.5f + glm::half_pi<float>(),
+                  glm::pi<float>() + _INTR_EPSILON) *
+             2.0f -
+         glm::pi<float>();
+}
 }
 }
 }

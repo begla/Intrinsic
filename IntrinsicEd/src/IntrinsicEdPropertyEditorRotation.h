@@ -38,6 +38,7 @@ signals:
 
 private:
   void updateFromProperty();
+  void updateProperty();
 
   Ui::IntrinsicEdPropertyEditorRotationClass _ui;
 };

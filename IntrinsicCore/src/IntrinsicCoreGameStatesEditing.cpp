@@ -484,7 +484,7 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
           1.0f / Math::calcScreenSpaceScale(
                      newWorldPos,
                      Components::CameraManager::_viewProjectionMatrix(camRef),
-                     0.5f);
+                     0.1f);
       _gridPosition = snapToGrid(newWorldPos, Editing::_gridSize);
 
       if (_translScaleXAxisSelected)
@@ -544,6 +544,9 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
             glm::quat(newRotation) * _initialOrientation;
       }
 
+      Components::NodeManager::_eulerAngles(currentEntityNodeRef) =
+          glm::eulerAngles(
+              Components::NodeManager::_orientation(currentEntityNodeRef));
       Components::NodeManager::updateTransforms(currentEntityNodeRef);
     }
   }
@@ -561,7 +564,7 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
 // Static members
 Entity::EntityRef Editing::_currentlySelectedEntity;
 EditingMode::Enum Editing::_editingMode = EditingMode::kDefault;
-float Editing::_gridSize = 1.0f;
+float Editing::_gridSize = 0.25f;
 float Editing::_gizmoSize = 0.15f;
 float Editing::_cameraSpeed = 150.0f;
 

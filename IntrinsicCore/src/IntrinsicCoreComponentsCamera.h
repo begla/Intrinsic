@@ -117,7 +117,7 @@ struct CameraManager
     p_Properties.AddMember(
         "eulerAngles",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Camera), _N(rotation),
-                          glm::degrees(_descEulerAngles(p_Ref)), false, false),
+                          _descEulerAngles(p_Ref), false, false),
         p_Document.GetAllocator());
   }
 
@@ -136,8 +136,8 @@ struct CameraManager
       _descFarPlane(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["farPlane"]);
     if (p_Properties.HasMember("eulerAngles"))
-      _descEulerAngles(p_Ref) = glm::radians(
-          JsonHelper::readPropertyVec3(p_Properties["eulerAngles"]));
+      _descEulerAngles(p_Ref) =
+          JsonHelper::readPropertyVec3(p_Properties["eulerAngles"]);
   }
 
   // <-
