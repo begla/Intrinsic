@@ -100,6 +100,7 @@ void Manager::loadSettings()
     readSetting(doc, _N(materialPassConfig), _materialPassConfig);
     readSetting(doc, _N(targetFrameRate), _targetFrameRate);
     readSetting(doc, _N(windowMode), (uint32_t&)_windowMode);
+    readSetting(doc, _N(initialGameState), (uint32_t&)_initialGameState);
     readSetting(doc, _N(screenResolutionWidth), _screenResolutionWidth);
     readSetting(doc, _N(screenResolutionHeight), _screenResolutionHeight);
     readSetting(doc, _N(initialWorld), _initialWorld);
