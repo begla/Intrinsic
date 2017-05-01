@@ -44,7 +44,7 @@
 // Vulkan macros
 #if !defined(_INTR_FINAL_BUILD)
 #define _INTR_PROFILE_GPU_MARKER_REGION(_name)                                 \
-  GpuMarkerRegion gpuMarker = GpuMarkerRegion(_name)
+  GpuMarkerRegion _INTR_CONCAT(marker, __COUNTER__) = GpuMarkerRegion(_name)
 #define _INTR_VK_CHECK_RESULT(x) assert(x == VK_SUCCESS)
 #else
 #define _INTR_VK_CHECK_RESULT(x)
