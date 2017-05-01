@@ -636,7 +636,10 @@ void updateStatusBar(QStatusBar* p_StatusBar)
   {
     QColor color;
 
-    const float fps = std::round(1.0f / TaskManager::_lastDeltaT);
+    static float smoothedDeltaT = 0.0f;
+    smoothedDeltaT = (smoothedDeltaT + TaskManager::_lastDeltaT) / 2.0f;
+
+    const float fps = std::round(1.0f / smoothedDeltaT);
 
     if (fps >= 60.0f)
       color.setRgb(0, 255, 0);
@@ -649,9 +652,9 @@ void updateStatusBar(QStatusBar* p_StatusBar)
     palette.setColor(QPalette::WindowText, color);
     p_StatusBar->setPalette(palette);
 
-    _INTR_STRING statucBarText =
-        StringUtil::toString<float>(fps) + " FPS / " +
-        StringUtil::toString<float>(TaskManager::_lastDeltaT) + " ms";
+    _INTR_STRING statucBarText = StringUtil::toString<float>(fps) + " FPS / " +
+                                 StringUtil::toString<float>(smoothedDeltaT) +
+                                 " ms";
     p_StatusBar->showMessage(statucBarText.c_str());
     timeSinceLastStatusBarUpdate = 0.0f;
   }
