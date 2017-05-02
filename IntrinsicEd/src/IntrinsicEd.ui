@@ -624,6 +624,17 @@
     <string>Benchmark Game State</string>
    </property>
   </action>
+  <action name="actionShow_Benchmark_Paths">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Benchmark Paths</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Benchmark Paths</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

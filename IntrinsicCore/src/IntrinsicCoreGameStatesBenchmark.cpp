@@ -30,14 +30,11 @@ namespace GameStates
 {
 namespace
 {
-struct Path
-{
-  _INTR_ARRAY(glm::vec3) nodePositions;
-};
-
-_INTR_ARRAY(Path) _paths;
+_INTR_ARRAY(Benchmark::Path) _paths;
+_INTR_ARRAY(Benchmark::Data) _benchmarkData;
 uint32_t _pathIdx = 0u;
 float _pathPos = 0.0f;
+rapidjson::Document _benchmarkDesc;
 }
 
 void Benchmark::init() {}
@@ -55,6 +52,30 @@ void Benchmark::activate()
 
   World::setActiveCamera(cameraRef);
 
+  _pathIdx = 0u;
+  _pathPos = 0.0f;
+  _paths.clear();
+  _benchmarkData.clear();
+
+  parseBenchmark(_benchmarkDesc);
+  assembleBenchmarkPaths(_benchmarkDesc, _paths);
+  _benchmarkData.resize(_paths.size());
+
+  _INTR_LOG_INFO("Starting benchmark...\n---");
+  if (!_paths.empty())
+  {
+    _INTR_LOG_INFO("Benchmarking path '%s'...", _paths[0u].name.c_str());
+  }
+}
+
+// <-
+
+void Benchmark::deativate() {}
+
+// <-
+
+void Benchmark::parseBenchmark(rapidjson::Document& p_BenchmarkDesc)
+{
   // Parse benchmark
   _INTR_STRING filePath =
       "worlds/" +
@@ -63,7 +84,6 @@ void Benchmark::activate()
           .getString() +
       ".benchmark.json";
 
-  rapidjson::Document benchmarkDesc;
   {
     FILE* fp = fopen(filePath.c_str(), "rb");
 
@@ -77,39 +97,41 @@ void Benchmark::activate()
     char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
     {
       rapidjson::FileReadStream is(fp, readBuffer, 65536u);
-      benchmarkDesc.ParseStream(is);
+      p_BenchmarkDesc.ParseStream(is);
       fclose(fp);
     }
     Tlsf::MainAllocator::free(readBuffer);
-  }
-
-  _pathIdx = 0u;
-  _pathPos = 0.0f;
-  _paths.clear();
-
-  // Assemble paths
-  for (uint32_t i = 0u; i < benchmarkDesc.Size(); ++i)
-  {
-    rapidjson::Value& pathDesc = benchmarkDesc[i];
-    rapidjson::Value& nodeDescs = pathDesc["nodes"];
-
-    Path path = {};
-
-    for (uint32_t j = 0u; j < nodeDescs.Size(); ++j)
-    {
-      Entity::EntityRef nodeEntity =
-          Entity::EntityManager::getEntityByName(nodeDescs[j].GetString());
-      path.nodePositions.push_back(Components::NodeManager::_worldPosition(
-          Components::NodeManager::getComponentForEntity(nodeEntity)));
-    }
-
-    _paths.push_back(path);
   }
 }
 
 // <-
 
-void Benchmark::deativate() {}
+void Benchmark::assembleBenchmarkPaths(
+    const rapidjson::Document& p_BenchmarkDesc, _INTR_ARRAY(Path) & p_Paths)
+{
+  // Assemble paths
+  for (uint32_t i = 0u; i < p_BenchmarkDesc.Size(); ++i)
+  {
+    const rapidjson::Value& pathDesc = p_BenchmarkDesc[i];
+    const rapidjson::Value& nodeDescs = pathDesc["nodes"];
+
+    Path path;
+    path.name = pathDesc["name"].GetString();
+    path.camSpeed = pathDesc["camSpeed"].GetFloat();
+
+    for (uint32_t j = 0u; j < nodeDescs.Size(); ++j)
+    {
+      Entity::EntityRef nodeEntity =
+          Entity::EntityManager::getEntityByName(nodeDescs[j].GetString());
+      const glm::vec3 worldPos = Components::NodeManager::_worldPosition(
+          Components::NodeManager::getComponentForEntity(nodeEntity));
+
+      path.nodePositions.push_back(worldPos);
+    }
+
+    p_Paths.push_back(path);
+  }
+}
 
 // <-
 
@@ -117,28 +139,72 @@ void Benchmark::update(float p_DeltaT)
 {
   _INTR_PROFILE_CPU("Game States", "Benchmark Game State Update");
 
+  if (_paths.empty())
+  {
+    return;
+  }
+
   const Components::NodeRef camNodeRef =
       Components::NodeManager::getComponentForEntity(
           Components::CameraManager::_entity(World::getActiveCamera()));
 
   const Path& currentPath = _paths[_pathIdx];
+  Data& data = _benchmarkData[_pathIdx];
 
   const glm::vec3 newCamPos =
       Math::bezierQuadratic(currentPath.nodePositions, _pathPos);
   const glm::vec3 newCamPos1 = Math::bezierQuadratic(
       currentPath.nodePositions, glm::clamp(_pathPos + 0.01f, 0.0f, 1.0f));
 
-  const glm::quat newCamOrientation = glm::rotation(
-      glm::vec3(0.0f, 0.0f, -1.0f), glm::normalize(newCamPos - newCamPos1));
+  const glm::vec3 camForward = glm::normalize(newCamPos1 - newCamPos);
+  glm::vec3 camRight =
+      glm::quat(glm::vec3(0.0f, glm::radians(90.0f), 0.0f)) * camForward;
+  camRight.y = 0.0f;
+  camRight = glm::normalize(camRight);
+
+  const glm::vec3 camUp = glm::cross(camForward, camRight);
 
   Components::NodeManager::_position(camNodeRef) = newCamPos;
-  Components::NodeManager::_orientation(camNodeRef) = newCamOrientation;
+  Components::NodeManager::_orientation(camNodeRef) =
+      glm::quat_cast(glm::mat3(camRight, camUp, camForward));
   Components::NodeManager::updateTransforms(camNodeRef);
 
-  _pathPos += p_DeltaT * 0.1f;
+  _pathPos += p_DeltaT * currentPath.camSpeed;
+  data.meanFps = 1.0f / TaskManager::_lastActualFrameDuration;
+
   if (_pathPos >= 1.0f)
   {
-    _pathIdx = (_pathIdx + 1u) % _paths.size();
+    _pathIdx = _pathIdx + 1u;
+
+    // Benchmark finished
+    if (_pathIdx >= _paths.size())
+    {
+      // Calc. total score
+      {
+        float totalScore = 0.0f;
+        for (uint32_t i = 0u; i < _benchmarkData.size(); ++i)
+          totalScore += _benchmarkData[i].calcScore();
+        totalScore /= _benchmarkData.size();
+
+        _INTR_LOG_INFO("Finished benchmarking, total score: %u\n---",
+                       (uint32_t)totalScore);
+      }
+
+      // Reset data
+      {
+        _pathIdx = 0u;
+        for (uint32_t i = 0u; i < _benchmarkData.size(); ++i)
+        {
+          _benchmarkData[i] = Data();
+        }
+      }
+    }
+    else
+    {
+      _INTR_LOG_INFO("Score: %u", data.calcScore());
+    }
+
+    _INTR_LOG_INFO("Benchmarking path '%s'...", _paths[_pathIdx].name);
     _pathPos = 0.0f;
   }
 }

@@ -31,6 +31,7 @@ const float _stepSize = 0.016f;
 
 // Static members
 float TaskManager::_lastDeltaT = 0.016f;
+float TaskManager::_lastActualFrameDuration = 0.016f;
 float TaskManager::_totalTimePassed = 0.0f;
 uint32_t TaskManager::_frameCounter = 0u;
 uint64_t TaskManager::_lastUpdate = 0u;
@@ -47,6 +48,7 @@ void TaskManager::executeTasks()
   {
     _lastDeltaT = std::min(
         (TimingHelper::getMicroseconds() - _lastUpdate) * 0.000001f, 0.3f);
+    _lastActualFrameDuration = _lastDeltaT;
 
     // Adjust deltaT to target frame rate
     while (_lastDeltaT < Settings::Manager::_targetFrameRate)

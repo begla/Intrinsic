@@ -570,7 +570,7 @@ float Editing::_cameraSpeed = 150.0f;
 
 // <-
 
-void Editing::init() {}
+void Editing::init() { onReinitRendering(); }
 
 void Editing::onReinitRendering()
 {

@@ -26,7 +26,8 @@ struct DebugStageFlags
 {
   enum Flags
   {
-    kWorldBoundingSpheres = 0x01
+    kWorldBoundingSpheres = 0x01,
+    kBenchmarkPaths = 0x02
   };
 };
 
