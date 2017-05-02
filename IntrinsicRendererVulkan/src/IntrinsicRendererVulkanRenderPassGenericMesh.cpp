@@ -35,8 +35,7 @@ void GenericMesh::init(const rapidjson::Value& p_RenderPassDesc)
 
   for (uint32_t i = 0u; i < materialPassDescs.Size(); ++i)
   {
-    _materialPassIds.push_back(
-        MaterialManager::getMaterialPassId(materialPassDescs[i].GetString()));
+    _materialPassNames.push_back(materialPassDescs[i].GetString());
   }
 
   if (p_RenderPassDesc["renderOrder"] == "FrontToBack")
@@ -62,6 +61,7 @@ void GenericMesh::destroy()
   Base::destroy();
 
   _materialPassIds.clear();
+  _materialPassNames.clear();
 }
 
 // <-
@@ -75,6 +75,17 @@ void GenericMesh::render(float p_DeltaT)
 
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
+
+  if (_materialPassIds.size() != _materialPassNames.size())
+  {
+    _materialPassIds.clear();
+
+    for (uint32_t i = 0u; i < _materialPassNames.size(); ++i)
+    {
+      _materialPassIds.push_back(
+          MaterialManager::getMaterialPassId(_materialPassNames[i]));
+    }
+  }
 
   for (uint32_t matPassId = 0u; matPassId < _materialPassIds.size();
        ++matPassId)
