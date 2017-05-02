@@ -94,7 +94,6 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
     initVkInstance();
     initVkDevice();
-    Debugging::init(_vkInstance);
     initVkSurface(p_PlatformHandle, p_PlatformWindow);
     initVkPipelineCache();
     initVkCommandPools();
@@ -172,6 +171,7 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
   RenderProcess::Default::loadRendererConfig();
   MaterialManager::loadMaterialPassConfig();
+  RenderProcess::Default::loadRendererConfig();
 
   _INTR_LOG_POP();
 }
@@ -251,6 +251,7 @@ void RenderSystem::reinitRendering()
   // Update from config files
   RenderProcess::Default::loadRendererConfig();
   MaterialManager::loadMaterialPassConfig();
+  RenderProcess::Default::loadRendererConfig();
 
   // Recreate draw calls
   GameStates::Editing::onReinitRendering();
@@ -543,6 +544,14 @@ void RenderSystem::initVkInstance()
   VkResult result =
       vkCreateInstance(&instanceCreateInfo, nullptr, &_vkInstance);
   _INTR_VK_CHECK_RESULT(result);
+
+  for (uint32_t i = 0u; i < enabledExtensions.size(); ++i)
+  {
+    if (strcmp(enabledExtensions[i], VK_EXT_DEBUG_REPORT_EXTENSION_NAME) == 0u)
+    {
+      Debugging::initDebugReportCallback();
+    }
+  }
 }
 
 // <-
@@ -694,6 +703,10 @@ void RenderSystem::initVkDevice()
   // Retrieve device queue
   vkGetDeviceQueue(_vkDevice, _vkGraphicsAndComputeQueueFamilyIndex, 0u,
                    &_vkQueue);
+
+  // Enable debug markers (if available)
+  if (debugMarkerExtPresent)
+    Debugging::initDebugMarkers();
 
   _INTR_LOG_POP();
 }

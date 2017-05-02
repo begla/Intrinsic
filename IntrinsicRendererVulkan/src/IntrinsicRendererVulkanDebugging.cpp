@@ -86,17 +86,17 @@ VkBool32 messageCallback(VkDebugReportFlagsEXT p_Flags,
 
 // <-
 
-void Debugging::init(VkInstance& p_Instance)
+void Debugging::initDebugReportCallback()
 {
   // Validation
   _createDebugReportCallback =
       (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(
-          p_Instance, "vkCreateDebugReportCallbackEXT");
+          RenderSystem::_vkInstance, "vkCreateDebugReportCallbackEXT");
   _destroyDebugReportCallback =
       (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(
-          p_Instance, "vkCreateDebugReportCallbackEXT");
+          RenderSystem::_vkInstance, "vkCreateDebugReportCallbackEXT");
   _dbgBreakCallback = (PFN_vkDebugReportMessageEXT)vkGetInstanceProcAddr(
-      p_Instance, "vkDebugReportMessageEXT");
+      RenderSystem::_vkInstance, "vkDebugReportMessageEXT");
 
   VkDebugReportCallbackCreateInfoEXT dbgCreateInfo = {};
   {
@@ -109,11 +109,14 @@ void Debugging::init(VkInstance& p_Instance)
 
   if (_createDebugReportCallback)
   {
-    VkResult result = _createDebugReportCallback(p_Instance, &dbgCreateInfo,
-                                                 nullptr, &_msgCallback);
+    VkResult result = _createDebugReportCallback(
+        RenderSystem::_vkInstance, &dbgCreateInfo, nullptr, &_msgCallback);
     _INTR_VK_CHECK_RESULT(result);
   }
+}
 
+void Debugging::initDebugMarkers()
+{
   // Markers
   _debugMarkerSetObjectTag =
       (PFN_vkDebugMarkerSetObjectTagEXT)vkGetDeviceProcAddr(
