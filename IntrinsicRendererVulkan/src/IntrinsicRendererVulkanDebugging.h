@@ -22,7 +22,8 @@ namespace Vulkan
 {
 struct Debugging
 {
-  static void init(VkInstance& p_Instance);
+  static void initDebugReportCallback();
+  static void initDebugMarkers();
 
   static VkDebugReportCallbackEXT _msgCallback;
   static PFN_vkCreateDebugReportCallbackEXT _createDebugReportCallback;
