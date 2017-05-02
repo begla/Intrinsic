@@ -193,6 +193,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    SLOT(onOpenMicroprofile()));
   QObject::connect(_ui.actionShow_World_Bounding_Spheres, SIGNAL(triggered()),
                    this, SLOT(onDebugGeometryChanged()));
+  QObject::connect(_ui.actionShow_Benchmark_Paths, SIGNAL(triggered()), this,
+                   SLOT(onDebugGeometryChanged()));
 
   QObject::connect(_ui.actionSpawn_Vegetation, SIGNAL(triggered()), this,
                    SLOT(onSpawnVegetation()));
@@ -311,6 +313,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   _debugContextMenu.addAction(_ui.actionSpawn_Grass);
 
   _debugGeometryContextMenu.addAction(_ui.actionShow_World_Bounding_Spheres);
+  _debugGeometryContextMenu.addAction(_ui.actionShow_Benchmark_Paths);
   _debugGeometryContextMenu.addSeparator();
   _debugGeometryContextMenu.addAction(_ui.actionShow_PhysX_Debug_Geometry);
 }
@@ -340,8 +343,9 @@ void IntrinsicEd::onExit() { exit(0); }
 
 void IntrinsicEd::onLoadWorld()
 {
-  const QString fileName = QFileDialog::getOpenFileName(
-      this, tr("Open World"), QString("worlds"), tr("World File (*.json)"));
+  const QString fileName =
+      QFileDialog::getOpenFileName(this, tr("Open World"), QString("worlds"),
+                                   tr("World File (*.world.json)"));
 
   if (fileName.size() > 0u)
   {
@@ -358,8 +362,9 @@ void IntrinsicEd::onReloadSettingsAndRendererConfig()
 
 void IntrinsicEd::onSaveWorld()
 {
-  const QString fileName = QFileDialog::getSaveFileName(
-      this, tr("Save World"), QString("worlds"), tr("World File (*.json)"));
+  const QString fileName =
+      QFileDialog::getSaveFileName(this, tr("Save World"), QString("worlds"),
+                                   tr("World File (*.world.json)"));
 
   if (fileName.size() > 0u)
   {
@@ -956,6 +961,19 @@ void IntrinsicEd::onDebugGeometryChanged()
     Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags &=
         ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
             kWorldBoundingSpheres;
+  }
+
+  if (_ui.actionShow_Benchmark_Paths->isChecked())
+  {
+    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags |=
+        Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
+            kBenchmarkPaths;
+  }
+  else
+  {
+    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags &=
+        ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
+            kBenchmarkPaths;
   }
 }
 

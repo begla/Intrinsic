@@ -22,10 +22,28 @@ namespace GameStates
 {
 struct Benchmark
 {
+  struct Path
+  {
+    _INTR_STRING name;
+    _INTR_ARRAY(glm::vec3) nodePositions;
+    float camSpeed;
+  };
+
+  struct Data
+  {
+    Data() { meanFps = 0.0f; }
+
+    _INTR_INLINE uint32_t calcScore() { return (uint32_t)(meanFps * 1337.0f); }
+    float meanFps;
+  };
+
   static void init();
   static void activate();
   static void deativate();
 
+  static void parseBenchmark(rapidjson::Document& p_BenchmarkDesc);
+  static void assembleBenchmarkPaths(const rapidjson::Document& p_BenchmarkDesc,
+                                     _INTR_ARRAY(Path) & p_Paths);
   static void update(float p_DeltaT);
 };
 }

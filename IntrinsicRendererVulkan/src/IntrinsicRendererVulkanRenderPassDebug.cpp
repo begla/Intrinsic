@@ -56,6 +56,10 @@ Resources::RenderPassRef _renderPassRef;
 DebugLineVertex* _mappedLineMemory = nullptr;
 uint32_t _currentLineVertexCount = 0u;
 
+rapidjson::Document _benchmarkDesc;
+_INTR_ARRAY(GameStates::Benchmark::Path) _benchmarkPaths;
+bool _parseBenchmark = true;
+
 void displayWorldBoundingSpheres()
 {
   for (uint32_t i = 0u; i < Components::NodeManager::_activeRefs.size(); ++i)
@@ -68,6 +72,45 @@ void displayWorldBoundingSpheres()
           Components::NodeManager::_worldBoundingSphere(nodeRef);
       Debug::renderSphere(worldBoundingSphere.p, worldBoundingSphere.r,
                           glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+    }
+  }
+}
+
+// <-
+
+void displayBenchmarkPaths()
+{
+  if (_parseBenchmark)
+  {
+    GameStates::Benchmark::parseBenchmark(_benchmarkDesc);
+    _parseBenchmark = false;
+  }
+
+  _benchmarkPaths.clear();
+  GameStates::Benchmark::assembleBenchmarkPaths(_benchmarkDesc,
+                                                _benchmarkPaths);
+
+  for (uint32_t i = 0u; i < _benchmarkPaths.size(); ++i)
+  {
+    static const float stepSize = 0.01f;
+
+    _INTR_ARRAY(glm::vec3) curvePositions;
+    curvePositions.reserve((uint32_t)(1.0f / 0.01f));
+
+    for (float perc = 0.0f; perc < 1.0f; perc += stepSize)
+    {
+      curvePositions.push_back(
+          Math::bezierQuadratic(_benchmarkPaths[i].nodePositions, perc));
+    }
+
+    if (curvePositions.size() > 1u)
+    {
+      for (uint32_t j = 0u; j < curvePositions.size() - 1u; ++j)
+      {
+        Debug::renderLine(curvePositions[j], curvePositions[j + 1],
+                          glm::vec3(0.0f, 1.0f, 1.0f),
+                          glm::vec3(0.0f, 1.0f, 1.0f));
+      }
     }
   }
 }
@@ -126,8 +169,9 @@ void Debug::init()
     PipelineLayoutManager::resetToDefault(_debugLinePipelineLayout);
 
     GpuProgramManager::reflectPipelineLayout(
-        8u, {Resources::GpuProgramManager::getResourceByName("debug_line.vert"),
-             GpuProgramManager::getResourceByName("debug_line.frag")},
+        8u,
+        {Resources::GpuProgramManager::getResourceByName("debug_line.vert"),
+         GpuProgramManager::getResourceByName("debug_line.frag")},
         _debugLinePipelineLayout);
 
     pipelineLayoutsToCreate.push_back(_debugLinePipelineLayout);
@@ -395,6 +439,14 @@ void Debug::render(float p_DeltaT)
     if ((_activeDebugStageFlags & DebugStageFlags::kWorldBoundingSpheres) > 0u)
     {
       displayWorldBoundingSpheres();
+    }
+    if ((_activeDebugStageFlags & DebugStageFlags::kBenchmarkPaths) > 0u)
+    {
+      displayBenchmarkPaths();
+    }
+    else
+    {
+      _parseBenchmark = true;
     }
 
     displayDebugLineGeometryForSelectedObject();
