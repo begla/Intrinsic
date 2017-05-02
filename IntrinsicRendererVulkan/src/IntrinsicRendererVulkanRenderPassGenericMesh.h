@@ -34,6 +34,7 @@ private:
   Resources::PipelineLayoutRef _pipelineLayoutRef;
   Resources::DrawCallRef _drawCallRef;
 
+  _INTR_ARRAY(_INTR_STRING) _materialPassNames;
   _INTR_ARRAY(uint8_t) _materialPassIds;
   RenderOrder::Enum _renderOrder;
 };
