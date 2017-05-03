@@ -2,7 +2,7 @@
     "name": "Prop_Atlas_01",
     "properties": {
         "name": "Prop_Atlas_01",
-        "materialPassMask": 515,
+        "materialPassMask": ["GBufferDefault", "Shadow", "PerPixelPicking"],
         "albedoTextureName": "Prop_Atlas_01",
         "uvOffsetScale": [
             0.0,

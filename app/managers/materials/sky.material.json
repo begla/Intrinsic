@@ -2,7 +2,7 @@
     "name": "sky",
     "properties": {
         "name": "sky",
-        "materialPassMask": 4,
+        "materialPassMask": ["GBufferSky"],
         "albedoTextureName": "GCanyon_C_YumaPoint_3k_cube_radiance",
         "uvOffsetScale": [
             0.0,

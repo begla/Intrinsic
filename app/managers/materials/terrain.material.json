@@ -2,7 +2,7 @@
     "name": "terrain",
     "properties": {
         "name": "terrain",
-        "materialPassMask": 770,
+        "materialPassMask": ["GBufferLayered", "Shadow", "PerPixelPicking"],
         "albedoTextureName": "grassleaves_01",
         "uvOffsetScale": [
             0.0,

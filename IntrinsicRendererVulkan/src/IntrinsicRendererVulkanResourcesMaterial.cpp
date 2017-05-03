@@ -96,6 +96,25 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
     _perMaterialDataFragmentOffset(matRef) =
         UniformManager::allocatePerMaterialDataMemory();
 
+    // Update material pass flags
+    {
+      uint32_t& materialPassMask = _materialPassMask(matRef);
+      const _INTR_ARRAY(Name)& materialPassMaskNames =
+          _descMaterialPassMask(matRef);
+      for (uint32_t i = 0u; i < materialPassMaskNames.size(); ++i)
+      {
+        for (uint32_t materialPassIdx = 0u;
+             materialPassIdx < _materialPasses.size(); ++materialPassIdx)
+        {
+          if (materialPassMaskNames[i] == _materialPasses[materialPassIdx].name)
+          {
+            materialPassMask |= 1u << materialPassIdx;
+            break;
+          }
+        }
+      }
+    }
+
     uint32_t& materialBufferEntryIdx = _materialBufferEntryIndex(matRef);
     {
       materialBufferEntryIdx = MaterialBuffer::allocateMaterialBufferEntry();
@@ -296,6 +315,8 @@ void MaterialManager::loadMaterialPassConfig()
       const Name materialPassName = materialPassDesc["name"].GetString();
 
       MaterialPass::MaterialPass matPass = {};
+      matPass.name = materialPassName;
+
       {
         RenderPassRef renderPassRef = RenderPassManager::_getResourceByName(
             materialPassDesc["renderPass"].GetString());

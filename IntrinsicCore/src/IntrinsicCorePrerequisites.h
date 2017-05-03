@@ -192,8 +192,11 @@ case IDCONTINUE : break;                                                       \
   Intrinsic::Core::JsonHelper::createProperty(_doc, _gd, _cat, _ed, _val, _ro, \
                                               _int)
 #define _INTR_CREATE_PROP_ENUM(_doc, _gd, _cat, _ed, _val, _enum, _ro, _int)   \
-  Intrinsic::Core::JsonHelper::createProperty(_doc, _gd, _cat, _ed, _val,      \
-                                              _enum, _ro, _int)
+  Intrinsic::Core::JsonHelper::createPropertyEnum(_doc, _gd, _cat, _ed, _val,  \
+                                                  _enum, _ro, _int)
+#define _INTR_CREATE_PROP_FLAGS(_doc, _gd, _cat, _ed, _val, _flags, _ro, _int) \
+  Intrinsic::Core::JsonHelper::createPropertyFlags(_doc, _gd, _cat, _ed, _val, \
+                                                   _flags, _ro, _int)
 
 // Math
 #define _INTR_EPSILON 1.0e-6f
