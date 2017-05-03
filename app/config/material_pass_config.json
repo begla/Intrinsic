@@ -97,6 +97,14 @@
   ],
   "materialPasses" : [
     {
+      "name" : "GBufferSimple",
+      "baseVertexGpuProgram" : "gbuffer_simple.vert",
+      "baseFragmentGpuProgram" : "gbuffer_simple.frag",
+      "renderPass" : "GBuffer",
+      "blendStates" : ["Default", "Default", "Default"],
+      "boundResources" : "GBuffer"
+    },
+    {
       "name" : "GBufferDefault",
       "baseVertexGpuProgram" : "gbuffer.vert",
       "baseFragmentGpuProgram" : "gbuffer.frag",

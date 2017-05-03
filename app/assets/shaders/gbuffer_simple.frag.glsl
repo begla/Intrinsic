@@ -40,10 +40,10 @@ OUTPUT
 
 void main()
 { 
-  const vec4 albedo = float3(1.0, 0.0, 0.0);
+  const vec4 albedo = vec4(1.0, 0.0, 0.0, 1.0);
   outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, 1.0); // Albedo
   outNormal.rg = encodeNormal(inNormal);
-  outNormal.b = roughness.g + uboPerMaterial.pbrBias.g; // Specular
-  outNormal.a = max(roughness.b + uboPerMaterial.pbrBias.b, 0.01); // Roughness
-  outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 0.0, 0.0); // Metal Mask / Material Buffer Idx
+  outNormal.b = uboPerMaterial.pbrBias.g; // Specular
+  outNormal.a = max(uboPerMaterial.pbrBias.b, 0.01); // Roughness
+  outParameter0.rgba = vec4(uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 0.0, 0.0); // Metal Mask / Material Buffer Idx
 }

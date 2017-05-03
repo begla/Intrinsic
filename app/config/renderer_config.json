@@ -85,7 +85,7 @@
 				}
 			],
 			"name" : "GBuffer",
-			"materialPasses" : ["GBuffer", "GBufferLayered", "GBufferFoliage"],
+			"materialPasses" : ["GBufferDefault", "GBufferSimple", "GBufferLayered", "GBufferFoliage"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
 				["GBufferAlbedo", [0.1, 0.5, 1.0, 1.0]],

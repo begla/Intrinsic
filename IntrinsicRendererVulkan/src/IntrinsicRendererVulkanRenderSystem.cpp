@@ -166,11 +166,7 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
   RenderProcess::Default::loadRendererConfig();
   MaterialManager::loadMaterialPassConfig();
-
-  {
-    _INTR_PROFILE_AUTO("Init. Materials");
-    MaterialManager::createAllResources();
-  }
+  MaterialManager::createAllResources();
 
   _INTR_LOG_POP();
 }
@@ -250,6 +246,7 @@ void RenderSystem::reinitRendering()
   // Update from config files
   RenderProcess::Default::loadRendererConfig();
   MaterialManager::loadMaterialPassConfig();
+  MaterialManager::createAllResources();
 
   // Recreate draw calls
   GameStates::Editing::onReinitRendering();

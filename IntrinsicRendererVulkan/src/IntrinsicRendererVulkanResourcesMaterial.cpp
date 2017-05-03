@@ -247,6 +247,7 @@ void MaterialManager::loadMaterialPassConfig()
   // Cleanup existing material pass data
   _materialPasses.clear();
   _materialPassBoundResources.clear();
+  _materialPassMapping.clear();
 
   for (uint32_t matPassIdx = 0u; matPassIdx < _materialPasses.size();
        ++matPassIdx)

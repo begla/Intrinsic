@@ -1,0 +1,10 @@
+{
+    "name": "gbuffer_simple.frag",
+    "properties": {
+        "name": "gbuffer_simple.frag",
+        "gpuProgramName": "gbuffer_simple.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

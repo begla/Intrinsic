@@ -18,13 +18,6 @@
             0.0,
             0.0
         ],
-        "translucencyThickness": 0.0,
-        "normalTextureName": "Prop_Atlas_01_NRM",
-        "pbrTextureName": "Prop_Atlas_01_PBR",
-        "pbrBias": [
-            0.0,
-            0.0,
-            0.0
-        ]
+        "translucencyThickness": 0.0
     }
 }
