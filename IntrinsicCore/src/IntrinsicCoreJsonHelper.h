@@ -315,10 +315,10 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
 }
 
 _INTR_INLINE rapidjson::Value
-createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
-               const Name& p_Category, const Name& p_Editor, uint32_t p_Value,
-               const _INTR_STRING& p_EnumItems, bool p_ReadOnly,
-               bool p_Internal)
+createPropertyEnum(rapidjson::Document& p_Doc, bool p_GenerateDesc,
+                   const Name& p_Category, const Name& p_Editor,
+                   uint32_t p_Value, const _INTR_STRING& p_EnumItems,
+                   bool p_ReadOnly, bool p_Internal)
 {
   rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);
   rapidjson::Value propertyCat =
@@ -335,14 +335,16 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
     property.AddMember("internal", p_Internal, p_Doc.GetAllocator());
 
     rapidjson::Value enumItems = rapidjson::Value(rapidjson::kArrayType);
-    _INTR_ARRAY(_INTR_STRING) items;
-    StringUtil::split(p_EnumItems, ",", items);
-
-    for (uint32_t i = 0u; i < items.size(); ++i)
     {
-      rapidjson::Value item =
-          rapidjson::Value(items[i].c_str(), p_Doc.GetAllocator());
-      enumItems.PushBack(item, p_Doc.GetAllocator());
+      _INTR_ARRAY(_INTR_STRING) items;
+      StringUtil::split(p_EnumItems, ",", items);
+
+      for (uint32_t i = 0u; i < items.size(); ++i)
+      {
+        rapidjson::Value item =
+            rapidjson::Value(items[i].c_str(), p_Doc.GetAllocator());
+        enumItems.PushBack(item, p_Doc.GetAllocator());
+      }
     }
 
     property.AddMember("enumItems", enumItems, p_Doc.GetAllocator());
@@ -351,6 +353,60 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
   else
   {
     property.SetUint(p_Value);
+  }
+
+  return property;
+}
+
+_INTR_INLINE rapidjson::Value createPropertyFlags(
+    rapidjson::Document& p_Doc, bool p_GenerateDesc, const Name& p_Category,
+    const Name& p_Editor, const _INTR_ARRAY(Name) & p_Value,
+    const _INTR_STRING& p_FlagItems, bool p_ReadOnly, bool p_Internal)
+{
+  rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);
+  rapidjson::Value propertyCat =
+      rapidjson::Value(p_Category._string.c_str(), p_Doc.GetAllocator());
+  rapidjson::Value propertyEditor =
+      rapidjson::Value(p_Editor._string.c_str(), p_Doc.GetAllocator());
+
+  // Create a list of selected flags
+  rapidjson::Value value = rapidjson::Value(rapidjson::kArrayType);
+  {
+    for (uint32_t i = 0u; i < p_Value.size(); ++i)
+    {
+      value.PushBack(rapidjson::Value(p_Value[i].getString().c_str(),
+                                      p_Doc.GetAllocator()),
+                     p_Doc.GetAllocator());
+    }
+  }
+
+  if (p_GenerateDesc)
+  {
+    property.AddMember("cat", propertyCat, p_Doc.GetAllocator());
+    property.AddMember("type", "name", p_Doc.GetAllocator());
+    property.AddMember("editor", propertyEditor, p_Doc.GetAllocator());
+    property.AddMember("readOnly", p_ReadOnly, p_Doc.GetAllocator());
+    property.AddMember("internal", p_Internal, p_Doc.GetAllocator());
+
+    rapidjson::Value flagItems = rapidjson::Value(rapidjson::kArrayType);
+    {
+      _INTR_ARRAY(_INTR_STRING) items;
+      StringUtil::split(p_FlagItems, ",", items);
+
+      for (uint32_t i = 0u; i < items.size(); ++i)
+      {
+        rapidjson::Value item =
+            rapidjson::Value(items[i].c_str(), p_Doc.GetAllocator());
+        flagItems.PushBack(item, p_Doc.GetAllocator());
+      }
+    }
+
+    property.AddMember("flagItems", flagItems, p_Doc.GetAllocator());
+    property.AddMember("value", value, p_Doc.GetAllocator());
+  }
+  else
+  {
+    property = value;
   }
 
   return property;
@@ -370,7 +426,22 @@ _INTR_INLINE _INTR_STRING readPropertyString(const rapidjson::Value& p_Property)
   return _INTR_STRING(p_Property.GetString());
 }
 
-_INTR_INLINE uint32_t readPropertyEnum(const rapidjson::Value& p_Property)
+_INTR_INLINE void readPropertyFlagsNameArray(const rapidjson::Value& p_Property,
+                                             _INTR_ARRAY(Name) & p_Strings)
+{
+  if (p_Property.IsObject())
+  {
+    const rapidjson::Value& strings = p_Property["value"];
+    for (uint32_t i = 0u; i < strings.Size(); ++i)
+      p_Strings.push_back(strings[i].GetString());
+    return;
+  }
+
+  for (uint32_t i = 0u; i < p_Property.Size(); ++i)
+    p_Strings.push_back(p_Property[i].GetString());
+}
+
+_INTR_INLINE uint32_t readPropertyEnumUint(const rapidjson::Value& p_Property)
 {
   if (p_Property.IsObject())
     return p_Property["value"].GetUint();

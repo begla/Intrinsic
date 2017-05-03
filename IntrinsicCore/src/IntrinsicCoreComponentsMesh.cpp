@@ -304,7 +304,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
                   meshRef)[subMeshIdx]);
 
       const uint32_t matPassMask =
-          Renderer::Vulkan::Resources::MaterialManager::_descMaterialPassMask(
+          Renderer::Vulkan::Resources::MaterialManager::_materialPassMask(
               matToUse);
 
       for (uint32_t matPassIdx = 0u;

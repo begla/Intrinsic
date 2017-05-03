@@ -2,7 +2,7 @@
     "name": "water",
     "properties": {
         "name": "water",
-        "materialPassMask": 128,
+        "materialPassMask": ["GBufferWater"],
         "albedoTextureName": "water",
         "uvOffsetScale": [
             0.0,

@@ -2,7 +2,7 @@
     "name": "default",
     "properties": {
         "name": "default",
-        "materialPassMask": 515,
+        "materialPassMask": ["GBufferDefault", "Shadow", "PerPixelPicking"],
         "albedoTextureName": "checkerboard",
         "uvOffsetScale": [
             0.0,

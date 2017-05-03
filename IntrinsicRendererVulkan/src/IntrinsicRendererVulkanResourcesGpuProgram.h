@@ -117,10 +117,11 @@ struct GpuProgramManager
                                              false, false),
                            p_Document.GetAllocator());
     p_Properties.AddMember(
-        "gpuProgramType", _INTR_CREATE_PROP_ENUM(
-                              p_Document, p_GenerateDesc, _N(GpuProgram),
-                              _N(enum), _descGpuProgramType(p_Ref),
-                              "Vertex,Fragment,Geometry,Compute", false, false),
+        "gpuProgramType",
+        _INTR_CREATE_PROP_ENUM(p_Document, p_GenerateDesc, _N(GpuProgram),
+                               _N(enum), _descGpuProgramType(p_Ref),
+                               "Vertex,Fragment,Geometry,Compute", false,
+                               false),
         p_Document.GetAllocator());
   }
 
@@ -144,7 +145,7 @@ struct GpuProgramManager
           JsonHelper::readPropertyString(p_Properties["preprocessorDefines"]);
     if (p_Properties.HasMember("gpuProgramType"))
       _descGpuProgramType(p_Ref) =
-          (GpuProgramType::Enum)JsonHelper::readPropertyEnum(
+          (GpuProgramType::Enum)JsonHelper::readPropertyEnumUint(
               p_Properties["gpuProgramType"]);
   }
 

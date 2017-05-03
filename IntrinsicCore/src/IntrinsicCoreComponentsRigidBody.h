@@ -115,7 +115,7 @@ struct RigidBodyManager
     if (p_Properties.HasMember("rigidBodyType"))
     {
       _descRigidBodyType(p_Ref) =
-          (RigidBodyType::Enum)JsonHelper::readPropertyEnum(
+          (RigidBodyType::Enum)JsonHelper::readPropertyEnumUint(
               p_Properties["rigidBodyType"]);
     }
     if (p_Properties.HasMember("density"))

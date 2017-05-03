@@ -1,8 +1,8 @@
 {
-    "name": "see",
+    "name": "sea",
     "properties": {
-        "name": "see",
-        "materialPassMask": 128,
+        "name": "sea",
+        "materialPassMask": ["GBufferWater"],
         "albedoTextureName": "water",
         "uvOffsetScale": [
             0.0,

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /** \file
-* Contains the Camera Controller Component Manager.
-*/
+ * Contains the Camera Controller Component Manager.
+ */
 
 #pragma once
 
@@ -155,7 +155,7 @@ struct CameraControllerManager
   {
     if (p_Properties.HasMember("cameraControllerType"))
       _descCameraControllerType(p_Ref) =
-          (CameraControllerType::Enum)JsonHelper::readPropertyEnum(
+          (CameraControllerType::Enum)JsonHelper::readPropertyEnumUint(
               p_Properties["cameraControllerType"]);
     if (p_Properties.HasMember("targetObjectName"))
       _descTargetObjectName(p_Ref) =

@@ -53,6 +53,7 @@ enum Enum
 
 struct MaterialPass
 {
+  Name name;
   uint8_t pipelineIdx;
   uint8_t pipelineLayoutIdx;
   uint8_t boundResoucesIdx;
@@ -103,6 +104,7 @@ struct MaterialData : Dod::Resources::ResourceDataBase
     perMaterialDataVertexOffset.resize(_INTR_MAX_MATERIAL_COUNT);
     perMaterialDataFragmentOffset.resize(_INTR_MAX_MATERIAL_COUNT);
     materialBufferEntryIndex.resize(_INTR_MAX_MATERIAL_COUNT);
+    materialPassMask.resize(_INTR_MAX_MATERIAL_COUNT);
 
     memset(perMaterialDataFragmentOffset.data(), 0xFF,
            perMaterialDataFragmentOffset.size() * sizeof(uint32_t));
@@ -134,12 +136,13 @@ struct MaterialData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(glm::vec2) descUvAnimation;
   _INTR_ARRAY(glm::vec3) descPbrBias;
 
-  _INTR_ARRAY(uint32_t) descMaterialPassMask;
+  _INTR_ARRAY(_INTR_ARRAY(Name)) descMaterialPassMask;
 
   // Resources
   _INTR_ARRAY(uint32_t) perMaterialDataVertexOffset;
   _INTR_ARRAY(uint32_t) perMaterialDataFragmentOffset;
   _INTR_ARRAY(uint32_t) materialBufferEntryIndex;
+  _INTR_ARRAY(uint32_t) materialPassMask;
 };
 
 struct MaterialManager
@@ -177,7 +180,7 @@ struct MaterialManager
     _descPbrBias(p_Ref) = glm::vec3(0.0f);
     _descUvAnimation(p_Ref) = glm::vec2(0.0f);
 
-    _descMaterialPassMask(p_Ref) = 3u; // Shadowed surface
+    _descMaterialPassMask(p_Ref) = {"GBuffer", "Shadow", "PerPixelPicking"};
   }
 
   _INTR_INLINE static void destroyMaterial(MaterialRef p_Ref)
@@ -185,6 +188,8 @@ struct MaterialManager
     Dod::Resources::ResourceManagerBase<
         MaterialData, _INTR_MAX_MATERIAL_COUNT>::_destroyResource(p_Ref);
   }
+
+  _INTR_INLINE static void updateMaterialPassFlags(MaterialRef p_Ref) {}
 
   _INTR_INLINE static void compileDescriptor(MaterialRef p_Ref,
                                              bool p_GenerateDesc,
@@ -196,10 +201,15 @@ struct MaterialManager
         _INTR_MAX_MATERIAL_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
                                                       p_Properties, p_Document);
 
+    _INTR_STRING materialPassNames;
+    for (auto& matPass : _materialPasses)
+      materialPassNames += "," + matPass.name.getString();
+
     p_Properties.AddMember(
         "materialPassMask",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Material), "",
-                          _descMaterialPassMask(p_Ref), false, true),
+        _INTR_CREATE_PROP_FLAGS(p_Document, p_GenerateDesc, _N(Material), "",
+                                _descMaterialPassMask(p_Ref), materialPassNames,
+                                false, true),
         p_Document.GetAllocator());
 
     // General
@@ -228,7 +238,7 @@ struct MaterialManager
     }
 
     // Surface / Foliage properties
-    if ((_descMaterialPassMask(p_Ref) &
+    if ((_materialPassMask(p_Ref) &
          (getMaterialPassFlag(_N(GBuffer)) |
           getMaterialPassFlag(_N(GBufferFoliage)) |
           getMaterialPassFlag(_N(GBufferWater)) |
@@ -252,8 +262,8 @@ struct MaterialManager
           p_Document.GetAllocator());
     }
 
-    if ((_descMaterialPassMask(p_Ref) &
-         getMaterialPassFlag(_N(GBufferFoliage))) != 0u)
+    if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferFoliage))) !=
+        0u)
     {
       p_Properties.AddMember("blendMaskTextureName",
                              _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
@@ -264,8 +274,8 @@ struct MaterialManager
     }
 
     // Surface (Layered)
-    if ((_descMaterialPassMask(p_Ref) &
-         getMaterialPassFlag(_N(GBufferLayered))) != 0u)
+    if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferLayered))) !=
+        0u)
     {
       p_Properties.AddMember("albedo1TextureName",
                              _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
@@ -312,8 +322,8 @@ struct MaterialManager
     }
 
     // Surface (Water)
-    if ((_descMaterialPassMask(p_Ref) &
-         getMaterialPassFlag(_N(GBufferWater))) != 0u)
+    if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferWater))) !=
+        0u)
     {
       p_Properties.AddMember("foamTextureName",
                              _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
@@ -401,8 +411,11 @@ struct MaterialManager
           JsonHelper::readPropertyVec3(p_Properties["pbrBias"]);
 
     if (p_Properties.HasMember("materialPassMask"))
-      _descMaterialPassMask(p_Ref) =
-          JsonHelper::readPropertyUint(p_Properties["materialPassMask"]);
+    {
+      _descMaterialPassMask(p_Ref).clear();
+      JsonHelper::readPropertyFlagsNameArray(p_Properties["materialPassMask"],
+                                             _descMaterialPassMask(p_Ref));
+    }
   }
 
   // <-
@@ -527,7 +540,8 @@ struct MaterialManager
     return _data.descTranslucencyThickness[p_Ref._id];
   }
 
-  _INTR_INLINE static uint32_t& _descMaterialPassMask(MaterialRef p_Ref)
+  _INTR_INLINE static _INTR_ARRAY(Name) &
+      _descMaterialPassMask(MaterialRef p_Ref)
   {
     return _data.descMaterialPassMask[p_Ref._id];
   }
@@ -545,6 +559,10 @@ struct MaterialManager
   _INTR_INLINE static uint32_t& _materialBufferEntryIndex(MaterialRef p_Ref)
   {
     return _data.materialBufferEntryIndex[p_Ref._id];
+  }
+  _INTR_INLINE static uint32_t& _materialPassMask(MaterialRef p_Ref)
+  {
+    return _data.materialPassMask[p_Ref._id];
   }
 
   // <-

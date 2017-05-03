@@ -121,7 +121,7 @@ struct AssetManager
       _descAssetFileName(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["assetFileName"]);
     if (p_Properties.HasMember("assetType"))
-      _descAssetType(p_Ref) = (AssetType::Enum)JsonHelper::readPropertyEnum(
+      _descAssetType(p_Ref) = (AssetType::Enum)JsonHelper::readPropertyEnumUint(
           p_Properties["assetType"]);
   }
 

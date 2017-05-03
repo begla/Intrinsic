@@ -164,13 +164,13 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     RenderPass::PerPixelPicking::init();
   }
 
+  RenderProcess::Default::loadRendererConfig();
+  MaterialManager::loadMaterialPassConfig();
+
   {
     _INTR_PROFILE_AUTO("Init. Materials");
     MaterialManager::createAllResources();
   }
-
-  RenderProcess::Default::loadRendererConfig();
-  MaterialManager::loadMaterialPassConfig();
 
   _INTR_LOG_POP();
 }
