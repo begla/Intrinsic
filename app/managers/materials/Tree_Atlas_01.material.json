@@ -2,7 +2,12 @@
     "name": "Tree_Atlas_01",
     "properties": {
         "name": "Tree_Atlas_01",
-        "materialPassMask": ["GBufferFoliage", "ShadowFoliage", "GBufferFoliagePrePass", "PerPixelPicking"],
+        "materialPassMask": [
+            "GBufferFoliage",
+            "ShadowFoliage",
+            "GBufferFoliagePrePass",
+            "PerPixelPicking"
+        ],
         "albedoTextureName": "Tree_Atlas_01",
         "uvOffsetScale": [
             0.0,

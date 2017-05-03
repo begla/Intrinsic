@@ -99,6 +99,8 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
     // Update material pass flags
     {
       uint32_t& materialPassMask = _materialPassMask(matRef);
+      materialPassMask = 0u;
+
       const _INTR_ARRAY(Name)& materialPassMaskNames =
           _descMaterialPassMask(matRef);
       for (uint32_t i = 0u; i < materialPassMaskNames.size(); ++i)

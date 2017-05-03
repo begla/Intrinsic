@@ -207,9 +207,9 @@ struct MaterialManager
 
     p_Properties.AddMember(
         "materialPassMask",
-        _INTR_CREATE_PROP_FLAGS(p_Document, p_GenerateDesc, _N(Material), "",
-                                _descMaterialPassMask(p_Ref), materialPassNames,
-                                false, true),
+        _INTR_CREATE_PROP_FLAGS(p_Document, p_GenerateDesc, _N(Material),
+                                "flags", _descMaterialPassMask(p_Ref),
+                                materialPassNames, false, false),
         p_Document.GetAllocator());
 
     // General

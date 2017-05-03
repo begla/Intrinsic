@@ -321,6 +321,12 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
               &_propertyDocument, &currentProperties, &it->value,
               it->name.GetString(), "Script");
         }
+        else if (strcmp(editor, "flags") == 0u)
+        {
+          propertyEditor = new IntrinsicEdPropertyEditorFlags(
+              &_propertyDocument, &currentProperties, &it->value,
+              it->name.GetString());
+        }
 
         if (propertyEditor)
         {

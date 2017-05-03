@@ -2,7 +2,9 @@
     "name": "grid",
     "properties": {
         "name": "grid",
-        "materialPassMask": ["DebugGrid"],
+        "materialPassMask": [
+            "DebugGrid"
+        ],
         "albedoTextureName": "checkerboard",
         "uvOffsetScale": [
             0.0,
