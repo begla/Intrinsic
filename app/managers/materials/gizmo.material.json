@@ -2,7 +2,9 @@
     "name": "gizmo",
     "properties": {
         "name": "gizmo",
-        "materialPassMask": ["DebugGizmo"],
+        "materialPassMask": [
+            "DebugGizmo"
+        ],
         "albedoTextureName": "checkerboard",
         "uvOffsetScale": [
             0.0,

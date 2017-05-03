@@ -2,7 +2,12 @@
     "name": "grass_01",
     "properties": {
         "name": "grass_01",
-        "materialPassMask": ["GBufferFoliage", "ShadowFoliage", "GBufferFoliagePrePass", "PerPixelPicking"],
+        "materialPassMask": [
+            "GBufferFoliage",
+            "ShadowFoliage",
+            "PerPixelPicking",
+            "GBufferFoliagePrePass"
+        ],
         "albedoTextureName": "grass_atlas_01",
         "uvOffsetScale": [
             0.0,
