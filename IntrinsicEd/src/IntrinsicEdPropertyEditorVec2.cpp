@@ -55,8 +55,10 @@ void IntrinsicEdPropertyEditorVec2::updateFromProperty()
   {
     _ui.x->blockSignals(true);
     _ui.y->blockSignals(true);
-    _ui.x->setValue(prop["values"][0].GetFloat());
-    _ui.y->setValue(prop["values"][1].GetFloat());
+    if (!_ui.x->hasFocus())
+      _ui.x->setValue(prop["values"][0].GetFloat());
+    if (!_ui.y->hasFocus())
+      _ui.y->setValue(prop["values"][1].GetFloat());
     _ui.x->blockSignals(false);
     _ui.y->blockSignals(false);
   }

@@ -48,7 +48,8 @@ void IntrinsicEdPropertyEditorFloat::updateFromProperty()
   if (prop["value"].GetFloat() != _ui.value->value())
   {
     _ui.value->blockSignals(true);
-    _ui.value->setValue(prop["value"].GetFloat());
+    if (!_ui.value->hasFocus())
+      _ui.value->setValue(prop["value"].GetFloat());
     _ui.value->blockSignals(false);
   }
 
