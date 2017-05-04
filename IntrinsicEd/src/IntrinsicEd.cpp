@@ -379,8 +379,6 @@ void IntrinsicEd::onFullscreen()
 
   _ui.centralWidget->setParent(nullptr);
   _ui.centralWidget->showFullScreen();
-
-  onMainGameState();
 }
 
 void IntrinsicEd::onEndFullscreen()
@@ -392,8 +390,6 @@ void IntrinsicEd::onEndFullscreen()
     restoreGeometry(_tempStoredGeometry);
     restoreState(_tempStoredState);
   }
-
-  onEditingGameState();
 }
 
 void IntrinsicEd::onEditingModeDefault()
