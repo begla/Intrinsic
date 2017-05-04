@@ -45,6 +45,7 @@ glm::vec3 _translScalePlaneNormal = glm::vec3(0.0f);
 
 float _lastGizmoScale = 1.0f;
 const float _mouseSens = glm::half_pi<float>() * 0.02f;
+const float _controllerSens = 10.0f;
 
 // Grid
 glm::vec3 _gridPosition = glm::vec3(0.0f);
@@ -367,6 +368,16 @@ _INTR_INLINE void updateCameraFreeFlight(float p_DeltaT)
     _rightMouseButtonPressed = false;
   }
 
+  // Controller handling
+  _camAngVel.y += -_controllerSens *
+                  Input::System::getVirtualKeyState(
+                      Input::VirtualKey::kMoveCameraHorizontal) *
+                  p_DeltaT;
+  _camAngVel.x += _controllerSens *
+                  Input::System::getVirtualKeyState(
+                      Input::VirtualKey::kMoveCameraVertical) *
+                  p_DeltaT;
+
   camRotEuler += _camAngVel * p_DeltaT;
   glm::quat camRot = Components::NodeManager::_worldOrientation(camNodeRef) *
                      glm::quat(camRotEuler);
@@ -401,6 +412,16 @@ _INTR_INLINE void updateCameraFreeFlight(float p_DeltaT)
   {
     _camVel += right * p_DeltaT * actualMoveSpeed;
   }
+
+  // Controller handling
+  _camVel +=
+      right * actualMoveSpeed *
+          Input::System::getVirtualKeyState(
+              Input::VirtualKey::kMoveHorizontal) *
+          p_DeltaT +
+      forward * -actualMoveSpeed *
+          Input::System::getVirtualKeyState(Input::VirtualKey::kMoveVertical) *
+          p_DeltaT;
 
   Components::NodeManager::_position(camNodeRef) += _camVel * p_DeltaT;
   Components::NodeManager::updateTransforms(camNodeRef);
