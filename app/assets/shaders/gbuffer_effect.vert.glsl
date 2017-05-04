@@ -33,10 +33,12 @@ layout (location = 1) out vec3 outTangent;
 layout (location = 2) out vec3 outBinormal;
 layout (location = 3) out vec3 outColor;
 layout (location = 4) out vec2 outUV0;
+layout (location = 5) out vec4 outPosition;
 
 void main()
 {
-  gl_Position = uboPerInstance.worldViewProjMatrix * vec4(inPosition.xyz, 1.0);
+  gl_Position = uboPerInstance.worldViewProjMatrix * vec4(inPosition.xyz + inNormal * 0.1, 1.0);
+  outPosition = gl_Position;
 
   outColor = inColor.xyz;
   outNormal = normalize(uboPerInstance.normalMatrix * vec4(inNormal, 0.0)).xyz;

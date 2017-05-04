@@ -176,7 +176,7 @@
 		{
 			"type" : "RenderPassGenericMesh",
 			"name" : "GBuffer",
-			"materialPasses" : ["GBufferDefault", "GBufferSimple", "GBufferLayered", "GBufferFoliage"],
+			"materialPasses" : ["GBufferDefault", "GBufferLayered", "GBufferFoliage"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
 				["GBufferAlbedo", [0.1, 0.5, 1.0, 1.0]],
@@ -249,7 +249,7 @@
 		{
 			"type" : "RenderPassGenericMesh",
 			"name" : "GBufferTransparents",
-			"materialPasses" : ["GBufferWater"],
+			"materialPasses" : ["GBufferWater", "GBufferEffect"],
 			"renderOrder" : "BackToFront",
 			"outputs" : [
 				["GBufferTransparentsAlbedo", [0.0, 0.0, 0.0, 1.0]],

@@ -27,6 +27,7 @@ PER_INSTANCE_UBO();
 
 // Bindings
 BINDINGS();
+layout (binding = 6) uniform sampler2D gbufferDepthTex;
 
 // Input
 layout (location = 0) in vec3 inNormal;
@@ -34,14 +35,29 @@ layout (location = 1) in vec3 inTangent;
 layout (location = 2) in vec3 inBinormal;
 layout (location = 3) in vec3 inColor;
 layout (location = 4) in vec2 inUV0;
+layout (location = 5) in vec4 inPosition;
 
 // Output
 OUTPUT
 
 void main()
 { 
-  const vec4 albedo = vec4(1.0, 0.0, 0.0, 1.0);
-  outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, 1.0); // Albedo
+  vec3 screenPos = inPosition.xyz / inPosition.w;
+  screenPos.xy = screenPos.xy * 0.5 + 0.5;
+
+  const vec4 camParams = vec4(1.0, 5000.0, 1.0, 1.0 / 5000.0);
+  screenPos.z = linearizeDepth(screenPos.z, camParams.x, camParams.y);
+
+  const float opaqueDepth = linearizeDepth(textureLod(gbufferDepthTex, screenPos.xy, 0.0).r, camParams.x, camParams.y);
+  if (opaqueDepth < screenPos.z)
+  {
+    discard;
+  }
+
+  vec4 albedo = vec4(0.0, 0.5, 0.8, abs(sin(inNormal.x + uboPerInstance.data0.w * 2.0)));
+  albedo.rgba *= 1.0;
+
+  outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, albedo.a); // Albedo
   outNormal.rg = encodeNormal(inNormal);
   outNormal.b = uboPerMaterial.pbrBias.g; // Specular
   outNormal.a = max(uboPerMaterial.pbrBias.b, 0.01); // Roughness
