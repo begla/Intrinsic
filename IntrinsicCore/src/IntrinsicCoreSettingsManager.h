@@ -68,6 +68,8 @@ struct Manager
   static uint32_t _initialGameState;
 
   static float _controllerDeadZone;
+  static bool _invertHorizontalCameraAxis;
+  static bool _invertVerticalCameraAxis;
   static _INTR_STRING _rendererConfig;
   static _INTR_STRING _materialPassConfig;
 };
