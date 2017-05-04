@@ -554,9 +554,6 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
             glm::quat(newRotation) * _initialOrientation;
       }
 
-      Components::NodeManager::_eulerAngles(currentEntityNodeRef) =
-          glm::eulerAngles(
-              Components::NodeManager::_orientation(currentEntityNodeRef));
       Components::NodeManager::updateTransforms(currentEntityNodeRef);
     }
   }

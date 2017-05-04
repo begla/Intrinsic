@@ -54,25 +54,23 @@ void IntrinsicEdPropertyEditorVec4::updateFromProperty()
     _ui.w->setReadOnly(true);
   }
 
-  bool changed = prop["values"][0].GetFloat() != _ui.x->value() ||
-                 prop["values"][1].GetFloat() != _ui.y->value() ||
-                 prop["values"][2].GetFloat() != _ui.z->value() ||
-                 prop["values"][3].GetFloat() != _ui.w->value();
+  const bool hasFocus = _ui.x->hasFocus() || _ui.y->hasFocus() ||
+                        _ui.z->hasFocus() || _ui.w->hasFocus();
+  const bool changed = prop["values"][0].GetFloat() != _ui.x->value() ||
+                       prop["values"][1].GetFloat() != _ui.y->value() ||
+                       prop["values"][2].GetFloat() != _ui.z->value() ||
+                       prop["values"][3].GetFloat() != _ui.w->value();
 
-  if (changed)
+  if (changed && !hasFocus)
   {
     _ui.x->blockSignals(true);
     _ui.y->blockSignals(true);
     _ui.z->blockSignals(true);
     _ui.w->blockSignals(true);
-    if (!_ui.x->hasFocus())
-      _ui.x->setValue(prop["values"][0].GetFloat());
-    if (!_ui.y->hasFocus())
-      _ui.y->setValue(prop["values"][1].GetFloat());
-    if (!_ui.z->hasFocus())
-      _ui.z->setValue(prop["values"][2].GetFloat());
-    if (!_ui.w->hasFocus())
-      _ui.w->setValue(prop["values"][3].GetFloat());
+    _ui.x->setValue(prop["values"][0].GetFloat());
+    _ui.y->setValue(prop["values"][1].GetFloat());
+    _ui.z->setValue(prop["values"][2].GetFloat());
+    _ui.w->setValue(prop["values"][3].GetFloat());
     _ui.x->blockSignals(false);
     _ui.y->blockSignals(false);
     _ui.z->blockSignals(false);
