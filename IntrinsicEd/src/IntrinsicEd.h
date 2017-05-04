@@ -90,9 +90,6 @@ public slots:
   void onRecompileShaders();
 
 private:
-  QByteArray _tempStoredGeometry;
-  QByteArray _tempStoredState;
-
   QMenu _createContextMenu;
   QMenu _debugContextMenu;
   QMenu _debugGeometryContextMenu;
