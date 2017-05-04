@@ -34,12 +34,17 @@ struct SwarmData : Dod::Components::ComponentDataBase
   SwarmData()
       : Dod::Components::ComponentDataBase(_INTR_MAX_SWARM_COMPONENT_COUNT)
   {
+    descBoidMeshName.resize(_INTR_MAX_SWARM_COMPONENT_COUNT);
+
     boids.resize(_INTR_MAX_SWARM_COMPONENT_COUNT);
     nodes.resize(_INTR_MAX_SWARM_COMPONENT_COUNT);
 
     currentAverageVelocity.resize(_INTR_MAX_SWARM_COMPONENT_COUNT);
     currentCenterOfMass.resize(_INTR_MAX_SWARM_COMPONENT_COUNT);
   }
+
+  // Description
+  _INTR_ARRAY(Name) descBoidMeshName;
 
   // Resources
   _INTR_ARRAY(_INTR_ARRAY(Boid)) boids;
@@ -67,7 +72,10 @@ struct SwarmManager
 
   // <-
 
-  _INTR_INLINE static void resetToDefault(SwarmRef p_Ref) {}
+  _INTR_INLINE static void resetToDefault(SwarmRef p_Ref)
+  {
+    _descBoidMeshName(p_Ref) = _N(monkey);
+  }
 
   // <-
 
@@ -84,6 +92,12 @@ struct SwarmManager
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
+    p_Properties.AddMember("boidMeshName",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(Mesh), _N(meshSelector),
+                                             _descBoidMeshName(p_Ref), false,
+                                             false),
+                           p_Document.GetAllocator());
   }
 
   // <-
@@ -91,6 +105,11 @@ struct SwarmManager
   _INTR_INLINE static void initFromDescriptor(SwarmRef p_Ref,
                                               rapidjson::Value& p_Properties)
   {
+    if (p_Properties.HasMember("boidMeshName"))
+    {
+      _descBoidMeshName(p_Ref) =
+          JsonHelper::readPropertyName(p_Properties["boidMeshName"]);
+    }
   }
 
   // <-
@@ -122,6 +141,12 @@ struct SwarmManager
 
   // Members refs
   // ->
+
+  // Description
+  _INTR_INLINE static Name& _descBoidMeshName(MeshRef p_Ref)
+  {
+    return _data.descBoidMeshName[p_Ref._id];
+  }
 
   // Resources
   _INTR_INLINE static _INTR_ARRAY(Boid) & _boids(SwarmRef p_Ref)

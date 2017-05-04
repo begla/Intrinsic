@@ -101,7 +101,7 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
         static const float distanceRuleWeight = 0.05f;
         static const float targetRuleWeight = 0.9f;
         static const float minTargetDist = 4.0f;
-        static const float matchVelWeight = 0.01f;
+        static const float matchVelWeight = 0.025f;
         static const float centerOfMassWeight = 0.8f;
         static const float groundPlaneWeight = 5.0f;
         static const float maxVel = 30.0f;
@@ -136,7 +136,8 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
 
         // Match velocities
         {
-          boid.vel += currentAverageVelocity * matchVelWeight * p_DeltaT;
+          boid.vel +=
+              (currentAverageVelocity - boid.vel) * matchVelWeight * p_DeltaT;
         }
 
         // Target the node of the component
@@ -207,7 +208,8 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
       Components::MeshRef meshRef =
           Components::MeshManager::createMesh(entityRef);
       Components::MeshManager::resetToDefault(meshRef);
-      Components::MeshManager::_descMeshName(meshRef) = _N(monkey);
+      Components::MeshManager::_descMeshName(meshRef) =
+          _descBoidMeshName(swarmRef);
 
       Components::NodeRef swarmNodeRef =
           Components::NodeManager::getComponentForEntity(
