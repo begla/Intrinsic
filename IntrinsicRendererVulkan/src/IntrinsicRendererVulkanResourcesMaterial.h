@@ -239,7 +239,7 @@ struct MaterialManager
 
     // Surface / Foliage properties
     if ((_materialPassMask(p_Ref) &
-         (getMaterialPassFlag(_N(GBuffer)) |
+         (getMaterialPassFlag(_N(GBufferDefault)) |
           getMaterialPassFlag(_N(GBufferFoliage)) |
           getMaterialPassFlag(_N(GBufferWater)) |
           getMaterialPassFlag(_N(GBufferLayered)))) != 0u)

@@ -1,8 +1,9 @@
 {
-    "name": "default",
+    "name": "default_effect",
     "properties": {
-        "name": "default",
+        "name": "default_effect",
         "materialPassMask": [
+            "GBufferEffect",
             "GBufferDefault",
             "Shadow",
             "PerPixelPicking"
@@ -20,7 +21,7 @@
         ],
         "translucencyThickness": 1.0,
         "normalTextureName": "default_NRM",
-        "pbrTextureName": "default_PBR",
+        "pbrTextureName": "default_NRM",
         "pbrBias": [
             0.0,
             0.0,

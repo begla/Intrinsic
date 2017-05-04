@@ -54,6 +54,18 @@
       ]
     },
     {
+      "name": "GBufferTransparents",
+      "resources" : [
+        ["Buffer", "PerInstance", "PerInstance", "Vertex"],
+        ["Buffer", "PerInstance", "PerInstance", "Fragment"],
+        ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
+        ["Image", "MaterialAlbedo", "albedoTex", "Fragment"],
+        ["Image", "MaterialNormal", "normalTex", "Fragment"],
+        ["Image", "MaterialRoughness", "roughnessTex", "Fragment"],
+        ["Image", "GBufferDepth", "gbufferDepthTex", "Fragment"]
+      ]
+    },
+    {
       "name": "GBufferLayered",
       "resources" : [
         ["Buffer", "PerInstance", "PerInstance", "Vertex"],
@@ -97,12 +109,12 @@
   ],
   "materialPasses" : [
     {
-      "name" : "GBufferSimple",
-      "baseVertexGpuProgram" : "gbuffer_simple.vert",
-      "baseFragmentGpuProgram" : "gbuffer_simple.frag",
-      "renderPass" : "GBuffer",
+      "name" : "GBufferEffect",
+      "baseVertexGpuProgram" : "gbuffer_effect.vert",
+      "baseFragmentGpuProgram" : "gbuffer_effect.frag",
+      "renderPass" : "GBufferTransparents",
       "blendStates" : ["Default", "Default", "Default"],
-      "boundResources" : "GBuffer"
+      "boundResources" : "GBufferTransparents"
     },
     {
       "name" : "GBufferDefault",
