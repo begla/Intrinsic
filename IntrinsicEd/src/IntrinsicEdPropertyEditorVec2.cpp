@@ -48,17 +48,16 @@ void IntrinsicEdPropertyEditorVec2::updateFromProperty()
     _ui.y->setReadOnly(true);
   }
 
-  bool changed = prop["values"][0].GetFloat() != _ui.x->value() ||
-                 prop["values"][1].GetFloat() != _ui.y->value();
+  const bool hasFocus = _ui.x->hasFocus() || _ui.y->hasFocus();
+  const bool changed = prop["values"][0].GetFloat() != _ui.x->value() ||
+                       prop["values"][1].GetFloat() != _ui.y->value();
 
-  if (changed)
+  if (changed && !hasFocus)
   {
     _ui.x->blockSignals(true);
     _ui.y->blockSignals(true);
-    if (!_ui.x->hasFocus())
-      _ui.x->setValue(prop["values"][0].GetFloat());
-    if (!_ui.y->hasFocus())
-      _ui.y->setValue(prop["values"][1].GetFloat());
+    _ui.x->setValue(prop["values"][0].GetFloat());
+    _ui.y->setValue(prop["values"][1].GetFloat());
     _ui.x->blockSignals(false);
     _ui.y->blockSignals(false);
   }

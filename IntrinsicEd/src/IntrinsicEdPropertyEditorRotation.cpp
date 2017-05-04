@@ -77,10 +77,14 @@ void IntrinsicEdPropertyEditorRotation::updateFromProperty()
   }
   euler = glm::degrees(Math::wrapEuler(euler));
 
-  bool changed = _ui.yaw->value() != euler.x || _ui.pitch->value() != euler.y ||
-                 _ui.roll->value() != euler.z;
+  const bool hasFocus = _ui.yaw->hasFocus() || _ui.pitch->hasFocus() ||
+                        _ui.roll->hasFocus() || _ui.sYaw->hasFocus() ||
+                        _ui.sPitch->hasFocus() || _ui.sRoll->hasFocus();
+  const bool changed = _ui.yaw->value() != euler.x ||
+                       _ui.pitch->value() != euler.y ||
+                       _ui.roll->value() != euler.z;
 
-  if (changed)
+  if (changed && !hasFocus)
   {
     _ui.yaw->blockSignals(true);
     _ui.pitch->blockSignals(true);
@@ -88,18 +92,12 @@ void IntrinsicEdPropertyEditorRotation::updateFromProperty()
     _ui.sYaw->blockSignals(true);
     _ui.sPitch->blockSignals(true);
     _ui.sRoll->blockSignals(true);
-    if (!_ui.yaw->hasFocus())
-      _ui.yaw->setValue(euler.x);
-    if (!_ui.pitch->hasFocus())
-      _ui.pitch->setValue(euler.y);
-    if (!_ui.roll->hasFocus())
-      _ui.roll->setValue(euler.z);
-    if (!_ui.sYaw->hasFocus())
-      _ui.sYaw->setValue(euler.x);
-    if (!_ui.sPitch->hasFocus())
-      _ui.sPitch->setValue(euler.y);
-    if (!_ui.sRoll->hasFocus())
-      _ui.sRoll->setValue(euler.z);
+    _ui.yaw->setValue(euler.x);
+    _ui.pitch->setValue(euler.y);
+    _ui.roll->setValue(euler.z);
+    _ui.sYaw->setValue(euler.x);
+    _ui.sPitch->setValue(euler.y);
+    _ui.sRoll->setValue(euler.z);
     _ui.yaw->blockSignals(false);
     _ui.pitch->blockSignals(false);
     _ui.roll->blockSignals(false);
