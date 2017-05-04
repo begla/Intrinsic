@@ -67,6 +67,7 @@ struct Manager
   static PresentMode::Enum _presentMode;
   static uint32_t _initialGameState;
 
+  static float _controllerDeadZone;
   static _INTR_STRING _rendererConfig;
   static _INTR_STRING _materialPassConfig;
 };

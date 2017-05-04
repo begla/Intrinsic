@@ -75,6 +75,8 @@ void Main::update(float p_DeltaT)
           Components::CameraControllerManager::getComponentForEntity(
               Components::CameraManager::_entity(camRef));
 
+      const glm::vec4 movement = Input::System::getMovementFiltered();
+
       if (camCtrlRef.isValid())
       {
         static const float camSpeed = 2.0f;
@@ -84,14 +86,8 @@ void Main::update(float p_DeltaT)
             Components::CameraControllerManager::_descTargetEulerAngles(
                 camCtrlRef);
 
-        targetEulerAngles.y += -camSpeed *
-                               Input::System::getVirtualKeyState(
-                                   Input::VirtualKey::kMoveCameraHorizontal) *
-                               p_DeltaT;
-        targetEulerAngles.x += camSpeed *
-                               Input::System::getVirtualKeyState(
-                                   Input::VirtualKey::kMoveCameraVertical) *
-                               p_DeltaT;
+        targetEulerAngles.y += -camSpeed * movement.w * p_DeltaT;
+        targetEulerAngles.x += camSpeed * movement.z * p_DeltaT;
 
         targetEulerAngles.y +=
             -camSpeedMouse * Input::System::getLastMousePosRel().x * p_DeltaT;
@@ -122,15 +118,17 @@ void Main::update(float p_DeltaT)
             Input::System::getVirtualKeyState(Input::VirtualKey::kMoveLeft) *
             glm::vec3(1.0f, 0.0f, 0.0f);
 
-        moveVector += glm::vec3(-Input::System::getVirtualKeyState(
-                                    Input::VirtualKey::kMoveHorizontal),
-                                0.0f, 0.0f);
-        moveVector += glm::vec3(0.0f, 0.0f,
-                                -Input::System::getVirtualKeyState(
-                                    Input::VirtualKey::kMoveVertical));
+        moveVector += glm::vec3(-movement.y, 0.0f, 0.0f);
+        moveVector += glm::vec3(0.0f, 0.0f, -movement.x);
       }
 
-      moveVector = camOrient * glm::normalize(moveVector);
+      const float moveVecLen = glm::length(moveVector);
+      if (moveVecLen < Settings::Manager::_controllerDeadZone)
+        moveVector = glm::vec3(0.0f);
+      else if (moveVecLen > 1.0f)
+        moveVector /= moveVecLen;
+
+      moveVector = camOrient * moveVector;
       moveVector.y = 0.0f;
       moveVector *= actualMovedSpeed;
 

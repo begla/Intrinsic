@@ -36,6 +36,7 @@ uint32_t Manager::_screenResolutionHeight = 720u;
 PresentMode::Enum Manager::_presentMode = PresentMode::kFifo;
 _INTR_STRING Manager::_rendererConfig = "renderer_config.json";
 _INTR_STRING Manager::_materialPassConfig = "material_pass_config.json";
+float Manager::_controllerDeadZone = 0.25f;
 
 namespace
 {
@@ -108,6 +109,7 @@ void Manager::loadSettings()
     readSetting(doc, _N(assetMeshPath), _assetMeshPath);
     readSetting(doc, _N(assetTexturePath), _assetTexturePath);
     readSetting(doc, _N(presentMode), (uint32_t&)_presentMode);
+    readSetting(doc, _N(controllerDeadZone), _controllerDeadZone);
   }
 
   _INTR_LOG_POP();

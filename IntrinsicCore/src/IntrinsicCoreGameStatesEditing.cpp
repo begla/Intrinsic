@@ -369,14 +369,9 @@ _INTR_INLINE void updateCameraFreeFlight(float p_DeltaT)
   }
 
   // Controller handling
-  _camAngVel.y += -_controllerSens *
-                  Input::System::getVirtualKeyState(
-                      Input::VirtualKey::kMoveCameraHorizontal) *
-                  p_DeltaT;
-  _camAngVel.x += _controllerSens *
-                  Input::System::getVirtualKeyState(
-                      Input::VirtualKey::kMoveCameraVertical) *
-                  p_DeltaT;
+  const glm::vec4 movement = Input::System::getMovementFiltered();
+  _camAngVel.y += -_controllerSens * movement.w * p_DeltaT;
+  _camAngVel.x += _controllerSens * movement.z * p_DeltaT;
 
   camRotEuler += _camAngVel * p_DeltaT;
   glm::quat camRot = Components::NodeManager::_worldOrientation(camNodeRef) *
@@ -414,14 +409,8 @@ _INTR_INLINE void updateCameraFreeFlight(float p_DeltaT)
   }
 
   // Controller handling
-  _camVel +=
-      right * actualMoveSpeed *
-          Input::System::getVirtualKeyState(
-              Input::VirtualKey::kMoveHorizontal) *
-          p_DeltaT +
-      forward * -actualMoveSpeed *
-          Input::System::getVirtualKeyState(Input::VirtualKey::kMoveVertical) *
-          p_DeltaT;
+  _camVel += right * actualMoveSpeed * movement.y * p_DeltaT +
+             forward * -actualMoveSpeed * movement.x * p_DeltaT;
 
   Components::NodeManager::_position(camNodeRef) += _camVel * p_DeltaT;
   Components::NodeManager::updateTransforms(camNodeRef);
