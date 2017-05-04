@@ -13,7 +13,9 @@
   "screenResolutionWidth": 1280,
   "screenResolutionHeight": 720,
 
-  "controllerDeadZone" : 0.25,
+  "controllerDeadZone" : 0.3,
+  "invertHorizontalCameraAxis": true,
+  "invertVerticalCameraAxis": false,
 
   "assetMeshPath": "../../Intrinsic_Assets/app/assets/meshes",
   "assetTexturePath": "../../Intrinsic_Assets/app/assets/textures"
