@@ -112,8 +112,8 @@ void CharacterControllerManager::updateControllers(
 
     if (xzVelocity < xzMoveVelocity)
     {
-      internalMoveVector.x += p_DeltaT * _currentMoveVector(charCtrlRef).x;
-      internalMoveVector.z += p_DeltaT * _currentMoveVector(charCtrlRef).z;
+      internalMoveVector.x = p_DeltaT * _currentMoveVector(charCtrlRef).x;
+      internalMoveVector.z = p_DeltaT * _currentMoveVector(charCtrlRef).z;
     }
     else
     {
@@ -173,6 +173,20 @@ void CharacterControllerManager::updateControllers(
       NodeManager::_position(nodeRef) =
           inverseParentOrient *
           (nodeWorldPosAfterSim - NodeManager::_worldPosition(parentNodeRef));
+    }
+
+    // Rotate the CCT into the direction of the move vector
+    glm::vec3 rotationDirection = internalMoveVector;
+    rotationDirection.y = 0.0f;
+    const float movVecLen = glm::length(rotationDirection);
+
+    if (movVecLen > _INTR_EPSILON)
+    {
+      const glm::vec3 playerOrientation = rotationDirection / movVecLen;
+      Components::NodeManager::_orientation(nodeRef) =
+          glm::slerp(Components::NodeManager::_orientation(nodeRef),
+                     glm::rotation(glm::vec3(0.0, 0.0, 1.0), playerOrientation),
+                     glm::clamp(p_DeltaT / 0.1f, 0.0f, 1.0f));
     }
 
     NodeManager::updateTransforms(nodeRef);

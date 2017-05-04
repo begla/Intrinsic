@@ -99,7 +99,7 @@ void Main::update(float p_DeltaT)
             camSpeedMouse * Input::System::getLastMousePosRel().y * p_DeltaT;
       }
 
-      static const float moveSpeed = 8.0f;
+      static const float moveSpeed = 500.0f;
       static const float runMultiplier = 0.5f;
       static const float jumpSpeed = 20.0f;
 
@@ -143,21 +143,6 @@ void Main::update(float p_DeltaT)
         }
 
         Components::CharacterControllerManager::move(charCtrlRef, moveVector);
-
-        // Rotate the player into the direction of the move vector
-        glm::vec3 actualMoveVector =
-            Components::CharacterControllerManager::_internalMoveVector(
-                charCtrlRef);
-        actualMoveVector.y = 0.0f;
-        const float movVecLen = glm::length(actualMoveVector);
-
-        if (movVecLen > _INTR_EPSILON)
-        {
-          const glm::vec3 playerOrientation = actualMoveVector / movVecLen;
-          Components::NodeManager::_orientation(playerNodeRef) =
-              glm::rotation(glm::vec3(0.0, 0.0, 1.0), playerOrientation);
-          Components::NodeManager::updateTransforms(playerNodeRef);
-        }
       }
     }
 
