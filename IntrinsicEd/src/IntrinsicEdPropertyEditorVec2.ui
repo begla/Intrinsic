@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>284</width>
+    <width>292</width>
     <height>31</height>
    </rect>
   </property>
@@ -114,6 +114,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="keyboardTracking">
+         <bool>false</bool>
+        </property>
         <property name="decimals">
          <number>3</number>
         </property>
@@ -154,6 +157,9 @@
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="keyboardTracking">
+         <bool>false</bool>
         </property>
         <property name="decimals">
          <number>3</number>

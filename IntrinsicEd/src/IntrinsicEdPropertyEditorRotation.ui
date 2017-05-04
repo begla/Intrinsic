@@ -156,6 +156,9 @@
          </item>
          <item>
           <widget class="QDoubleSpinBox" name="yaw">
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
             <number>3</number>
            </property>
@@ -225,6 +228,9 @@
          </item>
          <item>
           <widget class="QDoubleSpinBox" name="pitch">
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
             <number>3</number>
            </property>
@@ -299,6 +305,9 @@
              <width>0</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
            </property>
            <property name="decimals">
             <number>3</number>
