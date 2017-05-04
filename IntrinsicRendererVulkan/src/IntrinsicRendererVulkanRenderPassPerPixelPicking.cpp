@@ -181,7 +181,7 @@ void PerPixelPicking::destroy() {}
 
 // <-
 
-void PerPixelPicking::render(float p_DeltaT)
+void PerPixelPicking::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
@@ -195,9 +195,10 @@ void PerPixelPicking::render(float p_DeltaT)
 
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
-  RenderProcess::Default::_visibleDrawCallsPerMaterialPass
-      [0u][MaterialManager::getMaterialPassId(_N(PerPixelPicking))]
-          .copy(visibleDrawCalls);
+
+  RenderProcess::Default::getVisibleDrawCalls(
+      p_CameraRef, 0u, MaterialManager::getMaterialPassId(_N(PerPixelPicking)))
+      .copy(visibleDrawCalls);
 
   if (visibleDrawCalls.empty())
   {

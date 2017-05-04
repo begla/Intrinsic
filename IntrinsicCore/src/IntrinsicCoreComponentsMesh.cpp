@@ -381,15 +381,19 @@ void MeshManager::destroyResources(const MeshRefArray& p_Meshes)
 
 // <-
 
-void MeshManager::updatePerInstanceData(uint32_t p_FrustumIdx)
+void MeshManager::updatePerInstanceData(Dod::Ref p_CameraRef,
+                                        uint32_t p_FrustumIdx)
 {
   _INTR_PROFILE_CPU("Components", "Updt. Per Instance Data");
 
+  const uint32_t frustumId = Renderer::Vulkan::RenderProcess::Default::
+                                 _cameraToIdMapping[p_CameraRef] +
+                             p_FrustumIdx;
   _perInstanceDataUpdateTaskSet.m_SetSize =
       (uint32_t)Renderer::Vulkan::RenderProcess::Default::_visibleMeshComponents
-          [p_FrustumIdx]
+          [frustumId]
               .size();
-  _perInstanceDataUpdateTaskSet._frustumIdx = p_FrustumIdx;
+  _perInstanceDataUpdateTaskSet._frustumIdx = frustumId;
 
   Application::_scheduler.AddTaskSetToPipe(&_perInstanceDataUpdateTaskSet);
   Application::_scheduler.WaitforTaskSet(&_perInstanceDataUpdateTaskSet);

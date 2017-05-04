@@ -74,8 +74,9 @@ void VolumetricLighting::init()
     PipelineLayoutManager::resetToDefault(pipelineLayout);
 
     GpuProgramManager::reflectPipelineLayout(
-        8u, {Resources::GpuProgramManager::getResourceByName(
-                "volumetric_lighting.comp")},
+        8u,
+        {Resources::GpuProgramManager::getResourceByName(
+            "volumetric_lighting.comp")},
         pipelineLayout);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayout);
@@ -87,8 +88,9 @@ void VolumetricLighting::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutScattering);
 
     GpuProgramManager::reflectPipelineLayout(
-        8u, {Resources::GpuProgramManager::getResourceByName(
-                "volumetric_lighting_scattering.comp")},
+        8u,
+        {Resources::GpuProgramManager::getResourceByName(
+            "volumetric_lighting_scattering.comp")},
         pipelineLayoutScattering);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayoutScattering);
@@ -285,7 +287,8 @@ void VolumetricLighting::destroy() {}
 
 // <-
 
-void VolumetricLighting::render(float p_DeltaT)
+void VolumetricLighting::render(float p_DeltaT,
+                                Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
@@ -300,20 +303,19 @@ void VolumetricLighting::render(float p_DeltaT)
 
   // Update per instance data
   {
-    Components::CameraRef activeCamRef = World::getActiveCamera();
     Components::NodeRef camNodeRef =
         Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCamRef));
+            Components::CameraManager::_entity(p_CameraRef));
 
     _perInstanceData.prevViewProjMatrix = _perInstanceData.viewProjMatrix;
     _perInstanceData.viewProjMatrix =
-        Components::CameraManager::_viewProjectionMatrix(activeCamRef);
+        Components::CameraManager::_viewProjectionMatrix(p_CameraRef);
     _perInstanceData.projMatrix =
-        Components::CameraManager::_projectionMatrix(activeCamRef);
+        Components::CameraManager::_projectionMatrix(p_CameraRef);
     _perInstanceData.viewMatrix =
-        Components::CameraManager::_viewMatrix(activeCamRef);
+        Components::CameraManager::_viewMatrix(p_CameraRef);
     _perInstanceData.invViewMatrix =
-        Components::CameraManager::_inverseViewMatrix(activeCamRef);
+        Components::CameraManager::_inverseViewMatrix(p_CameraRef);
 
     _perInstanceData.camPos =
         glm::vec4(Components::NodeManager::_worldPosition(camNodeRef),
@@ -339,16 +341,18 @@ void VolumetricLighting::render(float p_DeltaT)
         Core::Resources::PostEffectManager::_descVolumetricLightingScattering(
             Core::Resources::PostEffectManager::_blendTargetRef);
 
-    for (uint32_t i = 0u; i < RenderPass::Shadow::_shadowFrustums.size(); ++i)
+    const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+        RenderProcess::Default::_shadowFrustums[p_CameraRef];
+
+    for (uint32_t i = 0u; i < shadowFrustums.size(); ++i)
     {
-      Core::Resources::FrustumRef shadowFrustumRef =
-          RenderPass::Shadow::_shadowFrustums[i];
+      Core::Resources::FrustumRef shadowFrustumRef = shadowFrustums[i];
 
       // Transform from camera view space => light proj. space
       _perInstanceData.shadowViewProjMatrix[i] =
           Core::Resources::FrustumManager::_viewProjectionMatrix(
               shadowFrustumRef) *
-          Components::CameraManager::_inverseViewMatrix(activeCamRef);
+          Components::CameraManager::_inverseViewMatrix(p_CameraRef);
     }
 
     ComputeCallRefArray computeCallsToUpdate = {accumComputeCallRefToUse};

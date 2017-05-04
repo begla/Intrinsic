@@ -27,7 +27,7 @@ struct GenericMesh : Base
   void init(const rapidjson::Value& p_RenderPassDesc);
   void destroy();
 
-  void render(float p_DeltaT);
+  void render(float p_DeltaT, Components::CameraRef p_CameraRef);
 
 private:
   Resources::PipelineRef _pipelineRef;

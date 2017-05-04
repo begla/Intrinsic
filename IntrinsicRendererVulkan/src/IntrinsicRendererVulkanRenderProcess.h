@@ -31,6 +31,29 @@ struct Default
   // ->
 
   static Core::Dod::RefArray _activeFrustums;
+  static _INTR_HASH_MAP(Components::CameraRef,
+                        _INTR_ARRAY(Dod::Ref)) _shadowFrustums;
+  static _INTR_HASH_MAP(Core::Resources::FrustumRef,
+                        uint8_t) Default::_cameraToIdMapping;
+
+  static _INTR_INLINE const
+      LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>&
+      getVisibleDrawCalls(Components::CameraRef p_CameraRef,
+                          uint32_t p_FrustumIdx, uint32_t p_MaterialPassIdx)
+  {
+    return _visibleDrawCallsPerMaterialPass[_cameraToIdMapping[p_CameraRef] +
+                                            p_FrustumIdx][p_MaterialPassIdx];
+  }
+
+  static _INTR_INLINE const
+      LockFreeStack<Core::Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT>&
+      getVisibleMeshComponents(Components::CameraRef p_CameraRef,
+                               uint32_t p_FrustumIdx)
+  {
+    return _visibleMeshComponents[_cameraToIdMapping[p_CameraRef] +
+                                  p_FrustumIdx];
+  }
+
   static LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>
       _visibleDrawCallsPerMaterialPass[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT]
                                       [_INTR_MAX_MATERIAL_PASS_COUNT];

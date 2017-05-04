@@ -50,31 +50,32 @@ struct PerInstanceData
 
 void renderLighting(Resources::FramebufferRef p_FramebufferRef,
                     Resources::DrawCallRef p_DrawCall,
-                    Resources::ImageRef p_LightingBufferRef)
+                    Resources::ImageRef p_LightingBufferRef,
+                    Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
   // Update per instance data
   {
-    Components::CameraRef activeCam = World::getActiveCamera();
-
     _perInstanceData.invProjectionMatrix =
-        Components::CameraManager::_inverseProjectionMatrix(activeCam);
+        Components::CameraManager::_inverseProjectionMatrix(p_CameraRef);
     _perInstanceData.viewMatrix =
-        Components::CameraManager::_viewMatrix(activeCam);
+        Components::CameraManager::_viewMatrix(p_CameraRef);
     _perInstanceData.invViewMatrix =
-        Components::CameraManager::_inverseViewMatrix(activeCam);
+        Components::CameraManager::_inverseViewMatrix(p_CameraRef);
 
-    for (uint32_t i = 0u; i < RenderPass::Shadow::_shadowFrustums.size(); ++i)
+    const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+        RenderProcess::Default::_shadowFrustums[p_CameraRef];
+
+    for (uint32_t i = 0u; i < shadowFrustums.size(); ++i)
     {
-      Core::Resources::FrustumRef shadowFrustumRef =
-          RenderPass::Shadow::_shadowFrustums[i];
+      Core::Resources::FrustumRef shadowFrustumRef = shadowFrustums[i];
 
       // Transform from camera view space => light proj. space
       _perInstanceData.shadowViewProjMatrix[i] =
           Core::Resources::FrustumManager::_viewProjectionMatrix(
               shadowFrustumRef) *
-          Components::CameraManager::_inverseViewMatrix(activeCam);
+          Components::CameraManager::_inverseViewMatrix(p_CameraRef);
     }
 
     DrawCallRefArray dcsToUpdate = {p_DrawCall};
@@ -380,14 +381,15 @@ void Lighting::destroy() {}
 
 // <-
 
-void Lighting::render(float p_DeltaT)
+void Lighting::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   _INTR_PROFILE_CPU("Render Pass", "Render Lighting");
   _INTR_PROFILE_GPU("Render Lighting");
 
-  renderLighting(_framebufferRef, _drawCallRef, _lightingBufferImageRef);
+  renderLighting(_framebufferRef, _drawCallRef, _lightingBufferImageRef,
+                 p_CameraRef);
   renderLighting(_framebufferTransparentsRef, _drawCallTransparentsRef,
-                 _lightingBufferTransparentsImageRef);
+                 _lightingBufferTransparentsImageRef, p_CameraRef);
 }
 }
 }

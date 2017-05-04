@@ -44,7 +44,7 @@ struct Debug
   static void renderSphere(const glm::vec3& p_Center, float p_Radius,
                            const glm::vec4& p_Color);
 
-  static void render(float p_DeltaT);
+  static void render(float p_DeltaT, Components::CameraRef p_CameraRef);
 
   static uint32_t _activeDebugStageFlags;
 };

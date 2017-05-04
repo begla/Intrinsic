@@ -128,7 +128,8 @@ struct MeshManager
   // <-
 
   static void updateUniformData(Dod::RefArray& p_Meshes);
-  static void updatePerInstanceData(uint32_t p_FrustumIdx);
+  static void updatePerInstanceData(Dod::Ref p_CameraRef,
+                                    uint32_t p_FrustumIdx);
 
   static void collectDrawCallsAndMeshComponents();
 

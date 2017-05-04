@@ -144,7 +144,7 @@ void GenericBlur::dispatchBlur(VkCommandBuffer p_CommandBuffer)
 
 // <-
 
-void GenericBlur::render(float p_DeltaT)
+void GenericBlur::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 

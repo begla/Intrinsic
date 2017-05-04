@@ -26,7 +26,7 @@ namespace RenderProcess
 {
 namespace
 {
-typedef void (*RenderPassRenderFunction)(float);
+typedef void (*RenderPassRenderFunction)(float, Components::CameraRef);
 typedef void (*RenderPassUpdateResDepResFunction)(void);
 
 namespace RenderStepType
@@ -34,6 +34,7 @@ namespace RenderStepType
 enum Enum
 {
   kImageMemoryBarrier,
+  kSwitchCamera,
 
   kRenderPassGenericFullscreen,
   kRenderPassGenericMesh,
@@ -110,25 +111,48 @@ _INTR_ARRAY(RenderPass::GenericFullscreen) _renderPassesGenericFullScreen;
 _INTR_ARRAY(RenderPass::GenericBlur) _renderPassesGenericBlur;
 _INTR_ARRAY(RenderPass::GenericMesh) _renderPassesGenericMesh;
 _INTR_ARRAY(RenderStep) _renderSteps;
+_INTR_ARRAY(Resources::ImageRef) _images;
+
+_INTR_ARRAY(Name) _cameraNames;
+_INTR_ARRAY(Components::CameraRef) _cameras;
 
 _INTR_INLINE void executeRenderSteps(float p_DeltaT)
 {
   using namespace Resources;
 
+  Components::CameraRef activeCamera = World::getActiveCamera();
+  Components::CameraRef currentActiveCamera = Components::CameraRef();
+
   for (uint32_t i = 0u; i < _renderSteps.size(); ++i)
   {
     const RenderStep& step = _renderSteps[i];
 
+    if (activeCamera != currentActiveCamera)
+    {
+      currentActiveCamera = activeCamera;
+
+      {
+        _INTR_PROFILE_CPU("Render Process", "Update Main And RP Uniforms");
+
+        Components::MeshManager::updatePerInstanceData(currentActiveCamera, 0u);
+        UniformManager::updatePerFrameUniformBufferData(currentActiveCamera);
+        UniformManager::updateUniformBuffers();
+      }
+    }
+
     switch (step.getType())
     {
     case RenderStepType::kRenderPassGenericFullscreen:
-      _renderPassesGenericFullScreen[step.getIndex()].render(p_DeltaT);
+      _renderPassesGenericFullScreen[step.getIndex()].render(
+          p_DeltaT, currentActiveCamera);
       continue;
     case RenderStepType::kRenderPassGenericBlur:
-      _renderPassesGenericBlur[step.getIndex()].render(p_DeltaT);
+      _renderPassesGenericBlur[step.getIndex()].render(p_DeltaT,
+                                                       currentActiveCamera);
       continue;
     case RenderStepType::kRenderPassGenericMesh:
-      _renderPassesGenericMesh[step.getIndex()].render(p_DeltaT);
+      _renderPassesGenericMesh[step.getIndex()].render(p_DeltaT,
+                                                       currentActiveCamera);
       continue;
     case RenderStepType::kImageMemoryBarrier:
       ImageManager::insertImageMemoryBarrier(
@@ -136,13 +160,16 @@ _INTR_INLINE void executeRenderSteps(float p_DeltaT)
           (VkImageLayout)step.getSourceLayout(),
           (VkImageLayout)step.getTargetLayout());
       continue;
+    case RenderStepType::kSwitchCamera:
+      activeCamera = _cameras[step.getIndex()];
+      continue;
     }
 
     auto renderPassFunction =
         _renderStepFunctionMapping.find((RenderStepType::Enum)step.getType());
     if (renderPassFunction != _renderStepFunctionMapping.end())
     {
-      renderPassFunction->second.render(p_DeltaT);
+      renderPassFunction->second.render(p_DeltaT, currentActiveCamera);
       continue;
     }
 
@@ -153,6 +180,12 @@ _INTR_INLINE void executeRenderSteps(float p_DeltaT)
 
 // Static members
 Dod::RefArray Default::_activeFrustums;
+
+_INTR_HASH_MAP(Components::CameraRef, _INTR_ARRAY(Dod::Ref))
+Default::_shadowFrustums;
+_INTR_HASH_MAP(Components::CameraRef, uint8_t)
+Default::_cameraToIdMapping;
+
 LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>
     RenderProcess::Default::_visibleDrawCallsPerMaterialPass
         [_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT][_INTR_MAX_MATERIAL_PASS_COUNT];
@@ -163,7 +196,9 @@ LockFreeStack<Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT> RenderProcess::Default::
 
 void Default::loadRendererConfig()
 {
-  // Destroy render passes
+  using namespace Resources;
+
+  // Destroy render passes and images
   {
     for (uint32_t i = 0u; i < _renderPassesGenericFullScreen.size(); ++i)
     {
@@ -175,9 +210,12 @@ void Default::loadRendererConfig()
       _renderPassesGenericMesh[i].destroy();
     }
     _renderPassesGenericMesh.clear();
-  }
 
+    ImageManager::destroyImagesAndResources(_images);
+    _images.clear();
+  }
   _renderSteps.clear();
+  _cameraNames.clear();
 
   rapidjson::Document rendererConfig;
   {
@@ -207,8 +245,47 @@ void Default::loadRendererConfig()
 
   const rapidjson::Value& renderSteps = rendererConfig["renderSteps"];
   const rapidjson::Value& uniformBuffers = rendererConfig["uniformBuffers"];
+  const rapidjson::Value& images = rendererConfig["images"];
 
+  // Uniform buffers
   UniformManager::load(uniformBuffers);
+
+  // Images
+  {
+    for (uint32_t i = 0u; i < images.Size(); ++i)
+    {
+      const rapidjson::Value& image = images[i];
+
+      ImageRef imageRef = ImageManager::createImage(image["name"].GetString());
+      {
+        ImageManager::resetToDefault(imageRef);
+        ImageManager::addResourceFlags(
+            imageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+        ImageManager::_descMemoryPoolType(imageRef) =
+            MemoryPoolType::kResolutionDependentImages;
+
+        ImageManager::_descDimensions(imageRef) = glm::uvec3(
+            RenderSystem::getAbsoluteRenderSize(
+                Helper::mapRenderSize(image["renderSize"].GetString())),
+            1u);
+
+        const rapidjson::Value& imageFormat = image["imageFormat"];
+        if (imageFormat == "Depth")
+          ImageManager::_descImageFormat(imageRef) =
+              RenderSystem::_depthStencilFormatToUse;
+        else
+        {
+          ImageManager::_descImageFormat(imageRef) =
+              Helper::mapFormat(imageFormat.GetString());
+          ImageManager::_descImageFlags(imageRef) |= ImageFlags::kUsageStorage;
+        }
+
+        ImageManager::_descImageType(imageRef) = ImageType::kTexture;
+      }
+      _images.push_back(imageRef);
+    }
+  }
+  ImageManager::createResources(_images);
 
   for (uint32_t i = 0u; i < renderSteps.Size(); ++i)
   {
@@ -223,6 +300,13 @@ void Default::loadRendererConfig()
                      Helper::mapImageLayout(
                          renderStepDesc["targetImageLayout"].GetString()),
                      renderStepDesc["image"].GetString()));
+    }
+    else if (renderStepDesc["type"] == "SwitchCamera")
+    {
+      const _INTR_STRING camName = renderStepDesc["cameraName"].GetString();
+      _cameraNames.push_back(camName);
+      _renderSteps.push_back(RenderStep(RenderStepType::kSwitchCamera,
+                                        (uint8_t)(_cameraNames.size() - 1u)));
     }
     else if (renderStepDesc["type"] == "RenderPassGenericFullscreen")
     {
@@ -280,40 +364,63 @@ void Default::renderFrame(float p_DeltaT)
   RenderSystem::beginFrame();
   {
     _INTR_PROFILE_GPU("Render Frame");
-    _INTR_PROFILE_CPU("Render System", "Render Frame");
+    _INTR_PROFILE_CPU("Render Process", "Render Frame");
 
-    // Preparation and culling
+    // Preparation
     {
-      _INTR_PROFILE_CPU("Render System", "Preparation and Culling");
+      _INTR_PROFILE_CPU("Render Process", "Culling");
+
+      // Update camera array
+      {
+        _cameras.clear();
+        if (!_cameraNames.empty())
+        {
+          for (uint32_t i = 0u; i < _cameraNames.size(); ++i)
+          {
+            const Name& cameraName = _cameraNames[i];
+
+            Components::CameraRef cam = World::getActiveCamera();
+            if (cameraName != _N(ActiveCamera))
+              cam = Components::CameraManager::getComponentForEntity(
+                  Entity::EntityManager::getEntityByName(cameraName));
+
+            _cameras.push_back(cam);
+          }
+        }
+        else
+        {
+          _cameras.push_back(World::getActiveCamera());
+        }
+      }
+
+      // Collect frustums for culling
+      _activeFrustums.clear();
+      for (uint32_t i = 0u; i < _cameras.size(); ++i)
+      {
+        Components::CameraRef camRef = _cameras[i];
+        _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+            _shadowFrustums[camRef];
+        RenderPass::Shadow::prepareFrustums(camRef, shadowFrustums);
+        Core::Resources::FrustumRef frustumRef =
+            Components::CameraManager::_frustum(camRef);
+
+        _cameraToIdMapping[camRef] = (uint8_t)_activeFrustums.size();
+        _activeFrustums.push_back(frustumRef);
+        _activeFrustums.insert(RenderProcess::Default::_activeFrustums.end(),
+                               shadowFrustums.begin(), shadowFrustums.end());
+      }
 
       Components::CameraManager::updateFrustums(
           Components::CameraManager::_activeRefs);
-      RenderPass::Shadow::prepareFrustums();
       Core::Resources::FrustumManager::prepareForRendering(
           Core::Resources::FrustumManager::_activeRefs);
 
-      // Update render pass uniform data
-      {
-        UniformManager::resetAllocator();
-        UniformManager::updatePerFrameUniformBufferData(
-            World::getActiveCamera());
-        UniformManager::updateUniformBuffers();
-      }
+      Core::Resources::FrustumManager::cullNodes(
+          RenderProcess::Default::_activeFrustums);
 
-      _activeFrustums.clear();
-      _activeFrustums.push_back(
-          Components::CameraManager::_frustum(World::getActiveCamera()));
-      _activeFrustums.insert(_activeFrustums.end(),
-                             RenderPass::Shadow::_shadowFrustums.begin(),
-                             RenderPass::Shadow::_shadowFrustums.end());
-
-      Core::Resources::FrustumManager::cullNodes(_activeFrustums);
-    }
-
-    // Collect visible draw calls and mesh components
-    {
+      // Collect visible draw calls and mesh components
       Components::MeshManager::collectDrawCallsAndMeshComponents();
-      Components::MeshManager::updatePerInstanceData(0u);
+      UniformManager::resetAllocator();
     }
 
     // Execute render steps
@@ -321,7 +428,6 @@ void Default::renderFrame(float p_DeltaT)
       executeRenderSteps(p_DeltaT);
     }
   }
-
   RenderSystem::endFrame();
 }
 }

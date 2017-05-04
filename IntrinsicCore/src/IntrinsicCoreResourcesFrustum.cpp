@@ -32,9 +32,6 @@ struct CullingParallelTaskSet : enki::ITaskSet
   {
     _INTR_PROFILE_CPU("Frustum", "Cull Nodes");
 
-    glm::mat4 mainFrustumViewMatrix =
-        FrustumManager::_descViewMatrix(_frustums[0u]);
-
     for (uint32_t frustIdx = 0u; frustIdx < _frustums.size(); ++frustIdx)
     {
       Resources::FrustumRef frustumRef = _frustums[frustIdx];

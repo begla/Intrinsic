@@ -27,7 +27,7 @@ struct PerPixelPicking
   static void init();
   static void onReinitRendering();
   static void destroy();
-  static void render(float p_DeltaT);
+  static void render(float p_DeltaT, Components::CameraRef p_CameraRef);
 
   static Core::Dod::Ref pickNode(const glm::vec2& p_UV);
 
