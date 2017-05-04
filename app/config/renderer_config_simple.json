@@ -8,6 +8,13 @@
 			]
 		}
 	],
+	"images" : [
+		{
+			"name" : "GBufferDepth",
+			"renderSize" : "Full",
+			"imageFormat" : "Depth"
+		}
+	],
 	"renderSteps" : [
 		{
 			"type" : "ImageMemoryBarrier",
@@ -17,15 +24,8 @@
 		},
 		{
 			"type" : "RenderPassGenericMesh",
-			"images" : [
-				{
-					"name" : "GBufferDepth",
-					"renderSize" : "Full",
-					"imageFormat" : "Depth"
-				}
-			],
 			"name" : "GBuffer",
-			"materialPasses" : ["GBuffer", "GBufferLayered"],
+			"materialPasses" : ["GBufferDefault", "GBufferLayered"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
 				["Backbuffer", [0.4, 0.4, 1.0, 1.0]],
@@ -34,8 +34,6 @@
 		},
 		{
 			"type" : "RenderPassGenericMesh",
-			"images" : [
-			],
 			"name" : "GBufferFoliage",
 			"materialPasses" : ["GBufferFoliage"],
 			"renderOrder" : "FrontToBack",

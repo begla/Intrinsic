@@ -34,7 +34,8 @@ Resources::RenderPassRef _renderPassRef;
 
 _INTR_INLINE void
 calculateFrustumForSplit(uint32_t p_SplitIdx,
-                         Core::Resources::FrustumRef p_FrustumRef)
+                         Core::Resources::FrustumRef p_FrustumRef,
+                         Components::CameraRef p_CameraRef)
 {
   _INTR_PROFILE_CPU("Render Pass", "Calc Shadow Map Matrices");
 
@@ -59,8 +60,6 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
       Core::Resources::FrustumManager::_descViewMatrix(p_FrustumRef);
   shadowViewMatrix = glm::lookAt(eye, center, glm::vec3(0.0f, 1.0f, 0.0f));
 
-  Components::CameraRef currentCamera = World::getActiveCamera();
-
   const float nearPlane =
       glm::max(glm::pow(splitDistance * p_SplitIdx, 2.0f), 0.1f);
   const float farPlane = !lastSplit
@@ -69,7 +68,7 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
 
   const glm::mat4 inverseProj =
       glm::inverse(Components::CameraManager::computeCustomProjMatrix(
-          currentCamera, nearPlane, farPlane));
+          p_CameraRef, nearPlane, farPlane));
 
   Math::FrustumCorners viewSpaceCorners;
   Math::extractFrustumsCorners(inverseProj, viewSpaceCorners);
@@ -88,7 +87,7 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
   const glm::vec3 boundingSphereCenter = (fpMin + fpMax) * 0.5f;
   const glm::mat4 viewToShadowView =
       shadowViewMatrix *
-      Components::CameraManager::_inverseViewMatrix(currentCamera);
+      Components::CameraManager::_inverseViewMatrix(p_CameraRef);
   const glm::vec3 boundingSphereCenterShadowSpace =
       glm::vec3(viewToShadowView * glm::vec4(boundingSphereCenter, 1.0f));
   const float boundingSphereRadius = glm::length(fpMax - fpMin) * 0.5f;
@@ -151,7 +150,6 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
 // <-
 
 // Static members
-_INTR_ARRAY(Core::Resources::FrustumRef) Shadow::_shadowFrustums;
 glm::uvec2 Shadow::_shadowMapSize = glm::uvec2(1024u, 1024u);
 
 // <-
@@ -230,15 +228,17 @@ void Shadow::destroy() {}
 
 // <-
 
-void Shadow::prepareFrustums()
+void Shadow::prepareFrustums(Components::CameraRef p_CameraRef,
+                             _INTR_ARRAY(Core::Resources::FrustumRef) &
+                                 p_ShadowFrustums)
 {
   _INTR_PROFILE_CPU("Render Pass", "Prepare Shadow Frustums");
 
-  for (uint32_t i = 0u; i < _shadowFrustums.size(); ++i)
+  for (uint32_t i = 0u; i < p_ShadowFrustums.size(); ++i)
   {
-    Core::Resources::FrustumManager::destroyFrustum(_shadowFrustums[i]);
+    Core::Resources::FrustumManager::destroyFrustum(p_ShadowFrustums[i]);
   }
-  _shadowFrustums.clear();
+  p_ShadowFrustums.clear();
 
   for (uint32_t shadowMapIdx = 0u; shadowMapIdx < _INTR_PSSM_SPLIT_COUNT;
        ++shadowMapIdx)
@@ -246,15 +246,15 @@ void Shadow::prepareFrustums()
     Core::Resources::FrustumRef frustumRef =
         Core::Resources::FrustumManager::createFrustum(_N(ShadowFrustum));
 
-    calculateFrustumForSplit(shadowMapIdx, frustumRef);
+    calculateFrustumForSplit(shadowMapIdx, frustumRef, p_CameraRef);
 
-    _shadowFrustums.push_back(frustumRef);
+    p_ShadowFrustums.push_back(frustumRef);
   }
 }
 
 // <-
 
-void Shadow::render(float p_DeltaT)
+void Shadow::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
@@ -264,13 +264,15 @@ void Shadow::render(float p_DeltaT)
   _INTR_PROFILE_COUNTER_SET("Dispatched Draw Calls (Shadows)",
                             DrawCallDispatcher::_dispatchedDrawCallCount);
 
-  for (uint32_t shadowMapIdx = 0u; shadowMapIdx < _shadowFrustums.size();
+  const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+      RenderProcess::Default::_shadowFrustums[p_CameraRef];
+  for (uint32_t shadowMapIdx = 0u; shadowMapIdx < shadowFrustums.size();
        ++shadowMapIdx)
   {
     _INTR_PROFILE_CPU("Render Pass", "Render Shadow Map");
     _INTR_PROFILE_GPU("Render Shadow Map");
 
-    Core::Resources::FrustumRef frustumRef = _shadowFrustums[shadowMapIdx];
+    Core::Resources::FrustumRef frustumRef = shadowFrustums[shadowMapIdx];
 
     ImageManager::insertImageMemoryBarrierSubResource(
         _shadowBufferImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
@@ -280,18 +282,20 @@ void Shadow::render(float p_DeltaT)
 
     static DrawCallRefArray visibleDrawCalls;
     visibleDrawCalls.clear();
-    RenderProcess::Default::_visibleDrawCallsPerMaterialPass
-        [frustumIdx][MaterialManager::getMaterialPassId(_N(Shadow))]
-            .copy(visibleDrawCalls);
-    RenderProcess::Default::_visibleDrawCallsPerMaterialPass
-        [frustumIdx][MaterialManager::getMaterialPassId(_N(ShadowFoliage))]
-            .copy(visibleDrawCalls);
+
+    RenderProcess::Default::getVisibleDrawCalls(
+        p_CameraRef, frustumIdx, MaterialManager::getMaterialPassId(_N(Shadow)))
+        .copy(visibleDrawCalls);
+    RenderProcess::Default::getVisibleDrawCalls(
+        p_CameraRef, frustumIdx,
+        MaterialManager::getMaterialPassId(_N(ShadowFoliage)))
+        .copy(visibleDrawCalls);
 
     DrawCallManager::sortDrawCallsFrontToBack(visibleDrawCalls);
 
     // Update per mesh uniform data
     {
-      Components::MeshManager::updatePerInstanceData(frustumIdx);
+      Components::MeshManager::updatePerInstanceData(p_CameraRef, frustumIdx);
       Core::Components::MeshManager::updateUniformData(visibleDrawCalls);
     }
 

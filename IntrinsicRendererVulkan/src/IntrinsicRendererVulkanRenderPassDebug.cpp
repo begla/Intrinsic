@@ -416,7 +416,7 @@ void Debug::renderSphere(const glm::vec3& p_Center, float p_Radius,
 
 // <-
 
-void Debug::render(float p_DeltaT)
+void Debug::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
@@ -457,15 +457,12 @@ void Debug::render(float p_DeltaT)
   {
     // Update line per instance data
     {
-      Components::CameraRef camRef = World::getActiveCamera();
-      _INTR_ASSERT(camRef.isValid());
-
       PerInstanceDataDebugLineVertex perInstanceDataVertex;
       {
         perInstanceDataVertex.worldViewProjMatrix =
-            Components::CameraManager::_viewProjectionMatrix(camRef);
+            Components::CameraManager::_viewProjectionMatrix(p_CameraRef);
         perInstanceDataVertex.normalMatrix =
-            Components::CameraManager::_viewMatrix(camRef);
+            Components::CameraManager::_viewMatrix(p_CameraRef);
       }
 
       // Write to GPU memory

@@ -66,7 +66,7 @@ void GenericMesh::destroy()
 
 // <-
 
-void GenericMesh::render(float p_DeltaT)
+void GenericMesh::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
@@ -90,9 +90,10 @@ void GenericMesh::render(float p_DeltaT)
   for (uint32_t matPassId = 0u; matPassId < _materialPassIds.size();
        ++matPassId)
   {
-    RenderProcess::Default::_visibleDrawCallsPerMaterialPass
-        [0u][_materialPassIds[matPassId]]
-            .copy(visibleDrawCalls);
+    const uint8_t materialPassId = _materialPassIds[matPassId];
+
+    RenderProcess::Default::getVisibleDrawCalls(p_CameraRef, 0u, materialPassId)
+        .copy(visibleDrawCalls);
   }
 
   if (_renderOrder == RenderOrder::kFrontToBack)

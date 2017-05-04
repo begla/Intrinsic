@@ -158,17 +158,13 @@ void GenericFullscreen::destroy()
 
 // <-
 
-void GenericFullscreen::render(float p_DeltaT)
+void GenericFullscreen::render(float p_DeltaT,
+                               Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
   _INTR_PROFILE_CPU("Renderer", _name.c_str());
   _INTR_PROFILE_GPU(_name.c_str());
-
-  Components::CameraRef camRef = World::getActiveCamera();
-  Components::NodeRef camNodeRef =
-      Components::NodeManager::getComponentForEntity(
-          Components::CameraManager::_entity(camRef));
 
   const RenderProcess::UniformBufferDataEntry uniformData =
       RenderProcess::UniformManager::requestUniformBufferData(
@@ -178,8 +174,9 @@ void GenericFullscreen::render(float p_DeltaT)
       {_drawCallRef}, nullptr, 0u, uniformData.uniformData, uniformData.size);
 
   RenderSystem::beginRenderPass(
-      _renderPassRef, _framebufferRefs[RenderSystem::_backbufferIndex %
-                                       _framebufferRefs.size()],
+      _renderPassRef,
+      _framebufferRefs[RenderSystem::_backbufferIndex %
+                       _framebufferRefs.size()],
       VK_SUBPASS_CONTENTS_INLINE, (uint32_t)_clearValues.size(),
       _clearValues.data());
   {

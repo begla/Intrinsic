@@ -28,12 +28,10 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
 {
   using namespace Resources;
 
-  ImageRefArray imagesToCreate;
   RenderPassRefArray renderpassesToCreate;
   FramebufferRefArray framebuffersToCreate;
 
   const rapidjson::Value& outputs = p_RenderPassDesc["outputs"];
-  const rapidjson::Value& images = p_RenderPassDesc["images"];
   _name = p_RenderPassDesc["name"].GetString();
 
   for (uint32_t clearValueIdx = 0u; clearValueIdx < outputs.Size();
@@ -62,46 +60,6 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
       _clearValues[clearValueIdx] = clearValue;
     }
   }
-
-  // Images
-  {
-    for (uint32_t i = 0u; i < images.Size(); ++i)
-    {
-      const rapidjson::Value& image = images[i];
-
-      ImageRef imageRef = ImageManager::createImage(image["name"].GetString());
-      {
-        ImageManager::resetToDefault(imageRef);
-        ImageManager::addResourceFlags(
-            imageRef, Dod::Resources::ResourceFlags::kResourceVolatile);
-        ImageManager::_descMemoryPoolType(imageRef) =
-            MemoryPoolType::kResolutionDependentImages;
-
-        ImageManager::_descDimensions(imageRef) = glm::uvec3(
-            RenderSystem::getAbsoluteRenderSize(
-                Helper::mapRenderSize(image["renderSize"].GetString())),
-            1u);
-
-        const rapidjson::Value& imageFormat = image["imageFormat"];
-        if (imageFormat == "Depth")
-          ImageManager::_descImageFormat(imageRef) =
-              RenderSystem::_depthStencilFormatToUse;
-        else
-        {
-          ImageManager::_descImageFormat(imageRef) =
-              Helper::mapFormat(imageFormat.GetString());
-          ImageManager::_descImageFlags(imageRef) |= ImageFlags::kUsageStorage;
-        }
-
-        ImageManager::_descImageType(imageRef) = ImageType::kTexture;
-      }
-      _imageRefs.push_back(imageRef);
-    }
-
-    imagesToCreate.insert(imagesToCreate.end(), _imageRefs.begin(),
-                          _imageRefs.end());
-  }
-  ImageManager::createResources(imagesToCreate);
 
   // Render passes
   if (!outputs.Empty())
@@ -201,7 +159,6 @@ void Base::destroy()
 {
   using namespace Resources;
 
-  ImageRefArray imagesToDestroy;
   FramebufferRefArray framebuffersToDestroy;
   RenderPassRefArray renderPassesToDestroy;
 
@@ -211,17 +168,11 @@ void Base::destroy()
                                  _framebufferRefs.end());
   _framebufferRefs.clear();
 
-  if (!_imageRefs.empty())
-    imagesToDestroy.insert(imagesToDestroy.end(), _imageRefs.begin(),
-                           _imageRefs.end());
-  _imageRefs.clear();
-
   if (_renderPassRef.isValid())
     renderPassesToDestroy.push_back(_renderPassRef);
   _renderPassRef = RenderPassRef();
 
   FramebufferManager::destroyFramebuffersAndResources(framebuffersToDestroy);
-  ImageManager::destroyImagesAndResources(imagesToDestroy);
   RenderPassManager::destroyRenderPassesAndResources(renderPassesToDestroy);
 
   _clearValues.clear();
