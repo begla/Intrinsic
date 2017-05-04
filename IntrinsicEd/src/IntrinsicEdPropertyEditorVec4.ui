@@ -165,6 +165,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
             <number>3</number>
            </property>
@@ -205,6 +208,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
            </property>
            <property name="decimals">
             <number>3</number>
@@ -277,6 +283,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
             <number>3</number>
            </property>
@@ -320,6 +329,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
            </property>
            <property name="decimals">
             <number>3</number>

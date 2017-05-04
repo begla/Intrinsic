@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>165</width>
+    <width>173</width>
     <height>31</height>
    </rect>
   </property>
@@ -77,6 +77,9 @@
       </item>
       <item>
        <widget class="QDoubleSpinBox" name="value">
+        <property name="keyboardTracking">
+         <bool>false</bool>
+        </property>
         <property name="decimals">
          <number>3</number>
         </property>

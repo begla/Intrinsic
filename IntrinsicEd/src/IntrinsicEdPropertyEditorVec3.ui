@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>387</width>
+    <width>395</width>
     <height>31</height>
    </rect>
   </property>
@@ -108,6 +108,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="keyboardTracking">
+         <bool>false</bool>
+        </property>
         <property name="decimals">
          <number>3</number>
         </property>
@@ -143,6 +146,9 @@
       </item>
       <item>
        <widget class="QDoubleSpinBox" name="y">
+        <property name="keyboardTracking">
+         <bool>false</bool>
+        </property>
         <property name="decimals">
          <number>3</number>
         </property>
@@ -178,6 +184,9 @@
       </item>
       <item>
        <widget class="QDoubleSpinBox" name="z">
+        <property name="keyboardTracking">
+         <bool>false</bool>
+        </property>
         <property name="decimals">
          <number>3</number>
         </property>
