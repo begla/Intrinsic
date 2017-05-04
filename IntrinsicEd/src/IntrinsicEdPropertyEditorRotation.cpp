@@ -88,12 +88,18 @@ void IntrinsicEdPropertyEditorRotation::updateFromProperty()
     _ui.sYaw->blockSignals(true);
     _ui.sPitch->blockSignals(true);
     _ui.sRoll->blockSignals(true);
-    _ui.yaw->setValue(euler.x);
-    _ui.pitch->setValue(euler.y);
-    _ui.roll->setValue(euler.z);
-    _ui.sYaw->setValue(euler.x);
-    _ui.sPitch->setValue(euler.y);
-    _ui.sRoll->setValue(euler.z);
+    if (!_ui.yaw->hasFocus())
+      _ui.yaw->setValue(euler.x);
+    if (!_ui.pitch->hasFocus())
+      _ui.pitch->setValue(euler.y);
+    if (!_ui.roll->hasFocus())
+      _ui.roll->setValue(euler.z);
+    if (!_ui.sYaw->hasFocus())
+      _ui.sYaw->setValue(euler.x);
+    if (!_ui.sPitch->hasFocus())
+      _ui.sPitch->setValue(euler.y);
+    if (!_ui.sRoll->hasFocus())
+      _ui.sRoll->setValue(euler.z);
     _ui.yaw->blockSignals(false);
     _ui.pitch->blockSignals(false);
     _ui.roll->blockSignals(false);
