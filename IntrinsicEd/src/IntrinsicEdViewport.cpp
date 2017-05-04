@@ -45,7 +45,10 @@ void IntrinsicEdViewport::onKeyPressed(Resources::EventRef p_EventRef)
   switch (eventData.keyEvent.key)
   {
   case Input::Key::kEscape:
-    IntrinsicEd::_mainWindow->onEndFullscreen();
+    if (IntrinsicEd::_mainWindow->centralWidget()->isFullScreen())
+      IntrinsicEd::_mainWindow->onEndFullscreen();
+    else
+      IntrinsicEd::_mainWindow->onEditingGameState();
     break;
   case Input::Key::k1:
     IntrinsicEd::_mainWindow->onEditingModeDefault();
