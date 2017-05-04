@@ -73,7 +73,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   _ui.setupUi(this);
 
   // Init. Intrinsic
-  Application::init(qWinAppInst(), (void*)_ui.centralWidget->winId());
+  Application::init(qWinAppInst(), (void*)_ui.viewPort->winId());
 
   // Activate editing game state
   GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
@@ -85,7 +85,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
         "managers/assets/", ".asset.json");
   }
 
-  _viewport = _ui.centralWidget;
+  _viewport = _ui.viewPort;
 
 #if defined(_WIN32)
   _qtWindowProc = (WNDPROC)GetWindowLongPtr((HWND)winId(), GWLP_WNDPROC);
@@ -97,7 +97,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
       SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER);
   _INTR_ASSERT(sdlResult == 0u);
 
-  _sdlViewport = SDL_CreateWindowFrom((void*)_ui.centralWidget->winId());
+  _sdlViewport = SDL_CreateWindowFrom((void*)_ui.viewPort->winId());
   _INTR_ASSERT(_sdlViewport);
 
   _sdlMainWindow = SDL_CreateWindowFrom((void*)winId());
@@ -374,22 +374,14 @@ void IntrinsicEd::onSaveWorld()
 
 void IntrinsicEd::onFullscreen()
 {
-  _tempStoredGeometry = saveGeometry();
-  _tempStoredState = saveState();
-
-  _ui.centralWidget->setParent(nullptr);
-  _ui.centralWidget->showFullScreen();
+  _ui.viewPort->setParent(nullptr);
+  _ui.viewPort->showFullScreen();
 }
 
 void IntrinsicEd::onEndFullscreen()
 {
-  if (_ui.centralWidget->isFullScreen())
-  {
-    setCentralWidget(_ui.centralWidget);
-
-    restoreGeometry(_tempStoredGeometry);
-    restoreState(_tempStoredState);
-  }
+  _ui.viewPort->setParent(_ui.centralWidget);
+  _ui.viewPort->showNormal();
 }
 
 void IntrinsicEd::onEditingModeDefault()
