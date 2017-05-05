@@ -80,7 +80,8 @@
         ["Image", "MaterialAlbedo2", "albedoTex2", "Fragment"],
         ["Image", "MaterialNormal2", "normalTex2", "Fragment"],
         ["Image", "MaterialRoughness2", "roughnessTex2", "Fragment"],
-        ["Image", "MaterialBlendMask", "blendMaskTex", "Fragment"]
+        ["Image", "MaterialBlendMask", "blendMaskTex", "Fragment"],
+        ["Image", "noise", "noiseTex", "Fragment"]
       ]
     },
     {

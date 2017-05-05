@@ -38,6 +38,11 @@ layout (location = 4) in vec2 inUV0;
 // Output
 OUTPUT
 
+vec3 blend(vec3 grass0, vec3 stone0, vec3 stone1, vec3 blendMask, float noise)
+{
+  return mix(grass0, mix(stone0.rgb, stone1.rgb, noise), 1.0 - blendMask.r);
+}
+
 void main()
 { 
   const mat3 TBN = mat3(inTangent, inBinormal, inNormal);
@@ -57,15 +62,20 @@ void main()
   const vec4 normal2 = texture(normalTex2, uv0);
   const vec4 roughness2 = texture(roughnessTex2, uv0);
 
-  vec4 blendMask = texture(blendMaskTex, uv0Raw);
+  vec3 blendMask = texture(blendMaskTex, uv0Raw).rgb;
+  float noise = clamp(texture(noiseTex, uv0Raw * 30.0).r, 0.0, 1.0);
 
-  vec3 albedo = min(albedo0.rgb * blendMask.r + albedo1.rgb * blendMask.g + albedo2.rgb * blendMask.b, vec3(1.0));
-  vec3 normal = min(normal0.rgb * blendMask.r + normal1.rgb * blendMask.g + normal2.rgb * blendMask.b, vec3(1.0));
-  vec3 roughness = min(roughness0.rgb * blendMask.r + roughness1.rgb * blendMask.g + roughness2.rgb * blendMask.b, vec3(1.0));
+  float stoneAtt = clamp(blendMask.b * 3.0, 0.0, 1.0);
+  float grassAtt = clamp((1.0 - blendMask.r) * 3.0 + 0.1, 0.0, 1.0);
+  vec3 occlusion = blend(vec3(grassAtt), vec3(stoneAtt), vec3(stoneAtt), blendMask, noise);
+
+  vec3 albedo = blend(albedo0.rgb, albedo1.rgb, albedo2.rgb, blendMask, noise);
+  vec3 normal = blend(normal0.rgb, normal1.rgb, normal2.rgb, blendMask, noise);
+  vec3 roughness = blend(roughness0.rgb, roughness1.rgb, roughness2.rgb, blendMask, noise);
 
   outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, 1.0); // Albedo
   outNormal.rg = encodeNormal(normalize(TBN * (normal.xyz * 2.0 - 1.0)));
   outNormal.b = roughness.g + uboPerMaterial.pbrBias.g; // Specular
   outNormal.a = max(roughness.b + uboPerMaterial.pbrBias.b, 0.01); // Roughness
-  outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 0.0, 0.0); // Metal Mask / Material Buffer Index;
+  outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, occlusion.r, 0.0); // Metal Mask / Material Buffer Index;
 }

@@ -71,7 +71,7 @@ void main()
   d.N = normalize(decodeNormal(normalSample.rg));  
   d.L = normalize(uboPerInstance.viewMatrix * vec4(1.0, 0.45, -0.275, 0.0)).xyz;
   d.V = -normalize(posVS); 
-  d.energy = 20.0 * vec3(1.0, 1.0, 1.0);
+  d.energy = 10.0 * vec3(1.0, 1.0, 1.0);
   initLightingData(d);
 
   // Ambient lighting
@@ -81,7 +81,7 @@ void main()
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
-  const vec3 irrad = d.diffuseColor * textureLod(irradianceTex, R, 0.0).rgb;
+  const vec3 irrad = parameter0Sample.z * d.diffuseColor * textureLod(irradianceTex, R, 0.0).rgb;
   outColor.rgb += irrad; 
 
   const float maxSpecPower = 999999.0;
@@ -106,7 +106,7 @@ void main()
 
   // Direct lighting
   const vec3 lightColor = vec3(1.0, 0.5, 0.5);
-  outColor.rgb += shadowAttenuation * calcLighting(d) * lightColor;
+  outColor.rgb += parameter0Sample.z * shadowAttenuation * calcLighting(d) * lightColor;
 
   // Translucency
   const float translDistortion = 0.2;

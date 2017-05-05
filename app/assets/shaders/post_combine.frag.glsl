@@ -70,7 +70,7 @@ void main()
   const vec2 framebufferSize = vec2(textureSize(sceneTex, 0));
 
   // Chromatic abberation
-  const vec3 colorOffsets = 5.0 * vec3(1, 2, 3);
+  const vec3 colorOffsets = 3.0 * vec3(1, 2, 3);
   vec3 scene = sampleColorOffsets(sceneTex, inUV0, colorOffsets, framebufferSize);
 
   const vec3 sceneBlurred = textureLod(sceneBlurredTex, inUV0, 0.0).rgb;

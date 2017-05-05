@@ -61,5 +61,5 @@ void main()
   outNormal.rg = encodeNormal(inNormal);
   outNormal.b = uboPerMaterial.pbrBias.g; // Specular
   outNormal.a = max(uboPerMaterial.pbrBias.b, 0.01); // Roughness
-  outParameter0.rgba = vec4(uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 0.0, 0.0); // Metal Mask / Material Buffer Idx
+  outParameter0.rgba = vec4(uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 1.0, 0.0); // Metal Mask / Material Buffer Idx
 }
