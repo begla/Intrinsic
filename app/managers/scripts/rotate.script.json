@@ -1,0 +1,7 @@
+{
+    "name": "rotate",
+    "properties": {
+        "name": "rotate",
+        "scriptFileName": "rotate.lua"
+    }
+}

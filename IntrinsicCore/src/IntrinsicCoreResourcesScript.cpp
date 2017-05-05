@@ -257,51 +257,57 @@ void ScriptManager::destroyResources(const ScriptRefArray& p_Scripts)
   }
 }
 
-void ScriptManager::callTickScript(ScriptRef p_Script, uint32_t p_InstanceId,
-                                   float p_DeltaT)
+void ScriptManager::callTickScript(ScriptRef p_ScriptRef,
+                                   Dod::Ref p_ScriptCompRef, float p_DeltaT)
 {
   sol::optional<sol::function> func =
-      _luaState["methods"]["tick"][(uint32_t)p_Script._id];
+      _luaState["methods"]["tick"][(uint32_t)p_ScriptRef._id];
   if (func)
   {
     bool success = false;
-    SOL_PROTECTED_EXEC((*func)(p_InstanceId, p_DeltaT), success);
+    SOL_PROTECTED_EXEC(
+        (*func)(Components::ScriptManager::_entity(p_ScriptCompRef), p_DeltaT),
+        success);
 
     if (!success)
     {
-      destroyResources(p_Script);
+      destroyResources(p_ScriptRef);
     }
   }
 }
 
-void ScriptManager::callOnCreate(ScriptRef p_Script, uint32_t p_InstanceId)
+void ScriptManager::callOnCreate(ScriptRef p_ScriptRef,
+                                 Dod::Ref p_ScriptCompRef)
 {
   sol::optional<sol::function> func =
-      _luaState["methods"]["onCreate"][(uint32_t)p_Script._id];
+      _luaState["methods"]["onCreate"][(uint32_t)p_ScriptRef._id];
   if (func)
   {
     bool success = false;
-    SOL_PROTECTED_EXEC((*func)(p_InstanceId), success);
+    SOL_PROTECTED_EXEC(
+        (*func)(Components::ScriptManager::_entity(p_ScriptCompRef)), success);
 
     if (!success)
     {
-      destroyResources(p_Script);
+      destroyResources(p_ScriptRef);
     }
   }
 }
 
-void ScriptManager::callOnDestroy(ScriptRef p_Script, uint32_t p_InstanceId)
+void ScriptManager::callOnDestroy(ScriptRef p_ScriptRef,
+                                  Dod::Ref p_ScriptCompRef)
 {
   sol::optional<sol::function> func =
-      _luaState["methods"]["onDestroy"][(uint32_t)p_Script._id];
+      _luaState["methods"]["onDestroy"][(uint32_t)p_ScriptRef._id];
   if (func)
   {
     bool success = false;
-    SOL_PROTECTED_EXEC((*func)(p_InstanceId), success);
+    SOL_PROTECTED_EXEC(
+        (*func)(Components::ScriptManager::_entity(p_ScriptCompRef)), success);
 
     if (!success)
     {
-      destroyResources(p_Script);
+      destroyResources(p_ScriptRef);
     }
   }
 }

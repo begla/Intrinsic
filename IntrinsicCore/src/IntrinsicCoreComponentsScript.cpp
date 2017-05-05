@@ -33,7 +33,7 @@ void ScriptManager::createResources(const ScriptRefArray& p_Scripts)
 
     if (scriptResRef.isValid())
     {
-      Resources::ScriptManager::callOnCreate(scriptResRef, scriptRef._id);
+      Resources::ScriptManager::callOnCreate(scriptResRef, scriptRef);
     }
   }
 }
@@ -45,7 +45,7 @@ void ScriptManager::destroyResources(const ScriptRefArray& p_Scripts)
     ScriptRef scriptRef = p_Scripts[scriptIdx];
     Resources::ScriptRef scriptResRef = _script(scriptRef);
 
-    Resources::ScriptManager::callOnDestroy(scriptResRef, scriptRef._id);
+    Resources::ScriptManager::callOnDestroy(scriptResRef, scriptRef);
     _script(scriptRef) = Resources::ScriptRef();
   }
 }
@@ -62,7 +62,7 @@ void ScriptManager::tickScripts(ScriptRefArray& p_Scripts, float p_DeltaT)
 
     if (scriptResRef.isValid())
     {
-      Resources::ScriptManager::callTickScript(scriptResRef, scriptRef._id,
+      Resources::ScriptManager::callTickScript(scriptResRef, scriptRef,
                                                p_DeltaT);
     }
   }

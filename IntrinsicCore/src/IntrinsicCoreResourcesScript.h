@@ -155,10 +155,10 @@ struct ScriptManager
 
   // <-
 
-  static void callTickScript(ScriptRef p_Script, uint32_t p_InstanceId,
+  static void callTickScript(ScriptRef p_ScriptRef, Dod::Ref p_ScriptCompRef,
                              float p_DeltaT);
-  static void callOnCreate(ScriptRef p_Script, uint32_t p_InstanceId);
-  static void callOnDestroy(ScriptRef p_Script, uint32_t p_InstanceId);
+  static void callOnCreate(ScriptRef p_ScriptRef, Dod::Ref p_ScriptCompRef);
+  static void callOnDestroy(ScriptRef p_Script, Dod::Ref p_ScriptCompRef);
 
   // <-
 
