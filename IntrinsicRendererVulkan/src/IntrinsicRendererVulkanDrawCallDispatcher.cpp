@@ -28,7 +28,7 @@ struct DrawCallParallelTaskSet : enki::ITaskSet
 {
   void ExecuteRange(enki::TaskSetPartition p_Range, uint32_t p_ThreadNum)
   {
-    _INTR_PROFILE_CPU("Draw Calls", "Dispatch Draw Calls");
+    _INTR_PROFILE_CPU("General", "Dispatch Draw Calls Job");
 
     RenderSystem::beginSecondaryCommandBuffer(
         _secondaryCmdBufferIdx,
@@ -139,7 +139,7 @@ void DrawCallDispatcher::queueDrawCalls(Core::Dod::RefArray& p_DrawCalls,
                                         Core::Dod::Ref p_RenderPass,
                                         Core::Dod::Ref p_Framebuffer)
 {
-  _INTR_PROFILE_CPU("Draw Calls", "Queue Draw Calls");
+  _INTR_PROFILE_CPU("General", "Queue Draw Calls");
 
   _dispatchedDrawCallCount = 0u;
   const uint32_t dcCount = (uint32_t)p_DrawCalls.size();
@@ -181,7 +181,7 @@ void DrawCallDispatcher::queueDrawCalls(Core::Dod::RefArray& p_DrawCalls,
   }
 
   {
-    _INTR_PROFILE_CPU("Draw Calls", "Wait For Draw Calls");
+    _INTR_PROFILE_CPU("General", "Wait For Draw Calls");
 
     for (uint32_t taskIdx = firstTaskIndex;
          taskIdx < firstTaskIndex + tasksQueued; ++taskIdx)

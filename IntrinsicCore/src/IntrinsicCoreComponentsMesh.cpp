@@ -30,7 +30,7 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
   void ExecuteRange(enki::TaskSetPartition p_Range,
                     uint32_t p_ThreadNum) override
   {
-    _INTR_PROFILE_CPU("Components", "Mesh Inst. Data Updt.");
+    _INTR_PROFILE_CPU("General", "Mesh Inst. Data Updt. Job");
 
     Dod::Ref frustumRef =
         Renderer::Vulkan::RenderProcess::Default::_activeFrustums[_frustumIdx];
@@ -99,7 +99,7 @@ struct UniformUpdateParallelTaskSet : enki::ITaskSet
   void ExecuteRange(enki::TaskSetPartition p_Range,
                     uint32_t p_ThreadNum) override
   {
-    _INTR_PROFILE_CPU("Components", "Mesh Uniform Data Updt.");
+    _INTR_PROFILE_CPU("General", "Mesh Uniform Data Updt. Job");
 
     Renderer::Vulkan::Resources::DrawCallRefArray& drawCalls = *_drawCalls;
 
@@ -136,7 +136,7 @@ struct DrawCallCollectionParallelTaskSet : enki::ITaskSet
   void ExecuteRange(enki::TaskSetPartition p_Range,
                     uint32_t p_ThreadNum) override
   {
-    _INTR_PROFILE_CPU("Components", "Collect Visible Mesh Draw Calls");
+    _INTR_PROFILE_CPU("General", "Collect Visible Mesh Draw Calls Job");
 
     auto& drawCallsPerMaterialPass = Renderer::Vulkan::Resources::
         DrawCallManager::_drawCallsPerMaterialPass[_materialPassIdx];
@@ -192,7 +192,7 @@ struct MeshCollectionParallelTaskSet : enki::ITaskSet
   void ExecuteRange(enki::TaskSetPartition p_Range,
                     uint32_t p_ThreadNum) override
   {
-    _INTR_PROFILE_CPU("Components", "Collect Visible Mesh Components");
+    _INTR_PROFILE_CPU("General", "Collect Visible Mesh Components Job");
     uint32_t activeFrustumsCount =
         (uint32_t)
             Renderer::Vulkan::RenderProcess::Default::_activeFrustums.size();
@@ -384,7 +384,7 @@ void MeshManager::destroyResources(const MeshRefArray& p_Meshes)
 void MeshManager::updatePerInstanceData(Dod::Ref p_CameraRef,
                                         uint32_t p_FrustumIdx)
 {
-  _INTR_PROFILE_CPU("Components", "Updt. Per Instance Data");
+  _INTR_PROFILE_CPU("General", "Update Per Instance Data");
 
   const uint32_t frustumId = Renderer::Vulkan::RenderProcess::Default::
                                  _cameraToIdMapping[p_CameraRef] +
@@ -405,7 +405,7 @@ void MeshManager::updateUniformData(Dod::RefArray& p_DrawCalls)
 {
   static UniformUpdateParallelTaskSet uniformUpdateTaskSet;
 
-  _INTR_PROFILE_CPU("Components", "Queue Mesh Uniform Data Updt.");
+  _INTR_PROFILE_CPU("General", "Mesh Uniform Data Updt.");
 
   uniformUpdateTaskSet._drawCalls = &p_DrawCalls;
   uniformUpdateTaskSet.m_SetSize = (uint32_t)p_DrawCalls.size();
@@ -422,7 +422,7 @@ void MeshManager::collectDrawCallsAndMeshComponents()
   static _INTR_ARRAY(DrawCallCollectionParallelTaskSet)
       drawCallCollectionTaskSets;
 
-  _INTR_PROFILE_CPU("Components",
+  _INTR_PROFILE_CPU("General",
                     "Collect Visible Mesh Components And Draw Calls");
 
   using namespace Renderer;

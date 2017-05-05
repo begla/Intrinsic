@@ -40,7 +40,7 @@ _INTR_INLINE void parallelSort(_INTR_ARRAY(Type) & p_Array,
     void ExecuteRange(enki::TaskSetPartition p_Range,
                       uint32_t p_ThreadNum) override
     {
-      _INTR_PROFILE_CPU("Algorithm", "Sort");
+      _INTR_PROFILE_CPU("General", "Sort Job");
 
       std::sort(_array->begin() + _start, _array->begin() + _end, _comparator);
     };
@@ -58,7 +58,7 @@ _INTR_INLINE void parallelSort(_INTR_ARRAY(Type) & p_Array,
     void ExecuteRange(enki::TaskSetPartition p_Range,
                       uint32_t p_ThreadNum) override
     {
-      _INTR_PROFILE_CPU("Algorithm", "Merge");
+      _INTR_PROFILE_CPU("General", "Merge Job");
 
       std::inplace_merge(_array->begin() + _start, _array->begin() + _middle,
                          _array->begin() + _end, _comparator);

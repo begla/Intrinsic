@@ -15,7 +15,7 @@
 // Precompiled header file
 #include "stdafx.h"
 
-#define BOID_COUNT 256u
+#define BOID_COUNT 512u
 
 namespace Intrinsic
 {

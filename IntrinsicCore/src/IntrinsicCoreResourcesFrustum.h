@@ -100,7 +100,7 @@ struct FrustumManager
 
   _INTR_INLINE static void prepareForRendering(FrustumRefArray p_Refs)
   {
-    _INTR_PROFILE_CPU("Resources", "Prepare Frustums For Rendering");
+    _INTR_PROFILE_CPU("General", "Prepare Frustums For Rendering");
 
     for (uint32_t i = 0u; i < p_Refs.size(); ++i)
     {

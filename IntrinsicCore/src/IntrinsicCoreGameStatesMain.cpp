@@ -53,7 +53,7 @@ void Main::deativate() {}
 
 void Main::update(float p_DeltaT)
 {
-  _INTR_PROFILE_CPU("Game States", "Main Game State Update");
+  _INTR_PROFILE_CPU("Game States", "Main");
 
   for (uint32_t i = 0u; i < Components::PlayerManager::_activeRefs.size(); ++i)
   {

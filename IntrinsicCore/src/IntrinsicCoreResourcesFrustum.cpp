@@ -30,7 +30,7 @@ struct CullingParallelTaskSet : enki::ITaskSet
   void ExecuteRange(enki::TaskSetPartition p_Range,
                     uint32_t p_ThreadNum) override
   {
-    _INTR_PROFILE_CPU("Frustum", "Cull Nodes");
+    _INTR_PROFILE_CPU("Culling", "Culling Job");
 
     for (uint32_t frustIdx = 0u; frustIdx < _frustums.size(); ++frustIdx)
     {
@@ -151,7 +151,7 @@ void FrustumManager::init()
 
 void FrustumManager::cullNodes(const FrustumRefArray& p_ActiveFrustums)
 {
-  _INTR_PROFILE_CPU("Frustum", "Culling");
+  _INTR_PROFILE_CPU("Culling", "Culling");
 
   _cullingParallelTaskSet._frustums = p_ActiveFrustums;
   _cullingParallelTaskSet.m_SetSize =
