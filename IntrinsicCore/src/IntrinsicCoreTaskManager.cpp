@@ -35,6 +35,7 @@ float TaskManager::_lastActualFrameDuration = 0.016f;
 float TaskManager::_totalTimePassed = 0.0f;
 uint32_t TaskManager::_frameCounter = 0u;
 uint64_t TaskManager::_lastUpdate = 0u;
+float TaskManager::_timeModulator = 1.0f;
 
 void TaskManager::executeTasks()
 {
@@ -58,7 +59,8 @@ void TaskManager::executeTasks()
     }
   }
 
-  _totalTimePassed += _lastDeltaT;
+  const float modDeltaT = _lastDeltaT * _timeModulator;
+  _totalTimePassed += modDeltaT;
   _lastUpdate = TimingHelper::getMicroseconds();
 
   {
@@ -72,27 +74,27 @@ void TaskManager::executeTasks()
 
     // Game state update
     {
-      GameStates::Manager::update(_lastDeltaT);
+      GameStates::Manager::update(modDeltaT);
     }
 
     // Scripts
     {
       Components::ScriptManager::tickScripts(
-          Components::ScriptManager::_activeRefs, _lastDeltaT);
+          Components::ScriptManager::_activeRefs, modDeltaT);
     }
 
     // Physics
     {
       _INTR_PROFILE_CPU("TaskManager", "Simulate And Update");
 
-      _stepAccum += _lastDeltaT;
+      _stepAccum += modDeltaT;
 
       while (_stepAccum > _stepSize)
       {
-        Physics::System::dispatchSimulation(_stepSize);
+        Physics::System::dispatchSimulation(modDeltaT);
         Physics::System::syncSimulation();
 
-        _stepAccum -= _stepSize;
+        _stepAccum -= modDeltaT;
       }
 
       Components::RigidBodyManager::updateNodesFromActors(
@@ -107,7 +109,7 @@ void TaskManager::executeTasks()
       _INTR_PROFILE_CPU("TaskManager", "Swarms");
 
       Components::SwarmManager::updateSwarms(
-          Components::SwarmManager::_activeRefs, _lastDeltaT);
+          Components::SwarmManager::_activeRefs, modDeltaT);
     }
 
     // Post effect system
@@ -126,7 +128,7 @@ void TaskManager::executeTasks()
     _INTR_PROFILE_CPU("TaskManager", "Rendering Tasks");
 
     // Rendering
-    Renderer::Vulkan::RenderProcess::Default::renderFrame(_lastDeltaT);
+    Renderer::Vulkan::RenderProcess::Default::renderFrame(modDeltaT);
   }
 
   {

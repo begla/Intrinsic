@@ -28,6 +28,7 @@ struct TaskManager
   static uint64_t _lastUpdate;
 
   static float _lastActualFrameDuration;
+  static float _timeModulator;
 };
 }
 }

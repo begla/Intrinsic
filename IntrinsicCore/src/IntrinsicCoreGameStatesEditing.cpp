@@ -792,13 +792,16 @@ void Editing::update(float p_DeltaT)
 {
   _INTR_PROFILE_CPU("Game States", "Editing");
 
+  // Avoid time mod.
+  const float deltaT = TaskManager::_lastDeltaT;
+
   // Fade grid in/out
   static const float fadeDurationInSeconds = 1.0f;
   if (_anyTranslScaleAxisSelected)
   {
     if (_gridFade < 1.0f)
     {
-      _gridFade += p_DeltaT * fadeDurationInSeconds;
+      _gridFade += deltaT * fadeDurationInSeconds;
       _gridFade = glm::min(_gridFade, 1.0f);
     }
   }
@@ -806,7 +809,7 @@ void Editing::update(float p_DeltaT)
   {
     if (_gridFade > 0.0f)
     {
-      _gridFade -= p_DeltaT * fadeDurationInSeconds;
+      _gridFade -= deltaT * fadeDurationInSeconds;
       _gridFade = glm::max(_gridFade, 0.0f);
     }
   }
@@ -815,7 +818,7 @@ void Editing::update(float p_DeltaT)
   {
     if (_editingMode == EditingMode::kTranslation)
     {
-      handleGizmo(p_DeltaT);
+      handleGizmo(deltaT);
 
       // Clone node
       if (Input::System::getKeyStates()[Input::Key::kAlt] ==
@@ -840,11 +843,11 @@ void Editing::update(float p_DeltaT)
     }
     else if (_editingMode == EditingMode::kRotation)
     {
-      handleGizmo(p_DeltaT);
+      handleGizmo(deltaT);
     }
     else if (_editingMode == EditingMode::kScale)
     {
-      handleGizmo(p_DeltaT);
+      handleGizmo(deltaT);
     }
   }
 
@@ -963,7 +966,7 @@ void Editing::update(float p_DeltaT)
         camOffset *
             Components::CameraManager::_forward(World::getActiveCamera());
 
-    const float blendFactor = p_DeltaT * 2.0f;
+    const float blendFactor = deltaT * 2.0f;
     Components::NodeManager::_position(camNodeRef) =
         (1.0f - blendFactor) * Components::NodeManager::_position(camNodeRef) +
         blendFactor * newPosition;
@@ -998,11 +1001,11 @@ void Editing::update(float p_DeltaT)
       Input::System::getKeyStates()[Input::Key::kCtrl] ==
           Input::KeyState::kPressed)
   {
-    updateCameraOrbit(p_DeltaT);
+    updateCameraOrbit(deltaT);
   }
   else
   {
-    updateCameraFreeFlight(p_DeltaT);
+    updateCameraFreeFlight(deltaT);
   }
 }
 }

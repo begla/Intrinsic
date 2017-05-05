@@ -249,78 +249,107 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    _managerWindowPostEffect, SLOT(show()));
 
   // Editing toolbar
-  {{QLabel* label = new QLabel("Grid Size");
-  label->setMargin(5);
+  {
+    QLabel* label = new QLabel("Grid Size:");
+    label->setMargin(3);
+    label->setStyleSheet("font: 8pt");
 
-  QDoubleSpinBox* gridSizeSpinBox = new QDoubleSpinBox();
-  gridSizeSpinBox->setMinimum(0.05f);
-  gridSizeSpinBox->setSingleStep(0.5f);
+    QDoubleSpinBox* gridSizeSpinBox = new QDoubleSpinBox();
+    gridSizeSpinBox->setMinimum(0.01f);
+    gridSizeSpinBox->setSingleStep(0.5f);
+    gridSizeSpinBox->setToolTip("Grid Size");
 
-  gridSizeSpinBox->setValue(GameStates::Editing::_gridSize);
+    gridSizeSpinBox->setValue(GameStates::Editing::_gridSize);
 
-  _ui.gridToolBar->addWidget(label);
-  _ui.gridToolBar->addWidget(gridSizeSpinBox);
+    _ui.gridToolBar->addWidget(label);
+    _ui.gridToolBar->addWidget(gridSizeSpinBox);
 
-  QObject::connect(gridSizeSpinBox, SIGNAL(valueChanged(double)), this,
-                   SLOT(onGridSizeChanged(double)));
-}
+    QObject::connect(gridSizeSpinBox, SIGNAL(valueChanged(double)), this,
+                     SLOT(onGridSizeChanged(double)));
+  }
 
-{
-  QLabel* label = new QLabel("Gizmo Size");
-  label->setMargin(5);
+  {
+    QLabel* label = new QLabel("Gizmo Size:");
+    label->setMargin(3);
+    label->setStyleSheet("font: 8pt");
 
-  QDoubleSpinBox* gizmoSizeSpinBox = new QDoubleSpinBox();
-  gizmoSizeSpinBox->setMinimum(0.05f);
-  gizmoSizeSpinBox->setSingleStep(0.05f);
+    QDoubleSpinBox* gizmoSizeSpinBox = new QDoubleSpinBox();
+    gizmoSizeSpinBox->setMinimum(0.05f);
+    gizmoSizeSpinBox->setSingleStep(0.05f);
+    gizmoSizeSpinBox->setToolTip("Gizmo Size");
 
-  gizmoSizeSpinBox->setValue(GameStates::Editing::_gizmoSize);
+    gizmoSizeSpinBox->setValue(GameStates::Editing::_gizmoSize);
 
-  _ui.gridToolBar->addWidget(label);
-  _ui.gridToolBar->addWidget(gizmoSizeSpinBox);
+    _ui.gridToolBar->addWidget(label);
+    _ui.gridToolBar->addWidget(gizmoSizeSpinBox);
 
-  QObject::connect(gizmoSizeSpinBox, SIGNAL(valueChanged(double)), this,
-                   SLOT(onGizmoSizeChanged(double)));
-}
+    QObject::connect(gizmoSizeSpinBox, SIGNAL(valueChanged(double)), this,
+                     SLOT(onGizmoSizeChanged(double)));
+  }
 
-{
-  QLabel* label = new QLabel("Camera Speed");
-  label->setMargin(5);
+  {
+    QLabel* label = new QLabel("Camera Speed:");
+    label->setMargin(3);
+    label->setStyleSheet("font: 8pt");
 
-  QDoubleSpinBox* cameraSpeedSpinBox = new QDoubleSpinBox();
-  cameraSpeedSpinBox->setMinimum(0.05f);
-  cameraSpeedSpinBox->setMaximum(1000.0f);
-  cameraSpeedSpinBox->setSingleStep(0.05f);
+    QDoubleSpinBox* cameraSpeedSpinBox = new QDoubleSpinBox();
+    cameraSpeedSpinBox->setMinimum(0.05f);
+    cameraSpeedSpinBox->setMaximum(1000.0f);
+    cameraSpeedSpinBox->setSingleStep(0.05f);
+    cameraSpeedSpinBox->setToolTip("Camera Speed");
 
-  cameraSpeedSpinBox->setValue(GameStates::Editing::_cameraSpeed);
+    cameraSpeedSpinBox->setValue(GameStates::Editing::_cameraSpeed);
 
-  _ui.gridToolBar->addWidget(label);
-  _ui.gridToolBar->addWidget(cameraSpeedSpinBox);
+    _ui.gridToolBar->addWidget(label);
+    _ui.gridToolBar->addWidget(cameraSpeedSpinBox);
 
-  QObject::connect(cameraSpeedSpinBox, SIGNAL(valueChanged(double)), this,
-                   SLOT(onCameraSpeedChanged(double)));
-}
-}
+    QObject::connect(cameraSpeedSpinBox, SIGNAL(valueChanged(double)), this,
+                     SLOT(onCameraSpeedChanged(double)));
+  }
 
-// Context menus
-{
-  _createContextMenu.addAction(_ui.actionCreateCube);
-  _createContextMenu.addAction(_ui.actionCreateSphere);
-  _createContextMenu.addSeparator();
-  _createContextMenu.addAction(_ui.actionCreateRigidBody);
-  _createContextMenu.addAction(_ui.actionCreateRigidBody_Sphere);
+  _ui.gridToolBar->addSeparator();
 
-  _debugContextMenu.addAction(_ui.actionSpawn_Vegetation);
-  _debugContextMenu.addAction(_ui.actionSpawn_Grass);
+  {
 
-  _debugGeometryContextMenu.addAction(_ui.actionShow_World_Bounding_Spheres);
-  _debugGeometryContextMenu.addAction(_ui.actionShow_Benchmark_Paths);
-  _debugGeometryContextMenu.addSeparator();
-  _debugGeometryContextMenu.addAction(_ui.actionShow_PhysX_Debug_Geometry);
-}
+    QLabel* label = new QLabel("Time Mod.:");
+    label->setMargin(3);
+    label->setStyleSheet("font: 8pt");
 
-onLoadEditorSettings();
+    QDoubleSpinBox* timeModSpinBox = new QDoubleSpinBox();
+    timeModSpinBox->setMinimum(0.0f);
+    timeModSpinBox->setMaximum(10.0f);
+    timeModSpinBox->setSingleStep(0.05f);
+    timeModSpinBox->setToolTip("Time Modulator");
 
-_mainWindow = this;
+    timeModSpinBox->setValue(TaskManager::_timeModulator);
+
+    _ui.gridToolBar->addWidget(label);
+    _ui.gridToolBar->addWidget(timeModSpinBox);
+
+    QObject::connect(timeModSpinBox, SIGNAL(valueChanged(double)), this,
+                     SLOT(onTimeModChanged(double)));
+  }
+
+  // Context menus
+  {
+    _createContextMenu.addAction(_ui.actionCreateCube);
+    _createContextMenu.addAction(_ui.actionCreateSphere);
+    _createContextMenu.addSeparator();
+    _createContextMenu.addAction(_ui.actionCreateRigidBody);
+    _createContextMenu.addAction(_ui.actionCreateRigidBody_Sphere);
+
+    _debugContextMenu.addAction(_ui.actionSpawn_Vegetation);
+    _debugContextMenu.addAction(_ui.actionSpawn_Grass);
+
+    _debugGeometryContextMenu.addAction(_ui.actionShow_World_Bounding_Spheres);
+    _debugGeometryContextMenu.addAction(_ui.actionShow_Benchmark_Paths);
+    _debugGeometryContextMenu.addSeparator();
+    _debugGeometryContextMenu.addAction(_ui.actionShow_PhysX_Debug_Geometry);
+  }
+
+  onLoadEditorSettings();
+
+  _mainWindow = this;
 }
 
 IntrinsicEd::~IntrinsicEd() {}
@@ -629,6 +658,11 @@ void IntrinsicEd::onGizmoSizeChanged(double p_Value)
 void IntrinsicEd::onCameraSpeedChanged(double p_Value)
 {
   GameStates::Editing::_cameraSpeed = (float)p_Value;
+}
+
+void IntrinsicEd::onTimeModChanged(double p_Value)
+{
+  TaskManager::_timeModulator = p_Value;
 }
 
 void IntrinsicEd::onOpenMicroprofile()
