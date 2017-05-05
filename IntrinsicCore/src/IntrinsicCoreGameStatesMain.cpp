@@ -55,6 +55,9 @@ void Main::update(float p_DeltaT)
 {
   _INTR_PROFILE_CPU("Game States", "Main");
 
+  // Avoid time mod.
+  const float deltaT = TaskManager::_lastDeltaT;
+
   for (uint32_t i = 0u; i < Components::PlayerManager::_activeRefs.size(); ++i)
   {
     Components::PlayerRef playerRef = Components::PlayerManager::_activeRefs[i];
@@ -86,13 +89,13 @@ void Main::update(float p_DeltaT)
             Components::CameraControllerManager::_descTargetEulerAngles(
                 camCtrlRef);
 
-        targetEulerAngles.y += -camSpeed * movement.w * p_DeltaT;
-        targetEulerAngles.x += camSpeed * movement.z * p_DeltaT;
+        targetEulerAngles.y += -camSpeed * movement.w * deltaT;
+        targetEulerAngles.x += camSpeed * movement.z * deltaT;
 
         targetEulerAngles.y +=
-            -camSpeedMouse * Input::System::getLastMousePosRel().x * p_DeltaT;
+            -camSpeedMouse * Input::System::getLastMousePosRel().x * deltaT;
         targetEulerAngles.x +=
-            camSpeedMouse * Input::System::getLastMousePosRel().y * p_DeltaT;
+            camSpeedMouse * Input::System::getLastMousePosRel().y * deltaT;
       }
 
       static const float moveSpeed = 500.0f;
@@ -145,7 +148,7 @@ void Main::update(float p_DeltaT)
     }
 
     Components::CameraControllerManager::updateControllers(
-        Components::CameraControllerManager::_activeRefs, p_DeltaT);
+        Components::CameraControllerManager::_activeRefs, deltaT);
     Components::CharacterControllerManager::updateControllers(
         Components::CharacterControllerManager::_activeRefs, p_DeltaT);
   }

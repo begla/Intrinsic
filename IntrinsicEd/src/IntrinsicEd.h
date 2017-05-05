@@ -75,6 +75,7 @@ public slots:
   void onGridSizeChanged(double p_Value);
   void onGizmoSizeChanged(double p_Value);
   void onCameraSpeedChanged(double p_Value);
+  void onTimeModChanged(double p_Value);
   void onCreateCube();
   void onCreateRigidBody();
   void onCreateRigidBodySphere();
