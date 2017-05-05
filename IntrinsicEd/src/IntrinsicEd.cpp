@@ -409,8 +409,7 @@ void IntrinsicEd::onFullscreen()
 
 void IntrinsicEd::onEndFullscreen()
 {
-  _ui.viewPort->setParent(_ui.centralWidget);
-  _ui.viewPort->showNormal();
+  _ui.centralWidget->layout()->addWidget(_ui.viewPort);
 }
 
 void IntrinsicEd::onEditingModeDefault()
