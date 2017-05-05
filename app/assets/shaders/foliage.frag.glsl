@@ -79,6 +79,6 @@ void main()
   outNormal.rg = encodeNormal(normalize(TBN * (normal.xyz * 2.0 - 1.0)));
   outNormal.b = roughness.g + uboPerMaterial.pbrBias.g; // Specular
   outNormal.a = max(roughness.b + uboPerMaterial.pbrBias.b, 0.05); // Roughness
-  outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 0.0, 0.0); // Metal Mask / Material Buffer Idx
+  outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 1.0, 0.0); // Metal Mask / Material Buffer Idx
 #endif // PRE_PASS
 }

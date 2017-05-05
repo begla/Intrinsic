@@ -35,7 +35,8 @@ layout (binding = 8) uniform sampler2D roughnessTex1; \
 layout (binding = 9) uniform sampler2D albedoTex2; \
 layout (binding = 10) uniform sampler2D normalTex2; \
 layout (binding = 11) uniform sampler2D roughnessTex2; \
-layout (binding = 12) uniform sampler2D blendMaskTex
+layout (binding = 12) uniform sampler2D blendMaskTex; \
+layout (binding = 13) uniform sampler2D noiseTex
 
 #define OUTPUT \
 layout (location = 0) out vec4 outAlbedo; \
