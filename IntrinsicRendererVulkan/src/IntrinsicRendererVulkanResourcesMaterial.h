@@ -180,7 +180,8 @@ struct MaterialManager
     _descPbrBias(p_Ref) = glm::vec3(0.0f);
     _descUvAnimation(p_Ref) = glm::vec2(0.0f);
 
-    _descMaterialPassMask(p_Ref) = {"GBuffer", "Shadow", "PerPixelPicking"};
+    _descMaterialPassMask(p_Ref) = {"GBufferDefault", "Shadow",
+                                    "PerPixelPicking"};
   }
 
   _INTR_INLINE static void destroyMaterial(MaterialRef p_Ref)
