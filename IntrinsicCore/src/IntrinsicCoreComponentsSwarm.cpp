@@ -97,8 +97,8 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
         Boid& boid = boids[boidIdx];
 
         static const float boidAcc = 10.0f;
-        static const float boidMinDistSqr = 4.0f * 4.0f;
-        static const float distanceRuleWeight = 0.05f;
+        static const float boidMinDistSqr = 8.0f * 8.0f;
+        static const float distanceRuleWeight = 0.3f;
         static const float targetRuleWeight = 0.9f;
         static const float minTargetDist = 4.0f;
         static const float matchVelWeight = 0.025f;
@@ -118,9 +118,13 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
         }
 
         // Keep a distance
-        for (uint32_t boidToCompareIdx = 0u; boidToCompareIdx < boids.size();
-             ++boidToCompareIdx)
+        for (uint32_t boidIdx = 0u;
+             boidIdx < std::min(32u, (uint32_t)boids.size()); ++boidIdx)
         {
+          // Very rough approx. to work around O(n^2)
+          const uint32_t boidToCompareIdx =
+              Math::calcRandomNumber() % boids.size();
+
           if (boidToCompareIdx == boidIdx)
             continue;
 
