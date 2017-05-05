@@ -37,7 +37,7 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
                          Core::Resources::FrustumRef p_FrustumRef,
                          Components::CameraRef p_CameraRef)
 {
-  _INTR_PROFILE_CPU("Render Pass", "Calc Shadow Map Matrices");
+  _INTR_PROFILE_CPU("Render Pass", "Calc. Shadow Map Matrices");
 
   // Make this configurable
   const bool lastSplit = p_SplitIdx == _INTR_PSSM_SPLIT_COUNT - 1u;

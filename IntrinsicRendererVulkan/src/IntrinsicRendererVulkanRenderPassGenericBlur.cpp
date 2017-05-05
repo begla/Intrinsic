@@ -148,8 +148,10 @@ void GenericBlur::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
-  _INTR_PROFILE_CPU("Renderer", _name.c_str());
-  _INTR_PROFILE_GPU(_name.c_str());
+  _INTR_PROFILE_CPU_DEFINE(GenericBlurCPU, "Render Pass", _name.c_str());
+  _INTR_PROFILE_CPU_CUSTOM(GenericBlurCPU);
+  _INTR_PROFILE_GPU_DEFINE(GenericBlurGPU, _name.c_str());
+  _INTR_PROFILE_GPU_CUSTOM(GenericBlurGPU, _name.c_str());
 
   dispatchBlur(RenderSystem::getPrimaryCommandBuffer());
 }

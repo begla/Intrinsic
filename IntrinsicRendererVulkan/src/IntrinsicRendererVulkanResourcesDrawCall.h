@@ -372,7 +372,7 @@ struct DrawCallManager
   _INTR_INLINE static void
   sortDrawCallsFrontToBack(DrawCallRefArray& p_RefArray)
   {
-    _INTR_PROFILE_CPU("Resources", "Sort Draw Calls");
+    _INTR_PROFILE_CPU("General", "Sort Draw Calls");
 
     struct Comparator
     {
@@ -390,7 +390,7 @@ struct DrawCallManager
   _INTR_INLINE static void
   sortDrawCallsBackToFront(DrawCallRefArray& p_RefArray)
   {
-    _INTR_PROFILE_CPU("Resources", "Sort Draw Calls");
+    _INTR_PROFILE_CPU("General", "Sort Draw Calls");
 
     struct Comparator
     {

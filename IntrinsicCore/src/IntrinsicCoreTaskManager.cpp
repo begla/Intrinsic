@@ -77,15 +77,13 @@ void TaskManager::executeTasks()
 
     // Scripts
     {
-      _INTR_PROFILE_CPU("Scripts", "Tick Scripts");
-
       Components::ScriptManager::tickScripts(
           Components::ScriptManager::_activeRefs, _lastDeltaT);
     }
 
     // Physics
     {
-      _INTR_PROFILE_CPU("Physics", "Simulate And Update");
+      _INTR_PROFILE_CPU("TaskManager", "Simulate And Update");
 
       _stepAccum += _lastDeltaT;
 
@@ -106,7 +104,7 @@ void TaskManager::executeTasks()
 
     // Swarms
     {
-      _INTR_PROFILE_CPU("Components", "Swarms");
+      _INTR_PROFILE_CPU("TaskManager", "Swarms");
 
       Components::SwarmManager::updateSwarms(
           Components::SwarmManager::_activeRefs, _lastDeltaT);

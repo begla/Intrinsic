@@ -70,8 +70,10 @@ void GenericMesh::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
-  _INTR_PROFILE_CPU("Renderer", _name.c_str());
-  _INTR_PROFILE_GPU(_name.c_str());
+  _INTR_PROFILE_CPU_DEFINE(GenericMeshCPU, "Render Pass", _name.c_str());
+  _INTR_PROFILE_CPU_CUSTOM(GenericMeshCPU);
+  _INTR_PROFILE_GPU_DEFINE(GenericMeshGPU, _name.c_str());
+  _INTR_PROFILE_GPU_CUSTOM(GenericMeshGPU, _name.c_str());
 
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
@@ -116,8 +118,6 @@ void GenericMesh::render(float p_DeltaT, Components::CameraRef p_CameraRef)
       (uint32_t)_clearValues.size(), _clearValues.data());
   {
     DrawCallDispatcher::queueDrawCalls(visibleDrawCalls, _renderPassRef, fbRef);
-    _INTR_PROFILE_COUNTER_SET(("Dispatched Draw Calls (" + _name + ")").c_str(),
-                              DrawCallDispatcher::_dispatchedDrawCallCount);
   }
   RenderSystem::endRenderPass(_renderPassRef);
 }

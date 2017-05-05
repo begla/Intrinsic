@@ -137,7 +137,7 @@ void Benchmark::assembleBenchmarkPaths(
 
 void Benchmark::update(float p_DeltaT)
 {
-  _INTR_PROFILE_CPU("Game States", "Benchmark Game State Update");
+  _INTR_PROFILE_CPU("Game States", "Benchmark");
 
   if (_paths.empty())
   {

@@ -163,8 +163,10 @@ void GenericFullscreen::render(float p_DeltaT,
 {
   using namespace Resources;
 
-  _INTR_PROFILE_CPU("Renderer", _name.c_str());
-  _INTR_PROFILE_GPU(_name.c_str());
+  _INTR_PROFILE_CPU_DEFINE(GenericFullscreenCPU, "Render Pass", _name.c_str());
+  _INTR_PROFILE_CPU_CUSTOM(GenericFullscreenCPU);
+  _INTR_PROFILE_GPU_DEFINE(GenericFullscreenGPU, _name.c_str());
+  _INTR_PROFILE_GPU_CUSTOM(GenericFullscreenGPU, _name.c_str());
 
   const RenderProcess::UniformBufferDataEntry uniformData =
       RenderProcess::UniformManager::requestUniformBufferData(

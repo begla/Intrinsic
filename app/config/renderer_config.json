@@ -383,9 +383,7 @@
 			"name" : "BlurLensFlares",
 			"sourceImage" : "LensFlare",
 			"pingPongImage" : "LensFlarePingPong",
-			"targetImage" : "LensFlare",
-			"outputs" : [
-			]
+			"targetImage" : "LensFlare"
 		},
 		{
 			"type" : "ImageMemoryBarrier",
@@ -411,9 +409,7 @@
 			"name" : "BlurScene",
 			"sourceImage" : "SceneDownSampled",
 			"pingPongImage" : "SceneBlurredPingPong",
-			"targetImage" : "SceneBlurred",
-			"outputs" : [
-			]
+			"targetImage" : "SceneBlurred"
 		},
 		{
 			"type" : "ImageMemoryBarrier",

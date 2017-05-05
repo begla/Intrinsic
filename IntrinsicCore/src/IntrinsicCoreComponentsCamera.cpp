@@ -57,7 +57,7 @@ void CameraManager::init()
 
 void CameraManager::updateFrustums(const CameraRefArray& p_Cameras)
 {
-  _INTR_PROFILE_CPU("Components", "Cam. Matrix Updt.");
+  _INTR_PROFILE_CPU("General", "Cam. Matrix Updt.");
 
   for (uint32_t i = 0u; i < static_cast<uint32_t>(p_Cameras.size()); ++i)
   {

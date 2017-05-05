@@ -210,9 +210,17 @@ case IDCONTINUE : break;                                                       \
 #if defined(_INTR_PROFILING_ENABLED)
 #define _INTR_PROFILE_CPU(_group, _name)                                       \
   MICROPROFILE_SCOPEI(_group, _name, 0xff00ff)
+#define _INTR_PROFILE_CPU_CUSTOM(_var) MICROPROFILE_SCOPE(_var)
+#define _INTR_PROFILE_CPU_DEFINE(_var, _group, _name)                          \
+  MICROPROFILE_DEFINE(_var, _group, _name, 0xff00ff)
 #define _INTR_PROFILE_GPU(_name)                                               \
   MICROPROFILE_SCOPEGPUI(_name, 0xff00ff);                                     \
   _INTR_PROFILE_GPU_MARKER_REGION(_name)
+#define _INTR_PROFILE_GPU_CUSTOM(_var, _name)                                  \
+  MICROPROFILE_SCOPEGPU(_var);                                                 \
+  _INTR_PROFILE_GPU_MARKER_REGION(_name)
+#define _INTR_PROFILE_GPU_DEFINE(_var, _name)                                  \
+  MICROPROFILE_DEFINE_GPU(_var, _name, 0xff00ff);
 #define _INTR_PROFILE_COUNTER_ADD(_name, _count)                               \
   MICROPROFILE_COUNTER_ADD(_name, _count)
 #define _INTR_PROFILE_COUNTER_SET(_name, _count)                               \
@@ -230,7 +238,11 @@ case IDCONTINUE : break;                                                       \
   MICROPROFILE_COUNTER_LOCAL_SUB(_var, _count)
 #else
 #define _INTR_PROFILE_CPU(_group, _name)
+#define _INTR_PROFILE_CPU_CUSTOM(_var)
+#define _INTR_PROFILE_CPU_DEFINE(_var, _group, _name)
 #define _INTR_PROFILE_GPU(_name)
+#define _INTR_PROFILE_GPU_CUSTOM(_var, _name)
+#define _INTR_PROFILE_GPU_DEFINE(_var, _name)
 #define _INTR_PROFILE_COUNTER_ADD(_name, _count)
 #define _INTR_PROFILE_COUNTER_SET(_name, _count)
 #define _INTR_PROFILE_COUNTER_SUB(_name, _count)

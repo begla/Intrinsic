@@ -1325,7 +1325,7 @@ void RenderSystem::endFrame()
   }
 
   {
-    _INTR_PROFILE_CPU("Renderer", "Queue Present");
+    _INTR_PROFILE_CPU("Render System", "Queue Present");
 
     VkPresentInfoKHR present = {};
     {

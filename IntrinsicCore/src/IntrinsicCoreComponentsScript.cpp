@@ -52,7 +52,7 @@ void ScriptManager::destroyResources(const ScriptRefArray& p_Scripts)
 
 void ScriptManager::tickScripts(ScriptRefArray& p_Scripts, float p_DeltaT)
 {
-  _INTR_PROFILE_CPU("Components", "Tick scripts");
+  _INTR_PROFILE_CPU("Scripts", "Tick Scripts");
 
   for (uint32_t scriptIdx = 0u;
        scriptIdx < static_cast<uint32_t>(p_Scripts.size()); ++scriptIdx)

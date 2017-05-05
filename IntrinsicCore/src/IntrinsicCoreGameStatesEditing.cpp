@@ -790,7 +790,7 @@ void Editing::findVisibleEditingDrawCalls(Dod::RefArray& p_DrawCalls)
 
 void Editing::update(float p_DeltaT)
 {
-  _INTR_PROFILE_CPU("Game States", "Editing Game State Update");
+  _INTR_PROFILE_CPU("Game States", "Editing");
 
   // Fade grid in/out
   static const float fadeDurationInSeconds = 1.0f;
