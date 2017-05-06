@@ -392,7 +392,7 @@ void IntrinsicEd::onLoadWorld()
 void IntrinsicEd::onReloadSettingsAndRendererConfig()
 {
   Settings::Manager::loadSettings();
-  Vulkan::RenderSystem::resizeSwapChain(true);
+  Vulkan::RenderSystem::onViewportChanged();
 }
 
 void IntrinsicEd::onSaveWorld()
@@ -1048,7 +1048,7 @@ int IntrinsicEd::enterMainLoop()
     {
       Settings::Manager::loadSettings();
       updateSettingsChangeWatch();
-      Vulkan::RenderSystem::resizeSwapChain(true);
+      Vulkan::RenderSystem::onViewportChanged();
       _settingsUpdatePending = false;
     }
   }
