@@ -57,6 +57,7 @@ glm::vec3 _orbitCamCenter = glm::vec3(0.0f);
 float _orbitRadius = 200.0f;
 glm::vec3 _camVel = glm::vec3();
 glm::vec3 _camAngVel = glm::vec3();
+glm::vec3 _eulerAngles = glm::vec3();
 
 // Cloning
 bool _cloningInProgress = false;
@@ -256,9 +257,7 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
 
   static const float damping = 0.005f;
 
-  glm::vec3& camRotEuler = Components::CameraManager::_descEulerAngles(camRef);
-  glm::quat camRot = Components::NodeManager::_worldOrientation(camNodeRef) *
-                     glm::quat(camRotEuler);
+  glm::quat camRot = glm::quat(_eulerAngles);
   glm::vec3 forward = camRot * glm::vec3(0.0f, 0.0f, 1.0f);
 
   // Init. orbit camera mode
@@ -305,8 +304,8 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
   else if (Input::System::getKeyStates()[Input::Key::kAlt] ==
            Input::KeyState::kPressed)
   {
-    camRotEuler.x += _camAngVel.y * p_DeltaT;
-    camRotEuler.y += -_camAngVel.x * p_DeltaT;
+    _eulerAngles.x += _camAngVel.y * p_DeltaT;
+    _eulerAngles.y += -_camAngVel.x * p_DeltaT;
   }
   else if (Input::System::getKeyStates()[Input::Key::kCtrl] ==
            Input::KeyState::kPressed)
@@ -317,9 +316,7 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
                  0.1f);
   }
 
-  camRot = Components::NodeManager::_worldOrientation(camNodeRef) *
-           glm::quat(camRotEuler);
-
+  Components::NodeManager::_orientation(camNodeRef) = _eulerAngles;
   Components::NodeManager::_position(camNodeRef) =
       _orbitCamCenter + camRot * glm::vec3(0.0f, 0.0f, -_orbitRadius);
   Components::NodeManager::updateTransforms(camNodeRef);
@@ -347,8 +344,6 @@ _INTR_INLINE void updateCameraFreeFlight(float p_DeltaT)
 
   static const float damping = 0.005f;
 
-  glm::vec3& camRotEuler = Components::CameraManager::_descEulerAngles(camRef);
-
   if (Input::System::getKeyStates()[Input::Key::kMouseRight] ==
       Input::KeyState::kPressed)
   {
@@ -373,9 +368,8 @@ _INTR_INLINE void updateCameraFreeFlight(float p_DeltaT)
   _camAngVel.y += -_controllerSens * movement.w * p_DeltaT;
   _camAngVel.x += _controllerSens * movement.z * p_DeltaT;
 
-  camRotEuler += _camAngVel * p_DeltaT;
-  glm::quat camRot = Components::NodeManager::_worldOrientation(camNodeRef) *
-                     glm::quat(camRotEuler);
+  _eulerAngles += _camAngVel * p_DeltaT;
+  glm::quat camRot = glm::quat(_eulerAngles);
 
   glm::vec3 forward = camRot * glm::vec3(0.0f, 0.0f, 1.0f);
   glm::vec3 up = camRot * glm::vec3(0.0f, 1.0f, 0.0f);
@@ -412,6 +406,7 @@ _INTR_INLINE void updateCameraFreeFlight(float p_DeltaT)
   _camVel += right * actualMoveSpeed * movement.y * p_DeltaT +
              forward * -actualMoveSpeed * movement.x * p_DeltaT;
 
+  Components::NodeManager::_orientation(camNodeRef) = _eulerAngles;
   Components::NodeManager::_position(camNodeRef) += _camVel * p_DeltaT;
   Components::NodeManager::updateTransforms(camNodeRef);
 
@@ -637,6 +632,22 @@ void Editing::activate()
   _INTR_ASSERT(cameraRef.isValid());
 
   World::setActiveCamera(cameraRef);
+
+  const Components::NodeRef camNodeRef =
+      Components::NodeManager::getComponentForEntity(
+          Components::CameraManager::_entity(cameraRef));
+  _eulerAngles =
+      glm::eulerAngles(Components::NodeManager::_orientation(camNodeRef));
+
+  // Remove roll if it ever gets into play - possible when switching from euler
+  // to quat. and the other way around
+  if (glm::abs(_eulerAngles.z) > glm::pi<float>() - _INTR_EPSILON)
+  {
+    _eulerAngles.x -= glm::pi<float>();
+    _eulerAngles.y =
+        glm::half_pi<float>() - (_eulerAngles.y - glm::half_pi<float>());
+    _eulerAngles.z = 0.0f;
+  }
 }
 
 // <-

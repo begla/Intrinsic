@@ -69,13 +69,13 @@ void CameraManager::updateFrustums(const CameraRefArray& p_Cameras)
     glm::vec3& forward = _forward(campCompRef);
     glm::vec3& up = _up(campCompRef);
 
-    glm::quat& cameraOrientation = _actualCameraOrientation(campCompRef) =
-        calcActualCameraOrientation(campCompRef);
     glm::vec3& camWorldPosition =
         Components::NodeManager::_worldPosition(nodeCompRef);
 
-    forward = cameraOrientation * glm::vec3(0.0f, 0.0f, 1.0f);
-    up = cameraOrientation * glm::vec3(0.0f, 1.0f, 0.0f);
+    forward = Components::NodeManager::_worldOrientation(nodeCompRef) *
+              glm::vec3(0.0f, 0.0f, 1.0f);
+    up = Components::NodeManager::_worldOrientation(nodeCompRef) *
+         glm::vec3(0.0f, 1.0f, 0.0f);
 
     _viewMatrix(campCompRef) =
         glm::lookAt(camWorldPosition, camWorldPosition + forward, up);

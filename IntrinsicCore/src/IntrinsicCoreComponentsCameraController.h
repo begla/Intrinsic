@@ -56,11 +56,18 @@ struct CameraControllerData : Dod::Components::ComponentDataBase
     descCameraControllerType.resize(
         _INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT);
     descTargetEulerAngles.resize(_INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT);
+
+    lastTargetEulerAngles.resize(_INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT);
+    timeSinceLastOrientationChange.resize(
+        _INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT);
   }
 
   _INTR_ARRAY(Name) descTargetObjectName;
   _INTR_ARRAY(CameraControllerType::Enum) descCameraControllerType;
   _INTR_ARRAY(glm::vec3) descTargetEulerAngles;
+
+  _INTR_ARRAY(glm::vec3) lastTargetEulerAngles;
+  _INTR_ARRAY(float) timeSinceLastOrientationChange;
 };
 
 ///
@@ -198,6 +205,20 @@ struct CameraControllerManager
   _descCameraControllerType(CameraControllerRef p_Ref)
   {
     return _data.descCameraControllerType[p_Ref._id];
+  }
+
+  // Resources
+  /// The euler angles seen during the last update call.
+  _INTR_INLINE static glm::vec3&
+  _lastTargetEulerAngles(CameraControllerRef p_Ref)
+  {
+    return _data.lastTargetEulerAngles[p_Ref._id];
+  }
+  /// The time passed since the last change in orientation.
+  _INTR_INLINE static float&
+  _timeSinceLastOrientationChange(CameraControllerRef p_Ref)
+  {
+    return _data.timeSinceLastOrientationChange[p_Ref._id];
   }
 };
 }

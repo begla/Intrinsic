@@ -68,8 +68,12 @@ void Main::update(float p_DeltaT)
     if (Components::PlayerManager::_descPlayerId(playerRef) == 0u)
     {
       Components::CameraRef camRef = World::getActiveCamera();
+      Components::NodeRef camNodeRef =
+          Components::NodeManager::getComponentForEntity(
+              Components::CameraManager::_entity(camRef));
+
       const glm::quat& camOrient =
-          Components::CameraManager::_actualCameraOrientation(camRef);
+          Components::NodeManager::_worldOrientation(camNodeRef);
 
       Components::CharacterControllerRef charCtrlRef =
           Components::CharacterControllerManager::getComponentForEntity(
