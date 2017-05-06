@@ -6,6 +6,8 @@ robocopy app/ distro/ Intrinsic.pdb
 robocopy app/ distro/ IntrinsicEd.exe
 robocopy app/ distro/ IntrinsicEd.pdb
 robocopy app/ distro/ settings.json
+robocopy . distro/ README.md
+robocopy . distro/ LICENSE
 robocopy app/config/ distro/config/ material_pass_config.json
 robocopy app/config/ distro/config/ renderer_config.json
 robocopy app/config/ distro/config/ renderer_config_simple.json
