@@ -1,0 +1,10 @@
+{
+    "name": "ssao_hbao.frag",
+    "properties": {
+        "name": "ssao_hbao.frag",
+        "gpuProgramName": "ssao_hbao.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

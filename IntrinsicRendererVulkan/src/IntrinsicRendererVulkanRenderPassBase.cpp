@@ -28,11 +28,17 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
 {
   using namespace Resources;
 
+  _name = p_RenderPassDesc["name"].GetString();
+
+  if (!p_RenderPassDesc.HasMember("outputs"))
+    return;
+
   RenderPassRefArray renderpassesToCreate;
   FramebufferRefArray framebuffersToCreate;
 
   const rapidjson::Value& outputs = p_RenderPassDesc["outputs"];
-  _name = p_RenderPassDesc["name"].GetString();
+  if (outputs.Empty())
+    return;
 
   for (uint32_t clearValueIdx = 0u; clearValueIdx < outputs.Size();
        ++clearValueIdx)
@@ -62,92 +68,86 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
   }
 
   // Render passes
-  if (!outputs.Empty())
+  _renderPassRef = RenderPassManager::createRenderPass(_name);
+  RenderPassManager::resetToDefault(_renderPassRef);
+
+  for (uint32_t i = 0u; i < outputs.Size(); ++i)
   {
-    _renderPassRef = RenderPassManager::createRenderPass(_name);
-    RenderPassManager::resetToDefault(_renderPassRef);
+    const rapidjson::Value& outputDesc = outputs[i];
 
-    for (uint32_t i = 0u; i < outputs.Size(); ++i)
+    ImageRef imageRef =
+        ImageManager::_getResourceByName(outputDesc[0].GetString());
+
+    if (outputs[i][0] != "Backbuffer")
     {
-      const rapidjson::Value& outputDesc = outputs[i];
-
-      ImageRef imageRef =
-          ImageManager::_getResourceByName(outputDesc[0].GetString());
-
-      if (outputs[i][0] != "Backbuffer")
-      {
-        AttachmentDescription colorAttachment = {
-            (uint8_t)ImageManager::_descImageFormat(imageRef),
-            outputDesc.Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
-        RenderPassManager::_descAttachments(_renderPassRef)
-            .push_back(colorAttachment);
-      }
-      else
-      {
-        AttachmentDescription sceneAttachment = {
-            Format::kB8G8R8A8Srgb,
-            outputs[0].Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
-        RenderPassManager::_descAttachments(_renderPassRef)
-            .push_back(sceneAttachment);
-      }
+      AttachmentDescription colorAttachment = {
+          (uint8_t)ImageManager::_descImageFormat(imageRef),
+          outputDesc.Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
+      RenderPassManager::_descAttachments(_renderPassRef)
+          .push_back(colorAttachment);
     }
-
-    renderpassesToCreate.push_back(_renderPassRef);
+    else
+    {
+      AttachmentDescription sceneAttachment = {
+          Format::kB8G8R8A8Srgb,
+          outputs[0].Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
+      RenderPassManager::_descAttachments(_renderPassRef)
+          .push_back(sceneAttachment);
+    }
   }
+
+  renderpassesToCreate.push_back(_renderPassRef);
 
   RenderPassManager::createResources(renderpassesToCreate);
 
   // Create framebuffer
-  if (!outputs.Empty())
+  for (uint32_t backBufferIdx = 0u;
+       backBufferIdx < (uint32_t)RenderSystem::_vkSwapchainImages.size();
+       ++backBufferIdx)
   {
-    for (uint32_t backBufferIdx = 0u;
-         backBufferIdx < (uint32_t)RenderSystem::_vkSwapchainImages.size();
-         ++backBufferIdx)
+
+    FramebufferRef framebufferRef =
+        FramebufferManager::createFramebuffer(_name);
     {
+      FramebufferManager::resetToDefault(framebufferRef);
+      FramebufferManager::addResourceFlags(
+          framebufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
 
-      FramebufferRef framebufferRef =
-          FramebufferManager::createFramebuffer(_name);
+      glm::uvec3 dim = glm::vec3(0u);
+      for (uint32_t i = 0u; i < outputs.Size(); ++i)
       {
-        FramebufferManager::resetToDefault(framebufferRef);
-        FramebufferManager::addResourceFlags(
-            framebufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
-
-        glm::uvec3 dim = glm::vec3(0u);
-        for (uint32_t i = 0u; i < outputs.Size(); ++i)
+        if (outputs[i][0] != "Backbuffer")
         {
-          if (outputs[i][0] != "Backbuffer")
-          {
-            ImageRef outputImage =
-                ImageManager::getResourceByName(outputs[i][0].GetString());
-            FramebufferManager::_descAttachedImages(framebufferRef)
-                .push_back(outputImage);
+          ImageRef outputImage =
+              ImageManager::getResourceByName(outputs[i][0].GetString());
+          FramebufferManager::_descAttachedImages(framebufferRef)
+              .push_back(outputImage);
 
-            _INTR_ASSERT((dim == glm::uvec3(0u) ||
-                          dim == ImageManager::_descDimensions(outputImage)) &&
-                         "Dimensions of all outputs must be identical");
-            dim = ImageManager::_descDimensions(outputImage);
-          }
-          else
-          {
-            ImageRef outputImage = ImageManager::getResourceByName(
-                _INTR_STRING("Backbuffer") +
-                StringUtil::toString<uint32_t>(backBufferIdx));
-            FramebufferManager::_descAttachedImages(framebufferRef)
-                .push_back(outputImage);
-
-            _INTR_ASSERT((dim == glm::uvec3(0u) ||
-                          dim == ImageManager::_descDimensions(outputImage)) &&
-                         "Dimensions of all outputs must be identical");
-            dim = ImageManager::_descDimensions(outputImage);
-          }
+          _INTR_ASSERT((dim == glm::uvec3(0u) ||
+                        dim == ImageManager::_descDimensions(outputImage)) &&
+                       "Dimensions of all outputs must be identical");
+          dim = ImageManager::_descDimensions(outputImage);
         }
+        else
+        {
+          ImageRef outputImage = ImageManager::getResourceByName(
+              _INTR_STRING("Backbuffer") +
+              StringUtil::toString<uint32_t>(backBufferIdx));
+          FramebufferManager::_descAttachedImages(framebufferRef)
+              .push_back(outputImage);
 
-        FramebufferManager::_descDimensions(framebufferRef) = dim;
-        FramebufferManager::_descRenderPass(framebufferRef) = _renderPassRef;
+          _INTR_ASSERT((dim == glm::uvec3(0u) ||
+                        dim == ImageManager::_descDimensions(outputImage)) &&
+                       "Dimensions of all outputs must be identical");
+          dim = ImageManager::_descDimensions(outputImage);
+        }
       }
-      framebuffersToCreate.push_back(framebufferRef);
-      _framebufferRefs.push_back(framebufferRef);
+
+      FramebufferManager::_descDimensions(framebufferRef) = dim;
+      FramebufferManager::_descRenderPass(framebufferRef) = _renderPassRef;
     }
+    framebuffersToCreate.push_back(framebufferRef);
+    _framebufferRefs.push_back(framebufferRef);
   }
 
   FramebufferManager::createResources(framebuffersToCreate);

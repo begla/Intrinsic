@@ -102,7 +102,10 @@ void updateThirdPersonCamera(CameraControllerRef p_Ref, float p_DeltaT)
 
       if (targetNodeRef.isValid())
       {
-        worldTargetPosition = NodeManager::_worldPosition(targetNodeRef);
+        worldTargetPosition =
+            NodeManager::_worldPosition(targetNodeRef) +
+            glm::vec3(0.0f, 0.8f * NodeManager::_localAABB(targetNodeRef).max.y,
+                      0.0f);
         worldCamTargetPosition += worldTargetPosition;
       }
     }

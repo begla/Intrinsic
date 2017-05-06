@@ -299,6 +299,9 @@ void Lighting::onReinitRendering()
         _drawCallRef, _N(depthTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(GBufferDepth)),
         Samplers::kNearestClamp);
+    DrawCallManager::bindImage(
+        _drawCallRef, _N(ssaoTex), GpuProgramType::kFragment,
+        ImageManager::getResourceByName(_N(SSAO)), Samplers::kNearestClamp);
     DrawCallManager::bindImage(_drawCallRef, _N(irradianceTex),
                                GpuProgramType::kFragment,
                                ImageManager::getResourceByName(
@@ -351,6 +354,9 @@ void Lighting::onReinitRendering()
         _drawCallTransparentsRef, _N(depthTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(GBufferTransparentsDepth)),
         Samplers::kNearestClamp);
+    DrawCallManager::bindImage(
+        _drawCallTransparentsRef, _N(ssaoTex), GpuProgramType::kFragment,
+        ImageManager::getResourceByName(_N(SSAO)), Samplers::kLinearClamp);
     DrawCallManager::bindImage(_drawCallTransparentsRef, _N(irradianceTex),
                                GpuProgramType::kFragment,
                                ImageManager::getResourceByName(

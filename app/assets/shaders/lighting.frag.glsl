@@ -36,10 +36,11 @@ layout (binding = 1) uniform sampler2D albedoTex;
 layout (binding = 2) uniform sampler2D normalTex;
 layout (binding = 3) uniform sampler2D parameter0Tex;
 layout (binding = 4) uniform sampler2D depthTex;
-layout (binding = 5) uniform samplerCube irradianceTex;
-layout (binding = 6) uniform samplerCube specularTex;
-layout (binding = 7) uniform sampler2DArrayShadow shadowBufferTex;
-layout (binding = 8) MATERIAL_BUFFER;
+layout (binding = 5) uniform sampler2D ssaoTex;
+layout (binding = 6) uniform samplerCube irradianceTex;
+layout (binding = 7) uniform samplerCube specularTex;
+layout (binding = 8) uniform sampler2DArrayShadow shadowBufferTex;
+layout (binding = 9) MATERIAL_BUFFER;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
@@ -57,6 +58,7 @@ void main()
 
   const vec3 posVS = unproject(inUV0, depth, uboPerInstance.invProjMatrix);
 
+  const vec4 ssaoSample = textureLod(ssaoTex, inUV0, 0.0);
   const vec4 normalSample = textureLod(normalTex, inUV0, 0.0);
   const vec4 albedoSample = textureLod(albedoTex, inUV0, 0.0);
   const vec4 parameter0Sample = textureLod(parameter0Tex, inUV0, 0.0);
@@ -81,7 +83,7 @@ void main()
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
-  const vec3 irrad = parameter0Sample.z * d.diffuseColor * textureLod(irradianceTex, R, 0.0).rgb;
+  const vec3 irrad = ssaoSample.r * parameter0Sample.z * d.diffuseColor * textureLod(irradianceTex, R, 0.0).rgb;
   outColor.rgb += irrad; 
 
   const float maxSpecPower = 999999.0;
@@ -106,7 +108,7 @@ void main()
 
   // Direct lighting
   const vec3 lightColor = vec3(1.0, 0.5, 0.5);
-  outColor.rgb += parameter0Sample.z * shadowAttenuation * calcLighting(d) * lightColor;
+  outColor.rgb += ssaoSample.r * parameter0Sample.z * shadowAttenuation * calcLighting(d) * lightColor;
 
   // Translucency
   const float translDistortion = 0.2;

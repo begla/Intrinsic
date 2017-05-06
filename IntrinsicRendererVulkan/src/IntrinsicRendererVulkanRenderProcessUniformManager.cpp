@@ -31,9 +31,12 @@ namespace
 {
 struct UniformDataSource
 {
+  glm::mat4 projectionMatrix;
   glm::mat4 inverseProjectionMatrix;
   glm::mat4 inverseViewProjectionMatrix;
   glm::vec4 cameraWorldPosition;
+  glm::mat4 normalMatrix;
+  glm::mat4 viewMatrix;
   glm::ivec4 haltonSamples;
 } _uniformDataSource;
 
@@ -82,6 +85,12 @@ struct UniformBuffer
 
 _INTR_HASH_MAP(Name, UniformDataRef)
 _uniformOffsetMapping = {
+    {"ProjectionMatrix",
+     UniformDataRef(&_uniformDataSource.projectionMatrix, sizeof(glm::mat4))},
+    {"ViewMatrix",
+     UniformDataRef(&_uniformDataSource.viewMatrix, sizeof(glm::mat4))},
+    {"NormalMatrix",
+     UniformDataRef(&_uniformDataSource.normalMatrix, sizeof(glm::mat4))},
     {"InverseProjectionMatrix",
      UniformDataRef(&_uniformDataSource.inverseProjectionMatrix,
                     sizeof(glm::mat4))},
@@ -141,6 +150,12 @@ void UniformManager::load(const rapidjson::Value& p_UniformBuffers)
 
 void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 {
+  _uniformDataSource.projectionMatrix =
+      Components::CameraManager::_projectionMatrix(p_Camera);
+  _uniformDataSource.viewMatrix =
+      Components::CameraManager::_viewMatrix(p_Camera);
+  _uniformDataSource.normalMatrix =
+      Components::CameraManager::_viewMatrix(p_Camera);
   _uniformDataSource.inverseProjectionMatrix =
       Components::CameraManager::_inverseProjectionMatrix(p_Camera);
   _uniformDataSource.inverseViewProjectionMatrix =
