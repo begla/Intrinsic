@@ -38,6 +38,10 @@ struct UniformDataSource
   glm::mat4 normalMatrix;
   glm::mat4 viewMatrix;
   glm::ivec4 haltonSamples;
+  glm::vec4 blurParamsXNormal;
+  glm::vec4 blurParamsXMedium;
+  glm::vec4 blurParamsYNormal;
+  glm::vec4 blurParamsYMedium;
 } _uniformDataSource;
 
 glm::vec2 _haltonSamples[HALTON_SAMPLE_COUNT];
@@ -52,6 +56,11 @@ _INTR_INLINE void initStaticUniformData()
                                     Math::calcHaltonSequence(i, 3u));
     }
   }
+
+  _uniformDataSource.blurParamsXNormal = glm::vec4(3.0f, 0.0f, 1.0f, 0.0f);
+  _uniformDataSource.blurParamsXMedium = glm::vec4(6.0f, 0.0f, 1.0f, 0.0f);
+  _uniformDataSource.blurParamsYNormal = glm::vec4(3.0f, 0.0f, 0.0f, 1.0f);
+  _uniformDataSource.blurParamsYMedium = glm::vec4(6.0f, 0.0f, 0.0f, 1.0f);
 }
 }
 
@@ -100,6 +109,14 @@ _uniformOffsetMapping = {
     {"CameraWorldPosition",
      UniformDataRef(&_uniformDataSource.cameraWorldPosition,
                     sizeof(glm::vec4))},
+    {"BlurParamsXNormal",
+     UniformDataRef(&_uniformDataSource.blurParamsXNormal, sizeof(glm::vec4))},
+    {"BlurParamsXMedium",
+     UniformDataRef(&_uniformDataSource.blurParamsXMedium, sizeof(glm::vec4))},
+    {"BlurParamsYNormal",
+     UniformDataRef(&_uniformDataSource.blurParamsYNormal, sizeof(glm::vec4))},
+    {"BlurParamsYMedium",
+     UniformDataRef(&_uniformDataSource.blurParamsYMedium, sizeof(glm::vec4))},
     {"HaltonSamples",
      UniformDataRef(&_uniformDataSource.haltonSamples, sizeof(glm::ivec4))}};
 

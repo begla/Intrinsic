@@ -16,6 +16,30 @@
 			]
 		},
 		{
+			"name" : "BlurX",
+			"entries" : [
+				"BlurParamsXNormal"
+			]
+		},
+		{
+			"name" : "BlurY",
+			"entries" : [
+				"BlurParamsYNormal"
+			]
+		},
+		{
+			"name" : "BlurMediumX",
+			"entries" : [
+				"BlurParamsXMedium"
+			]
+		},
+		{
+			"name" : "BlurMediumY",
+			"entries" : [
+				"BlurParamsYMedium"
+			]
+		},
+		{
 			"name" : "PerInstanceDataSSAO",
 			"entries" : [
 				"InverseProjectionMatrix"
@@ -101,12 +125,12 @@
 		},
 		{
 			"name" : "SSAO",
-			"renderSize" : "Quarter",
+			"renderSize" : "Half",
 			"imageFormat" : "B8G8R8A8UNorm"
 		},
 		{
 			"name" : "SSAOPingPong",
-			"renderSize" : "Quarter",
+			"renderSize" : "Half",
 			"imageFormat" : "B8G8R8A8UNorm"
 		}
 	],
@@ -307,6 +331,8 @@
 		{
 			"type" : "RenderPassShadow"
 		},
+		// Render and blur SSAO
+		// ->
 		{
 			"type" : "ImageMemoryBarrier",
 			"image" : "SSAO",
@@ -317,11 +343,11 @@
 			"type" : "RenderPassGenericFullscreen",
 			"name" : "SSAO",
 			"fragmentGpuProgram" : "ssao_hbao.frag",
-			"viewportRenderSize" : "Quarter",
+			"viewportRenderSize" : "Half",
 			"perInstanceDataBufferName" : "PerInstanceDataSSAO",
 			"inputs" : [
 				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"],
-				["Image", "static_noise", "noiseTex", "Fragment", "NearestRepeat"]
+				["Image", "hbao_noise", "noiseTex", "Fragment", "NearestRepeat"]
 			],
 			"outputs" : [
 				["SSAO"]
@@ -334,12 +360,58 @@
 			"targetImageLayout" : "ShaderReadOnly"
 		},
 		{
-			"type" : "RenderPassGenericBlur",
-			"name" : "BlurSSAO",
-			"sourceImage" : "SSAO",
-			"pingPongImage" : "SSAOPingPong",
-			"targetImage" : "SSAO"
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAOPingPong",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
 		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurSSAO_X",
+			"fragmentGpuProgram" : "blur_bilateral.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "BlurX",
+			"inputs" : [
+				["Image", "SSAO", "inputTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["SSAOPingPong"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAOPingPong",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAO",
+			"sourceImageLayout" : "ShaderReadOnly",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurSSAO_Y",
+			"fragmentGpuProgram" : "blur_bilateral.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "BlurY",
+			"inputs" : [
+				["Image", "SSAOPingPong", "inputTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["SSAO"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAO",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		// <-
 		{
 			"type" : "RenderPassLighting"
 		},
@@ -385,6 +457,7 @@
 			"sourceImageLayout" : "ColorAttachment",
 			"targetImageLayout" : "ShaderReadOnly"
 		},
+		// Downsample scene
 		{
 			"type" : "ImageMemoryBarrier",
 			"image" : "SceneDownSampled",
@@ -405,8 +478,16 @@
 			]
 		},
 		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneDownSampled",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
 			"type" : "RenderPassBloom"
 		},
+		// Render and blur lens flares
+		// ->
 		{
 			"type" : "ImageMemoryBarrier",
 			"image" : "LensFlare",
@@ -428,13 +509,6 @@
 			]
 		},
 		{
-			"type" : "RenderPassGenericBlur",
-			"name" : "BlurLensFlares",
-			"sourceImage" : "LensFlare",
-			"pingPongImage" : "LensFlarePingPong",
-			"targetImage" : "LensFlare"
-		},
-		{
 			"type" : "ImageMemoryBarrier",
 			"image" : "LensFlare",
 			"sourceImageLayout" : "ColorAttachment",
@@ -442,23 +516,100 @@
 		},
 		{
 			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlarePingPong",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurLensFlares_X",
+			"fragmentGpuProgram" : "blur.frag",
+			"viewportRenderSize" : "Quarter",
+			"perInstanceDataBufferName" : "BlurMediumX",
+			"inputs" : [
+				["Image", "LensFlare", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["LensFlarePingPong"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlarePingPong",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlare",
+			"sourceImageLayout" : "ShaderReadOnly",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurLensFlares_Y",
+			"fragmentGpuProgram" : "blur.frag",
+			"viewportRenderSize" : "Quarter",
+			"perInstanceDataBufferName" : "BlurMediumY",
+			"inputs" : [
+				["Image", "LensFlarePingPong", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["LensFlare"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlare",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		// <-
+		// Generate blurred half res. scene image
+		// ->
+		{
+			"type" : "ImageMemoryBarrier",
 			"image" : "SceneBlurred",
 			"sourceImageLayout" : "Undefined",
 			"targetImageLayout" : "ColorAttachment"
 		},
 		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurScene_X",
+			"fragmentGpuProgram" : "blur.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "BlurX",
+			"inputs" : [
+				["Image", "SceneDownSampled", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["SceneBlurredPingPong"]
+			]
+		},
+		{
 			"type" : "ImageMemoryBarrier",
 			"image" : "SceneBlurredPingPong",
-			"sourceImageLayout" : "Undefined",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneBlurred",
+			"sourceImageLayout" : "ShaderReadOnly",
 			"targetImageLayout" : "ColorAttachment"
 		},
-		// Generate blurred half res. scene image
 		{
-			"type" : "RenderPassGenericBlur",
-			"name" : "BlurScene",
-			"sourceImage" : "SceneDownSampled",
-			"pingPongImage" : "SceneBlurredPingPong",
-			"targetImage" : "SceneBlurred"
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurScene_Y",
+			"fragmentGpuProgram" : "blur.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "BlurY",
+			"inputs" : [
+				["Image", "SceneBlurredPingPong", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["SceneBlurred"]
+			]
 		},
 		{
 			"type" : "ImageMemoryBarrier",
@@ -466,6 +617,7 @@
 			"sourceImageLayout" : "ColorAttachment",
 			"targetImageLayout" : "ShaderReadOnly"
 		},
+		// <-
 		{
 			"type" : "RenderPassGenericFullscreen",
 			"name" : "PostCombine",

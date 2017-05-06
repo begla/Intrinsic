@@ -1,8 +1,8 @@
 {
-    "name": "static_noise",
+    "name": "hbao_noise",
     "properties": {
-        "name": "static_noise",
-        "assetFileName": "static_noise.tga",
+        "name": "hbao_noise",
+        "assetFileName": "hbao_noise.tga",
         "assetType": 2
     }
 }

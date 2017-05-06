@@ -37,8 +37,8 @@ layout (location = 0) out vec4 outColor;
 
 const uint numDirections = 6;
 const uint numSamples = 4;
-const float strength = 1.8;
-const float R = 2.0;
+const float strength = 2.0;
+const float R = 1.8;
 const float R2 = R*R;
 const float negInvR2 = -1.0 / R2;
 const float maxRadiusPixels = 50.0;
@@ -177,9 +177,9 @@ float horizonOcclusion(vec2 deltaUV,
 void main()
 { 
   // TODO
-  vec4 res = vec4(0.25 * textureSize(depthBufferTex, 0).xy, 0.0, 0.0);
+  vec4 res = vec4(0.5 * textureSize(depthBufferTex, 0).xy, 0.0, 0.0);
   res.zw = 1.0 / res.xy;
-  const vec2 noiseScale = res.xy / textureSize(noiseTex, 0).xy;
+  const vec2 noiseScale = textureSize(noiseTex, 0).xy / res.xy;
 
   vec3 P, Pr, Pl, Pt, Pb;
   P = fetchPosVS(inUV0);
@@ -195,7 +195,7 @@ void main()
   vec3 dPdv = minDiff(P, Pt, Pb) * (res.y * res.z);
 
   // Get the random samples from the noise texture
-  vec3 random = texture(noiseTex, inUV0.xy * noiseScale).rgb;
+  vec3 random = texture(noiseTex, inUV0.xy / noiseScale).rgb;
 
   // Calculate the projected size of the hemisphere
   float rayRadiusUV = 0.5 * R * focalLen / -P.z;
