@@ -37,11 +37,13 @@ struct UniformDataSource
   glm::vec4 cameraWorldPosition;
   glm::mat4 normalMatrix;
   glm::mat4 viewMatrix;
+  glm::mat4 prevViewMatrix;
   glm::ivec4 haltonSamples;
   glm::vec4 blurParamsXNormal;
   glm::vec4 blurParamsXMedium;
   glm::vec4 blurParamsYNormal;
   glm::vec4 blurParamsYMedium;
+
 } _uniformDataSource;
 
 glm::vec2 _haltonSamples[HALTON_SAMPLE_COUNT];
@@ -98,6 +100,8 @@ _uniformOffsetMapping = {
      UniformDataRef(&_uniformDataSource.projectionMatrix, sizeof(glm::mat4))},
     {"ViewMatrix",
      UniformDataRef(&_uniformDataSource.viewMatrix, sizeof(glm::mat4))},
+    {"PrevViewMatrix",
+     UniformDataRef(&_uniformDataSource.prevViewMatrix, sizeof(glm::mat4))},
     {"NormalMatrix",
      UniformDataRef(&_uniformDataSource.normalMatrix, sizeof(glm::mat4))},
     {"InverseProjectionMatrix",
@@ -169,6 +173,8 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 {
   _uniformDataSource.projectionMatrix =
       Components::CameraManager::_projectionMatrix(p_Camera);
+  _uniformDataSource.prevViewMatrix =
+      Components::CameraManager::_prevViewMatrix(p_Camera);
   _uniformDataSource.viewMatrix =
       Components::CameraManager::_viewMatrix(p_Camera);
   _uniformDataSource.normalMatrix =

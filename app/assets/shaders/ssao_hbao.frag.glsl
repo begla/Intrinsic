@@ -37,8 +37,8 @@ layout (location = 0) out vec4 outColor;
 
 const uint numDirections = 6;
 const uint numSamples = 4;
-const float strength = 2.0;
-const float R = 1.8;
+const float strength = 1.8;
+const float R = 12.0;
 const float R2 = R*R;
 const float negInvR2 = -1.0 / R2;
 const float maxRadiusPixels = 50.0;
@@ -176,7 +176,7 @@ float horizonOcclusion(vec2 deltaUV,
 
 void main()
 { 
-  // TODO
+  // TODO: Hardcoded half size target
   vec4 res = vec4(0.5 * textureSize(depthBufferTex, 0).xy, 0.0, 0.0);
   res.zw = 1.0 / res.xy;
   const vec2 noiseScale = textureSize(noiseTex, 0).xy / res.xy;
