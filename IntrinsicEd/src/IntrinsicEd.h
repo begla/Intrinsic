@@ -89,11 +89,17 @@ public slots:
   void onOpenMicroprofile();
   void onCompileShaders();
   void onRecompileShaders();
+  void onSettingsFileChanged(const QString&);
 
 private:
+  void updateSettingsChangeWatch();
+
   QMenu _createContextMenu;
   QMenu _debugContextMenu;
   QMenu _debugGeometryContextMenu;
+
+  QFileSystemWatcher* _settingsChangeWatch;
+  bool _settingsUpdatePending;
 
   Ui::IntrinsicEdClass _ui;
 };
