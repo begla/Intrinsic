@@ -110,5 +110,5 @@ void main()
 
   outAlbedo = vec4(color, 1.0);
   outNormal = vec4(encodeNormal((uboPerInstance.normalMatrix * vec4(uboPerInstance.planeNormal.xyz, 0.0)).xyz), 1.0, 0.5);
-  outParameter0 = vec4(0.0, 1.0, 0.0, 0.0);
+  outParameter0 = vec4(0.0, 1.0, 1.0, 0.0);
 }

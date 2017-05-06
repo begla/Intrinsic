@@ -87,7 +87,8 @@ void CharacterControllerManager::updateControllers(
 
     NodeRef nodeRef = NodeManager::getComponentForEntity(_entity(charCtrlRef));
     const glm::vec3 currentControllerPosition =
-        PhysxHelper::convertExt(pxController->getPosition());
+        PhysxHelper::convertExt(pxController->getPosition()) -
+        glm::vec3(0.0f, 1.5f, 0.0f);
     const glm::vec3& currentWorldPos = NodeManager::_worldPosition(nodeRef);
 
     if (currentControllerPosition != currentWorldPos)
@@ -162,7 +163,8 @@ void CharacterControllerManager::updateControllers(
     }
 
     const glm::vec3 nodeWorldPosAfterSim =
-        PhysxHelper::convertExt(pxController->getPosition());
+        PhysxHelper::convertExt(pxController->getPosition()) -
+        glm::vec3(0.0f, 1.5f, 0.0f);
 
     // Update node position (and remove parent transform beforehand)
     NodeRef parentNodeRef = NodeManager::_parent(nodeRef);

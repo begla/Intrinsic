@@ -1,0 +1,8 @@
+{
+    "name": "static_noise",
+    "properties": {
+        "name": "static_noise",
+        "assetFileName": "static_noise.tga",
+        "assetType": 2
+    }
+}

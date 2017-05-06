@@ -2,7 +2,7 @@
 
 [![Contribute!](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/begla/Intrinsic/issues) [![Join the Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Intrinsic-Engine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Intrinsic is a Vulkan based cross-platform game and rendering engine. The project is currently in an early stage of development but evolves rapidly from day to day.
+Intrinsic is a Vulkan based cross-platform game and rendering engine. The project is currently in an early stage of development.
 
 ![Intrinsic](media/screenshot_0.jpg)
 
@@ -142,12 +142,13 @@ Intrinsic uses the following proprietary libraries:
 * PhysX 3 (see https://developer.nvidia.com/physx-sdk)
 * FBX SDK (IntrinsicEd only, see http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775847)
 
-Intrinsic also uses the following tools in binary format:
+... and the following tools in binary format:
 
 * NVTT (see https://developer.nvidia.com/gpu-accelerated-texture-compression)
 * Cloc (see http://cloc.sourceforge.net)
 * 7za (see http://www.7-zip.org/download.html)
 
-HDR cubemaps downloaded from:
+Assets (amongst other things) sourced from:
 
-* http://www.hdrlabs.com/sibl/archive.html
+* https://cloud.blender.org/ (Bunny character mesh)
+* http://www.hdrlabs.com/sibl/archive.html (HDR cubemaps)

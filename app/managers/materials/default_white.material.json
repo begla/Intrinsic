@@ -1,0 +1,30 @@
+{
+    "name": "default_white",
+    "properties": {
+        "name": "default_white",
+        "materialPassMask": [
+            "GBufferDefault",
+            "Shadow",
+            "PerPixelPicking"
+        ],
+        "albedoTextureName": "white",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 1.0,
+        "normalTextureName": "default_NRM",
+        "pbrTextureName": "default_PBR",
+        "pbrBias": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    }
+}
