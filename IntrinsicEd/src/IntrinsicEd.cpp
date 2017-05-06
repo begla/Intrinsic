@@ -349,6 +349,12 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
   onLoadEditorSettings();
 
+  _settingsChangeWatch = new QFileSystemWatcher(this);
+  QObject::connect(_settingsChangeWatch, SIGNAL(fileChanged(const QString&)),
+                   this, SLOT(onSettingsFileChanged(const QString&)));
+  updateSettingsChangeWatch();
+  _settingsUpdatePending = false;
+
   _mainWindow = this;
 }
 
@@ -1010,6 +1016,24 @@ void IntrinsicEd::onRecompileShaders()
       true);
 }
 
+void IntrinsicEd::onSettingsFileChanged(const QString&)
+{
+  _settingsUpdatePending = true;
+}
+
+void IntrinsicEd::updateSettingsChangeWatch()
+{
+  QStringList files = _settingsChangeWatch->files();
+  if (!files.empty())
+    _settingsChangeWatch->removePaths(files);
+
+  _settingsChangeWatch->addPath("settings.json");
+  _settingsChangeWatch->addPath(QString("config/") +
+                                Settings::Manager::_rendererConfig.c_str());
+  _settingsChangeWatch->addPath(QString("config/") +
+                                Settings::Manager::_materialPassConfig.c_str());
+}
+
 int IntrinsicEd::enterMainLoop()
 {
   while (Application::_running)
@@ -1019,6 +1043,14 @@ int IntrinsicEd::enterMainLoop()
     TaskManager::executeTasks();
     updateStatusBar(_ui.statusBar);
     _propertyView->updatePropertyView();
+
+    if (_settingsUpdatePending)
+    {
+      Settings::Manager::loadSettings();
+      updateSettingsChangeWatch();
+      Vulkan::RenderSystem::resizeSwapChain(true);
+      _settingsUpdatePending = false;
+    }
   }
 
   return 0;
