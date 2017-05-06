@@ -1,0 +1,10 @@
+{
+    "name": "ssao_temp.frag",
+    "properties": {
+        "name": "ssao_temp.frag",
+        "gpuProgramName": "ssao_temp.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

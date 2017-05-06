@@ -10,6 +10,15 @@
 			]
 		},
 		{
+			"name" : "SSAOTemporalReproj",
+			"entries" : [
+				"InverseViewProjectionMatrix",
+				"InverseProjectionMatrix",
+				"ProjectionMatrix",
+				"PrevViewMatrix"
+			]
+		},
+		{
 			"name" : "PerInstanceDataPostCombine",
 			"entries" : [
 				"HaltonSamples"
@@ -130,6 +139,11 @@
 		},
 		{
 			"name" : "SSAOPingPong",
+			"renderSize" : "Half",
+			"imageFormat" : "B8G8R8A8UNorm"
+		},
+		{
+			"name" : "SSAOPrevFrame",
 			"renderSize" : "Half",
 			"imageFormat" : "B8G8R8A8UNorm"
 		}
@@ -335,7 +349,7 @@
 		// ->
 		{
 			"type" : "ImageMemoryBarrier",
-			"image" : "SSAO",
+			"image" : "SSAOPingPong",
 			"sourceImageLayout" : "Undefined",
 			"targetImageLayout" : "ColorAttachment"
 		},
@@ -350,6 +364,32 @@
 				["Image", "hbao_noise", "noiseTex", "Fragment", "NearestRepeat"]
 			],
 			"outputs" : [
+				["SSAOPingPong"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAOPingPong",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAO",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurSSAO_X",
+			"fragmentGpuProgram" : "blur_bilateral.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "BlurX",
+			"inputs" : [
+				["Image", "SSAOPingPong", "inputTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
 				["SSAO"]
 			]
 		},
@@ -362,15 +402,15 @@
 		{
 			"type" : "ImageMemoryBarrier",
 			"image" : "SSAOPingPong",
-			"sourceImageLayout" : "Undefined",
+			"sourceImageLayout" : "ShaderReadOnly",
 			"targetImageLayout" : "ColorAttachment"
 		},
 		{
 			"type" : "RenderPassGenericFullscreen",
-			"name" : "BlurSSAO_X",
+			"name" : "BlurSSAO_Y",
 			"fragmentGpuProgram" : "blur_bilateral.frag",
 			"viewportRenderSize" : "Half",
-			"perInstanceDataBufferName" : "BlurX",
+			"perInstanceDataBufferName" : "BlurY",
 			"inputs" : [
 				["Image", "SSAO", "inputTex", "Fragment", "NearestClamp"],
 				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"]
@@ -387,18 +427,25 @@
 		},
 		{
 			"type" : "ImageMemoryBarrier",
+			"image" : "SSAOPrevFrame",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
 			"image" : "SSAO",
 			"sourceImageLayout" : "ShaderReadOnly",
 			"targetImageLayout" : "ColorAttachment"
 		},
 		{
 			"type" : "RenderPassGenericFullscreen",
-			"name" : "BlurSSAO_Y",
-			"fragmentGpuProgram" : "blur_bilateral.frag",
+			"name" : "SSAOTemporalReproj",
+			"fragmentGpuProgram" : "ssao_temp.frag",
 			"viewportRenderSize" : "Half",
-			"perInstanceDataBufferName" : "BlurY",
+			"perInstanceDataBufferName" : "SSAOTemporalReproj",
 			"inputs" : [
-				["Image", "SSAOPingPong", "inputTex", "Fragment", "NearestClamp"],
+				["Image", "SSAOPingPong", "ssaoTex", "Fragment", "NearestClamp"],
+				["Image", "SSAOPrevFrame", "ssaoPrevTex", "Fragment", "NearestClamp"],
 				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"]
 			],
 			"outputs" : [
@@ -410,6 +457,19 @@
 			"image" : "SSAO",
 			"sourceImageLayout" : "ColorAttachment",
 			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "CopySSAO",
+			"fragmentGpuProgram" : "blit.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "Dummy",
+			"inputs" : [
+				["Image", "SSAO", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["SSAOPrevFrame"]
+			]
 		},
 		// <-
 		{

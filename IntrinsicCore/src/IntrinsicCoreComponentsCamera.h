@@ -163,6 +163,10 @@ struct CameraManager
   {
     return Resources::FrustumManager::_descViewMatrix(_frustum(p_Ref));
   }
+  _INTR_INLINE static glm::mat4x4& _prevViewMatrix(CameraRef p_Ref)
+  {
+    return Resources::FrustumManager::_descPrevViewMatrix(_frustum(p_Ref));
+  }
   _INTR_INLINE static glm::mat4x4& _inverseViewMatrix(CameraRef p_Ref)
   {
     return Resources::FrustumManager::_invViewMatrix(_frustum(p_Ref));
