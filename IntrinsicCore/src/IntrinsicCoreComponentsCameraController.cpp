@@ -68,28 +68,12 @@ void updateThirdPersonCamera(CameraControllerRef p_Ref, float p_DeltaT)
       CameraControllerManager::_descTargetObjectName(p_Ref);
   glm::vec3& targetEulerAngles =
       CameraControllerManager::_descTargetEulerAngles(p_Ref);
+  glm::vec3& lastTargetEulerAngles =
+      CameraControllerManager::_lastTargetEulerAngles(p_Ref);
+  float& timeSinceLastOrientationChange =
+      CameraControllerManager::_timeSinceLastOrientationChange(p_Ref);
 
-  // Clamp vertical camera movement
-  targetEulerAngles.x = glm::clamp(targetEulerAngles.x, -glm::half_pi<float>(),
-                                   glm::half_pi<float>());
-
-  const glm::quat targetOrientation = glm::quat(targetEulerAngles);
-  const glm::vec3 targetVector =
-      targetOrientation * glm::vec3(0.0f, 0.0f, -1.0f);
-
-  NodeRef cameraNodeRef = NodeManager::getComponentForEntity(
-      CameraControllerManager::_entity(p_Ref));
-  CameraRef cameraRef = CameraManager::getComponentForEntity(
-      CameraControllerManager::_entity(p_Ref));
-
-  glm::vec3& camPosition = NodeManager::_position(cameraNodeRef);
-  glm::vec3& camEulerAngles = CameraManager::_descEulerAngles(cameraRef);
-
-  const float camDistance = 10.0f;
-  const glm::vec3 localTargetPosition = camDistance * targetVector;
-  glm::vec3 worldCamTargetPosition = localTargetPosition;
-  glm::vec3 worldTargetPosition = glm::vec3(0.0f);
-
+  Components::NodeRef targetNodeRef;
   if (targetObjectName.isValid())
   {
     Entity::EntityRef targetEntityRef =
@@ -97,18 +81,76 @@ void updateThirdPersonCamera(CameraControllerRef p_Ref, float p_DeltaT)
 
     if (targetEntityRef.isValid())
     {
-      Components::NodeRef targetNodeRef =
-          NodeManager::getComponentForEntity(targetEntityRef);
-
-      if (targetNodeRef.isValid())
-      {
-        worldTargetPosition =
-            NodeManager::_worldPosition(targetNodeRef) +
-            glm::vec3(0.0f, 0.8f * NodeManager::_localAABB(targetNodeRef).max.y,
-                      0.0f);
-        worldCamTargetPosition += worldTargetPosition;
-      }
+      targetNodeRef = NodeManager::getComponentForEntity(targetEntityRef);
     }
+  }
+
+  // Clamp vertical camera movement
+  targetEulerAngles.x =
+      glm::clamp(targetEulerAngles.x, -glm::half_pi<float>() + _INTR_EPSILON,
+                 glm::half_pi<float>() - _INTR_EPSILON);
+
+  if (targetEulerAngles != lastTargetEulerAngles)
+    timeSinceLastOrientationChange = 0.0f;
+  else
+    timeSinceLastOrientationChange += p_DeltaT;
+
+  glm::quat targetOrientation = glm::quat(targetEulerAngles);
+  glm::vec3 targetVector = targetOrientation * glm::vec3(0.0f, 0.0f, -1.0f);
+
+  NodeRef cameraNodeRef = NodeManager::getComponentForEntity(
+      CameraControllerManager::_entity(p_Ref));
+
+  // If the player doesn't use the camera controls, position the camera behind
+  // the player model automatically
+  if (timeSinceLastOrientationChange > 2.0f)
+  {
+    glm::vec3 targetDir = glm::vec3(1.0f, 0.0f, 0.0f);
+    if (targetNodeRef.isValid())
+    {
+      targetDir = NodeManager::_worldOrientation(targetNodeRef) * targetDir;
+    }
+
+    glm::vec3 newTargetEulerAngles;
+    {
+      newTargetEulerAngles.z = 0.0f;
+      newTargetEulerAngles.x = 0.5f * glm::quarter_pi<float>();
+      newTargetEulerAngles.y = -std::atan2(targetDir.z, targetDir.x);
+    }
+
+    const glm::quat newTargetOrientation = newTargetEulerAngles;
+    const glm::vec3 newTargetVector =
+        newTargetOrientation * glm::vec3(0.0f, 0.0f, -1.0f);
+
+    const glm::vec3 currentCameraOrientation =
+        NodeManager::_orientation(cameraNodeRef) * glm::vec3(0.0f, 0.0f, -1.0f);
+
+    // Allow the player to turn
+    if (glm::dot(currentCameraOrientation, newTargetVector) > 0.0f)
+    {
+      targetEulerAngles = newTargetEulerAngles;
+      targetOrientation = newTargetOrientation;
+      targetVector = newTargetVector;
+    }
+  }
+
+  CameraRef cameraRef = CameraManager::getComponentForEntity(
+      CameraControllerManager::_entity(p_Ref));
+
+  glm::vec3& camPosition = NodeManager::_position(cameraNodeRef);
+
+  const float camDistance = 10.0f;
+  const glm::vec3 localTargetPosition = camDistance * targetVector;
+  glm::vec3 worldCamTargetPosition = localTargetPosition;
+  glm::vec3 worldTargetPosition = glm::vec3(0.0f);
+
+  if (targetNodeRef.isValid())
+  {
+    worldTargetPosition =
+        NodeManager::_worldPosition(targetNodeRef) +
+        glm::vec3(0.0f, 0.8f * NodeManager::_localAABB(targetNodeRef).max.y,
+                  0.0f);
+    worldCamTargetPosition += worldTargetPosition;
   }
 
   // Camera collision
@@ -122,6 +164,7 @@ void updateThirdPersonCamera(CameraControllerRef p_Ref, float p_DeltaT)
   const Math::FrustumCorners& frustumCornersVS =
       Resources::FrustumManager::_frustumCornersViewSpace(
           CameraManager::_frustum(cameraRef));
+
   for (uint32_t i = 0u; i < 4u; ++i)
   {
     const glm::vec3 corner =
@@ -149,12 +192,15 @@ void updateThirdPersonCamera(CameraControllerRef p_Ref, float p_DeltaT)
   static const float rotationSpeed = 4.0f;
   static const float movementSpeed = 4.0f;
 
-  camEulerAngles =
-      glm::mix(camEulerAngles, targetEulerAngles, rotationSpeed * p_DeltaT);
+  NodeManager::_orientation(cameraNodeRef) =
+      glm::slerp(NodeManager::_orientation(cameraNodeRef), targetOrientation,
+                 rotationSpeed * p_DeltaT);
   camPosition =
       glm::mix(camPosition, worldCamTargetPosition, movementSpeed * p_DeltaT);
 
   NodeManager::updateTransforms(cameraNodeRef);
+
+  lastTargetEulerAngles = targetEulerAngles;
 }
 
 // <-
@@ -176,7 +222,6 @@ void updateFirstPersonCamera(CameraControllerRef p_Ref, float p_DeltaT)
       CameraControllerManager::_entity(p_Ref));
 
   glm::vec3& camPosition = NodeManager::_position(cameraNodeRef);
-  glm::vec3& camEulerAngles = CameraManager::_descEulerAngles(cameraRef);
 
   if (targetObjectName.isValid())
   {
@@ -190,13 +235,19 @@ void updateFirstPersonCamera(CameraControllerRef p_Ref, float p_DeltaT)
 
       if (targetNodeRef.isValid())
       {
-        camPosition = NodeManager::_worldPosition(targetNodeRef) +
-                      glm::vec3(0.0f, 1.5f, 0.0f);
+        camPosition =
+            NodeManager::_worldPosition(targetNodeRef) +
+            glm::vec3(0.0f, 0.8f * NodeManager::_localAABB(targetNodeRef).max.y,
+                      0.0f);
+        ;
       }
     }
   }
 
-  camEulerAngles = targetEulerAngles;
+  static const float rotationSpeed = 4.0f;
+  NodeManager::_orientation(cameraNodeRef) =
+      glm::slerp(NodeManager::_orientation(cameraNodeRef),
+                 glm::quat(targetEulerAngles), rotationSpeed * p_DeltaT);
 
   NodeManager::updateTransforms(cameraNodeRef);
 }
