@@ -102,12 +102,12 @@
 		{
 			"name" : "SSAO",
 			"renderSize" : "Quarter",
-			"imageFormat" : "B10G11R11UFloat"
+			"imageFormat" : "B8G8R8A8UNorm"
 		},
 		{
 			"name" : "SSAOPingPong",
 			"renderSize" : "Quarter",
-			"imageFormat" : "B10G11R11UFloat"
+			"imageFormat" : "B8G8R8A8UNorm"
 		}
 	],
 
