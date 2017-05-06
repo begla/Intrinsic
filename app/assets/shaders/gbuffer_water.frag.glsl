@@ -46,6 +46,7 @@ void main()
   vec3 screenPos = inPosition.xyz / inPosition.w;
   screenPos.xy = screenPos.xy * 0.5 + 0.5;
 
+  // TODO
   const vec4 camParams = vec4(1.0, 5000.0, 1.0, 1.0 / 5000.0);
   screenPos.z = linearizeDepth(screenPos.z, camParams.x, camParams.y);
 

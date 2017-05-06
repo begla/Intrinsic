@@ -1,0 +1,10 @@
+{
+    "name": "blur_bilateral.frag",
+    "properties": {
+        "name": "blur_bilateral.frag",
+        "gpuProgramName": "blur_bilateral.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}
