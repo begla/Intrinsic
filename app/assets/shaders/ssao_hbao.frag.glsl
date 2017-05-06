@@ -37,8 +37,8 @@ layout (location = 0) out vec4 outColor;
 
 const uint numDirections = 6;
 const uint numSamples = 4;
-const float strength = 1.5;
-const float R = 3.0;
+const float strength = 1.8;
+const float R = 2.0;
 const float R2 = R*R;
 const float negInvR2 = -1.0 / R2;
 const float maxRadiusPixels = 50.0;
@@ -121,7 +121,7 @@ float tangent(vec3 P, vec3 S)
   return -(P.z - S.z) * invLength(S.xy - P.xy);
 }
 
-float Falloff(float d2)
+float falloff(float d2)
 {
   return d2 * negInvR2 + 1.0f;
 }
@@ -164,7 +164,7 @@ float horizonOcclusion(vec2 deltaUV,
     {
       float sinS = tanToSin(tanS);
       // Apply falloff based on the distance
-      ao += Falloff(d2) * (sinS - sinH);
+      ao += falloff(d2) * (sinS - sinH);
 
       tanH = tanS;
       sinH = sinS;
@@ -177,7 +177,7 @@ float horizonOcclusion(vec2 deltaUV,
 void main()
 { 
   // TODO
-  vec4 res = vec4(0.5 * textureSize(depthBufferTex, 0).xy, 0.0, 0.0);
+  vec4 res = vec4(0.25 * textureSize(depthBufferTex, 0).xy, 0.0, 0.0);
   res.zw = 1.0 / res.xy;
   const vec2 noiseScale = res.xy / textureSize(noiseTex, 0).xy;
 
