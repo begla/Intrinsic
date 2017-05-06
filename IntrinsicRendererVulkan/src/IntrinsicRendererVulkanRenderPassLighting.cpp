@@ -301,7 +301,7 @@ void Lighting::onReinitRendering()
         Samplers::kNearestClamp);
     DrawCallManager::bindImage(
         _drawCallRef, _N(ssaoTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(SSAO)), Samplers::kNearestClamp);
+        ImageManager::getResourceByName(_N(SSAO)), Samplers::kLinearClamp);
     DrawCallManager::bindImage(_drawCallRef, _N(irradianceTex),
                                GpuProgramType::kFragment,
                                ImageManager::getResourceByName(
