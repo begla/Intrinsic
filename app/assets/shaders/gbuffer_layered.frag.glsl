@@ -40,7 +40,7 @@ OUTPUT
 
 vec3 blend(vec3 grass0, vec3 stone0, vec3 stone1, vec3 blendMask, float noise)
 {
-  return mix(grass0, mix(stone0.rgb, stone1.rgb, noise), 1.0 - blendMask.r);
+  return mix(grass0, stone0, clamp(1.0 - blendMask.r, 0.0, 1.0));
 }
 
 void main()
@@ -62,11 +62,11 @@ void main()
   const vec4 normal2 = texture(normalTex2, uv0);
   const vec4 roughness2 = texture(roughnessTex2, uv0);
 
-  vec3 blendMask = texture(blendMaskTex, uv0Raw).rgb;
-  float noise = clamp(texture(noiseTex, uv0Raw * 30.0).r, 0.0, 1.0);
+  float noise = clamp(texture(noiseTex, uv0Raw * 20.0).r, 0.0, 1.0);
+  vec3 blendMask = texture(blendMaskTex, uv0Raw ).rgb;
 
-  float stoneAtt = clamp(blendMask.b * 3.0, 0.0, 1.0);
-  float grassAtt = clamp((1.0 - blendMask.r) * 3.0 + 0.1, 0.0, 1.0);
+  float stoneAtt = clamp(clamp(noise, 0.0, 1.0) * blendMask.b * 6.0 - 0.4, 0.0, 1.0);
+  float grassAtt = clamp(clamp(noise * 2.0, 0.0, 1.0) * (1.0 - blendMask.r) * 5.0 + 0.2, 0.0, 1.0);
   vec3 occlusion = blend(vec3(grassAtt), vec3(stoneAtt), vec3(stoneAtt), blendMask, noise);
 
   vec3 albedo = blend(albedo0.rgb, albedo1.rgb, albedo2.rgb, blendMask, noise);
