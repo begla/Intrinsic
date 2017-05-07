@@ -84,7 +84,7 @@ void main()
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
   const vec3 irrad = d.diffuseColor * textureLod(irradianceTex, R, 0.0).rgb;
-  outColor.rgb += irrad; 
+  outColor.rgb += min(ssaoSample.r, parameter0Sample.z) * irrad; 
 
   const float maxSpecPower = 999999.0;
   const float k0 = 0.00098; const float k1 = 0.9921;
@@ -101,14 +101,17 @@ void main()
   const float specLod = float(numMips-1-mipOffset) * (1.0 - clamp(smulMaxT/maxT, 0.0, 1.0));
   const vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
 
-  outColor.rgb += spec;
+  outColor.rgb += parameter0Sample.z * spec;
 
   // Directional main light shadows
   float shadowAttenuation = calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
 
   // Direct lighting
   const vec3 lightColor = vec3(1.0, 0.5, 0.5);
-  outColor.rgb += ssaoSample.r * parameter0Sample.z * shadowAttenuation * calcLighting(d) * lightColor;
+
+  // NOTE: That's just a hack for good looks
+  const float directOcclusion = clamp(min(ssaoSample.r, parameter0Sample.z) * 2.0, 0.0, 1.0);
+  outColor.rgb += directOcclusion * shadowAttenuation * calcLighting(d) * lightColor;
 
   // Translucency
   const float translDistortion = 0.2;
