@@ -157,51 +157,6 @@
 		},
 		{
 			"type" : "ImageMemoryBarrier",
-			"image" : "GBufferDepth",
-			"sourceImageLayout" : "Undefined",
-			"targetImageLayout" : "DepthStencilAttachment"
-		},
-		{
-			"type" : "ImageMemoryBarrier",
-			"image" : "Scene",
-			"sourceImageLayout" : "Undefined",
-			"targetImageLayout" : "ColorAttachment"
-		},
-		{
-			"type" : "RenderPassGenericMesh",
-			"name" : "GBuffer",
-			"materialPasses" : ["GBufferDefault", "GBufferLayered"],
-			"renderOrder" : "FrontToBack",
-			"outputs" : [
-				["Scene", [0.4, 0.4, 1.0, 1.0]],
-				["GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
-			]
-		},
-		{
-			"type" : "RenderPassGenericMesh",
-			"name" : "GBufferFoliage",
-			"materialPasses" : ["GBufferFoliage"],
-			"renderOrder" : "FrontToBack",
-			"outputs" : [
-				["Scene"],
-				["GBufferDepth"]
-			]
-		},
-		{
-			"type" : "ImageMemoryBarrier",
-			"image" : "Scene",
-			"sourceImageLayout" : "ColorAttachment",
-			"targetImageLayout" : "ShaderReadOnly"
-		},
-		// <-
-		// GBuffer passes
-		// ->
-		{
-			"type" : "SwitchCamera",
-			"cameraName" : "ActiveCamera"
-		},
-		{
-			"type" : "ImageMemoryBarrier",
 			"image" : "GBufferAlbedo",
 			"sourceImageLayout" : "Undefined",
 			"targetImageLayout" : "ColorAttachment"
@@ -217,6 +172,80 @@
 			"image" : "GBufferParameter0",
 			"sourceImageLayout" : "Undefined",
 			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferDepth",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "DepthStencilAttachment"
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"name" : "GBuffer",
+			"materialPasses" : ["GBufferDefault", "GBufferLayered"],
+			"renderOrder" : "FrontToBack",
+			"outputs" : [
+				["GBufferAlbedo", [0.1, 0.5, 1.0, 1.0]],
+				["GBufferNormal", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferParameter0", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
+			]
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"name" : "GBufferFoliage",
+			"materialPasses" : ["GBufferFoliage"],
+			"renderOrder" : "FrontToBack",
+			"outputs" : [
+				["GBufferAlbedo"],
+				["GBufferNormal"],
+				["GBufferParameter0"],
+				["GBufferDepth"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferAlbedo",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "Scene",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "CopyOffscreenResult",
+			"fragmentGpuProgram" : "blit.frag",
+			"viewportRenderSize" : "Full",
+			"perInstanceDataBufferName" : "Dummy",
+			"inputs" : [
+				["Image", "GBufferAlbedo", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["Scene"]
+			]
+		},	
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "Scene",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferAlbedo",
+			"sourceImageLayout" : "ShaderReadOnly",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		// <-
+		// GBuffer passes
+		// ->
+		{
+			"type" : "SwitchCamera",
+			"cameraName" : "ActiveCamera"
 		},
 		{
 			"type" : "RenderPassGenericMesh",
@@ -459,6 +488,12 @@
 			"targetImageLayout" : "ShaderReadOnly"
 		},
 		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAOPrevFrame",
+			"sourceImageLayout" : "ShaderReadOnly",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
 			"type" : "RenderPassGenericFullscreen",
 			"name" : "CopySSAO",
 			"fragmentGpuProgram" : "blit.frag",
@@ -629,7 +664,7 @@
 		// ->
 		{
 			"type" : "ImageMemoryBarrier",
-			"image" : "SceneBlurred",
+			"image" : "SceneBlurredPingPong",
 			"sourceImageLayout" : "Undefined",
 			"targetImageLayout" : "ColorAttachment"
 		},
@@ -655,7 +690,7 @@
 		{
 			"type" : "ImageMemoryBarrier",
 			"image" : "SceneBlurred",
-			"sourceImageLayout" : "ShaderReadOnly",
+			"sourceImageLayout" : "Undefined",
 			"targetImageLayout" : "ColorAttachment"
 		},
 		{
