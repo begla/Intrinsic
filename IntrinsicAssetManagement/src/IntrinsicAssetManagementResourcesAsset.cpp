@@ -68,12 +68,18 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     if (_descAssetType(assetRef) == AssetType::kMesh)
     {
       ImporterFbx::init();
+
+      _INTR_ARRAY(Core::Resources::MeshRef) importedMeshes;
       ImporterFbx::importMeshesFromFile(Settings::Manager::_assetMeshPath +
-                                        "/" + _descAssetFileName(assetRef));
+                                            "/" + _descAssetFileName(assetRef),
+                                        importedMeshes);
       ImporterFbx::destroy();
 
-      Core::Resources::MeshManager::saveToMultipleFiles("managers/meshes/",
-                                                        ".mesh.json");
+      for (uint32_t i = 0u; i < importedMeshes.size(); ++i)
+      {
+        Core::Resources::MeshManager::saveToMultipleFilesSingleResource(
+            importedMeshes[i], "managers/meshes/", ".mesh.json");
+      }
 
       Renderer::Vulkan::Resources::MaterialManager::saveToMultipleFiles(
           "managers/materials/", ".material.json");

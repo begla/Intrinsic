@@ -170,10 +170,11 @@ protected:
                                               rapidjson::Value& p_Properties,
                                               rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember(
-        "name", _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Resource),
-                                  _N(string), _name(p_Ref), false, false),
-        p_Document.GetAllocator());
+    p_Properties.AddMember("name",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(Resource), _N(string),
+                                             _name(p_Ref), false, false),
+                           p_Document.GetAllocator());
   }
 
   // <-
@@ -264,8 +265,6 @@ protected:
   _saveToMultipleFiles(const char* p_Path, const char* p_Extension,
                        ManagerCompileDescriptorFunction p_CompileFunction)
   {
-    char* writeBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
-
     // Delete removed files
     {
       tinydir_dir dir;
@@ -312,46 +311,57 @@ protected:
          i < Dod::ManagerBase<IdCount, DataType>::_activeRefs.size(); ++i)
     {
       Ref ref = Dod::ManagerBase<IdCount, DataType>::_activeRefs[i];
-      const Name& name = _name(ref);
+      _saveToMultipleFilesSingleResource(ref, p_Path, p_Extension,
+                                         p_CompileFunction);
+    }
+  }
 
-      // Don't save volatile resources
-      if (hasResourceFlags(ref, ResourceFlags::kResourceVolatile))
-      {
-        continue;
-      }
+  // <-
 
-      rapidjson::Document resource =
-          rapidjson::Document(rapidjson::kObjectType);
-      rapidjson::Value nameValue;
-      nameValue.SetString(name._string.c_str(), resource.GetAllocator());
+  template <
+      class WriterType = rapidjson::PrettyWriter<rapidjson::FileWriteStream>>
+  _INTR_INLINE static void _saveToMultipleFilesSingleResource(
+      Dod::Ref p_Ref, const char* p_Path, const char* p_Extension,
+      ManagerCompileDescriptorFunction p_CompileFunction)
+  {
+    const Name& name = _name(p_Ref);
 
-      resource.AddMember("name", nameValue, resource.GetAllocator());
-
-      rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-      p_CompileFunction(ref, false, properties, resource);
-
-      resource.AddMember("properties", properties, resource.GetAllocator());
-
-      _INTR_STRING fileName =
-          _INTR_STRING(p_Path) + name._string + _INTR_STRING(p_Extension);
-
-      FILE* fp = fopen(fileName.c_str(), "wb");
-
-      if (fp == nullptr)
-      {
-        _INTR_LOG_WARNING("Failed to save resources to file '%s'...", fileName);
-        return;
-      }
-
-      {
-        rapidjson::FileWriteStream os(fp, writeBuffer, 65536u);
-        WriterType writer(os);
-        resource.Accept(writer);
-        fclose(fp);
-      }
+    // Don't save volatile resources
+    if (hasResourceFlags(p_Ref, ResourceFlags::kResourceVolatile))
+    {
+      return;
     }
 
-    Tlsf::MainAllocator::free(writeBuffer);
+    rapidjson::Document resource = rapidjson::Document(rapidjson::kObjectType);
+    rapidjson::Value nameValue;
+    nameValue.SetString(name._string.c_str(), resource.GetAllocator());
+
+    resource.AddMember("name", nameValue, resource.GetAllocator());
+
+    rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
+    p_CompileFunction(p_Ref, false, properties, resource);
+
+    resource.AddMember("properties", properties, resource.GetAllocator());
+
+    _INTR_STRING fileName =
+        _INTR_STRING(p_Path) + name._string + _INTR_STRING(p_Extension);
+
+    FILE* fp = fopen(fileName.c_str(), "wb");
+
+    if (fp == nullptr)
+    {
+      _INTR_LOG_WARNING("Failed to save resources to file '%s'...", fileName);
+      return;
+    }
+
+    {
+      char* writeBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+      rapidjson::FileWriteStream os(fp, writeBuffer, 65536u);
+      WriterType writer(os);
+      resource.Accept(writer);
+      fclose(fp);
+      Tlsf::MainAllocator::free(writeBuffer);
+    }
   }
 
   // <-
