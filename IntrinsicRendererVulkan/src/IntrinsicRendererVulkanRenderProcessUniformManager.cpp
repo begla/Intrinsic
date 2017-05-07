@@ -40,9 +40,11 @@ struct UniformDataSource
   glm::mat4 prevViewMatrix;
   glm::ivec4 haltonSamples;
   glm::vec4 blurParamsXNormal;
-  glm::vec4 blurParamsXMedium;
   glm::vec4 blurParamsYNormal;
+  glm::vec4 blurParamsXMedium;
   glm::vec4 blurParamsYMedium;
+  glm::vec4 blurParamsXLow;
+  glm::vec4 blurParamsYLow;
 
 } _uniformDataSource;
 
@@ -60,9 +62,11 @@ _INTR_INLINE void initStaticUniformData()
   }
 
   _uniformDataSource.blurParamsXNormal = glm::vec4(3.0f, 0.0f, 1.0f, 0.0f);
-  _uniformDataSource.blurParamsXMedium = glm::vec4(6.0f, 0.0f, 1.0f, 0.0f);
   _uniformDataSource.blurParamsYNormal = glm::vec4(3.0f, 0.0f, 0.0f, 1.0f);
+  _uniformDataSource.blurParamsXMedium = glm::vec4(6.0f, 0.0f, 1.0f, 0.0f);
   _uniformDataSource.blurParamsYMedium = glm::vec4(6.0f, 0.0f, 0.0f, 1.0f);
+  _uniformDataSource.blurParamsXLow = glm::vec4(1.0f, 0.0f, 1.0f, 0.0f);
+  _uniformDataSource.blurParamsYLow = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }
 }
 
@@ -115,12 +119,16 @@ _uniformOffsetMapping = {
                     sizeof(glm::vec4))},
     {"BlurParamsXNormal",
      UniformDataRef(&_uniformDataSource.blurParamsXNormal, sizeof(glm::vec4))},
-    {"BlurParamsXMedium",
-     UniformDataRef(&_uniformDataSource.blurParamsXMedium, sizeof(glm::vec4))},
     {"BlurParamsYNormal",
      UniformDataRef(&_uniformDataSource.blurParamsYNormal, sizeof(glm::vec4))},
+    {"BlurParamsXMedium",
+     UniformDataRef(&_uniformDataSource.blurParamsXMedium, sizeof(glm::vec4))},
     {"BlurParamsYMedium",
      UniformDataRef(&_uniformDataSource.blurParamsYMedium, sizeof(glm::vec4))},
+    {"BlurParamsXLow",
+     UniformDataRef(&_uniformDataSource.blurParamsXLow, sizeof(glm::vec4))},
+    {"BlurParamsYLow",
+     UniformDataRef(&_uniformDataSource.blurParamsYLow, sizeof(glm::vec4))},
     {"HaltonSamples",
      UniformDataRef(&_uniformDataSource.haltonSamples, sizeof(glm::ivec4))}};
 
