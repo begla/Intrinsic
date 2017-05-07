@@ -40,7 +40,17 @@ OUTPUT
 
 vec3 blend(vec3 grass0, vec3 stone0, vec3 stone1, vec3 blendMask, float noise)
 {
-  return mix(grass0, stone0, clamp(1.0 - blendMask.r, 0.0, 1.0));
+  return mix(grass0, stone0, clamp(blendMask.b * 3.0, 0.0, 1.0));
+}
+
+vec3 contrast(vec3 color, float contrast)
+{
+  return ((color.rgb - 0.5) * max(contrast, 0)) + 0.5;
+}
+
+float contrast(float color, float contrast)
+{
+  return ((color - 0.5) * max(contrast, 0)) + 0.5;
 }
 
 void main()
@@ -62,12 +72,10 @@ void main()
   const vec4 normal2 = texture(normalTex2, uv0);
   const vec4 roughness2 = texture(roughnessTex2, uv0);
 
-  float noise = clamp(texture(noiseTex, uv0Raw * 20.0).r, 0.0, 1.0);
-  vec3 blendMask = texture(blendMaskTex, uv0Raw ).rgb;
-
-  float stoneAtt = clamp(clamp(noise, 0.0, 1.0) * blendMask.b * 6.0 - 0.4, 0.0, 1.0);
-  float grassAtt = clamp(clamp(noise * 2.0, 0.0, 1.0) * (1.0 - blendMask.r) * 5.0 + 0.2, 0.0, 1.0);
-  vec3 occlusion = blend(vec3(grassAtt), vec3(stoneAtt), vec3(stoneAtt), blendMask, noise);
+  float noise = clamp(texture(noiseTex, uv0Raw * 10.0).r, 0.0, 1.0);
+  vec3 blendMask = texture(blendMaskTex, uv0Raw).rgb;
+  float occlusion = clamp(mix(clamp(noise * 5.0, 0.0, 1.0) * blendMask.b, 1.0 - blendMask.r, 
+    clamp((1.0 - blendMask.g) * 2.0 - 0.9, 0.0, 1.0)) * 2.0 + 0.3, 0.0, 1.0);
 
   vec3 albedo = blend(albedo0.rgb, albedo1.rgb, albedo2.rgb, blendMask, noise);
   vec3 normal = blend(normal0.rgb, normal1.rgb, normal2.rgb, blendMask, noise);
@@ -77,5 +85,6 @@ void main()
   outNormal.rg = encodeNormal(normalize(TBN * (normal.xyz * 2.0 - 1.0)));
   outNormal.b = roughness.g + uboPerMaterial.pbrBias.g; // Specular
   outNormal.a = max(roughness.b + uboPerMaterial.pbrBias.b, 0.01); // Roughness
-  outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, occlusion.r, 0.0); // Metal Mask / Material Buffer Index;
+  outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, 
+    uboPerMaterial.data0.x, occlusion.r, 0.0); // Metal Mask / Material Buffer Index;
 }
