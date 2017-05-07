@@ -83,7 +83,7 @@ void main()
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
-  const vec3 irrad = ssaoSample.r * parameter0Sample.z * d.diffuseColor * textureLod(irradianceTex, R, 0.0).rgb;
+  const vec3 irrad = d.diffuseColor * textureLod(irradianceTex, R, 0.0).rgb;
   outColor.rgb += irrad; 
 
   const float maxSpecPower = 999999.0;
