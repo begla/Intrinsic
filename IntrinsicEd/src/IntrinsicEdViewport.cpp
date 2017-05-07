@@ -50,6 +50,15 @@ void IntrinsicEdViewport::onKeyPressed(Resources::EventRef p_EventRef)
     else
       IntrinsicEd::_mainWindow->onEditingGameState();
     break;
+  case Input::Key::kF1:
+    IntrinsicEd::_mainWindow->onEditingGameState();
+    break;
+  case Input::Key::kF2:
+    IntrinsicEd::_mainWindow->onBenchmarkGameState();
+    break;
+  case Input::Key::kF3:
+    IntrinsicEd::_mainWindow->onMainGameState();
+    break;
   case Input::Key::k1:
     IntrinsicEd::_mainWindow->onEditingModeDefault();
     break;

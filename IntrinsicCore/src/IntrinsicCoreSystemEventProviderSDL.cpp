@@ -77,6 +77,15 @@ void SDL::pumpEvents()
       case SDLK_t:
         keyEvent.key = Input::Key::kT;
         break;
+      case SDLK_F1:
+        keyEvent.key = Input::Key::kF1;
+        break;
+      case SDLK_F2:
+        keyEvent.key = Input::Key::kF2;
+        break;
+      case SDLK_F3:
+        keyEvent.key = Input::Key::kF3;
+        break;
       case SDLK_0:
         keyEvent.key = Input::Key::k0;
         break;
