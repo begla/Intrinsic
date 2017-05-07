@@ -324,6 +324,18 @@ struct MeshManager
 
   // <-
 
+  _INTR_INLINE static void
+  saveToMultipleFilesSingleResource(MeshRef p_Ref, const char* p_Path,
+                                    const char* p_Extension)
+  {
+    Dod::Resources::ResourceManagerBase<MeshData, _INTR_MAX_MESH_COUNT>::
+        _saveToMultipleFilesSingleResource<
+            rapidjson::Writer<rapidjson::FileWriteStream>>(
+            p_Ref, p_Path, p_Extension, compileDescriptor);
+  }
+
+  // <-
+
   _INTR_INLINE static void loadFromMultipleFiles(const char* p_Path,
                                                  const char* p_Extension)
   {
