@@ -13,5 +13,10 @@
 		"name" : "Top Down",
 		"nodes" : ["PathC1", "PathC2", "PathC3", "PathC4"],
 		"camSpeed" : 0.2
+	},
+	{
+		"name" : "Mountains",
+		"nodes" : ["PathD1", "PathD2", "PathD4", "PathD5", "PathD6", "PathD7"],
+		"camSpeed" : 0.1
 	}
 ]
