@@ -49,6 +49,18 @@
 			]
 		},
 		{
+			"name" : "BlurLowX",
+			"entries" : [
+				"BlurParamsXLow"
+			]
+		},
+		{
+			"name" : "BlurLowY",
+			"entries" : [
+				"BlurParamsYLow"
+			]
+		},
+		{
 			"name" : "PerInstanceDataSSAO",
 			"entries" : [
 				"InverseProjectionMatrix"
@@ -673,7 +685,7 @@
 			"name" : "BlurScene_X",
 			"fragmentGpuProgram" : "blur.frag",
 			"viewportRenderSize" : "Half",
-			"perInstanceDataBufferName" : "BlurX",
+			"perInstanceDataBufferName" : "BlurLowX",
 			"inputs" : [
 				["Image", "SceneDownSampled", "inputTex", "Fragment", "NearestClamp"]
 			],
@@ -698,7 +710,7 @@
 			"name" : "BlurScene_Y",
 			"fragmentGpuProgram" : "blur.frag",
 			"viewportRenderSize" : "Half",
-			"perInstanceDataBufferName" : "BlurY",
+			"perInstanceDataBufferName" : "BlurLowY",
 			"inputs" : [
 				["Image", "SceneBlurredPingPong", "inputTex", "Fragment", "NearestClamp"]
 			],
