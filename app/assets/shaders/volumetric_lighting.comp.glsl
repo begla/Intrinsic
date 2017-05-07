@@ -117,12 +117,12 @@ void main()
   // TESTING REMOVE ME
 #if 1
   // Point light
-  const float dist = distance(posWS, vec3(-1101.0, 581.0, -234.0));
+  /*const float dist = distance(posWS, vec3(-1101.0, 581.0, -234.0));
   const float radius = 10.0;
   const float minLight = 0.01;
   const float a = 0.9; const float b = 1.0 / (radius*radius * minLight);
   const float att = 1.0 / (1.0 + a*dist + b*dist*dist);
-  accumFog += vec4(scattering * att * vec3(1.0, 0.0, 0.0) * 500.0, scattering);  
+  accumFog += vec4(scattering * att * vec3(1.0, 0.0, 0.0) * 500.0, scattering);*/
 
   // Noise
   noiseAccum *= noise(posWS * 0.25 + uboPerInstance.eyeWSVectorX.w * 1.0);
