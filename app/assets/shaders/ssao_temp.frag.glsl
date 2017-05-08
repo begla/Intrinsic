@@ -50,7 +50,7 @@ void main()
   const float prevDepth = texture(depthBufferTex, prevUV.xy).r;
 
   // Distance weight (ghosting)
-  float weight = distance(prevViewPos.xyz, viewPos.xyz) * 1.2;
+  float weight = distance(prevViewPos.xyz, viewPos.xyz) * 8.0;
   // AO intensity weight (trailing)
   weight += abs(ao - prevAo) * 2.0;
 
