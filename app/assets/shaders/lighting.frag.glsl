@@ -110,8 +110,7 @@ void main()
   const vec3 lightColor = vec3(1.0, 0.5, 0.5);
 
   // NOTE: That's just a hack for good looks
-  const float directOcclusion = clamp(min(ssaoSample.r, parameter0Sample.z) * 2.0, 0.0, 1.0);
-  outColor.rgb += directOcclusion * shadowAttenuation * calcLighting(d) * lightColor;
+  outColor.rgb += shadowAttenuation * calcLighting(d) * lightColor;
 
   // Translucency
   const float translDistortion = 0.2;

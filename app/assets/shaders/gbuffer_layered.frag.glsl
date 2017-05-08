@@ -40,7 +40,7 @@ OUTPUT
 
 vec3 blend(vec3 grass0, vec3 stone0, vec3 stone1, vec3 blendMask, float noise)
 {
-  return mix(grass0, stone0, clamp(blendMask.b * 3.0, 0.0, 1.0));
+  return mix(grass0, mix(stone0, stone1, 1.0 -noise), clamp(blendMask.b * 3.0, 0.0, 1.0));
 }
 
 vec3 contrast(vec3 color, float contrast)
@@ -68,9 +68,9 @@ void main()
   const vec4 normal1 = texture(normalTex1, uv0);
   const vec4 roughness1 = texture(roughnessTex1, uv0);
   
-  const vec4 albedo2 = texture(albedoTex2, uv0);
-  const vec4 normal2 = texture(normalTex2, uv0);
-  const vec4 roughness2 = texture(roughnessTex2, uv0);
+  const vec4 albedo2 = texture(albedoTex2, uv0 * 0.1);
+  const vec4 normal2 = texture(normalTex2, uv0 * 0.1);
+  const vec4 roughness2 = texture(roughnessTex2, uv0 * 0.1);
 
   float noise = clamp(texture(noiseTex, uv0Raw * 10.0).r, 0.0, 1.0);
   vec3 blendMask = texture(blendMaskTex, uv0Raw).rgb;
@@ -79,9 +79,9 @@ void main()
   vec3 normal = blend(normal0.rgb, normal1.rgb, normal2.rgb, blendMask, noise);
   vec3 roughness = blend(roughness0.rgb, roughness1.rgb, roughness2.rgb, blendMask, noise);
 
-  float tint = clamp(mix(clamp(noise * 5.0, 0.0, 1.0) * blendMask.b, 1.0 - blendMask.r, 
-  clamp((1.0 - blendMask.g) * 2.0 - 0.9, 0.0, 1.0)) * 2.0 + 0.5, 0.0, 1.0);
-  albedo *= clamp(tint , 0.0, 1.0);
+  float occlusion = clamp(mix(clamp(noise * 5.0, 0.0, 1.0) * blendMask.b, 1.0 - blendMask.r, 
+  clamp((1.0 - blendMask.g) * 1.0 - 0.7, 0.0, 1.0)) * 2.0 + 0.5, 0.0, 1.0);
+  albedo *= clamp(occlusion , 0.0, 1.0);
 
   outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, 1.0); // Albedo
   outNormal.rg = encodeNormal(normalize(TBN * (normal.xyz * 2.0 - 1.0)));
