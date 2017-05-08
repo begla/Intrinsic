@@ -66,9 +66,9 @@ layout (binding = 5) buffer LightIndexBuffer
 layout (local_size_x = 4u, local_size_y = 4u, local_size_z = 4u) in; 
 void main()
 {
-  const float sunDensity = 40.0; 
-  const vec3 fogSunColor = 50.0 * vec3(1.0, 0.9, 0.8); 
-  const vec3 fogSkyColor = 40.0 * vec3(0.8, 1.0, 1.0);
+  const float sunDensity = 30.0; 
+  const vec3 fogSunColor = 20.0 * vec3(1.0, 0.9, 0.8); 
+  const vec3 fogSkyColor = 15.0 * vec3(0.8, 1.0, 1.0);
   const float minShadowAttenuation = 0.05;
   const float heightAttenuationFactor = 0.025;
   const float scatteringFactor = uboPerInstance.data0.x;
@@ -138,8 +138,8 @@ void main()
     const float dist = length(lightDistVec);
     const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
 
-    // FIX ME
-    accumFog += vec4(att * 50.0 * scattering * light.color.rgb, att * scattering);
+    // FIXME
+    accumFog += vec4(att * 150.0 * scattering * light.color.rgb / MATH_PI, scattering);
   }
 
   // Noise
