@@ -43,25 +43,36 @@ layout (binding = 0) uniform PerInstance
 
   vec4 camPos;
 
-  mat4 shadowViewProjMatrix[PSSM_SPLIT_COUNT];
+  mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT];
+
+  vec4 nearFar;
+  vec4 nearFarWidthHeight;
 } uboPerInstance; 
 
 layout (binding = 1) uniform sampler2DArrayShadow shadowBufferTex;
 layout (binding = 2, rgba16f) uniform image3D output0Tex;
 layout (binding = 3) uniform sampler3D prevVolLightBufferTex;
+layout (binding = 4) buffer LightBuffer
+{
+  Light lights[];
+};
+layout (binding = 5) buffer LightIndexBuffer
+{
+  uint lightIndices[];
+};
  
 // Based on AC4 volumetric fog
 // https://goo.gl/xEgT9O
 layout (local_size_x = 4u, local_size_y = 4u, local_size_z = 4u) in; 
 void main()
 {
-  const float sunDensity = 12.0; 
+  const float sunDensity = 40.0; 
   const vec3 fogSunColor = 50.0 * vec3(1.0, 0.9, 0.8); 
   const vec3 fogSkyColor = 40.0 * vec3(0.8, 1.0, 1.0);
   const float minShadowAttenuation = 0.05;
   const float heightAttenuationFactor = 0.025;
   const float scatteringFactor = uboPerInstance.data0.x;
-  float reprojWeight = 0.9; 
+  float reprojWeight = 0.95; 
 
   // ->
 
@@ -114,20 +125,26 @@ void main()
   vec4 accumFog = vec4(0.0);
   float noiseAccum = 1.0;
 
-  // TESTING REMOVE ME
-#if 1
-  // Point light
-  /*const float dist = distance(posWS, vec3(-1101.0, 581.0, -234.0));
-  const float radius = 10.0;
-  const float minLight = 0.01;
-  const float a = 0.9; const float b = 1.0 / (radius*radius * minLight);
-  const float att = 1.0 / (1.0 + a*dist + b*dist*dist);
-  accumFog += vec4(scattering * att * vec3(1.0, 0.0, 0.0) * 500.0, scattering);*/
+  const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
+  const uint clusterIdx = calcClusterIndex(gridPos);
+
+  uint lightCount = lightIndices[clusterIdx];
+
+  for (uint li=0; li<lightCount; ++li)
+  {
+    Light light = lights[lightIndices[clusterIdx + li + 1]];
+
+    const vec3 lightDistVec = light.posAndRadius.xyz - posVS;
+    const float dist = length(lightDistVec);
+    const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
+
+    // FIX ME
+    accumFog += vec4(att * 50.0 * scattering * light.color.rgb, att * scattering);
+  }
 
   // Noise
   noiseAccum *= noise(posWS * 0.25 + uboPerInstance.eyeWSVectorX.w * 1.0);
   noiseAccum *= noise(posWS * 0.15 + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.382871);
-#endif
 
   // Sky light
   accumFog += vec4(noiseAccum * scattering * heightAttenuation * shadowAttenuation * lightColor, scattering);
