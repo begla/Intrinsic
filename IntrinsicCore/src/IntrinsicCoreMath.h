@@ -32,6 +32,12 @@ struct AABB
   glm::vec3 max;
 };
 
+struct AABB2
+{
+  glm::vec3 center;
+  glm::vec3 halfExtent;
+};
+
 // <-
 
 struct Ray
@@ -269,13 +275,11 @@ _INTR_INLINE glm::vec3 calcAABBCenter(const AABB& p_AABB)
 // <-
 
 _INTR_INLINE bool calcIntersectSphereAABB(const Sphere& p_Sphere,
-                                          const AABB& p_AABB)
+                                          const AABB2& p_AABB)
 {
-  const glm::vec3 aabbHalfExtent = calcAABBHalfExtent(p_AABB);
-  const glm::vec3 aabbCenter = calcAABBCenter(p_AABB);
-
-  const glm::vec3 d0 = glm::max(
-      glm::vec3(0.0f), glm::abs(aabbCenter - p_Sphere.p) - aabbHalfExtent);
+  const glm::vec3 d0 =
+      glm::max(glm::vec3(0.0f),
+               glm::abs(p_AABB.center - p_Sphere.p) - p_AABB.halfExtent);
   const float d1 = glm::dot(d0, d0);
 
   return d1 <= p_Sphere.r * p_Sphere.r;
