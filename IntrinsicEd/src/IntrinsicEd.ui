@@ -653,6 +653,18 @@
     <string>Show Benchmark Paths</string>
    </property>
   </action>
+  <action name="actionCreateLight">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/lightbulb</normaloff>:/Icons/lightbulb</iconset>
+   </property>
+   <property name="text">
+    <string>Create Light</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Light</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

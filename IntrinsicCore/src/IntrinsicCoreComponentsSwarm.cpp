@@ -218,6 +218,10 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
       Components::LightRef lightRef =
           Components::LightManager::createLight(entityRef);
       Components::LightManager::resetToDefault(lightRef);
+      Components::LightManager::_descColor(lightRef) =
+          glm::vec3(Math::calcRandomFloatMinMax(0.0f, 1.0f),
+                    Math::calcRandomFloatMinMax(0.0f, 1.0f),
+                    Math::calcRandomFloatMinMax(0.0f, 1.0f));
 
       Components::NodeRef swarmNodeRef =
           Components::NodeManager::getComponentForEntity(

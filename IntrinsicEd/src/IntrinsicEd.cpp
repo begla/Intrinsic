@@ -188,6 +188,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    SLOT(onCreateRigidBodySphere()));
   QObject::connect(_ui.actionCreateSphere, SIGNAL(triggered()), this,
                    SLOT(onCreateSphere()));
+  QObject::connect(_ui.actionCreateLight, SIGNAL(triggered()), this,
+                   SLOT(onCreateLight()));
 
   QObject::connect(_ui.actionShow_PhysX_Debug_Geometry, SIGNAL(triggered()),
                    this, SLOT(onDebugGeometryChanged()));
@@ -336,6 +338,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   {
     _createContextMenu.addAction(_ui.actionCreateCube);
     _createContextMenu.addAction(_ui.actionCreateSphere);
+    _createContextMenu.addSeparator();
+    _createContextMenu.addAction(_ui.actionCreateLight);
     _createContextMenu.addSeparator();
     _createContextMenu.addAction(_ui.actionCreateRigidBody);
     _createContextMenu.addAction(_ui.actionCreateRigidBody_Sphere);
@@ -650,6 +654,35 @@ void IntrinsicEd::onCreateSphere()
 
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
   Components::MeshManager::createResources(meshComponentsToCreate);
+}
+
+void IntrinsicEd::onCreateLight()
+{
+  Components::LightRefArray lightComponentsToCreate;
+
+  {
+    Entity::EntityRef entityRef =
+        Entity::EntityManager::createEntity(_N(Light));
+    Components::NodeRef nodeRef =
+        Components::NodeManager::createNode(entityRef);
+    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
+    Components::LightRef lightRef =
+        Components::LightManager::createLight(entityRef);
+    lightComponentsToCreate.push_back(lightRef);
+    Components::LightManager::resetToDefault(lightRef);
+
+    Components::CameraRef activeCamera = World::getActiveCamera();
+    Components::NodeRef cameraNode =
+        Components::NodeManager::getComponentForEntity(
+            Components::CameraManager::_entity(activeCamera));
+
+    Components::NodeManager::_position(nodeRef) =
+        Components::NodeManager::_worldPosition(cameraNode) +
+        Components::CameraManager::_forward(activeCamera) * 10.0f;
+    GameStates::Editing::_currentlySelectedEntity = entityRef;
+  }
+
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
 }
 
 void IntrinsicEd::onGridSizeChanged(double p_Value)
