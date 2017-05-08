@@ -16,7 +16,7 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
-#define MAX_LIGHT_COUNT_PER_CLUSTER 256u
+#define MAX_LIGHT_COUNT_PER_CLUSTER 128u
 #define GRID_DEPTH_SLICE_COUNT 24u
 
 namespace Intrinsic
@@ -91,9 +91,36 @@ _INTR_INLINE float calcGridDepthSlice(uint32_t p_DepthSliceIdx)
   return (p_DepthSliceIdx * p_DepthSliceIdx) * _gridDepthSliceScale;
 }
 
-_INTR_INLINE Math::AABB calcAABBForGridPos(glm::uvec3 p_GridPos,
-                                           glm::vec4 p_NearFarWidthHeight,
-                                           glm::vec4 p_NearFar)
+_INTR_INLINE Math::AABB2 calcAABBForDepthSlice(uint32_t p_DepthSlice,
+                                               glm::vec4 p_NearFarWidthHeight,
+                                               glm::vec4 p_NearFar)
+{
+  const float gridStartDepth = calcGridDepthSlice(p_DepthSlice);
+  const float gridEndDepth = calcGridDepthSlice(p_DepthSlice + 1u);
+
+  const float gridDepth = gridEndDepth - gridStartDepth;
+  const float gridHalfDepth = gridDepth * 0.5f;
+
+  const float rayPos =
+      (gridEndDepth - p_NearFar.x) / (p_NearFar.y - p_NearFar.x);
+
+  const glm::vec2 gridHalfWidthHeight =
+      glm::mix(glm::vec2(p_NearFarWidthHeight.x, p_NearFarWidthHeight.y),
+               glm::vec2(p_NearFarWidthHeight.z, p_NearFarWidthHeight.w),
+               rayPos) *
+      0.5f;
+
+  const glm::vec3 gridCenter =
+      glm::vec3(0.0f, 0.0f, -gridStartDepth - gridHalfDepth);
+  const glm::vec3 gridHalfExtent =
+      glm::vec3(gridHalfWidthHeight.x, gridHalfWidthHeight.y, gridHalfDepth);
+
+  return {gridCenter, gridHalfExtent};
+}
+
+_INTR_INLINE Math::AABB2 calcAABBForGridPos(glm::uvec3 p_GridPos,
+                                            glm::vec4 p_NearFarWidthHeight,
+                                            glm::vec4 p_NearFar)
 {
   const float gridStartDepth = calcGridDepthSlice(p_GridPos.z);
   const float gridEndDepth = calcGridDepthSlice(p_GridPos.z + 1u);
@@ -122,7 +149,7 @@ _INTR_INLINE Math::AABB calcAABBForGridPos(glm::uvec3 p_GridPos,
           aabbHalfExtent * glm::vec3(2.0, 2.0, 0.0);
   aabbCenter.z = -aabbCenter.z;
 
-  return {aabbCenter - aabbHalfExtent, aabbCenter + aabbHalfExtent};
+  return {aabbCenter, aabbHalfExtent};
 }
 
 struct LightCullingParallelTaskSet : enki::ITaskSet
@@ -140,7 +167,7 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
       {
         const glm::uvec3 gridPos = glm::uvec3(x, y, _z);
 
-        const Math::AABB clusterAABB =
+        const Math::AABB2 clusterAABB =
             calcAABBForGridPos(gridPos, _perInstanceData.nearFarWidthHeight,
                                _perInstanceData.nearFar);
 
@@ -148,16 +175,16 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
         uint32_t& lightCount = _lightIndexBufferGpuMemory[clusterIndex];
         lightCount = 0u;
 
-        for (uint32_t i = 0u; i < Components::LightManager::_activeRefs.size();
-             ++i)
+        for (uint32_t i = 0u; i < _availableLights.size(); ++i)
         {
-          const Light& light = _lightBufferMemory[i];
+          uint32_t lidx = _availableLights[i];
+          const Light& light = _lightBufferMemory[lidx];
           if (Math::calcIntersectSphereAABB(
                   {glm::vec3(light.posAndRadius), light.posAndRadius.w},
                   clusterAABB))
           {
-            const uint32_t lidx = clusterIndex + lightCount + 1u;
-            _lightIndexBufferGpuMemory[lidx] = i;
+            const uint32_t clusterLightIdx = clusterIndex + lightCount + 1u;
+            _lightIndexBufferGpuMemory[clusterLightIdx] = lidx;
             ++lightCount;
           }
         }
@@ -166,40 +193,82 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
   }
 
   uint32_t _z;
+  _INTR_ARRAY(uint32_t) _availableLights;
 } _cullingTaskSets[GRID_DEPTH_SLICE_COUNT];
 
 _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
 {
-  // Collect all (visible) lights
-  // TODO: Coarse culling step beforehand
-  for (uint32_t i = 0u; i < Components::LightManager::_activeRefs.size(); ++i)
-  {
-    Components::LightRef lightRef = Components::LightManager::_activeRefs[i];
-    Components::NodeRef lightNodeRef =
-        Components::NodeManager::getComponentForEntity(
-            Components::LightManager::_entity(lightRef));
+  _INTR_PROFILE_CPU("Lighting", "Cull Lights And Write Buffers");
 
-    const glm::vec3 lightPosVS =
-        Components::CameraManager::_viewMatrix(p_CameraRef) *
-        glm::vec4(Components::NodeManager::_worldPosition(lightNodeRef), 1.0);
-    _lightBufferMemory[i] = _lightBufferGpuMemory[i] = {
-        glm::vec4(lightPosVS, Components::LightManager::_descRadius(lightRef)),
-        Components::LightManager::_descIntensity(lightRef) *
-            glm::vec4(Components::LightManager::_descColor(lightRef), 0.0f)};
+  {
+    _INTR_PROFILE_CPU("Lighting", "Write Light Buffer");
+
+    for (uint32_t i = 0u; i < Components::LightManager::_activeRefs.size(); ++i)
+    {
+      Components::LightRef lightRef = Components::LightManager::_activeRefs[i];
+      Components::NodeRef lightNodeRef =
+          Components::NodeManager::getComponentForEntity(
+              Components::LightManager::_entity(lightRef));
+
+      const glm::vec3 lightPosVS =
+          Components::CameraManager::_viewMatrix(p_CameraRef) *
+          glm::vec4(Components::NodeManager::_worldPosition(lightNodeRef), 1.0);
+      _lightBufferMemory[i] = {
+          glm::vec4(lightPosVS,
+                    Components::LightManager::_descRadius(lightRef)),
+          Components::LightManager::_descIntensity(lightRef) *
+              glm::vec4(Components::LightManager::_descColor(lightRef), 0.0f)};
+    }
   }
 
-  for (uint32_t z = 0u; z < _gridRes.z; ++z)
+  // Find lights intersecting the depth slices and kick jobs for populated
+  // ones
+  _INTR_ARRAY(uint32_t) _activeTaskSets;
+  _activeTaskSets.reserve(GRID_DEPTH_SLICE_COUNT);
   {
-    LightCullingParallelTaskSet& taskSet = _cullingTaskSets[z];
-    taskSet._z = z;
+    _INTR_PROFILE_CPU("Lighting", "Find Slice And Kick Jobs");
 
-    Application::_scheduler.AddTaskSetToPipe(&taskSet);
+    for (uint32_t z = 0u; z < _gridRes.z; ++z)
+    {
+      LightCullingParallelTaskSet& taskSet = _cullingTaskSets[z];
+      taskSet._z = z;
+      taskSet._availableLights.clear();
+
+      const Math::AABB2 depthSliceAABB = calcAABBForDepthSlice(
+          z, _perInstanceData.nearFarWidthHeight, _perInstanceData.nearFar);
+
+      for (uint32_t i = 0u; i < Components::LightManager::_activeRefs.size();
+           ++i)
+      {
+        const Light& light = _lightBufferMemory[i];
+        if (Math::calcIntersectSphereAABB(
+                {glm::vec3(light.posAndRadius), light.posAndRadius.w},
+                depthSliceAABB))
+        {
+          taskSet._availableLights.push_back(i);
+        }
+      }
+
+      if (!taskSet._availableLights.empty())
+      {
+        Application::_scheduler.AddTaskSetToPipe(&taskSet);
+        _activeTaskSets.push_back(z);
+      }
+    }
   }
 
-  for (uint32_t z = 0u; z < _gridRes.z; ++z)
+  memcpy(_lightBufferGpuMemory, _lightBufferMemory,
+         Components::LightManager::_activeRefs.size() * sizeof(Light));
+
   {
-    LightCullingParallelTaskSet& taskSet = _cullingTaskSets[z];
-    Application::_scheduler.WaitforTaskSet(&taskSet);
+    _INTR_PROFILE_CPU("Lighting", "Wait For Jobs");
+
+    for (uint32_t i = 0u; i < _activeTaskSets.size(); ++i)
+    {
+      LightCullingParallelTaskSet& taskSet =
+          _cullingTaskSets[_activeTaskSets[i]];
+      Application::_scheduler.WaitforTaskSet(&taskSet);
+    }
   }
 }
 
