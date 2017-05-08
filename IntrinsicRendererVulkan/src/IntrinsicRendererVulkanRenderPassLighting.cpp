@@ -183,7 +183,9 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
         Components::CameraManager::_viewMatrix(p_CameraRef) *
         glm::vec4(Components::NodeManager::_worldPosition(lightNodeRef), 1.0);
     _lightBufferMemory[i] = _lightBufferGpuMemory[i] = {
-        glm::vec4(lightPosVS, 5.0f), 5.0f * glm::vec4(1.0f, 0.2f, 0.3f, 0.0f)};
+        glm::vec4(lightPosVS, Components::LightManager::_descRadius(lightRef)),
+        Components::LightManager::_descIntensity(lightRef) *
+            glm::vec4(Components::LightManager::_descColor(lightRef), 0.0f)};
   }
 
   for (uint32_t z = 0u; z < _gridRes.z; ++z)

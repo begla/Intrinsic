@@ -28,10 +28,14 @@ struct LightData : Dod::Components::ComponentDataBase
   LightData()
       : Dod::Components::ComponentDataBase(_INTR_MAX_LIGHT_COMPONENT_COUNT)
   {
-    descLightId.resize(_INTR_MAX_LIGHT_COMPONENT_COUNT);
+    descRadius.resize(_INTR_MAX_LIGHT_COMPONENT_COUNT);
+    descColor.resize(_INTR_MAX_LIGHT_COMPONENT_COUNT);
+    descIntensity.resize(_INTR_MAX_LIGHT_COMPONENT_COUNT);
   }
 
-  _INTR_ARRAY(uint32_t) descLightId;
+  _INTR_ARRAY(float) descRadius;
+  _INTR_ARRAY(glm::vec3) descColor;
+  _INTR_ARRAY(float) descIntensity;
 };
 
 struct LightManager
@@ -54,7 +58,9 @@ struct LightManager
 
   _INTR_INLINE static void resetToDefault(MeshRef p_Ref)
   {
-    _descLightId(p_Ref) = 0u;
+    _descRadius(p_Ref) = 5.0f;
+    _descColor(p_Ref) = glm::vec3(1.0f, 1.0f, 1.0f);
+    _descIntensity(p_Ref) = 5.0f;
   }
 
   // <-
@@ -72,11 +78,21 @@ struct LightManager
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember("LightId",
+    p_Properties.AddMember("Radius",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(Light), _N(Enum),
-                                             _descLightId(p_Ref), false, false),
+                                             _N(Light), _N(float),
+                                             _descRadius(p_Ref), false, false),
                            p_Document.GetAllocator());
+    p_Properties.AddMember("Color",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(Light), _N(vec4),
+                                             _descColor(p_Ref), false, false),
+                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "Intensity",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Light), _N(float),
+                          _descIntensity(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   // <-
@@ -84,9 +100,14 @@ struct LightManager
   _INTR_INLINE static void initFromDescriptor(LightRef p_Ref,
                                               rapidjson::Value& p_Properties)
   {
-    if (p_Properties.HasMember("LightId"))
-      _descLightId(p_Ref) =
-          JsonHelper::readPropertyUint(p_Properties["LightId"]);
+    if (p_Properties.HasMember("Radius"))
+      _descRadius(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["Radius"]);
+    if (p_Properties.HasMember("Color"))
+      _descColor(p_Ref) = JsonHelper::readPropertyVec3(p_Properties["Color"]);
+    if (p_Properties.HasMember("Intensity"))
+      _descIntensity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["Intensity"]);
   }
 
   // <-
@@ -95,9 +116,17 @@ struct LightManager
   // ->
 
   // Description
-  _INTR_INLINE static uint32_t& _descLightId(LightRef p_Ref)
+  _INTR_INLINE static float& _descRadius(LightRef p_Ref)
   {
-    return _data.descLightId[p_Ref._id];
+    return _data.descRadius[p_Ref._id];
+  }
+  _INTR_INLINE static glm::vec3& _descColor(LightRef p_Ref)
+  {
+    return _data.descColor[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descIntensity(LightRef p_Ref)
+  {
+    return _data.descIntensity[p_Ref._id];
   }
 };
 }
