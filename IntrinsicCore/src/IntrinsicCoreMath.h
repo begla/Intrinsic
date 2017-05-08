@@ -268,6 +268,21 @@ _INTR_INLINE glm::vec3 calcAABBCenter(const AABB& p_AABB)
 
 // <-
 
+_INTR_INLINE bool calcIntersectSphereAABB(const Sphere& p_Sphere,
+                                          const AABB& p_AABB)
+{
+  const glm::vec3 aabbHalfExtent = calcAABBHalfExtent(p_AABB);
+  const glm::vec3 aabbCenter = calcAABBCenter(p_AABB);
+
+  const glm::vec3 d0 = glm::max(
+      glm::vec3(0.0f), glm::abs(aabbCenter - p_Sphere.p) - aabbHalfExtent);
+  const float d1 = glm::dot(d0, d0);
+
+  return d1 <= p_Sphere.r * p_Sphere.r;
+}
+
+// <-
+
 _INTR_INLINE void scaleAABB(AABB& p_AABB, const glm::vec3& p_Scale)
 {
   const glm::vec3 aabbCenter = calcAABBCenter(p_AABB);

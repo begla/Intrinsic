@@ -130,6 +130,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     _categoryToIconMapping["Player"] = ":Icons/user";
     _categoryToIconMapping["RigidBody"] = ":Icons/cube";
     _categoryToIconMapping["PostEffectVolume"] = ":Icons/picture";
+    _categoryToIconMapping["Light"] = ":Icons/lightbulb";
   }
 
   {
@@ -143,6 +144,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     _componentToIconMapping["Script"] = ":Icons/script";
     _componentToIconMapping["RigidBody"] = ":Icons/cube";
     _componentToIconMapping["PostEffectVolume"] = ":Icons/picture";
+    _componentToIconMapping["Light"] = ":Icons/lightbulb";
   }
 
   QObject::connect(_ui.actionExit, SIGNAL(triggered()), this, SLOT(onExit()));

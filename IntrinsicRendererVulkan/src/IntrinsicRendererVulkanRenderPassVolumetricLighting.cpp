@@ -47,6 +47,9 @@ struct PerInstanceData
   glm::vec4 camPos;
 
   glm::mat4 shadowViewProjMatrix[_INTR_MAX_SHADOW_MAP_COUNT];
+
+  glm::vec4 nearFar;
+  glm::vec4 nearFarWidthHeight;
 } _perInstanceData;
 
 Resources::ImageRef _volLightingBufferImageRef;
@@ -183,6 +186,10 @@ void VolumetricLighting::init()
 
   ImageManager::createResources(imgsToCreate);
 
+  BufferRef lightBuffer = BufferManager::getResourceByName(_N(LightBuffer));
+  BufferRef lightIndexBuffer =
+      BufferManager::getResourceByName(_N(LightIndexBuffer));
+
   // Compute calls
   _computeCallRef =
       ComputeCallManager::createComputeCall(_N(VolumetricLighting));
@@ -209,6 +216,13 @@ void VolumetricLighting::init()
     ComputeCallManager::bindImage(
         _computeCallRef, _N(prevVolLightBufferTex), GpuProgramType::kCompute,
         _volLightingBufferPrevFrameImageRef, Samplers::kLinearClamp);
+    ComputeCallManager::bindBuffer(
+        _computeCallRef, _N(LightBuffer), GpuProgramType::kCompute, lightBuffer,
+        UboType::kInvalidUbo, BufferManager::_descSizeInBytes(lightBuffer));
+    ComputeCallManager::bindBuffer(
+        _computeCallRef, _N(LightIndexBuffer), GpuProgramType::kCompute,
+        lightIndexBuffer, UboType::kInvalidUbo,
+        BufferManager::_descSizeInBytes(lightIndexBuffer));
   }
 
   computeCallsToCreate.push_back(_computeCallRef);
@@ -240,6 +254,14 @@ void VolumetricLighting::init()
         _computeCallPrevFrameRef, _N(prevVolLightBufferTex),
         GpuProgramType::kCompute, _volLightingBufferImageRef,
         Samplers::kLinearClamp);
+    ComputeCallManager::bindBuffer(
+        _computeCallPrevFrameRef, _N(LightBuffer), GpuProgramType::kCompute,
+        lightBuffer, UboType::kInvalidUbo,
+        BufferManager::_descSizeInBytes(lightBuffer));
+    ComputeCallManager::bindBuffer(
+        _computeCallPrevFrameRef, _N(LightIndexBuffer),
+        GpuProgramType::kCompute, lightIndexBuffer, UboType::kInvalidUbo,
+        BufferManager::_descSizeInBytes(lightIndexBuffer));
   }
 
   computeCallsToCreate.push_back(_computeCallPrevFrameRef);
@@ -307,6 +329,11 @@ void VolumetricLighting::render(float p_DeltaT,
         Components::NodeManager::getComponentForEntity(
             Components::CameraManager::_entity(p_CameraRef));
 
+    // Post effect data
+    _perInstanceData.data0.x =
+        Core::Resources::PostEffectManager::_descVolumetricLightingScattering(
+            Core::Resources::PostEffectManager::_blendTargetRef);
+
     _perInstanceData.prevViewProjMatrix = _perInstanceData.viewProjMatrix;
     _perInstanceData.viewProjMatrix =
         Components::CameraManager::_viewProjectionMatrix(p_CameraRef);
@@ -336,10 +363,20 @@ void VolumetricLighting::render(float p_DeltaT,
 
     _perInstanceData.eyeWSVectorX.w = TaskManager::_totalTimePassed;
 
-    // Post effect data
-    _perInstanceData.data0.x =
-        Core::Resources::PostEffectManager::_descVolumetricLightingScattering(
-            Core::Resources::PostEffectManager::_blendTargetRef);
+    _perInstanceData.nearFar = glm::vec4(
+        Components::CameraManager::_descNearPlane(p_CameraRef),
+        Components::CameraManager::_descFarPlane(p_CameraRef), 0.0f, 0.0f);
+
+    Math::FrustumCorners viewSpaceCorners;
+    Math::extractFrustumsCorners(
+        Components::CameraManager::_inverseProjectionMatrix(p_CameraRef),
+        viewSpaceCorners);
+
+    _perInstanceData.nearFarWidthHeight = glm::vec4(
+        viewSpaceCorners.c[3].x - viewSpaceCorners.c[2].x /* Near Width */,
+        viewSpaceCorners.c[2].y - viewSpaceCorners.c[1].y /* Near Height */,
+        viewSpaceCorners.c[7].x - viewSpaceCorners.c[6].x /* Far Width */,
+        viewSpaceCorners.c[6].y - viewSpaceCorners.c[5].y /* Far Height */);
 
     const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
         RenderProcess::Default::_shadowFrustums[p_CameraRef];

@@ -13,6 +13,58 @@
 // limitations under the License.
 
 #define PSSM_SPLIT_COUNT 4u
+#define MAX_SHADOW_MAP_COUNT 16u
+
+// Clustered lighting
+// ->
+
+// Have to match the values on C++ side
+const uint maxLightCountPerCluster = 256;
+const float gridDepth = 10000.0f;
+const uvec3 gridRes = uvec3(16u, 8u, 24u);
+const float gridDepthSliceScale =
+    gridDepth * (1.0f / ((gridRes.z - 1u) * (gridRes.z - 1u)));
+const float gridDepthSliceScaleRcp = 1.0f / gridDepthSliceScale;
+
+uint calcClusterIndex(uvec3 gridPos)
+{
+  return gridPos.x * maxLightCountPerCluster +
+         gridPos.y * gridRes.x * maxLightCountPerCluster +
+         gridPos.z * gridRes.y * gridRes.x * maxLightCountPerCluster;
+}
+
+float calcGridDepthSlice(uint depthSliceIdx)
+{
+  return (depthSliceIdx * depthSliceIdx) * gridDepthSliceScale;
+}
+
+uint calcGridDepthIndex(float depthVS)
+{
+  return uint(sqrt(depthVS * gridDepthSliceScaleRcp));
+}
+
+uvec3 calcGridPosForViewPos(vec3 posVS, vec4 nearFar, vec4 nearFarWidthHeight)
+{
+  const uint gridDepthIdx = calcGridDepthIndex(-posVS.z);
+  const float gridStartDepth = calcGridDepthSlice(gridDepthIdx);
+  const float gridEndDepth = calcGridDepthSlice(gridDepthIdx + 1);
+
+  const float rayPos = (gridEndDepth - nearFar.x) / (nearFar.y - nearFar.x);
+  const vec2 gridHalfWidthHeight = mix(nearFarWidthHeight.xy, nearFarWidthHeight.zw, rayPos) * 0.5;
+
+  const vec2 localPos = posVS.xy / gridHalfWidthHeight.xy;
+  return uvec3(uvec2((localPos.xy * 0.5 + 0.5) * gridRes.xy), gridDepthIdx);
+}
+
+// <-
+
+struct Light
+{
+  vec4 posAndRadius;
+  vec4 color;
+};
+
+// <-
 
 struct LightingData
 {
@@ -59,17 +111,20 @@ float D_GGX(float NdH, float roughness2)
   return r / (MATH_PI * f * f);
 }
 
-void initLightingData(inout LightingData d)
+void initLightingDataFromGBuffer(inout LightingData d)
 {
   d.diffuseColor = d.baseColor - d.baseColor * d.metalMask;
   d.specularColor = mix(0.08 * d.specular.xxx, d.baseColor, d.metalMask);
+  d.roughness2 = d.roughness * d.roughness;
+}
 
+void calculateLightingData(inout LightingData d)
+{
   d.H = normalize(d.L + d.V);
   d.NdL = clamp(dot(d.N, d.L), 0.0, 1.0); 
   d.NdV = clamp(abs(dot(d.N, d.V)) + 1.0e-5, 0.0, 1.0);
   d.NdH = clamp(dot(d.N, d.H), 0.0, 1.0);
   d.VdH = clamp(dot(d.V, d.H), 0.0, 1.0);
-  d.roughness2 = d.roughness * d.roughness;
 }
 
 vec3 calcDiffuse(LightingData d)
@@ -91,7 +146,16 @@ vec3 calcLighting(LightingData d)
   return (calcDiffuse(d) + calcSpecular(d)) * d.NdL;
 }
 
-vec4 calcPosLS(vec3 posVS, uint shadowMapIdx, mat4 shadowViewProjMatrix[PSSM_SPLIT_COUNT])
+float calcInverseSqrFalloff(float lightRadius, float dist)
+{
+  float a0 = dist / lightRadius;
+  a0 = a0 * a0 * a0 * a0;
+  const float dist2 = dist * dist;
+  const float a1 = clamp(1.0 - a0, 0.0, 1.0);
+  return a1 * a1 / (dist2 + 1.0);
+}
+
+vec4 calcPosLS(vec3 posVS, uint shadowMapIdx, mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT])
 {
   vec4 posLS = shadowViewProjMatrix[shadowMapIdx] * vec4(posVS, 1.0);
 
@@ -105,7 +169,7 @@ vec4 calcPosLS(vec3 posVS, uint shadowMapIdx, mat4 shadowViewProjMatrix[PSSM_SPL
   return posLS;
 }
 
-uint findBestFittingSplit(vec3 posVS, out vec4 posLS, mat4 shadowViewProjMatrix[PSSM_SPLIT_COUNT])
+uint findBestFittingSplit(vec3 posVS, out vec4 posLS, mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT])
 {
   for (uint i=0u; i<PSSM_SPLIT_COUNT; ++i)
   {
@@ -179,7 +243,7 @@ float witnessPCF(vec3 shadowPos, uint shadowMapIdx, sampler2DArrayShadow shadowT
   return sum * 1.0 / 144.0;
 }
 
-float calcShadowAttenuation(vec3 posVS, mat4 shadowViewProjMatrix[PSSM_SPLIT_COUNT], sampler2DArrayShadow shadowTex)
+float calcShadowAttenuation(vec3 posVS, mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT], sampler2DArrayShadow shadowTex)
 {
   float shadowAttenuation = 1.0;
 

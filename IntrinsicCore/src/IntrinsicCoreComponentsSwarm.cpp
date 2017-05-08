@@ -15,7 +15,7 @@
 // Precompiled header file
 #include "stdafx.h"
 
-#define BOID_COUNT 512u
+#define BOID_COUNT 200u
 
 namespace Intrinsic
 {
@@ -214,6 +214,10 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
       Components::MeshManager::resetToDefault(meshRef);
       Components::MeshManager::_descMeshName(meshRef) =
           _descBoidMeshName(swarmRef);
+
+      Components::LightRef lightRef =
+          Components::LightManager::createLight(entityRef);
+      Components::LightManager::resetToDefault(lightRef);
 
       Components::NodeRef swarmNodeRef =
           Components::NodeManager::getComponentForEntity(
