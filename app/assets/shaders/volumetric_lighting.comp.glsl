@@ -23,6 +23,11 @@
 #include "lib_vol_lighting.glsl"
 #include "lib_noise.glsl"
 
+vec4 PDnrand4(vec2 n) 
+{
+  return fract(sin(dot(n.xy, vec2(12.9898f, 78.233f)))* vec4(43758.5453, 28001.8384, 50849.4141, 12996.89));
+}
+
 layout (binding = 0) uniform PerInstance
 {
   mat4 projMatrix;
@@ -73,28 +78,30 @@ void main()
   const float heightAttenuationFactor = 0.025;
   const float scatteringFactor = uboPerInstance.data0.x;
   const float localLightIntens = uboPerInstance.data0.y;
-  float reprojWeight = 0.9; 
+  float reprojWeight = 0.85; 
 
   // ->
 
-  const vec3 cellIndex = vec3(gl_GlobalInvocationID.xyz);
-
-  const vec3 posSS = cellIndexToScreenSpacePos(cellIndex);
-  const float linDepth = volumeZToDepth(posSS.z);
-  const float layerThick = volumeZToDepth(posSS.z + 1.0 / VOLUME_DIMENSIONS.z) - linDepth;
-
   // Temporal reprojection
   const vec3 posSSReproj = cellIndexToScreenSpacePos(vec3(gl_GlobalInvocationID.xyz));
+  const float linDepthReproj = volumeZToDepth(posSSReproj.z);
   const vec3 posWSReproj = uboPerInstance.camPos.xyz + screenToViewSpacePos(posSSReproj.xy, 
     uboPerInstance.eyeWSVectorX.xyz, uboPerInstance.eyeWSVectorY.xyz, uboPerInstance.eyeWSVectorZ.xyz,
-     linDepth, uboPerInstance.projMatrix);
+     linDepthReproj, uboPerInstance.projMatrix);
   vec4 posSSPrevFrame = uboPerInstance.prevViewProjMatrix * vec4(posWSReproj, 1.0);
-  //reprojWeight *= posSSPrevFrame.w > 0.0 ? 1.0 : 0.0;
+  reprojWeight *= posSSPrevFrame.w > 1.0 ? 1.0 : 0.0;
   posSSPrevFrame.xy /= posSSPrevFrame.ww;
   posSSPrevFrame.xy = posSSPrevFrame.xy * 0.5 + 0.5;
   posSSPrevFrame.xyz = vec3(posSSPrevFrame.xy, depthToVolumeZ(posSSPrevFrame.z));
   const vec4 reprojFog = textureLod(prevVolLightBufferTex, screenSpacePosToCellIndex(posSSPrevFrame.xyz), 0.0);
 
+  // Jittering for temporal super-sampling
+  const vec3 cellIndex = vec3(gl_GlobalInvocationID.xyz) 
+    + vec3(0.0, 0.0, PDnrand4(posSSReproj.xy * 0.5 + 0.5 + sin(uboPerInstance.camPos.w) + 0.64801));
+
+  const vec3 posSS = cellIndexToScreenSpacePos(cellIndex);
+  const float linDepth = volumeZToDepth(posSS.z);
+  const float layerThick = volumeZToDepth(posSS.z + 1.0 / VOLUME_DIMENSIONS.z) - linDepth;
   const vec3 posVS = screenToViewSpacePos(posSS.xy, 
     uboPerInstance.eyeVSVectorX.xyz, uboPerInstance.eyeVSVectorY.xyz, uboPerInstance.eyeVSVectorZ.xyz,
     linDepth, uboPerInstance.projMatrix);
@@ -149,7 +156,7 @@ void main()
   // Main light
   accumFog += vec4(noiseAccum * scattering * shadowAttenuation * lightColor, scattering);
   accumFog *= heightAttenuation;
-  
+
   const vec4 finalFog = mix(accumFog, reprojFog, reprojWeight);
   imageStore(output0Tex, ivec3(cellIndex), finalFog);
 }    

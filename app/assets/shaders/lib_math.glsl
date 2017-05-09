@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #define MATH_PI 3.14159
+#define LUM_WEIGHTS vec3(0.27, 0.67, 0.06)
 
 float calcScreenSpaceScale(vec3 worldPosition, mat4 viewProjMatrix, float height)
 {

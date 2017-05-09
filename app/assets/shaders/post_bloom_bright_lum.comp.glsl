@@ -18,7 +18,6 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
-#define LUM_WEIGHTS vec3(0.27, 0.67, 0.06)
 #define DELTA 0.00001
 #define LUM_AND_BRIGHT_THREADS 8u
 
