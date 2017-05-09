@@ -73,7 +73,7 @@ void main()
   const float heightAttenuationFactor = 0.025;
   const float scatteringFactor = uboPerInstance.data0.x;
   const float localLightIntens = uboPerInstance.data0.y;
-  float reprojWeight = 0.8; 
+  float reprojWeight = 0.9; 
 
   // ->
 
