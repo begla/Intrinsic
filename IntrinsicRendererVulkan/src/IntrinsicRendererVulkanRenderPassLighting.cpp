@@ -200,6 +200,7 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
 {
   _INTR_PROFILE_CPU("Lighting", "Cull Lights And Write Buffers");
 
+  // TODO: Coarse frustum culling pre-pass
   {
     _INTR_PROFILE_CPU("Lighting", "Write Light Buffer");
 
