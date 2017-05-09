@@ -333,6 +333,9 @@ void VolumetricLighting::render(float p_DeltaT,
     _perInstanceData.data0.x =
         Core::Resources::PostEffectManager::_descVolumetricLightingScattering(
             Core::Resources::PostEffectManager::_blendTargetRef);
+    _perInstanceData.data0.y = Core::Resources::PostEffectManager::
+        _descVolumetricLightingLocalLightIntensity(
+            Core::Resources::PostEffectManager::_blendTargetRef);
 
     _perInstanceData.prevViewProjMatrix = _perInstanceData.viewProjMatrix;
     _perInstanceData.viewProjMatrix =

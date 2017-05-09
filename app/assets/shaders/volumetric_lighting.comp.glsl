@@ -72,7 +72,8 @@ void main()
   const float minShadowAttenuation = 0.05;
   const float heightAttenuationFactor = 0.025;
   const float scatteringFactor = uboPerInstance.data0.x;
-  float reprojWeight = 0.95; 
+  const float localLightIntens = uboPerInstance.data0.y;
+  float reprojWeight = 0.8; 
 
   // ->
 
@@ -88,7 +89,7 @@ void main()
     uboPerInstance.eyeWSVectorX.xyz, uboPerInstance.eyeWSVectorY.xyz, uboPerInstance.eyeWSVectorZ.xyz,
      linDepth, uboPerInstance.projMatrix);
   vec4 posSSPrevFrame = uboPerInstance.prevViewProjMatrix * vec4(posWSReproj, 1.0);
-  reprojWeight *= posSSPrevFrame.w > 0.0 ? 1.0 : 0.0;
+  //reprojWeight *= posSSPrevFrame.w > 0.0 ? 1.0 : 0.0;
   posSSPrevFrame.xy /= posSSPrevFrame.ww;
   posSSPrevFrame.xy = posSSPrevFrame.xy * 0.5 + 0.5;
   posSSPrevFrame.xyz = vec3(posSSPrevFrame.xy, depthToVolumeZ(posSSPrevFrame.z));
@@ -138,16 +139,17 @@ void main()
     const float dist = length(lightDistVec);
     const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
 
-    // FIXME
-    accumFog += vec4(att * 150.0 * scattering * light.color.rgb / MATH_PI, scattering);
+    // TODO: Fix me
+    accumFog += vec4(localLightIntens * att * light.color.rgb / MATH_PI, 0.0);
   }
 
   // Noise
   noiseAccum *= noise(posWS * 0.25 + uboPerInstance.eyeWSVectorX.w * 1.0);
   noiseAccum *= noise(posWS * 0.15 + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.382871);
 
-  // Sky light
-  accumFog += vec4(noiseAccum * scattering * heightAttenuation * shadowAttenuation * lightColor, scattering);
+  // Main light
+  accumFog += vec4(noiseAccum * scattering * shadowAttenuation * lightColor, scattering);
+  accumFog *= heightAttenuation;
   
   const vec4 finalFog = mix(accumFog, reprojFog, reprojWeight);
   imageStore(output0Tex, ivec3(cellIndex), finalFog);

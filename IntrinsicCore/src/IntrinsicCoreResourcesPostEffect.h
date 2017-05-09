@@ -29,11 +29,14 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
       : Dod::Resources::ResourceDataBase(_INTR_MAX_POST_EFFECT_COUNT)
   {
     descVolumetricLightingScattering.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descVolumetricLightingLocalLightIntensity.resize(
+        _INTR_MAX_POST_EFFECT_COUNT);
   }
 
   // <-
 
   _INTR_ARRAY(float) descVolumetricLightingScattering;
+  _INTR_ARRAY(float) descVolumetricLightingLocalLightIntensity;
 };
 
 struct PostEffectManager
@@ -56,6 +59,7 @@ struct PostEffectManager
   _INTR_INLINE static void resetToDefault(PostEffectRef p_Ref)
   {
     _descVolumetricLightingScattering(p_Ref) = 0.0f;
+    _descVolumetricLightingLocalLightIntensity(p_Ref) = 0.0f;
   }
 
   // <-
@@ -80,10 +84,16 @@ struct PostEffectManager
                                                          p_Document);
 
     p_Properties.AddMember(
-        "volumetricLightingScattering",
+        "Scattering",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(VolumetricLighting),
                           _N(float), _descVolumetricLightingScattering(p_Ref),
                           false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "LocalLightIntensity",
+        _INTR_CREATE_PROP(
+            p_Document, p_GenerateDesc, _N(VolumetricLighting), _N(float),
+            _descVolumetricLightingLocalLightIntensity(p_Ref), false, false),
         p_Document.GetAllocator());
   }
 
@@ -96,9 +106,12 @@ struct PostEffectManager
         PostEffectData,
         _INTR_MAX_POST_EFFECT_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
 
-    if (p_Properties.HasMember("volumetricLightingScattering"))
-      _descVolumetricLightingScattering(p_Ref) = JsonHelper::readPropertyFloat(
-          p_Properties["volumetricLightingScattering"]);
+    if (p_Properties.HasMember("Scattering"))
+      _descVolumetricLightingScattering(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["Scattering"]);
+    if (p_Properties.HasMember("LocalLightIntensity"))
+      _descVolumetricLightingLocalLightIntensity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["LocalLightIntensity"]);
   }
 
   // <-
@@ -135,6 +148,9 @@ struct PostEffectManager
     _descVolumetricLightingScattering(p_Target) =
         glm::mix(_descVolumetricLightingScattering(p_Left),
                  _descVolumetricLightingScattering(p_Right), p_BlendFactor);
+    _descVolumetricLightingLocalLightIntensity(p_Target) = glm::mix(
+        _descVolumetricLightingLocalLightIntensity(p_Left),
+        _descVolumetricLightingLocalLightIntensity(p_Right), p_BlendFactor);
   }
 
   // <-
@@ -147,6 +163,11 @@ struct PostEffectManager
   _descVolumetricLightingScattering(PostEffectRef p_Ref)
   {
     return _data.descVolumetricLightingScattering[p_Ref._id];
+  }
+  _INTR_INLINE static float&
+  _descVolumetricLightingLocalLightIntensity(PostEffectRef p_Ref)
+  {
+    return _data.descVolumetricLightingLocalLightIntensity[p_Ref._id];
   }
 
   // Static members
