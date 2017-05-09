@@ -60,6 +60,7 @@ Resources::PipelineRef _pipelineScatteringRef;
 Resources::ComputeCallRef _computeCallRef;
 Resources::ComputeCallRef _computeCallPrevFrameRef;
 Resources::ComputeCallRef _computeCallScatteringRef;
+Resources::ComputeCallRef _computeCallScatteringPrevFrameRef;
 }
 
 void VolumetricLighting::init()
@@ -191,110 +192,152 @@ void VolumetricLighting::init()
       BufferManager::getResourceByName(_N(LightIndexBuffer));
 
   // Compute calls
-  _computeCallRef =
-      ComputeCallManager::createComputeCall(_N(VolumetricLighting));
   {
-    ComputeCallManager::resetToDefault(_computeCallRef);
-    ComputeCallManager::addResourceFlags(
-        _computeCallRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+    _computeCallRef =
+        ComputeCallManager::createComputeCall(_N(VolumetricLighting));
+    {
+      ComputeCallManager::resetToDefault(_computeCallRef);
+      ComputeCallManager::addResourceFlags(
+          _computeCallRef, Dod::Resources::ResourceFlags::kResourceVolatile);
 
-    ComputeCallManager::_descDimensions(_computeCallRef) = glm::uvec3(
-        Math::divideByMultiple(dim.x, 4u), Math::divideByMultiple(dim.y, 4u),
-        Math::divideByMultiple(dim.z, 4u));
-    ComputeCallManager::_descPipeline(_computeCallRef) = _pipelineRef;
+      ComputeCallManager::_descDimensions(_computeCallRef) = glm::uvec3(
+          Math::divideByMultiple(dim.x, 4u), Math::divideByMultiple(dim.y, 4u),
+          Math::divideByMultiple(dim.z, 4u));
+      ComputeCallManager::_descPipeline(_computeCallRef) = _pipelineRef;
 
-    ComputeCallManager::bindBuffer(
-        _computeCallRef, _N(PerInstance), GpuProgramType::kCompute,
-        UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceCompute,
-        sizeof(PerInstanceData));
-    ComputeCallManager::bindImage(
-        _computeCallRef, _N(shadowBufferTex), GpuProgramType::kCompute,
-        ImageManager::getResourceByName(_N(ShadowBuffer)), Samplers::kShadow);
-    ComputeCallManager::bindImage(
-        _computeCallRef, _N(output0Tex), GpuProgramType::kCompute,
-        _volLightingBufferImageRef, Samplers::kInvalidSampler);
-    ComputeCallManager::bindImage(
-        _computeCallRef, _N(prevVolLightBufferTex), GpuProgramType::kCompute,
-        _volLightingBufferPrevFrameImageRef, Samplers::kLinearClamp);
-    ComputeCallManager::bindBuffer(
-        _computeCallRef, _N(LightBuffer), GpuProgramType::kCompute, lightBuffer,
-        UboType::kInvalidUbo, BufferManager::_descSizeInBytes(lightBuffer));
-    ComputeCallManager::bindBuffer(
-        _computeCallRef, _N(LightIndexBuffer), GpuProgramType::kCompute,
-        lightIndexBuffer, UboType::kInvalidUbo,
-        BufferManager::_descSizeInBytes(lightIndexBuffer));
+      ComputeCallManager::bindBuffer(
+          _computeCallRef, _N(PerInstance), GpuProgramType::kCompute,
+          UniformManager::_perInstanceUniformBuffer,
+          UboType::kPerInstanceCompute, sizeof(PerInstanceData));
+      ComputeCallManager::bindImage(
+          _computeCallRef, _N(shadowBufferTex), GpuProgramType::kCompute,
+          ImageManager::getResourceByName(_N(ShadowBuffer)), Samplers::kShadow);
+      ComputeCallManager::bindImage(
+          _computeCallRef, _N(output0Tex), GpuProgramType::kCompute,
+          _volLightingBufferImageRef, Samplers::kInvalidSampler);
+      ComputeCallManager::bindImage(
+          _computeCallRef, _N(prevVolLightBufferTex), GpuProgramType::kCompute,
+          _volLightingBufferPrevFrameImageRef, Samplers::kLinearClamp);
+      ComputeCallManager::bindBuffer(
+          _computeCallRef, _N(LightBuffer), GpuProgramType::kCompute,
+          lightBuffer, UboType::kInvalidUbo,
+          BufferManager::_descSizeInBytes(lightBuffer));
+      ComputeCallManager::bindBuffer(
+          _computeCallRef, _N(LightIndexBuffer), GpuProgramType::kCompute,
+          lightIndexBuffer, UboType::kInvalidUbo,
+          BufferManager::_descSizeInBytes(lightIndexBuffer));
+    }
+
+    computeCallsToCreate.push_back(_computeCallRef);
   }
 
-  computeCallsToCreate.push_back(_computeCallRef);
-
-  _computeCallPrevFrameRef =
-      ComputeCallManager::createComputeCall(_N(VolumetricLightingPrevFrame));
   {
-    ComputeCallManager::resetToDefault(_computeCallPrevFrameRef);
-    ComputeCallManager::addResourceFlags(
-        _computeCallPrevFrameRef,
-        Dod::Resources::ResourceFlags::kResourceVolatile);
+    _computeCallPrevFrameRef =
+        ComputeCallManager::createComputeCall(_N(VolumetricLightingPrevFrame));
+    {
+      ComputeCallManager::resetToDefault(_computeCallPrevFrameRef);
+      ComputeCallManager::addResourceFlags(
+          _computeCallPrevFrameRef,
+          Dod::Resources::ResourceFlags::kResourceVolatile);
 
-    ComputeCallManager::_descDimensions(_computeCallPrevFrameRef) = glm::uvec3(
-        Math::divideByMultiple(dim.x, 4u), Math::divideByMultiple(dim.y, 4u),
-        Math::divideByMultiple(dim.z, 4u));
-    ComputeCallManager::_descPipeline(_computeCallPrevFrameRef) = _pipelineRef;
+      ComputeCallManager::_descDimensions(_computeCallPrevFrameRef) =
+          glm::uvec3(Math::divideByMultiple(dim.x, 4u),
+                     Math::divideByMultiple(dim.y, 4u),
+                     Math::divideByMultiple(dim.z, 4u));
+      ComputeCallManager::_descPipeline(_computeCallPrevFrameRef) =
+          _pipelineRef;
 
-    ComputeCallManager::bindBuffer(
-        _computeCallPrevFrameRef, _N(PerInstance), GpuProgramType::kCompute,
-        UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceCompute,
-        sizeof(PerInstanceData));
-    ComputeCallManager::bindImage(
-        _computeCallPrevFrameRef, _N(shadowBufferTex), GpuProgramType::kCompute,
-        ImageManager::getResourceByName(_N(ShadowBuffer)), Samplers::kShadow);
-    ComputeCallManager::bindImage(
-        _computeCallPrevFrameRef, _N(output0Tex), GpuProgramType::kCompute,
-        _volLightingBufferPrevFrameImageRef, Samplers::kInvalidSampler);
-    ComputeCallManager::bindImage(
-        _computeCallPrevFrameRef, _N(prevVolLightBufferTex),
-        GpuProgramType::kCompute, _volLightingBufferImageRef,
-        Samplers::kLinearClamp);
-    ComputeCallManager::bindBuffer(
-        _computeCallPrevFrameRef, _N(LightBuffer), GpuProgramType::kCompute,
-        lightBuffer, UboType::kInvalidUbo,
-        BufferManager::_descSizeInBytes(lightBuffer));
-    ComputeCallManager::bindBuffer(
-        _computeCallPrevFrameRef, _N(LightIndexBuffer),
-        GpuProgramType::kCompute, lightIndexBuffer, UboType::kInvalidUbo,
-        BufferManager::_descSizeInBytes(lightIndexBuffer));
+      ComputeCallManager::bindBuffer(
+          _computeCallPrevFrameRef, _N(PerInstance), GpuProgramType::kCompute,
+          UniformManager::_perInstanceUniformBuffer,
+          UboType::kPerInstanceCompute, sizeof(PerInstanceData));
+      ComputeCallManager::bindImage(
+          _computeCallPrevFrameRef, _N(shadowBufferTex),
+          GpuProgramType::kCompute,
+          ImageManager::getResourceByName(_N(ShadowBuffer)), Samplers::kShadow);
+      ComputeCallManager::bindImage(
+          _computeCallPrevFrameRef, _N(output0Tex), GpuProgramType::kCompute,
+          _volLightingBufferPrevFrameImageRef, Samplers::kInvalidSampler);
+      ComputeCallManager::bindImage(
+          _computeCallPrevFrameRef, _N(prevVolLightBufferTex),
+          GpuProgramType::kCompute, _volLightingBufferImageRef,
+          Samplers::kLinearClamp);
+      ComputeCallManager::bindBuffer(
+          _computeCallPrevFrameRef, _N(LightBuffer), GpuProgramType::kCompute,
+          lightBuffer, UboType::kInvalidUbo,
+          BufferManager::_descSizeInBytes(lightBuffer));
+      ComputeCallManager::bindBuffer(
+          _computeCallPrevFrameRef, _N(LightIndexBuffer),
+          GpuProgramType::kCompute, lightIndexBuffer, UboType::kInvalidUbo,
+          BufferManager::_descSizeInBytes(lightIndexBuffer));
+    }
+
+    computeCallsToCreate.push_back(_computeCallPrevFrameRef);
   }
 
-  computeCallsToCreate.push_back(_computeCallPrevFrameRef);
-
-  _computeCallScatteringRef =
-      ComputeCallManager::createComputeCall(_N(VolumetricLighting));
   {
-    ComputeCallManager::resetToDefault(_computeCallScatteringRef);
-    ComputeCallManager::addResourceFlags(
-        _computeCallScatteringRef,
-        Dod::Resources::ResourceFlags::kResourceVolatile);
+    _computeCallScatteringRef =
+        ComputeCallManager::createComputeCall(_N(VolumetricLighting));
+    {
+      ComputeCallManager::resetToDefault(_computeCallScatteringRef);
+      ComputeCallManager::addResourceFlags(
+          _computeCallScatteringRef,
+          Dod::Resources::ResourceFlags::kResourceVolatile);
 
-    ComputeCallManager::_descDimensions(_computeCallScatteringRef) =
-        glm::uvec3(Math::divideByMultiple(dim.x, 8u),
-                   Math::divideByMultiple(dim.y, 8u), 1u);
-    ComputeCallManager::_descPipeline(_computeCallScatteringRef) =
-        _pipelineScatteringRef;
+      ComputeCallManager::_descDimensions(_computeCallScatteringRef) =
+          glm::uvec3(Math::divideByMultiple(dim.x, 8u),
+                     Math::divideByMultiple(dim.y, 8u), 1u);
+      ComputeCallManager::_descPipeline(_computeCallScatteringRef) =
+          _pipelineScatteringRef;
 
-    ComputeCallManager::bindBuffer(
-        _computeCallScatteringRef, _N(PerInstance), GpuProgramType::kCompute,
-        UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceCompute,
-        sizeof(PerInstanceData));
-    ComputeCallManager::bindImage(
-        _computeCallScatteringRef, _N(volLightBufferTex),
-        GpuProgramType::kCompute, _volLightingBufferImageRef,
-        Samplers::kLinearClamp);
-    ComputeCallManager::bindImage(
-        _computeCallScatteringRef, _N(volLightScatterBufferTex),
-        GpuProgramType::kCompute, _volLightingScatteringBufferImageRef,
-        Samplers::kInvalidSampler);
+      ComputeCallManager::bindBuffer(
+          _computeCallScatteringRef, _N(PerInstance), GpuProgramType::kCompute,
+          UniformManager::_perInstanceUniformBuffer,
+          UboType::kPerInstanceCompute, sizeof(PerInstanceData));
+      ComputeCallManager::bindImage(
+          _computeCallScatteringRef, _N(volLightBufferTex),
+          GpuProgramType::kCompute, _volLightingBufferImageRef,
+          Samplers::kLinearClamp);
+      ComputeCallManager::bindImage(
+          _computeCallScatteringRef, _N(volLightScatterBufferTex),
+          GpuProgramType::kCompute, _volLightingScatteringBufferImageRef,
+          Samplers::kInvalidSampler);
+    }
+
+    computeCallsToCreate.push_back(_computeCallScatteringRef);
   }
 
-  computeCallsToCreate.push_back(_computeCallScatteringRef);
+  {
+    _computeCallScatteringPrevFrameRef =
+        ComputeCallManager::createComputeCall(_N(VolumetricLighting));
+    {
+      ComputeCallManager::resetToDefault(_computeCallScatteringPrevFrameRef);
+      ComputeCallManager::addResourceFlags(
+          _computeCallScatteringPrevFrameRef,
+          Dod::Resources::ResourceFlags::kResourceVolatile);
+
+      ComputeCallManager::_descDimensions(_computeCallScatteringPrevFrameRef) =
+          glm::uvec3(Math::divideByMultiple(dim.x, 8u),
+                     Math::divideByMultiple(dim.y, 8u), 1u);
+      ComputeCallManager::_descPipeline(_computeCallScatteringPrevFrameRef) =
+          _pipelineScatteringRef;
+
+      ComputeCallManager::bindBuffer(
+          _computeCallScatteringPrevFrameRef, _N(PerInstance),
+          GpuProgramType::kCompute, UniformManager::_perInstanceUniformBuffer,
+          UboType::kPerInstanceCompute, sizeof(PerInstanceData));
+      ComputeCallManager::bindImage(
+          _computeCallScatteringPrevFrameRef, _N(volLightBufferTex),
+          GpuProgramType::kCompute, _volLightingBufferPrevFrameImageRef,
+          Samplers::kLinearClamp);
+      ComputeCallManager::bindImage(
+          _computeCallScatteringPrevFrameRef, _N(volLightScatterBufferTex),
+          GpuProgramType::kCompute, _volLightingScatteringBufferImageRef,
+          Samplers::kInvalidSampler);
+    }
+
+    computeCallsToCreate.push_back(_computeCallScatteringPrevFrameRef);
+  }
 
   ComputeCallManager::createResources(computeCallsToCreate);
 }
@@ -321,6 +364,30 @@ void VolumetricLighting::render(float p_DeltaT,
   if ((TaskManager::_frameCounter % 2u) != 0u)
   {
     accumComputeCallRefToUse = _computeCallPrevFrameRef;
+
+    ImageManager::insertImageMemoryBarrier(
+        _volLightingBufferPrevFrameImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_GENERAL, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+
+    ImageManager::insertImageMemoryBarrier(
+        _volLightingBufferImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+  }
+  else
+  {
+    ImageManager::insertImageMemoryBarrier(
+        _volLightingBufferImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_GENERAL, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+
+    ImageManager::insertImageMemoryBarrier(
+        _volLightingBufferPrevFrameImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   }
 
   // Update per instance data
@@ -402,25 +469,38 @@ void VolumetricLighting::render(float p_DeltaT,
 
   VkCommandBuffer primaryCmdBuffer = RenderSystem::getPrimaryCommandBuffer();
 
-  ImageManager::insertImageMemoryBarrier(
-      _volLightingBufferImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
-      VK_IMAGE_LAYOUT_GENERAL, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   {
     RenderSystem::dispatchComputeCall(accumComputeCallRefToUse,
                                       primaryCmdBuffer);
   }
-  ImageManager::insertImageMemoryBarrier(
-      _volLightingBufferImageRef, VK_IMAGE_LAYOUT_GENERAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+
+  ComputeCallRef scatteringComputeCalltoUse = _computeCallScatteringRef;
+  if ((TaskManager::_frameCounter % 2u) != 0u)
+  {
+    scatteringComputeCalltoUse = _computeCallScatteringPrevFrameRef;
+
+    ImageManager::insertImageMemoryBarrier(
+        _volLightingBufferPrevFrameImageRef, VK_IMAGE_LAYOUT_GENERAL,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+  }
+  else
+  {
+    ImageManager::insertImageMemoryBarrier(
+        _volLightingBufferImageRef, VK_IMAGE_LAYOUT_GENERAL,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+  }
 
   ImageManager::insertImageMemoryBarrier(
       _volLightingScatteringBufferImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
       VK_IMAGE_LAYOUT_GENERAL, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
       VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+
   {
-    RenderSystem::dispatchComputeCall(_computeCallScatteringRef,
+    RenderSystem::dispatchComputeCall(scatteringComputeCalltoUse,
                                       primaryCmdBuffer);
   }
   ImageManager::insertImageMemoryBarrier(
