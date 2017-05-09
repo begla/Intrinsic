@@ -139,7 +139,6 @@ void main()
     const float dist = length(lightDistVec);
     const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
 
-    // TODO: Fix me
     accumFog += vec4(localLightIntens * att * light.color.rgb / MATH_PI, 0.0);
   }
 
