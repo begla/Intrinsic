@@ -1,0 +1,10 @@
+{
+    "name": "esm_generate.frag",
+    "properties": {
+        "name": "esm_generate.frag",
+        "gpuProgramName": "esm_generate.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}
