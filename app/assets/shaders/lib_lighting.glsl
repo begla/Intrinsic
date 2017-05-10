@@ -15,6 +15,10 @@
 #define PSSM_SPLIT_COUNT 4u
 #define MAX_SHADOW_MAP_COUNT 16u
 
+#define ESM_POSITIVE_EXPONENT 100.0
+#define ESM_NEGATIVE_EXPONENT 80.0
+#define ESM_EXPONENTS vec2(ESM_POSITIVE_EXPONENT, ESM_NEGATIVE_EXPONENT)
+
 // Clustered lighting
 // ->
 
@@ -65,7 +69,6 @@ struct Light
 };
 
 // <-
-
 struct LightingData
 {
   // Source
@@ -155,6 +158,9 @@ float calcInverseSqrFalloff(float lightRadius, float dist)
   return a1 * a1 / (dist2 + 1.0);
 }
 
+// Shadows
+// ->
+
 vec4 calcPosLS(vec3 posVS, uint shadowMapIdx, mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT])
 {
   vec4 posLS = shadowViewProjMatrix[shadowMapIdx] * vec4(posVS, 1.0);
@@ -184,6 +190,9 @@ uint findBestFittingSplit(vec3 posVS, out vec4 posLS, mat4 shadowViewProjMatrix[
 
   return uint(-1);
 }
+
+// Ordinary shadow mapping / PCF
+// ->
 
 float sampleShadowMap(vec2 base_uv, float u, float v, vec2 shadowMapSizeInv, float depth, uint shadowMapIdx, sampler2DArrayShadow shadowTex) 
 {
@@ -269,4 +278,48 @@ float calcShadowAttenuation(vec3 posVS, mat4 shadowViewProjMatrix[MAX_SHADOW_MAP
   }
 
   return shadowAttenuation;
+}
+
+// Exponential shadow maps
+// ->
+
+vec2 warpDepth(float depth)
+{
+  depth = 2.0 * depth - 1.0;
+  const float pos = exp(ESM_POSITIVE_EXPONENT * depth);
+  const float neg = -exp(-ESM_NEGATIVE_EXPONENT * depth);
+  return vec2(pos, neg);
+}
+
+float chebyshev(vec2 moments, float mean, float minVariance)
+{
+  // Compute variance
+  float variance = moments.y - (moments.x * moments.x);
+  variance = max(variance, minVariance);
+
+  // Compute probabilistic upper bound
+  float d = mean - moments.x;
+  float pMax = variance / (variance + (d * d));
+
+  // One-tailed Chebyshev
+  return (mean <= moments.x ? 1.0f : pMax);
+}
+
+float calculateShadowEVSM(vec4 moments, float shadowDepth)
+{
+  vec2 posMoments = vec2(moments.x, moments.z);
+  vec2 negMoments = vec2(moments.y, moments.w);
+  vec2 warpedDepth = warpDepth(shadowDepth);
+
+  vec2 depthScale = 0.0001 * ESM_EXPONENTS * warpedDepth;
+  vec2 minVariance = depthScale * depthScale;
+  float posResult = chebyshev(posMoments, warpedDepth.x, minVariance.x);
+  float negResult = chebyshev(negMoments, warpedDepth.y, minVariance.y);
+  return min(posResult, negResult);
+}
+
+float calculateShadowESM(vec4 moments, float shadowDepth)
+{
+  const vec2 warpedDepth = warpDepth(shadowDepth);
+  return clamp(moments.x / warpedDepth.x, 0.0, 1.0);
 }

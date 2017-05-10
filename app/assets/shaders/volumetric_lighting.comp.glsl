@@ -60,16 +60,16 @@ layout (binding = 5) buffer LightIndexBuffer
 {
   uint lightIndices[];
 };
+layout (binding = 6) uniform sampler2DArray shadowBufferExpTex;
  
 // Based on AC4 volumetric fog
-// https://goo.gl/xEgT9O
 layout (local_size_x = 4u, local_size_y = 4u, local_size_z = 4u) in; 
 void main()
 {
   const float sunDensity = 30.0; 
   const vec3 fogSunColor = 20.0 * vec3(1.0, 0.9, 0.8); 
   const vec3 fogSkyColor = 15.0 * vec3(0.8, 1.0, 1.0);
-  const float minShadowAttenuation = 0.05;
+  const float minShadowAttenuation = 0.0;
   const float heightAttenuationFactor = 0.025;
   const float scatteringFactor = uboPerInstance.data0.x;
   const float localLightIntens = uboPerInstance.data0.y;
@@ -117,7 +117,10 @@ void main()
   if (shadowMapIdx != uint(-1)) 
   {
     //shadowAttenuation = witnessPCF(posLS.xyz, shadowMapIdx, shadowBufferTex);
-    shadowAttenuation = texture(shadowBufferTex, vec4(posLS.xy, shadowMapIdx, posLS.z));
+    //shadowAttenuation = texture(shadowBufferTex, vec4(posLS.xy, shadowMapIdx, posLS.z));
+
+    vec4 shadowSample = texture(shadowBufferExpTex, vec3(posLS.xy, shadowMapIdx));
+    shadowAttenuation = clamp(calculateShadowESM(shadowSample, posLS.z)*1.1 - 0.1, 0.0, 1.0);
   }
 
   shadowAttenuation = max(minShadowAttenuation, shadowAttenuation);
@@ -145,8 +148,8 @@ void main()
   }
 
   // Noise
-  noiseAccum *= noise(posWS * 0.25 + uboPerInstance.eyeWSVectorX.w * 1.0);
-  noiseAccum *= noise(posWS * 0.15 + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.382871);
+  //noiseAccum *= noise(posWS * 0.25 + uboPerInstance.eyeWSVectorX.w * 1.0);
+  //noiseAccum *= noise(posWS * 0.15 + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.382871);
 
   // Main light
   accumFog += vec4(noiseAccum * scattering * shadowAttenuation * lightColor, scattering);

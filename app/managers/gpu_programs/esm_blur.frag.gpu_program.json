@@ -1,0 +1,10 @@
+{
+    "name": "esm_blur.frag",
+    "properties": {
+        "name": "esm_blur.frag",
+        "gpuProgramName": "esm_blur.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}
