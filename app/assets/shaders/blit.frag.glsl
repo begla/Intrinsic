@@ -32,6 +32,5 @@ layout (location = 0) out vec4 outColor;
 
 void main()
 {
-  const vec2 framebufferSize = textureSize(inputTex, 0);
   outColor = textureLod(inputTex, inUV0, 0.0).rgba;
 }
