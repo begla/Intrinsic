@@ -71,7 +71,7 @@ void displayWorldBoundingSpheres()
       Math::Sphere& worldBoundingSphere =
           Components::NodeManager::_worldBoundingSphere(nodeRef);
       Debug::renderSphere(worldBoundingSphere.p, worldBoundingSphere.r,
-                          glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+                          glm::vec3(0.0f, 1.0f, 0.0f));
     }
   }
 }
@@ -139,13 +139,25 @@ void displayDebugLineGeometryForSelectedObject()
       Debug::renderSphere(
           Components::NodeManager::_worldPosition(nodeRef),
           Components::PostEffectVolumeManager::_descRadius(postVolumeRef),
-          glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+          glm::vec3(0.0f, 0.0f, 1.0f));
       Debug::renderSphere(
           Components::NodeManager::_worldPosition(nodeRef),
           Components::PostEffectVolumeManager::_descRadius(postVolumeRef) -
               Components::PostEffectVolumeManager::_descBlendRange(
                   postVolumeRef),
-          glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
+          glm::vec3(0.0f, 1.0f, 1.0f));
+    }
+
+    Components::LightRef lightRef =
+        Components::LightManager::getComponentForEntity(
+            GameStates::Editing::_currentlySelectedEntity);
+
+    if (lightRef.isValid())
+    {
+      Debug::renderSphere(
+          Components::NodeManager::_worldPosition(nodeRef),
+          Components::LightManager::_descRadius(lightRef),
+          glm::vec3(Components::LightManager::_descColor(lightRef)));
     }
   }
 }
@@ -386,7 +398,7 @@ void Debug::renderLine(const glm::vec3& p_Pos0, const glm::vec3& p_Pos1,
 // <-
 
 void Debug::renderSphere(const glm::vec3& p_Center, float p_Radius,
-                         const glm::vec4& p_Color)
+                         const glm::vec3& p_Color)
 {
   if (GameStates::Manager::getActiveGameState() !=
       GameStates::GameState::kEditing)
