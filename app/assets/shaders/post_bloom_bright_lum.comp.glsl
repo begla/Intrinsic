@@ -18,6 +18,8 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
+#include "lib_math.glsl"
+
 #define DELTA 0.00001
 #define LUM_AND_BRIGHT_THREADS 8u
 
