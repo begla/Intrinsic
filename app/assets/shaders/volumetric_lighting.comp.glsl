@@ -23,11 +23,6 @@
 #include "lib_vol_lighting.glsl"
 #include "lib_noise.glsl"
 
-vec4 PDnrand4(vec2 n) 
-{
-  return fract(sin(dot(n.xy, vec2(12.9898f, 78.233f)))* vec4(43758.5453, 28001.8384, 50849.4141, 12996.89));
-}
-
 layout (binding = 0) uniform PerInstance
 {
   mat4 projMatrix;
