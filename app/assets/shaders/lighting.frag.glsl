@@ -123,6 +123,9 @@ void main()
 
   outColor.rgb += parameter0Sample.z * spec;
 
+  // Emissive
+  outColor.rgb += matParams.emissiveIntensity * d.baseColor;
+
   // Direct lighting
   float shadowAttenuation = calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
   outColor.rgb += shadowAttenuation * mainLightColor * calcLighting(d);

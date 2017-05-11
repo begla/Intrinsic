@@ -1,7 +1,7 @@
 {
-    "name": "default_white",
+    "name": "default_emissive",
     "properties": {
-        "name": "default_white",
+        "name": "default_emissive",
         "materialPassMask": [
             "GBufferDefault",
             "Shadow",
@@ -19,11 +19,11 @@
             0.0
         ],
         "translucencyThickness": 1.0,
-        "emissiveIntensity": 0.0,
+        "emissiveIntensity": 1.0,
         "normalTextureName": "default_NRM",
         "pbrTextureName": "default_PBR",
         "pbrBias": [
-            0.0,
+            1.0,
             0.0,
             0.0
         ]
