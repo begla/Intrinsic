@@ -254,12 +254,12 @@ createComputeCallScattering(glm::vec3 p_Dim,
   return computeCallScatteringRef;
 }
 
-_INTR_INLINE void generateExponentialShadowMaps()
+_INTR_INLINE void generateExponentialShadowMaps(uint32_t p_ShadowMapCount)
 {
   using namespace Resources;
 
-  for (uint32_t shadowMapIndex = 0u;
-       shadowMapIndex < _INTR_MAX_SHADOW_MAP_COUNT; ++shadowMapIndex)
+  for (uint32_t shadowMapIndex = 0u; shadowMapIndex < p_ShadowMapCount;
+       ++shadowMapIndex)
   {
     PerInstanceDataESMGenerate instanceData;
     instanceData.arrayIdx.x = shadowMapIndex;
@@ -288,14 +288,14 @@ _INTR_INLINE void generateExponentialShadowMaps()
   }
 }
 
-_INTR_INLINE void blurExponentialShadowMaps()
+_INTR_INLINE void blurExponentialShadowMaps(uint32_t p_ShadowMapCount)
 {
   using namespace Resources;
 
   static const float blurRadius = 2.0f;
 
-  for (uint32_t shadowMapIndex = 0u;
-       shadowMapIndex < _INTR_MAX_SHADOW_MAP_COUNT; ++shadowMapIndex)
+  for (uint32_t shadowMapIndex = 0u; shadowMapIndex < p_ShadowMapCount;
+       ++shadowMapIndex)
   {
     PerInstanceDataESMBlur instanceData;
     instanceData.arrayIdx.x = shadowMapIndex;
@@ -765,8 +765,12 @@ void VolumetricLighting::render(float p_DeltaT,
   _INTR_PROFILE_CPU("Render Pass", "Render Volumetric Lighting");
   _INTR_PROFILE_GPU("Render Volumetric Lighting");
 
-  generateExponentialShadowMaps();
-  blurExponentialShadowMaps();
+  const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+      RenderProcess::Default::_shadowFrustums[p_CameraRef];
+
+  const uint32_t shadowMapCount = (uint32_t)shadowFrustums.size();
+  generateExponentialShadowMaps(shadowMapCount);
+  blurExponentialShadowMaps(shadowMapCount);
 
   ComputeCallRef accumComputeCallRefToUse = _computeCallAccumRef;
   if ((TaskManager::_frameCounter % 2u) != 0u)
