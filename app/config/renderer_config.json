@@ -82,12 +82,12 @@
 		{
 			"name" : "GBufferAlbedo",
 			"renderSize" : "Full",
-			"imageFormat" : "R16G16B16A16Float"
+			"imageFormat" : "B8G8R8A8UNorm"
 		},
 		{
 			"name" : "GBufferNormal",
 			"renderSize" : "Full",
-			"imageFormat" : "R16G16B16A16Float"
+			"imageFormat" : "B8G8R8A8UNorm"
 		},
 		{
 			"name" : "GBufferParameter0",
@@ -97,12 +97,12 @@
 		{
 			"name" : "GBufferTransparentsAlbedo",
 			"renderSize" : "Full",
-			"imageFormat" : "R16G16B16A16Float"
+			"imageFormat" : "B8G8R8A8UNorm"
 		},
 		{
 			"name" : "GBufferTransparentsNormal",
 			"renderSize" : "Full",
-			"imageFormat" : "R16G16B16A16Float"
+			"imageFormat" : "B8G8R8A8UNorm"
 		},
 		{
 			"name" : "GBufferTransparentsParameter0",
