@@ -73,7 +73,7 @@ void main()
   const float heightAttenuationFactor = 0.025;
   const float scatteringFactor = uboPerInstance.data0.x;
   const float localLightIntens = uboPerInstance.data0.y;
-  float reprojWeight = 0.85; 
+  float reprojWeight = 0.9; 
 
   // ->
 
@@ -112,6 +112,7 @@ void main()
 
   vec4 posLS;
   uint shadowMapIdx = findBestFittingSplit(posVS.xyz, posLS, uboPerInstance.shadowViewProjMatrix);
+
   float shadowAttenuation = 1.0; 
 
   if (shadowMapIdx != uint(-1)) 
@@ -120,6 +121,7 @@ void main()
     //shadowAttenuation = texture(shadowBufferTex, vec4(posLS.xy, shadowMapIdx, posLS.z));
 
     vec4 shadowSample = texture(shadowBufferExpTex, vec3(posLS.xy, shadowMapIdx));
+    //shadowAttenuation = calculateShadowESM(shadowSample, posLS.z);
     shadowAttenuation = clamp(calculateShadowESM(shadowSample, posLS.z)*1.1 - 0.1, 0.0, 1.0);
   }
 
@@ -149,7 +151,7 @@ void main()
 
   // Noise
   //noiseAccum *= noise(posWS * 0.25 + uboPerInstance.eyeWSVectorX.w * 1.0);
-  //noiseAccum *= noise(posWS * 0.15 + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.382871);
+  noiseAccum *= noise(posWS * 0.15 + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.382871);
 
   // Main light
   accumFog += vec4(noiseAccum * scattering * shadowAttenuation * lightColor, scattering);
