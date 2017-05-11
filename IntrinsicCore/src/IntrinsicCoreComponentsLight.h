@@ -78,18 +78,18 @@ struct LightManager
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember("Radius",
+    p_Properties.AddMember("radius",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
                                              _N(Light), _N(float),
                                              _descRadius(p_Ref), false, false),
                            p_Document.GetAllocator());
-    p_Properties.AddMember("Color",
+    p_Properties.AddMember("color",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
                                              _N(Light), _N(vec3),
                                              _descColor(p_Ref), false, false),
                            p_Document.GetAllocator());
     p_Properties.AddMember(
-        "Intensity",
+        "intensity",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Light), _N(float),
                           _descIntensity(p_Ref), false, false),
         p_Document.GetAllocator());
@@ -100,14 +100,14 @@ struct LightManager
   _INTR_INLINE static void initFromDescriptor(LightRef p_Ref,
                                               rapidjson::Value& p_Properties)
   {
-    if (p_Properties.HasMember("Radius"))
+    if (p_Properties.HasMember("radius"))
       _descRadius(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["Radius"]);
-    if (p_Properties.HasMember("Color"))
-      _descColor(p_Ref) = JsonHelper::readPropertyVec3(p_Properties["Color"]);
-    if (p_Properties.HasMember("Intensity"))
+          JsonHelper::readPropertyFloat(p_Properties["radius"]);
+    if (p_Properties.HasMember("color"))
+      _descColor(p_Ref) = JsonHelper::readPropertyVec3(p_Properties["color"]);
+    if (p_Properties.HasMember("intensity"))
       _descIntensity(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["Intensity"]);
+          JsonHelper::readPropertyFloat(p_Properties["intensity"]);
   }
 
   // <-
