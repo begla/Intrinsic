@@ -17,6 +17,7 @@
             0.009999999776482582
         ],
         "translucencyThickness": 0.0,
+        "emissiveIntensity": 0.0,
         "normalTextureName": "water_NRM",
         "pbrTextureName": "water_PBR",
         "pbrBias": [

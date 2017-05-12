@@ -42,7 +42,7 @@ struct Debug
   static void renderLine(const glm::vec3& p_Pos0, const glm::vec3& p_Pos1,
                          uint32_t p_Color0, uint32_t p_Color1);
   static void renderSphere(const glm::vec3& p_Center, float p_Radius,
-                           const glm::vec4& p_Color);
+                           const glm::vec3& p_Color);
 
   static void render(float p_DeltaT, Components::CameraRef p_CameraRef);
 

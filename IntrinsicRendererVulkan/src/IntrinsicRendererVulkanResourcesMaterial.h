@@ -94,6 +94,7 @@ struct MaterialData : Dod::Resources::ResourceDataBase
     descRefractionFactor.resize(_INTR_MAX_MATERIAL_COUNT);
 
     descTranslucencyThickness.resize(_INTR_MAX_MATERIAL_COUNT);
+    descEmissiveIntensity.resize(_INTR_MAX_MATERIAL_COUNT);
 
     descUvOffsetScale.resize(_INTR_MAX_MATERIAL_COUNT);
     descUvAnimation.resize(_INTR_MAX_MATERIAL_COUNT);
@@ -131,6 +132,7 @@ struct MaterialData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(float) descRefractionFactor;
 
   _INTR_ARRAY(float) descTranslucencyThickness;
+  _INTR_ARRAY(float) descEmissiveIntensity;
 
   _INTR_ARRAY(glm::vec4) descUvOffsetScale;
   _INTR_ARRAY(glm::vec2) descUvAnimation;
@@ -174,7 +176,9 @@ struct MaterialManager
     _descFoamTextureName(p_Ref) = _N(checkerboard);
     _descFoamFadeDistance(p_Ref) = 1.0f;
     _descRefractionFactor(p_Ref) = 0.0f;
+
     _descTranslucencyThickness(p_Ref) = 0.0f;
+    _descEmissiveIntensity(p_Ref) = 0.0f;
 
     _descUvOffsetScale(p_Ref) = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
     _descPbrBias(p_Ref) = glm::vec3(0.0f);
@@ -235,6 +239,12 @@ struct MaterialManager
           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
                             _N(Properties_Translucency), "float",
                             _descTranslucencyThickness(p_Ref), false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "emissiveIntensity",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                            _N(Properties_Translucency), "float",
+                            _descEmissiveIntensity(p_Ref), false, false),
           p_Document.GetAllocator());
     }
 
@@ -400,6 +410,9 @@ struct MaterialManager
     if (p_Properties.HasMember("translucencyThickness"))
       _descTranslucencyThickness(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["translucencyThickness"]);
+    if (p_Properties.HasMember("emissiveIntensity"))
+      _descEmissiveIntensity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["emissiveIntensity"]);
 
     if (p_Properties.HasMember("uvOffsetScale"))
       _descUvOffsetScale(p_Ref) =
@@ -539,6 +552,10 @@ struct MaterialManager
   _INTR_INLINE static float& _descTranslucencyThickness(MaterialRef p_Ref)
   {
     return _data.descTranslucencyThickness[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descEmissiveIntensity(MaterialRef p_Ref)
+  {
+    return _data.descEmissiveIntensity[p_Ref._id];
   }
 
   _INTR_INLINE static _INTR_ARRAY(Name) &

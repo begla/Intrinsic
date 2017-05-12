@@ -195,7 +195,7 @@ void Shadow::init()
   }
   imagesToCreate.push_back(_shadowBufferImageRef);
 
-  // Create framebuffer
+  // Create framebuffers
   for (uint32_t shadowMapIdx = 0u; shadowMapIdx < _INTR_MAX_SHADOW_MAP_COUNT;
        ++shadowMapIdx)
   {

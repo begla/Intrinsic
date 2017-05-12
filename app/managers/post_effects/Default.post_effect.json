@@ -2,6 +2,7 @@
     "name": "Default",
     "properties": {
         "name": "Default",
-        "volumetricLightingScattering": 0.0
+        "Scattering": 0.0,
+        "LocalLightIntensity": 0.0
     }
 }

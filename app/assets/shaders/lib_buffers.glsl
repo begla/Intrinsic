@@ -16,6 +16,7 @@ struct MaterialParameters
 {
   float refractionFactor;
   float translucencyThickness;
+  float emissiveIntensity;
 };
 
 #define MATERIAL_BUFFER buffer MaterialBuffer \

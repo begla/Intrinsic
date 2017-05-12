@@ -22,7 +22,7 @@
 
 layout (binding = 0) uniform PerInstance
 {
-  ivec4 data0;
+  ivec4 haltonSamples;
 } uboPerInstance;
 
 layout (binding = 1) uniform sampler2D sceneTex;
@@ -110,7 +110,7 @@ void main()
 
   // Film grain
   const vec4 grain = texelFetch(filmGrainTex, 
-    (ivec2(inUV0 * framebufferSize.xy) + uboPerInstance.data0.xy) & 255, 0).rgba;
+    (ivec2(inUV0 * framebufferSize.xy) + uboPerInstance.haltonSamples.xy) & 255, 0).rgba;
   outColor.rgb = grain.rgb * min(outColor.rgb + filmGrainBias, filmGrainMax) + outColor.rgb;
 
   // Tonemapping

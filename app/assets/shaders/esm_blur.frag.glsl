@@ -20,17 +20,46 @@
 
 #include "lib_math.glsl"
 
+#define KERNEL_RADIUS uboPerInstance.blurParams.x
+
 layout (binding = 0) uniform PerInstance
 {
-  vec4 cameraWorldPosition;
+  vec4 blurParams;
+  uvec4 arrayIdx;
 } uboPerInstance;
 
-layout (binding = 1) uniform sampler2D inputTex;
+layout (binding = 1) uniform sampler2DArray inputTex;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
+vec4 blur(vec2 uv, inout float w_total)
+{
+  w_total += 1.0;
+  return texture(inputTex, vec3(uv, uboPerInstance.arrayIdx.x));
+}
+
 void main()
 {
-  outColor = textureLod(inputTex, inUV0, 0.0).rgba;
+	vec4  center_c = texture(inputTex, vec3(inUV0, uboPerInstance.arrayIdx.x));
+
+  vec2 resDir = textureSize(inputTex, 0).xy;
+  resDir = 1.0 / resDir * uboPerInstance.blurParams.zw;
+  
+  vec4  c_total = center_c;
+  float w_total = 1.0;
+  
+  for (float r = 1; r <= KERNEL_RADIUS; ++r)
+  {
+    vec2 uv = inUV0 + resDir * r;
+    c_total += blur(uv, w_total);  
+  }
+  
+  for (float r = 1; r <= KERNEL_RADIUS; ++r)
+  {
+    vec2 uv = inUV0 - resDir * r;
+    c_total += blur(uv, w_total);  
+  }
+
+  outColor = c_total/w_total;
 }
