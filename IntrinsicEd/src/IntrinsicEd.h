@@ -79,6 +79,7 @@ public slots:
   void onCreateCube();
   void onCreateRigidBody();
   void onCreateRigidBodySphere();
+  void onCreateLight();
   void onCreateSphere();
   void onSpawnVegetation();
   void onSpawnGrass();

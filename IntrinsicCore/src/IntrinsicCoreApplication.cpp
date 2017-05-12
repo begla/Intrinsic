@@ -116,6 +116,7 @@ void Application::initManagers()
     Components::SwarmManager::init();
     Components::CameraControllerManager::init();
     Components::PlayerManager::init();
+    Components::LightManager::init();
   }
 
   // Init resource managers

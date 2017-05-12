@@ -19,6 +19,7 @@
             0.0
         ],
         "translucencyThickness": 0.0,
+        "emissiveIntensity": 0.0,
         "normalTextureName": "grassleaves_01_NRM",
         "pbrTextureName": "grassleaves_01_PBR",
         "pbrBias": [

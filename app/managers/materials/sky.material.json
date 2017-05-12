@@ -16,6 +16,7 @@
             0.0,
             0.0
         ],
-        "translucencyThickness": 0.0
+        "translucencyThickness": 0.0,
+        "emissiveIntensity": 0.0
     }
 }

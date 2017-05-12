@@ -29,7 +29,10 @@ layout (binding = 0) uniform PerInstance
   mat4 invProjMatrix;
   mat4 invViewMatrix;
 
-  mat4 shadowViewProjMatrix[PSSM_SPLIT_COUNT];
+  mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT];
+
+  vec4 nearFarWidthHeight;
+  vec4 nearFar;
 } uboPerInstance; 
 
 layout (binding = 1) uniform sampler2D albedoTex;
@@ -41,9 +44,25 @@ layout (binding = 6) uniform samplerCube irradianceTex;
 layout (binding = 7) uniform samplerCube specularTex;
 layout (binding = 8) uniform sampler2DArrayShadow shadowBufferTex;
 layout (binding = 9) MATERIAL_BUFFER;
+layout (binding = 10) buffer LightBuffer
+{
+  Light lights[];
+};
+layout (binding = 11) buffer LightIndexBuffer
+{
+  uint lightIndices[];
+};
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
+
+const vec4 mainLightDir = vec4(1.0, 0.45, -0.275, 0.0);
+const vec3 mainLightColor = vec3(1.0, 0.4, 0.2);
+
+const float translDistortion = 0.2;
+const float translPower = 12.0;
+const float translScale = 1.0;
+const vec3 translAmbient = vec3(0.0);
 
 void main()
 {
@@ -69,12 +88,13 @@ void main()
   d.metalMask = parameter0Sample.r;
   d.specular = normalSample.b;
   d.roughness = normalSample.a;
+  initLightingDataFromGBuffer(d);
 
   d.N = normalize(decodeNormal(normalSample.rg));  
-  d.L = normalize(uboPerInstance.viewMatrix * vec4(1.0, 0.45, -0.275, 0.0)).xyz;
+  d.L = normalize(uboPerInstance.viewMatrix * mainLightDir).xyz;
   d.V = -normalize(posVS); 
   d.energy = 10.0 * vec3(1.0, 1.0, 1.0);
-  initLightingData(d);
+  calculateLightingData(d);
 
   // Ambient lighting
   const vec3 normalWS = (uboPerInstance.invViewMatrix * vec4(d.N, 0.0)).xyz;
@@ -103,28 +123,49 @@ void main()
 
   outColor.rgb += parameter0Sample.z * spec;
 
-  // Directional main light shadows
-  float shadowAttenuation = calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
+  // Emissive
+  outColor.rgb += matParams.emissiveIntensity * d.baseColor;
 
   // Direct lighting
-  const vec3 lightColor = vec3(1.0, 0.5, 0.5);
-
-  // NOTE: That's just a hack for good looks
-  outColor.rgb += shadowAttenuation * calcLighting(d) * lightColor;
+  float shadowAttenuation = calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
+  outColor.rgb += shadowAttenuation * mainLightColor * calcLighting(d);
 
   // Translucency
-  const float translDistortion = 0.2;
-  const float translPower = 12.0;
-  const float translScale = 1.0;
-  const vec3 translAmbient = vec3(0.0);
   const float translThickness = matParams.translucencyThickness;
 
   vec3 translLightVector = d.L + d.N * translDistortion;
   float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
   vec3 transl = (translDot + translAmbient) * translThickness;
-  vec3 translColor = d.diffuseColor * lightColor * transl;
+  vec3 translColor = d.diffuseColor * mainLightColor * transl;
 
   outColor.rgb += translColor;
+
+  const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
+  const uint clusterIdx = calcClusterIndex(gridPos);
+
+  // Point lights
+  uint lightCount = lightIndices[clusterIdx];
+
+  // DEBUG: Visualize clusters
+  /*if (lightCount > 0)
+  {
+    outColor = vec4(gridPos / vec3(gridRes), 0.0);
+    return;
+  }*/
+
+  for (uint li=0; li<lightCount; ++li)
+  {
+    Light light = lights[lightIndices[clusterIdx + li + 1]];
+
+    const vec3 lightDistVec = light.posAndRadius.xyz - posVS;
+    const float dist = length(lightDistVec);
+    d.L = lightDistVec / dist;
+    calculateLightingData(d);
+
+    outColor.rgb += 
+      calcInverseSqrFalloff(light.posAndRadius.w, dist) 
+      * calcLighting(d) * light.color.rgb;
+  }
 
   outColor.a = 1.0;
 }

@@ -9,7 +9,7 @@ configuration:
 environment:
   INTR_QTDIR: "C:\\Qt\\5.7\\msvc2015_64\\"
   INTR_GIT_TOKEN: 
-    secure: 7D4rb81yGcTOgpizeKD1m3vlSDc7tU9SNQdW4/LVdHzou7gMaKK01esf7/v/3ccB
+    secure: 3K1IRVqC1dSplGBGvUMuykBbCMIH8INr3HUE4YNJDmtEYNy0kTJPzeW+pMSCae4y
   VK_SDK_PATH: "C:\\VulkanSDK\\1.0.46.0\\"
   
 artifacts:
