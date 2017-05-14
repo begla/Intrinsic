@@ -48,6 +48,7 @@ namespace BlendStates
 enum Enum
 {
   kDefault,
+  kAlphaBlend,
 
   kCount
 };

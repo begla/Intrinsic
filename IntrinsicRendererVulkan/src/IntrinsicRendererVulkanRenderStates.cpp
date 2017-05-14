@@ -167,6 +167,19 @@ void initBlendStates()
     bs.srcAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
     bs.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
   }
+
+  {
+    VkPipelineColorBlendAttachmentState& bs =
+        RenderStates::blendStates[BlendStates::kAlphaBlend];
+    bs.colorWriteMask = 0xf;
+    bs.blendEnable = VK_TRUE;
+    bs.alphaBlendOp = VK_BLEND_OP_ADD;
+    bs.colorBlendOp = VK_BLEND_OP_ADD;
+    bs.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_COLOR;
+    bs.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR;
+    bs.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    bs.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+  }
 }
 
 void RenderStates::init()
