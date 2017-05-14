@@ -209,19 +209,22 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
           Components::NodeFlags::kSpawned;
       Components::NodeManager::_size(nodeRef) = glm::vec3(0.45f, 0.45f, 0.45f);
 
+      glm::vec4 boidColor =
+          glm::vec4(Math::calcRandomFloatMinMax(0.0f, 1.0f),
+                    Math::calcRandomFloatMinMax(0.0f, 1.0f),
+                    Math::calcRandomFloatMinMax(0.0f, 1.0f), 1.0f);
+
       Components::MeshRef meshRef =
           Components::MeshManager::createMesh(entityRef);
       Components::MeshManager::resetToDefault(meshRef);
       Components::MeshManager::_descMeshName(meshRef) =
           _descBoidMeshName(swarmRef);
+      Components::MeshManager::_descColorTint(meshRef) = boidColor;
 
       Components::LightRef lightRef =
           Components::LightManager::createLight(entityRef);
       Components::LightManager::resetToDefault(lightRef);
-      Components::LightManager::_descColor(lightRef) =
-          glm::vec3(Math::calcRandomFloatMinMax(0.0f, 1.0f),
-                    Math::calcRandomFloatMinMax(0.0f, 1.0f),
-                    Math::calcRandomFloatMinMax(0.0f, 1.0f));
+      Components::LightManager::_descColor(lightRef) = boidColor;
 
       Components::NodeRef swarmNodeRef =
           Components::NodeManager::getComponentForEntity(
