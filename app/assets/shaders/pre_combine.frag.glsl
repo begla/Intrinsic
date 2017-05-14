@@ -83,7 +83,7 @@ void main()
     const float depthLinTransp = linearizeDepth(depthTransp, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
 
     // Refraction
-    const float distStrength = matParamsTransp.refractionFactor;
+    const float distStrength = albedoTransparents.a * matParamsTransp.refractionFactor;
 
     const vec2 distortedUV = inUV0 + normTranspVS.xy * (distStrength / -depthLinTransp);
     const vec3 albedoDistored = textureLod(albedoTex, distortedUV, 0.0).rgb;

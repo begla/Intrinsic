@@ -29,6 +29,7 @@ PER_INSTANCE_UBO;
 BINDINGS_GBUFFER;
 layout (binding = 6) uniform sampler2D gbufferDepthTex;
 layout (binding = 7) uniform sampler2D foamTex;
+layout (binding = 8) uniform sampler2D noiseTex;
 
 // Input
 layout (location = 0) in vec3 inNormal;
@@ -41,7 +42,7 @@ layout (location = 5) in vec4 inPosition;
 // Output
 OUTPUT
 
-const float edgeFadeDistance = 0.0;
+const float edgeFadeDistance = 15.0;
 const float waterBaseAlpha = 0.5;
 
 void main()
@@ -66,19 +67,21 @@ void main()
   const vec4 normal0 = texture(normalTex, uv0);
   const vec4 albedo1 = texture(albedoTex, uv0InverseAnim * 0.2);
   const vec4 normal1 = texture(normalTex, uv0InverseAnim * 0.2);
+  const vec4 noise = texture(noiseTex, uv0 * 2.0);
 
-  const float blend = waterBaseAlpha;
+  const float blend = 0.5;
   vec4 albedo = mix(albedo0, albedo1, blend);
   const vec4 normal = mix(normal0, normal1, blend);
 
-  const vec4 foam = texture(foamTex, uv0);
+  const vec4 foam = texture(foamTex, uv0 * 5.0);
   vec4 pbr = texture(pbrTex, uv0);
 
-  albedo.a = 0.5;
+  albedo.a = waterBaseAlpha;
 
-  const float foamFade = 1.0 
+  float foamFade = 1.0 
     - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
-      * uboPerInstance.camParams.y / uboPerMaterial.pbrBias.w / foam.r, 0.0, 1.0);
+      * uboPerInstance.camParams.y / 60.0 * foam.r, 0.0, 1.0);
+  foamFade += clamp(noise.r - 0.4, 0.0, 1.0);
   const float edgeFade = 1.0 
     - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
       * uboPerInstance.camParams.y / edgeFadeDistance, 0.0, 1.0);

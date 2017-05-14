@@ -50,7 +50,8 @@
         ["Image", "MaterialNormal", "normalTex", "Fragment"],
         ["Image", "MaterialRoughness", "pbrTex", "Fragment"],
         ["Image", "MaterialFoam", "foamTex", "Fragment"],
-        ["Image", "GBufferDepth", "gbufferDepthTex", "Fragment"]
+        ["Image", "GBufferDepth", "gbufferDepthTex", "Fragment"],
+        ["Image", "noise", "noiseTex", "Fragment"]
       ]
     },
     {
