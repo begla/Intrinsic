@@ -41,6 +41,9 @@ layout (location = 5) in vec4 inPosition;
 // Output
 OUTPUT
 
+const float edgeFadeDistance = 0.0;
+const float waterBaseAlpha = 0.5;
+
 void main()
 { 
   vec3 screenPos = inPosition.xyz / inPosition.w;
@@ -57,23 +60,21 @@ void main()
   const mat3 TBN = mat3(inTangent, inBinormal, inNormal);
 
   const vec2 uv0 = UV0_TRANSFORMED_ANIMATED;
-  const vec2 uv0InverseAnim = UV0_TRANSFORMED_ANIMATED_FACTOR(vec2(0.4, 0.3));
+  const vec2 uv0InverseAnim = UV0_TRANSFORMED_ANIMATED_FACTOR(vec2(0.2, 0.9));
 
   const vec4 albedo0 = texture(albedoTex, uv0);
   const vec4 normal0 = texture(normalTex, uv0);
+  const vec4 albedo1 = texture(albedoTex, uv0InverseAnim * 0.2);
+  const vec4 normal1 = texture(normalTex, uv0InverseAnim * 0.2);
 
-  const vec4 albedo1 = texture(albedoTex, uv0InverseAnim * 0.4);
-  const vec4 normal1 = texture(normalTex, uv0InverseAnim * 0.4);
-
-  const float blend = 0.5;
+  const float blend = waterBaseAlpha;
   vec4 albedo = mix(albedo0, albedo1, blend);
   const vec4 normal = mix(normal0, normal1, blend);
 
   const vec4 foam = texture(foamTex, uv0);
   vec4 pbr = texture(pbrTex, uv0);
 
-  const float baseAlpha = 0.5;
-  const float edgeFadeDistance = 0.0;
+  albedo.a = 0.5;
 
   const float foamFade = 1.0 
     - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
@@ -82,8 +83,7 @@ void main()
     - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
       * uboPerInstance.camParams.y / edgeFadeDistance, 0.0, 1.0);
 
-  albedo.a = mix(baseAlpha, 0.0, foamFade);
-  albedo.a = mix(albedo.a, 1.0, edgeFade);
+  albedo.a = mix(albedo.a, 0.0, edgeFade);
   albedo.rgb = mix(albedo.rgb, foam.rgb, foamFade);
   pbr.xz = mix(pbr.xz, vec2(0.0, 1.0), foamFade);
 

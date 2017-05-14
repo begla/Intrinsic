@@ -355,7 +355,7 @@
 			"materialPasses" : ["GBufferWater", "GBufferEffect"],
 			"renderOrder" : "BackToFront",
 			"outputs" : [
-				["GBufferTransparentsAlbedo", [0.0, 0.0, 0.0, 1.0]],
+				["GBufferTransparentsAlbedo", [0.0, 0.0, 0.0, 0.0]],
 				["GBufferTransparentsNormal", [0.0, 0.0, 0.0, 0.0]],
 				["GBufferTransparentsParameter0", [0.0, 0.0, 0.0, 0.0]],
 				["GBufferTransparentsDepth", [1.0]]
