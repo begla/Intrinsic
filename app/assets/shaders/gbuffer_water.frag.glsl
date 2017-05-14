@@ -80,11 +80,14 @@ void main()
 
   float foamFade = 1.0 
     - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
-      * uboPerInstance.camParams.y / 60.0 * foam.r, 0.0, 1.0);
+      * uboPerInstance.camParams.y / uboPerMaterial.waterParams.x * foam.r, 0.0, 1.0);
+
+  // Add foam based on noise texture
   foamFade += clamp(noise.r - 0.4, 0.0, 1.0);
+
   const float edgeFade = 1.0 
     - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
-      * uboPerInstance.camParams.y / edgeFadeDistance, 0.0, 1.0);
+      * uboPerInstance.camParams.y / uboPerMaterial.waterParams.y, 0.0, 1.0);
 
   albedo.a = mix(albedo.a, 0.0, edgeFade);
   albedo.rgb = mix(albedo.rgb, foam.rgb, foamFade);

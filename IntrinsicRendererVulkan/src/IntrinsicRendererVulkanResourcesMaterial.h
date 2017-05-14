@@ -36,6 +36,7 @@ struct PerMaterialDataFragment
   glm::vec4 uvOffsetScale;
   glm::vec4 uvAnimation;
   glm::vec4 pbrBias;
+  glm::vec4 waterParams;
 
   uint32_t data0[4];
 };
@@ -90,7 +91,6 @@ struct MaterialData : Dod::Resources::ResourceDataBase
 
     descBlendMaskTextureName.resize(_INTR_MAX_MATERIAL_COUNT);
     descFoamTextureName.resize(_INTR_MAX_MATERIAL_COUNT);
-    descFoamFadeDistance.resize(_INTR_MAX_MATERIAL_COUNT);
     descRefractionFactor.resize(_INTR_MAX_MATERIAL_COUNT);
 
     descTranslucencyThickness.resize(_INTR_MAX_MATERIAL_COUNT);
@@ -99,6 +99,7 @@ struct MaterialData : Dod::Resources::ResourceDataBase
     descUvOffsetScale.resize(_INTR_MAX_MATERIAL_COUNT);
     descUvAnimation.resize(_INTR_MAX_MATERIAL_COUNT);
     descPbrBias.resize(_INTR_MAX_MATERIAL_COUNT);
+    descWaterParams.resize(_INTR_MAX_MATERIAL_COUNT);
 
     descMaterialPassMask.resize(_INTR_MAX_MATERIAL_COUNT);
 
@@ -128,7 +129,6 @@ struct MaterialData : Dod::Resources::ResourceDataBase
 
   _INTR_ARRAY(Name) descBlendMaskTextureName;
   _INTR_ARRAY(Name) descFoamTextureName;
-  _INTR_ARRAY(float) descFoamFadeDistance;
   _INTR_ARRAY(float) descRefractionFactor;
 
   _INTR_ARRAY(float) descTranslucencyThickness;
@@ -137,6 +137,7 @@ struct MaterialData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(glm::vec4) descUvOffsetScale;
   _INTR_ARRAY(glm::vec2) descUvAnimation;
   _INTR_ARRAY(glm::vec3) descPbrBias;
+  _INTR_ARRAY(glm::vec4) descWaterParams;
 
   _INTR_ARRAY(_INTR_ARRAY(Name)) descMaterialPassMask;
 
@@ -174,7 +175,6 @@ struct MaterialManager
 
     _descBlendMaskTextureName(p_Ref) = _N(white);
     _descFoamTextureName(p_Ref) = _N(checkerboard);
-    _descFoamFadeDistance(p_Ref) = 1.0f;
     _descRefractionFactor(p_Ref) = 0.0f;
 
     _descTranslucencyThickness(p_Ref) = 0.0f;
@@ -183,6 +183,7 @@ struct MaterialManager
     _descUvOffsetScale(p_Ref) = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
     _descPbrBias(p_Ref) = glm::vec3(0.0f);
     _descUvAnimation(p_Ref) = glm::vec2(0.0f);
+    _descWaterParams(p_Ref) = glm::vec4(0.0f);
 
     _descMaterialPassMask(p_Ref) = {"GBufferDefault", "Shadow",
                                     "PerPixelPicking"};
@@ -344,8 +345,13 @@ struct MaterialManager
           p_Document.GetAllocator());
       p_Properties.AddMember(
           "foamFadeDistance",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "float",
-                            _descFoamFadeDistance(p_Ref), false, false),
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Water), "float",
+                            _descWaterParams(p_Ref).x, false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "waterFadeDistance",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Water), "float",
+                            _descWaterParams(p_Ref).y, false, false),
           p_Document.GetAllocator());
       p_Properties.AddMember("refractionFactor",
                              _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
@@ -400,8 +406,11 @@ struct MaterialManager
       _descFoamTextureName(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["foamTextureName"]);
     if (p_Properties.HasMember("foamFadeDistance"))
-      _descFoamFadeDistance(p_Ref) =
+      _descWaterParams(p_Ref).x =
           JsonHelper::readPropertyFloat(p_Properties["foamFadeDistance"]);
+    if (p_Properties.HasMember("waterFadeDistance"))
+      _descWaterParams(p_Ref).y =
+          JsonHelper::readPropertyFloat(p_Properties["waterFadeDistance"]);
     if (p_Properties.HasMember("refractionFactor"))
       _descRefractionFactor(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["refractionFactor"]);
@@ -533,10 +542,6 @@ struct MaterialManager
   {
     return _data.descFoamTextureName[p_Ref._id];
   }
-  _INTR_INLINE static float& _descFoamFadeDistance(MaterialRef p_Ref)
-  {
-    return _data.descFoamFadeDistance[p_Ref._id];
-  }
   _INTR_INLINE static float& _descRefractionFactor(MaterialRef p_Ref)
   {
     return _data.descRefractionFactor[p_Ref._id];
@@ -553,6 +558,10 @@ struct MaterialManager
   _INTR_INLINE static glm::vec3& _descPbrBias(MaterialRef p_Ref)
   {
     return _data.descPbrBias[p_Ref._id];
+  }
+  _INTR_INLINE static glm::vec4& _descWaterParams(MaterialRef p_Ref)
+  {
+    return _data.descWaterParams[p_Ref._id];
   }
 
   _INTR_INLINE static float& _descTranslucencyThickness(MaterialRef p_Ref)
