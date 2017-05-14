@@ -20,12 +20,12 @@
 
 #include "lib_noise.glsl"
 #include "lib_math.glsl"
+#include "gbuffer.inc.glsl"
 
 layout (location = 0) in vec3 inPosition;
 
-layout (location = 0) out vec4 outAlbedo;
-layout (location = 1) out vec4 outNormal;
-layout (location = 2) out vec4 outParameter0;
+// Output
+OUTPUT
 
 layout (binding = 1) uniform PerInstance
 {
@@ -108,7 +108,14 @@ void main()
     color = TINY_GRID_COLOR;
   }
 
-  outAlbedo = vec4(color, 1.0);
-  outNormal = vec4(encodeNormal((uboPerInstance.normalMatrix * vec4(uboPerInstance.planeNormal.xyz, 0.0)).xyz), 1.0, 0.5);
-  outParameter0 = vec4(0.0, 1.0, 1.0, 0.0);
+  GBuffer gbuffer;
+  {
+    gbuffer.albedo = vec4(color, 1.0);
+    gbuffer.normal = normalize((uboPerInstance.normalMatrix * vec4(uboPerInstance.planeNormal.xyz, 0.0)).xyz);
+    gbuffer.metalMask = 0.0;
+    gbuffer.specular = 0.5;
+    gbuffer.roughness = 0.5;
+    gbuffer.materialBufferIdx = 0;   
+  }
+  writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
 }

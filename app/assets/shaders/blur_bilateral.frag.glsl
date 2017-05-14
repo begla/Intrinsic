@@ -19,13 +19,11 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "lib_math.glsl"
+#include "ubos.inc.glsl"
 
 #define KERNEL_RADIUS uboPerInstance.blurParams.x
 
-layout (binding = 0) uniform PerInstance
-{
-  vec4 blurParams;
-} uboPerInstance;
+PER_INSTANCE_DATA_BLUR;
 
 layout (binding = 1) uniform sampler2D inputTex;
 layout (binding = 2) uniform sampler2D depthBufferTex;
@@ -33,15 +31,13 @@ layout (binding = 2) uniform sampler2D depthBufferTex;
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
-// TODO
-const vec4 camParams = vec4(1.0, 10000.0, 1.0, 1.0 / 10000.0);
 const float sharpness = 9000.0;
 
 vec4 blur(vec2 uv, float r, vec4 center_c, float center_d, inout float w_total)
 {
   vec4  c = texture(inputTex, uv);
   float d = texture(depthBufferTex, uv).x;
- 	d = linearizeDepth(d, camParams.x, camParams.y);
+ 	d = linearizeDepth(d, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
   
   const float blurSigma = KERNEL_RADIUS * 0.5;
   const float blurFalloff = 1.0 / (2.0*blurSigma*blurSigma);
@@ -57,7 +53,7 @@ void main()
 {
 	vec4  center_c = texture(inputTex, inUV0);
   float center_d = texture(depthBufferTex, inUV0).x;
-  center_d = linearizeDepth(center_d, camParams.x, camParams.y);
+  center_d = linearizeDepth(center_d, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
 
   vec2 resDir = textureSize(inputTex, 0).xy;
   resDir = 1.0 / resDir * uboPerInstance.blurParams.zw;

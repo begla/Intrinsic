@@ -23,11 +23,9 @@
         "emissiveIntensity": 0.0,
         "normalTextureName": "grass_atlas_01_NRM",
         "pbrTextureName": "default_PBR",
-        "pbrBias": [
-            0.0,
-            0.0,
-            0.0
-        ],
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": 0.0,
         "blendMaskTextureName": "foliage_blend_mask_01"
     }
 }

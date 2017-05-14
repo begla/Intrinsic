@@ -1,0 +1,10 @@
+{
+    "name": "gbuffer_terrain.frag",
+    "properties": {
+        "name": "gbuffer_terrain.frag",
+        "gpuProgramName": "gbuffer_terrain.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

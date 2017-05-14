@@ -23,11 +23,9 @@
         "emissiveIntensity": 0.0,
         "normalTextureName": "Tree_Atlas_01_NRM",
         "pbrTextureName": "Tree_Atlas_01_PBR",
-        "pbrBias": [
-            0.0,
-            0.0,
-            0.0
-        ],
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": 0.0,
         "blendMaskTextureName": "white"
     }
 }

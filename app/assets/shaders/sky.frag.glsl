@@ -19,11 +19,11 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "lib_math.glsl"
-#include "surface_fragment.inc.glsl"
+#include "gbuffer.inc.glsl"
 
 // Ubos
-PER_MATERIAL_UBO();
-PER_INSTANCE_UBO();
+PER_MATERIAL_UBO;
+PER_INSTANCE_UBO;
 
 // Bindings
 layout (binding = 3) uniform samplerCube albedoTex;
@@ -38,5 +38,5 @@ layout (location = 0) out vec4 outAlbedo;
 void main()
 { 
   const vec4 albedo = textureLod(albedoTex, inNormal, 1.0);
-  outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, 1.0);
+  outAlbedo = vec4(albedo.rgb, 1.0);
 }

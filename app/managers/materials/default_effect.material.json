@@ -23,10 +23,8 @@
         "emissiveIntensity": 0.0,
         "normalTextureName": "default_NRM",
         "pbrTextureName": "default_NRM",
-        "pbrBias": [
-            0.0,
-            0.0,
-            0.0
-        ]
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": 0.0
     }
 }

@@ -19,13 +19,11 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "lib_math.glsl"
+#include "ubos.inc.glsl"
 
 #define KERNEL_RADIUS uboPerInstance.blurParams.x
 
-layout (binding = 0) uniform PerInstance
-{
-  vec4 blurParams;
-} uboPerInstance;
+PER_INSTANCE_DATA_BLUR;
 
 layout (binding = 1) uniform sampler2D inputTex;
 

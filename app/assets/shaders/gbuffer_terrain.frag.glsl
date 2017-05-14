@@ -19,14 +19,14 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "lib_math.glsl"
-#include "surface_fragment.inc.glsl"
+#include "gbuffer.inc.glsl"
 
 // Ubos
-PER_MATERIAL_UBO();
-PER_INSTANCE_UBO();
+PER_MATERIAL_UBO;
+PER_INSTANCE_UBO;
 
 // Bindings
-BINDINGS_LAYERED();
+BINDINGS_TERRAIN;
 
 // Input
 layout (location = 0) in vec3 inNormal;
@@ -62,31 +62,35 @@ void main()
 
   const vec4 albedo0 = texture(albedoTex0, uv0);
   const vec4 normal0 = texture(normalTex0, uv0);
-  const vec4 roughness0 = texture(roughnessTex0, uv0);
+  const vec4 pbr0 = texture(pbrTex0, uv0);
 
   const vec4 albedo1 = texture(albedoTex1, uv0);
   const vec4 normal1 = texture(normalTex1, uv0);
-  const vec4 roughness1 = texture(roughnessTex1, uv0);
+  const vec4 pbr1 = texture(pbrTex1, uv0);
   
   const vec4 albedo2 = texture(albedoTex2, uv0 * 0.1);
   const vec4 normal2 = texture(normalTex2, uv0 * 0.1);
-  const vec4 roughness2 = texture(roughnessTex2, uv0 * 0.1);
+  const vec4 pbr2 = texture(pbrTex2, uv0 * 0.1);
 
   float noise = clamp(texture(noiseTex, uv0Raw * 10.0).r, 0.0, 1.0);
   vec3 blendMask = texture(blendMaskTex, uv0Raw).rgb;
 
   vec3 albedo = blend(albedo0.rgb, albedo1.rgb, albedo2.rgb, blendMask, noise);
   vec3 normal = blend(normal0.rgb, normal1.rgb, normal2.rgb, blendMask, noise);
-  vec3 roughness = blend(roughness0.rgb, roughness1.rgb, roughness2.rgb, blendMask, noise);
+  vec3 pbr = blend(pbr0.rgb, pbr1.rgb, pbr2.rgb, blendMask, noise);
 
   float occlusion = clamp(mix(clamp(noise * 5.0, 0.0, 1.0) * blendMask.b, 1.0 - blendMask.r, 
   clamp((1.0 - blendMask.g) * 1.0 - 0.7, 0.0, 1.0)) * 2.0 + 0.5, 0.0, 1.0);
   albedo *= clamp(occlusion , 0.0, 1.0);
 
-  outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, 1.0); // Albedo
-  outNormal.rg = encodeNormal(normalize(TBN * (normal.xyz * 2.0 - 1.0)));
-  outNormal.b = roughness.g + uboPerMaterial.pbrBias.g; // Specular
-  outNormal.a = max(roughness.b + uboPerMaterial.pbrBias.b, 0.01); // Roughness
-  outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, 
-    uboPerMaterial.data0.x, 1.0, 0.0); // Metal Mask / Material Buffer Index;
+  GBuffer gbuffer;
+  {
+    gbuffer.albedo = vec4(albedo, 1.0) * uboPerInstance.colorTint;
+    gbuffer.normal = normalize(TBN * (normal * 2.0 - 1.0));
+    gbuffer.metalMask = pbr.r + uboPerMaterial.pbrBias.r;
+    gbuffer.specular = pbr.g + uboPerMaterial.pbrBias.g;
+    gbuffer.roughness = pbr.b + uboPerMaterial.pbrBias.b;
+    gbuffer.materialBufferIdx = uboPerMaterial.data0.x;   
+  }
+  writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
 }

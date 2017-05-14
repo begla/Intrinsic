@@ -6,7 +6,8 @@
 			"entries" : [
 				"InverseProjectionMatrix",
 				"InverseViewProjectionMatrix",
-				"CameraWorldPosition"
+				"CameraWorldPosition",
+				"CameraParameters"
 			]
 		},
 		{
@@ -21,43 +22,50 @@
 		{
 			"name" : "PerInstanceDataPostCombine",
 			"entries" : [
-				"HaltonSamples"
+				"HaltonSamples",
+				"CameraParameters"
 			]
 		},
 		{
 			"name" : "BlurX",
 			"entries" : [
-				"BlurParamsXNormal"
+				"BlurParamsXNormal",
+				"CameraParameters"
 			]
 		},
 		{
 			"name" : "BlurY",
 			"entries" : [
-				"BlurParamsYNormal"
+				"BlurParamsYNormal",
+				"CameraParameters"
 			]
 		},
 		{
 			"name" : "BlurMediumX",
 			"entries" : [
-				"BlurParamsXMedium"
+				"BlurParamsXMedium",
+				"CameraParameters"
 			]
 		},
 		{
 			"name" : "BlurMediumY",
 			"entries" : [
-				"BlurParamsYMedium"
+				"BlurParamsYMedium",
+				"CameraParameters"
 			]
 		},
 		{
 			"name" : "BlurLowX",
 			"entries" : [
-				"BlurParamsXLow"
+				"BlurParamsXLow",
+				"CameraParameters"
 			]
 		},
 		{
 			"name" : "BlurLowY",
 			"entries" : [
-				"BlurParamsYLow"
+				"BlurParamsYLow",
+				"CameraParameters"
 			]
 		},
 		{
@@ -82,12 +90,12 @@
 		{
 			"name" : "GBufferAlbedo",
 			"renderSize" : "Full",
-			"imageFormat" : "B8G8R8A8UNorm"
+			"imageFormat" : "R16G16B16A16Float"
 		},
 		{
 			"name" : "GBufferNormal",
 			"renderSize" : "Full",
-			"imageFormat" : "B8G8R8A8UNorm"
+			"imageFormat" : "R16G16B16A16Float"
 		},
 		{
 			"name" : "GBufferParameter0",
@@ -97,12 +105,12 @@
 		{
 			"name" : "GBufferTransparentsAlbedo",
 			"renderSize" : "Full",
-			"imageFormat" : "B8G8R8A8UNorm"
+			"imageFormat" : "R16G16B16A16Float"
 		},
 		{
 			"name" : "GBufferTransparentsNormal",
 			"renderSize" : "Full",
-			"imageFormat" : "B8G8R8A8UNorm"
+			"imageFormat" : "R16G16B16A16Float"
 		},
 		{
 			"name" : "GBufferTransparentsParameter0",
@@ -194,7 +202,7 @@
 		{
 			"type" : "RenderPassGenericMesh",
 			"name" : "GBuffer",
-			"materialPasses" : ["GBufferDefault", "GBufferLayered"],
+			"materialPasses" : ["GBufferDefault", "GBufferTerrain"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
 				["GBufferAlbedo", [0.1, 0.5, 1.0, 1.0]],
@@ -271,7 +279,7 @@
 		{
 			"type" : "RenderPassGenericMesh",
 			"name" : "GBuffer",
-			"materialPasses" : ["GBufferDefault", "GBufferLayered", "GBufferFoliage"],
+			"materialPasses" : ["GBufferDefault", "GBufferTerrain", "GBufferFoliage"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
 				["GBufferAlbedo", [0.1, 0.5, 1.0, 1.0]],

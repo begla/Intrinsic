@@ -21,7 +21,7 @@
 /* __PREPROCESSOR DEFINES__ */
 
 #include "lib_math.glsl"
-#include "surface_fragment.inc.glsl"
+#include "gbuffer.inc.glsl"
 
 #if defined (PRE_PASS)
 # undef OUTPUT
@@ -29,11 +29,11 @@
 #endif // PRE_PASS
 
 // Ubos
-PER_MATERIAL_UBO();
-PER_INSTANCE_UBO();
+PER_MATERIAL_UBO;
+PER_INSTANCE_UBO;
 
 // Bindings
-BINDINGS();
+BINDINGS_GBUFFER;
 layout (binding = 6) uniform sampler2D blendMaskTex;
 
 // Input
@@ -66,8 +66,8 @@ void main()
   vec4 albedo = texture(albedoTex, uv0);
   albedo.rgb *= blendMask.rgb;
 
-  const vec4 normal = texture(normalTex, uv0);
-  const vec4 roughness = texture(roughnessTex, uv0);
+  const vec3 normal = texture(normalTex, uv0).rgb;
+  const vec3 pbr = texture(pbrTex, uv0).rgb;
 
   if (albedo.a < 0.3)
   {
@@ -75,10 +75,15 @@ void main()
   }
 
 #if !defined (PRE_PASS)
-  outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, 1.0); // Albedo
-  outNormal.rg = encodeNormal(normalize(TBN * (normal.xyz * 2.0 - 1.0)));
-  outNormal.b = roughness.g + uboPerMaterial.pbrBias.g; // Specular
-  outNormal.a = max(roughness.b + uboPerMaterial.pbrBias.b, 0.05); // Roughness
-  outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 1.0, 0.0); // Metal Mask / Material Buffer Idx
+  GBuffer gbuffer;
+  {
+    gbuffer.albedo = albedo * uboPerInstance.colorTint;
+    gbuffer.normal = normalize(TBN * (normal * 2.0 - 1.0));
+    gbuffer.metalMask = pbr.r + uboPerMaterial.pbrBias.r;
+    gbuffer.specular = pbr.g + uboPerMaterial.pbrBias.g;
+    gbuffer.roughness = pbr.b + uboPerMaterial.pbrBias.b;
+    gbuffer.materialBufferIdx = uboPerMaterial.data0.x;   
+  }
+  writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
 #endif // PRE_PASS
 }

@@ -1,4 +1,4 @@
-#define PER_INSTANCE_UBO() layout (binding = 0) uniform PerInstance \
+#define PER_INSTANCE_UBO layout (binding = 0) uniform PerInstance \
 { \
   mat4 worldMatrix; \
   mat4 normalMatrix; \

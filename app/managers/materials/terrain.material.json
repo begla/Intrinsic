@@ -3,7 +3,7 @@
     "properties": {
         "name": "terrain",
         "materialPassMask": [
-            "GBufferLayered",
+            "GBufferTerrain",
             "Shadow",
             "PerPixelPicking"
         ],
@@ -22,11 +22,9 @@
         "emissiveIntensity": 0.0,
         "normalTextureName": "grassleaves_01_NRM",
         "pbrTextureName": "grassleaves_01_PBR",
-        "pbrBias": [
-            0.0,
-            0.0,
-            0.0
-        ],
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": 0.0,
         "albedo1TextureName": "gravel_01",
         "normal1TextureName": "gravel_01_NRM",
         "pbr1TextureName": "gravel_01_PBR",

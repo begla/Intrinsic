@@ -19,11 +19,9 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "lib_math.glsl"
+#include "ubos.inc.glsl"
 
-layout (binding = 0) uniform PerInstance
-{
-  ivec4 haltonSamples;
-} uboPerInstance;
+PER_INSTANCE_DATA_POST_COMBINE;
 
 layout (binding = 1) uniform sampler2D sceneTex;
 layout (binding = 2) uniform sampler2D sceneBlurredTex;
@@ -75,10 +73,7 @@ void main()
 
   const vec3 sceneBlurred = textureLod(sceneBlurredTex, inUV0, 0.0).rgb;
   const float depth = textureLod(depthBufferTex, inUV0, 0.0).r;
-
-  // TODO
-  const vec4 camParams = vec4(1.0, 10000.0, 1.0, 1.0 / 10000.0);
-  const float linDepth = linearizeDepth(depth, camParams.x, camParams.y) * camParams.y;
+  const float linDepth = linearizeDepth(depth, uboPerInstance.camParams.x, uboPerInstance.camParams.y) * uboPerInstance.camParams.y;
 
   // DoF fake
   const float blurFactor = clamp((linDepth - 500.0) / 50.0, 0.0, 1.0);
