@@ -45,6 +45,7 @@ struct UniformDataSource
   glm::vec4 blurParamsYMedium;
   glm::vec4 blurParamsXLow;
   glm::vec4 blurParamsYLow;
+  glm::vec4 cameraParameters;
 
 } _uniformDataSource;
 
@@ -129,6 +130,8 @@ _uniformOffsetMapping = {
      UniformDataRef(&_uniformDataSource.blurParamsXLow, sizeof(glm::vec4))},
     {"BlurParamsYLow",
      UniformDataRef(&_uniformDataSource.blurParamsYLow, sizeof(glm::vec4))},
+    {"CameraParameters",
+     UniformDataRef(&_uniformDataSource.cameraParameters, sizeof(glm::vec4))},
     {"HaltonSamples",
      UniformDataRef(&_uniformDataSource.haltonSamples, sizeof(glm::ivec4))}};
 
@@ -179,6 +182,14 @@ void UniformManager::load(const rapidjson::Value& p_UniformBuffers)
 
 void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 {
+  _uniformDataSource.cameraParameters.x =
+      Components::CameraManager::_descNearPlane(p_Camera);
+  _uniformDataSource.cameraParameters.y =
+      Components::CameraManager::_descFarPlane(p_Camera);
+  _uniformDataSource.cameraParameters.z =
+      1.0f / _uniformDataSource.cameraParameters.x;
+  _uniformDataSource.cameraParameters.w =
+      1.0f / _uniformDataSource.cameraParameters.y;
   _uniformDataSource.projectionMatrix =
       Components::CameraManager::_projectionMatrix(p_Camera);
   _uniformDataSource.prevViewMatrix =

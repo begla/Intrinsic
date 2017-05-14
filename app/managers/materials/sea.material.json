@@ -20,11 +20,9 @@
         "emissiveIntensity": 0.0,
         "normalTextureName": "water_NRM",
         "pbrTextureName": "water_PBR",
-        "pbrBias": [
-            0.0,
-            0.0,
-            0.0
-        ],
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": 0.0,
         "foamTextureName": "foam",
         "foamFadeDistance": 99.0,
         "refractionFactor": 0.0020000000949949028

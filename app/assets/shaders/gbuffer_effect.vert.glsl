@@ -25,7 +25,7 @@ out gl_PerVertex
   vec4 gl_Position;
 };
 
-PER_INSTANCE_UBO();
+PER_INSTANCE_UBO;
 INPUT();
 
 layout (location = 0) out vec3 outNormal;

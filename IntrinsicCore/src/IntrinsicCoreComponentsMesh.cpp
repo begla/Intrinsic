@@ -38,8 +38,6 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
         Resources::FrustumManager::_descViewMatrix(frustumRef);
     glm::mat4& viewProjectionMatrix =
         Resources::FrustumManager::_viewProjectionMatrix(frustumRef);
-    Math::FrustumCorners& frustumCornersWS =
-        Resources::FrustumManager::_frustumCornersWorldSpace(frustumRef);
 
     for (uint32_t meshIdx = p_Range.start; meshIdx < p_Range.end; ++meshIdx)
     {
@@ -70,24 +68,38 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
       MeshPerInstanceDataFragment& perInstanceDataFragment =
           Components::MeshManager::_perInstanceDataFragment(meshCompRef);
       {
-        perInstanceDataFragment.data0.x = 1.0f; // Emissive factor
+        perInstanceDataFragment.camParams.x =
+            CameraManager::_descNearPlane(_camRef);
+        perInstanceDataFragment.camParams.y =
+            CameraManager::_descFarPlane(_camRef);
+        perInstanceDataFragment.camParams.z =
+            1.0f / perInstanceDataFragment.camParams.x;
+        perInstanceDataFragment.camParams.w =
+            1.0f / perInstanceDataFragment.camParams.y;
+
+        perInstanceDataFragment.data0.x = 0.0f; // Unused
         perInstanceDataFragment.data0.y = distToCamera;
         perInstanceDataFragment.data0.z = (float)nodeRef._id;
         perInstanceDataFragment.data0.w = TaskManager::_totalTimePassed;
+        perInstanceDataFragment.colorTint =
+            Components::MeshManager::_descColorTint(meshCompRef);
 
-        // TODO: Move this to a more fitting place
+        // Modulate tint when entity is selected
         if (GameStates::Manager::getActiveGameState() ==
                 GameStates::GameState::kEditing &&
             GameStates::Editing::_currentlySelectedEntity == entityRef)
         {
-          perInstanceDataFragment.data0.x *=
-              1.0f + abs(sin(TaskManager::_totalTimePassed * 2.0f));
+          perInstanceDataFragment.colorTint =
+              glm::mix(perInstanceDataFragment.colorTint,
+                       glm::vec4(1.0f, 0.6f, 0.0f, 1.0f),
+                       abs(sin(TaskManager::_totalTimePassed * 2.0f)));
         }
       }
     }
   };
 
   uint32_t _frustumIdx;
+  CameraRef _camRef;
 } _perInstanceDataUpdateTaskSet;
 
 // <-
@@ -227,6 +239,7 @@ MeshData::MeshData()
     : Dod::Components::ComponentDataBase(_INTR_MAX_MESH_COMPONENT_COUNT)
 {
   descMeshName.resize(_INTR_MAX_MESH_COMPONENT_COUNT);
+  descColorTint.resize(_INTR_MAX_MESH_COMPONENT_COUNT);
 
   perInstanceDataVertex.resize(_INTR_MAX_MESH_COMPONENT_COUNT);
   perInstanceDataFragment.resize(_INTR_MAX_MESH_COMPONENT_COUNT);
@@ -242,7 +255,11 @@ MeshData::MeshData()
 
 // <-
 
-void MeshManager::resetToDefault(MeshRef p_Mesh) { _descMeshName(p_Mesh) = ""; }
+void MeshManager::resetToDefault(MeshRef p_Mesh)
+{
+  _descMeshName(p_Mesh) = "";
+  _descColorTint(p_Mesh) = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+}
 
 void MeshManager::init()
 {
@@ -394,6 +411,7 @@ void MeshManager::updatePerInstanceData(Dod::Ref p_CameraRef,
           [frustumId]
               .size();
   _perInstanceDataUpdateTaskSet._frustumIdx = frustumId;
+  _perInstanceDataUpdateTaskSet._camRef = p_CameraRef;
 
   Application::_scheduler.AddTaskSetToPipe(&_perInstanceDataUpdateTaskSet);
   Application::_scheduler.WaitforTaskSet(&_perInstanceDataUpdateTaskSet);

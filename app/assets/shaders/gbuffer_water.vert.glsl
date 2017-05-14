@@ -26,7 +26,7 @@ out gl_PerVertex
 };
 
 // Ubos
-PER_INSTANCE_UBO();
+PER_INSTANCE_UBO;
 
 // Input
 INPUT();

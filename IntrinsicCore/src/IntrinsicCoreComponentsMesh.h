@@ -36,6 +36,8 @@ struct MeshPerInstanceDataVertex
 
 struct MeshPerInstanceDataFragment
 {
+  glm::vec4 colorTint;
+  glm::vec4 camParams;
   glm::vec4 data0;
 };
 
@@ -44,6 +46,7 @@ struct MeshData : Dod::Components::ComponentDataBase
   MeshData();
 
   _INTR_ARRAY(Name) descMeshName;
+  _INTR_ARRAY(glm::vec4) descColorTint;
 
   _INTR_ARRAY(MeshPerInstanceDataVertex) perInstanceDataVertex;
   _INTR_ARRAY(MeshPerInstanceDataFragment) perInstanceDataFragment;
@@ -90,6 +93,11 @@ struct MeshManager
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Mesh),
                           _N(meshSelector), _descMeshName(p_Ref), false, false),
         p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "colorTint",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Mesh), _N(vec4),
+                          _descColorTint(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   // <-
@@ -101,6 +109,11 @@ struct MeshManager
     {
       _descMeshName(p_Ref) =
           JsonHelper::readPropertyName(p_Properties["meshName"]);
+    }
+    if (p_Properties.HasMember("colorTint"))
+    {
+      _descColorTint(p_Ref) =
+          JsonHelper::readPropertyVec4(p_Properties["colorTint"]);
     }
   }
 
@@ -154,6 +167,10 @@ struct MeshManager
   _INTR_INLINE static Name& _descMeshName(MeshRef p_Ref)
   {
     return _data.descMeshName[p_Ref._id];
+  }
+  _INTR_INLINE static glm::vec4& _descColorTint(MeshRef p_Ref)
+  {
+    return _data.descColorTint[p_Ref._id];
   }
 
   // Resources

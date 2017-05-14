@@ -19,14 +19,14 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "lib_math.glsl"
-#include "surface_fragment.inc.glsl"
+#include "gbuffer.inc.glsl"
 
 // Ubos
-PER_MATERIAL_UBO();
-PER_INSTANCE_UBO();
+PER_MATERIAL_UBO;
+PER_INSTANCE_UBO;
 
 // Bindings
-BINDINGS();
+BINDINGS_GBUFFER;
 layout (binding = 6) uniform sampler2D gbufferDepthTex;
 
 // Input
@@ -44,22 +44,26 @@ void main()
 { 
   vec3 screenPos = inPosition.xyz / inPosition.w;
   screenPos.xy = screenPos.xy * 0.5 + 0.5;
+  screenPos.z = linearizeDepth(screenPos.z, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
 
-  const vec4 camParams = vec4(1.0, 5000.0, 1.0, 1.0 / 5000.0);
-  screenPos.z = linearizeDepth(screenPos.z, camParams.x, camParams.y);
-
-  const float opaqueDepth = linearizeDepth(textureLod(gbufferDepthTex, screenPos.xy, 0.0).r, camParams.x, camParams.y);
+  const float opaqueDepth = linearizeDepth(textureLod(gbufferDepthTex, screenPos.xy, 0.0).r, 
+    uboPerInstance.camParams.x, 
+    uboPerInstance.camParams.y);
   if (opaqueDepth < screenPos.z)
   {
     discard;
   }
 
-  vec4 albedo = vec4(0.0, 0.5, 0.8, abs(sin(inNormal.x + uboPerInstance.data0.w * 2.0)));
-  albedo.rgba *= 1.0;
+  vec4 albedo = vec4(0.0, 0.5, 0.8, clamp(sin(inNormal.x + uboPerInstance.data0.w * 2.0) + 0.5, 0.0, 1.0));
 
-  outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, albedo.a); // Albedo
-  outNormal.rg = encodeNormal(inNormal);
-  outNormal.b = uboPerMaterial.pbrBias.g; // Specular
-  outNormal.a = max(uboPerMaterial.pbrBias.b, 0.01); // Roughness
-  outParameter0.rgba = vec4(uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 1.0, 0.0); // Metal Mask / Material Buffer Idx
+  GBuffer gbuffer;
+  {
+    gbuffer.albedo = albedo;
+    gbuffer.normal = normalize(inNormal);
+    gbuffer.metalMask = uboPerMaterial.pbrBias.r;
+    gbuffer.specular = uboPerMaterial.pbrBias.g;
+    gbuffer.roughness = uboPerMaterial.pbrBias.b;
+    gbuffer.materialBufferIdx = uboPerMaterial.data0.x;   
+  }
+  writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
 }

@@ -27,6 +27,8 @@ Intrinsic.includes
 app/assets/*
 
 !app/assets/shaders
+app/media/shaders/*
+!app/media/shaders/KEEP_ME
 app/crash_dumps
 
 app/Intrinsic.log

@@ -116,12 +116,12 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     _categoryToIconMapping["Mesh"] = ":Icons/user";
     _categoryToIconMapping["GpuProgram"] = ":Icons/calendar";
     _categoryToIconMapping["Resource"] = ":Icons/case";
-    _categoryToIconMapping["Properties_Surface"] = ":Icons/brush";
+    _categoryToIconMapping["PBR"] = ":Icons/lightbulb";
+    _categoryToIconMapping["Emissive"] = ":Icons/lightbulb";
     _categoryToIconMapping["Textures"] = ":Icons/picture";
-    _categoryToIconMapping["Textures_Water"] = ":Icons/picture";
-    _categoryToIconMapping["Textures_Layered"] = ":Icons/picture";
-    _categoryToIconMapping["Properties_UV"] = ":Icons/picture";
-    _categoryToIconMapping["Properties_Water"] = ":Icons/picture";
+    _categoryToIconMapping["Translucency"] = ":Icons/picture";
+    _categoryToIconMapping["UV"] = ":Icons/picture";
+    _categoryToIconMapping["Transparency"] = ":Icons/picture";
     _categoryToIconMapping["Material"] = ":Icons/brush";
     _categoryToIconMapping["Camera"] = ":Icons/film";
     _categoryToIconMapping["CameraController"] = ":Icons/film";

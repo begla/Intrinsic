@@ -19,14 +19,9 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "lib_math.glsl"
+#include "ubos.inc.glsl"
 
-layout (binding = 0) uniform PerInstance
-{
-  mat4 invViewProjMatrix;
-  mat4 invProjMatrix;
-  mat4 projMatrix;
-  mat4 prevViewMatrix;
-} uboPerInstance;
+PER_INSTANCE_DATA_SSAO_TEMP_REPROJ;
 
 layout (binding = 1) uniform sampler2D ssaoTex;
 layout (binding = 2) uniform sampler2D ssaoPrevTex;

@@ -9,7 +9,7 @@
         ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
         ["Image", "MaterialAlbedo", "albedoTex", "Fragment"],
         ["Image", "MaterialNormal", "normalTex", "Fragment"],
-        ["Image", "MaterialRoughness", "roughnessTex", "Fragment"]
+        ["Image", "MaterialRoughness", "pbrTex", "Fragment"]
       ]
     },
     {
@@ -20,7 +20,7 @@
         ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
         ["Image", "MaterialAlbedo", "albedoTex", "Fragment"],
         ["Image", "MaterialNormal", "normalTex", "Fragment"],
-        ["Image", "MaterialRoughness", "roughnessTex", "Fragment"],
+        ["Image", "MaterialRoughness", "pbrTex", "Fragment"],
         ["Image", "MaterialBlendMask", "blendMaskTex", "Fragment"]
       ]
     },
@@ -48,7 +48,7 @@
         ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
         ["Image", "MaterialAlbedo", "albedoTex", "Fragment"],
         ["Image", "MaterialNormal", "normalTex", "Fragment"],
-        ["Image", "MaterialRoughness", "roughnessTex", "Fragment"],
+        ["Image", "MaterialRoughness", "pbrTex", "Fragment"],
         ["Image", "MaterialFoam", "foamTex", "Fragment"],
         ["Image", "GBufferDepth", "gbufferDepthTex", "Fragment"]
       ]
@@ -61,25 +61,25 @@
         ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
         ["Image", "MaterialAlbedo", "albedoTex", "Fragment"],
         ["Image", "MaterialNormal", "normalTex", "Fragment"],
-        ["Image", "MaterialRoughness", "roughnessTex", "Fragment"],
+        ["Image", "MaterialRoughness", "pbrTex", "Fragment"],
         ["Image", "GBufferDepth", "gbufferDepthTex", "Fragment"]
       ]
     },
     {
-      "name": "GBufferLayered",
+      "name": "GBufferTerrain",
       "resources" : [
         ["Buffer", "PerInstance", "PerInstance", "Vertex"],
         ["Buffer", "PerInstance", "PerInstance", "Fragment"],
         ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
         ["Image", "MaterialAlbedo", "albedoTex0", "Fragment"],
         ["Image", "MaterialNormal", "normalTex0", "Fragment"],
-        ["Image", "MaterialRoughness", "roughnessTex0", "Fragment"],
+        ["Image", "MaterialRoughness", "pbrTex0", "Fragment"],
         ["Image", "MaterialAlbedo1", "albedoTex1", "Fragment"],
         ["Image", "MaterialNormal1", "normalTex1", "Fragment"],
-        ["Image", "MaterialRoughness1", "roughnessTex1", "Fragment"],
+        ["Image", "MaterialRoughness1", "pbrTex1", "Fragment"],
         ["Image", "MaterialAlbedo2", "albedoTex2", "Fragment"],
         ["Image", "MaterialNormal2", "normalTex2", "Fragment"],
-        ["Image", "MaterialRoughness2", "roughnessTex2", "Fragment"],
+        ["Image", "MaterialRoughness2", "pbrTex2", "Fragment"],
         ["Image", "MaterialBlendMask", "blendMaskTex", "Fragment"],
         ["Image", "noise", "noiseTex", "Fragment"]
       ]
@@ -160,8 +160,8 @@
     },
     {
       "name" : "GBufferFoliage",
-      "baseVertexGpuProgram" : "foliage.vert",
-      "baseFragmentGpuProgram" : "foliage.frag",
+      "baseVertexGpuProgram" : "gbuffer_foliage.vert",
+      "baseFragmentGpuProgram" : "gbuffer_foliage.frag",
       "renderPass" : "GBuffer",
       "blendStates" : ["Default", "Default", "Default"],
       "rasterizationState" : "DoubleSided",
@@ -185,12 +185,12 @@
       "boundResources" : "GBufferWater"
     },
     {
-      "name" : "GBufferLayered",
-      "baseVertexGpuProgram" : "gbuffer_layered.vert",
-      "baseFragmentGpuProgram" : "gbuffer_layered.frag",
+      "name" : "GBufferTerrain",
+      "baseVertexGpuProgram" : "gbuffer_terrain.vert",
+      "baseFragmentGpuProgram" : "gbuffer_terrain.frag",
       "renderPass" : "GBuffer",
       "blendStates" : ["Default", "Default", "Default"],
-      "boundResources" : "GBufferLayered"
+      "boundResources" : "GBufferTerrain"
     },
     {
       "name" : "PerPixelPicking",
@@ -203,8 +203,8 @@
     },
     {
       "name" : "GBufferFoliagePrePass",
-      "baseVertexGpuProgram" : "foliage.vert",
-      "baseFragmentGpuProgram" : "foliage_prepass.frag",
+      "baseVertexGpuProgram" : "gbuffer_foliage.vert",
+      "baseFragmentGpuProgram" : "gbuffer_foliage_prepass.frag",
       "renderPass" : "GBufferPrePassFoliage",
       "blendStates" : [],
       "rasterizationState" : "DoubleSided",

@@ -21,13 +21,9 @@
 #include "lib_math.glsl"
 #include "lib_buffers.glsl"
 #include "lib_vol_lighting.glsl"
+#include "ubos.inc.glsl"
 
-layout (binding = 0) uniform PerInstance
-{
-  mat4 invProjMatrix;
-  mat4 invViewProjMatrix;
-  vec4 camPosition;
-} uboPerInstance;
+PER_INSTANCE_DATA_PRE_COMBINE;
 
 layout (binding = 1) uniform sampler2D albedoTex;
 layout (binding = 2) uniform sampler2D normalTex;
@@ -48,8 +44,6 @@ layout (location = 0) out vec4 outColor;
 
 void main()
 {
-  const vec4 camParams = vec4(1.0, 10000.0, 1.0, 1.0 / 10000.0);
-
   outColor = vec4(0.0, 0.0, 0.0, 1.0);
 
   const float opaqueDepth = textureLod(depthBufferTex, inUV0, 0.0).r;
@@ -75,7 +69,7 @@ void main()
 
     const float transparentDepth = textureLod(depthBufferTransparentsTex, inUV0, 0.0).r;
     fogDepth = min(fogDepth, transparentDepth.r);
-    const float linTranspDepth = linearizeDepth(transparentDepth, camParams.x, camParams.y);
+    const float linTranspDepth = linearizeDepth(transparentDepth, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
 
     // Refraction
     const float distStrength = transpMatParams.refractionFactor;
@@ -97,13 +91,13 @@ void main()
     }
 
     // Water fog
-    const float waterFogDensity = 50.0;
-    const float waterFogMaxBlendFactor = 0.9;
+    const float waterFogDensity = 20.0;
+    const float waterFogMaxBlendFactor = 0.8;
     const vec3 waterFogColor0 = vec3(0.2, 0.5, 1.0);
     const vec3 waterFogColor1 = vec3(0.0, 0.0, 0.0);
 
-    const float linDepthOpaque = linearizeDepth(waterFogDepth, camParams.x, camParams.y);
-    const float linDepthTransp = linearizeDepth(transparentDepth, camParams.x, camParams.y);
+    const float linDepthOpaque = linearizeDepth(waterFogDepth, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
+    const float linDepthTransp = linearizeDepth(transparentDepth, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
 
     const float waterFog = min(1.0 - exp(-(linDepthOpaque - linDepthTransp) * waterFogDensity), waterFogMaxBlendFactor);
     const float waterFogDecay = clamp(pow(waterFog, 4.0), 0.0, 1.0);
@@ -142,7 +136,8 @@ void main()
   }
 
   {
-    const vec3 volLightingCoord = screenSpacePosToCellIndex(vec3(inUV0, depthToVolumeZ(depthToVSDepth(fogDepth, camParams.x, camParams.y))));
+    const vec3 volLightingCoord = screenSpacePosToCellIndex(vec3(inUV0, 
+      depthToVolumeZ(depthToVSDepth(fogDepth, uboPerInstance.camParams.x, uboPerInstance.camParams.y))));
     fog += textureLod(volumetricLightingScatteringBufferTex, volLightingCoord, 0.0);
   }
 
