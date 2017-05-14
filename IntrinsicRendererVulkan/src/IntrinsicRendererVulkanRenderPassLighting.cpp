@@ -641,6 +641,10 @@ void Lighting::onReinitRendering()
     DrawCallManager::bindImage(
         _drawCallTransparentsRef, _N(ssaoTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(SSAO)), Samplers::kLinearClamp);
+    DrawCallManager::bindImage(
+        _drawCallTransparentsRef, _N(kelvinLutTex), GpuProgramType::kFragment,
+        ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
+        Samplers::kLinearClamp);
     DrawCallManager::bindImage(_drawCallTransparentsRef, _N(irradianceTex),
                                GpuProgramType::kFragment,
                                ImageManager::getResourceByName(
