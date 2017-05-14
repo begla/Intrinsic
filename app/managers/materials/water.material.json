@@ -25,6 +25,7 @@
         "specularBias": 0.0,
         "foamTextureName": "foam",
         "foamFadeDistance": 1.0,
+        "waterFadeDistance": 0.5,
         "refractionFactor": 0.00009999999747378752
     }
 }

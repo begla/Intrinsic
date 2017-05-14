@@ -34,6 +34,7 @@
   vec4 uvOffsetScale; \
   vec4 uvAnimation; \
   vec4 pbrBias; \
+  vec4 waterParams; \
   \
   uvec4 data0; \
 } uboPerMaterial

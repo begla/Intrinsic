@@ -143,8 +143,8 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
     {
       PerMaterialDataFragment fragmentData;
       fragmentData.uvOffsetScale = _descUvOffsetScale(matRef);
-      fragmentData.pbrBias =
-          glm::vec4(_descPbrBias(matRef), _descFoamFadeDistance(matRef));
+      fragmentData.waterParams = _descWaterParams(matRef);
+      fragmentData.pbrBias = glm::vec4(_descPbrBias(matRef), 0.0f);
       fragmentData.uvAnimation =
           glm::vec4(_descUvAnimation(matRef), 0.0f, 0.0f);
       fragmentData.data0[0] = materialBufferEntryIdx;
