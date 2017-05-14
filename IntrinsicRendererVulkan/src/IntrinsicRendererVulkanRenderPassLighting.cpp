@@ -43,7 +43,8 @@ Resources::BufferRef _lightIndexBuffer;
 struct Light
 {
   glm::vec4 posAndRadius;
-  glm::vec4 color;
+  glm::vec4 colorAndIntensity;
+  glm::vec4 temp;
 };
 
 uint32_t* _lightIndexBufferGpuMemory = nullptr;
@@ -217,8 +218,9 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
       _lightBufferMemory[i] = {
           glm::vec4(lightPosVS,
                     Components::LightManager::_descRadius(lightRef)),
-          Components::LightManager::_descIntensity(lightRef) *
-              glm::vec4(Components::LightManager::_descColor(lightRef), 0.0f)};
+          glm::vec4(Components::LightManager::_descColor(lightRef),
+                    Components::LightManager::_descIntensity(lightRef)),
+          glm::vec4(Components::LightManager::_descTemperature(lightRef))};
     }
   }
 
@@ -573,6 +575,10 @@ void Lighting::onReinitRendering()
     DrawCallManager::bindImage(
         _drawCallRef, _N(ssaoTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(SSAO)), Samplers::kLinearClamp);
+    DrawCallManager::bindImage(
+        _drawCallRef, _N(kelvinLutTex), GpuProgramType::kFragment,
+        ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
+        Samplers::kLinearClamp);
     DrawCallManager::bindImage(_drawCallRef, _N(irradianceTex),
                                GpuProgramType::kFragment,
                                ImageManager::getResourceByName(
