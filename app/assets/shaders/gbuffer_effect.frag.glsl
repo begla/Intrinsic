@@ -54,15 +54,17 @@ void main()
     discard;
   }
 
-  vec4 albedo = vec4(0.0, 0.5, 0.8, clamp(sin(inNormal.x + uboPerInstance.data0.w * 2.0) + 0.5, 0.0, 1.0));
+  vec4 albedo;
+  albedo.a = clamp(sin(inNormal.x + uboPerInstance.data0.w * 2.0), 0.0, 1.0);
+  albedo.rgb = vec3(1.0, 0.7, 0.7) * trunc(inNormal.xyz * 10.0 * 0.5 + 0.5) * 0.1;
 
   GBuffer gbuffer;
   {
     gbuffer.albedo = albedo;
     gbuffer.normal = normalize(inNormal);
     gbuffer.metalMask = uboPerMaterial.pbrBias.r;
-    gbuffer.specular = uboPerMaterial.pbrBias.g;
-    gbuffer.roughness = uboPerMaterial.pbrBias.b;
+    gbuffer.specular = 0.5 + uboPerMaterial.pbrBias.g;
+    gbuffer.roughness = 0.5 + uboPerMaterial.pbrBias.b;
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;   
   }
   writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
