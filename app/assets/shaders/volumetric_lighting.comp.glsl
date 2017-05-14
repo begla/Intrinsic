@@ -61,6 +61,7 @@ layout (binding = 5) buffer LightIndexBuffer
   uint lightIndices[];
 };
 layout (binding = 6) uniform sampler2DArray shadowBufferExpTex;
+layout (binding = 7) uniform sampler2D kelvinLutTex;
  
 // Based on AC4 volumetric fog
 layout (local_size_x = 4u, local_size_y = 4u, local_size_z = 4u) in; 
@@ -146,7 +147,7 @@ void main()
     const float dist = length(lightDistVec);
     const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
 
-    accumFog += vec4(localLightIntens * att * light.color.rgb / MATH_PI, 0.0);
+    accumFog += vec4(localLightIntens * att * light.colorAndIntensity.rgb * light.colorAndIntensity.a * kelvinToRGB(light.temp.r, kelvinLutTex) / MATH_PI, 0.0);
   }
 
   // Noise

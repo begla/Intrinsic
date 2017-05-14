@@ -40,6 +40,7 @@ layout (binding = 2) uniform sampler2D normalTex;
 layout (binding = 3) uniform sampler2D parameter0Tex;
 layout (binding = 4) uniform sampler2D depthTex;
 layout (binding = 5) uniform sampler2D ssaoTex;
+layout (binding = 12) uniform sampler2D kelvinLutTex;
 layout (binding = 6) uniform samplerCube irradianceTex;
 layout (binding = 7) uniform samplerCube specularTex;
 layout (binding = 8) uniform sampler2DArrayShadow shadowBufferTex;
@@ -57,7 +58,7 @@ layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
 const vec4 mainLightDir = vec4(1.0, 0.45, -0.275, 0.0);
-const vec3 mainLightColor = vec3(1.0, 0.4, 0.2);
+const float mainLightTemp = 2000.0;
 
 const float translDistortion = 0.2;
 const float translPower = 12.0;
@@ -126,6 +127,8 @@ void main()
   // Emissive
   outColor.rgb += matParams.emissiveIntensity * d.baseColor;
 
+  const vec3 mainLightColor = kelvinToRGB(mainLightTemp, kelvinLutTex);
+
   // Direct lighting
   float shadowAttenuation = calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
   outColor.rgb += shadowAttenuation * mainLightColor * calcLighting(d);
@@ -164,7 +167,8 @@ void main()
 
     outColor.rgb += 
       calcInverseSqrFalloff(light.posAndRadius.w, dist) 
-      * calcLighting(d) * light.color.rgb;
+      * calcLighting(d) * light.colorAndIntensity.a * light.colorAndIntensity.rgb 
+      * kelvinToRGB(light.temp.r, kelvinLutTex);
   }
 
   outColor.a = 1.0;

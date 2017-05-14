@@ -65,7 +65,8 @@ uvec3 calcGridPosForViewPos(vec3 posVS, vec4 nearFar, vec4 nearFarWidthHeight)
 struct Light
 {
   vec4 posAndRadius;
-  vec4 color;
+  vec4 colorAndIntensity;
+  vec4 temp;
 };
 
 // <-
@@ -156,6 +157,11 @@ float calcInverseSqrFalloff(float lightRadius, float dist)
   const float dist2 = dist * dist;
   const float a1 = clamp(1.0 - a0, 0.0, 1.0);
   return a1 * a1 / (dist2 + 1.0);
+}
+
+vec3 kelvinToRGB(float kelvin, sampler2D kelvinLutTex)
+{
+  return texture(kelvinLutTex, vec2(max(kelvin - 1000.0, 0.0) / 30000.0, 0.0)).rgb;
 }
 
 // Shadows

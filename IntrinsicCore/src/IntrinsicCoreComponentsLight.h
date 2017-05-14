@@ -30,12 +30,14 @@ struct LightData : Dod::Components::ComponentDataBase
   {
     descRadius.resize(_INTR_MAX_LIGHT_COMPONENT_COUNT);
     descColor.resize(_INTR_MAX_LIGHT_COMPONENT_COUNT);
+    descTemperature.resize(_INTR_MAX_LIGHT_COMPONENT_COUNT);
     descIntensity.resize(_INTR_MAX_LIGHT_COMPONENT_COUNT);
   }
 
   _INTR_ARRAY(float) descRadius;
   _INTR_ARRAY(glm::vec3) descColor;
   _INTR_ARRAY(float) descIntensity;
+  _INTR_ARRAY(float) descTemperature;
 };
 
 struct LightManager
@@ -60,6 +62,7 @@ struct LightManager
   {
     _descRadius(p_Ref) = 5.0f;
     _descColor(p_Ref) = glm::vec3(1.0f, 1.0f, 1.0f);
+    _descTemperature(p_Ref) = 6500.0f;
     _descIntensity(p_Ref) = 5.0f;
   }
 
@@ -93,6 +96,11 @@ struct LightManager
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Light), _N(float),
                           _descIntensity(p_Ref), false, false),
         p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "temperature",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Light), _N(float),
+                          _descTemperature(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   // <-
@@ -108,6 +116,9 @@ struct LightManager
     if (p_Properties.HasMember("intensity"))
       _descIntensity(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["intensity"]);
+    if (p_Properties.HasMember("temperature"))
+      _descTemperature(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["temperature"]);
   }
 
   // <-
@@ -127,6 +138,10 @@ struct LightManager
   _INTR_INLINE static float& _descIntensity(LightRef p_Ref)
   {
     return _data.descIntensity[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descTemperature(LightRef p_Ref)
+  {
+    return _data.descTemperature[p_Ref._id];
   }
 };
 }
