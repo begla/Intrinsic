@@ -751,7 +751,8 @@ _INTR_INLINE static BlendStates::Enum
 mapBlendState(const _INTR_STRING& p_BlendSate)
 {
   static _INTR_HASH_MAP(Name, BlendStates::Enum)
-      blendStates = {{"Default", BlendStates::kDefault}};
+      blendStates = {{"Default", BlendStates::kDefault},
+                     {"AlphaBlend", BlendStates::kAlphaBlend}};
 
   auto blendState = blendStates.find(p_BlendSate);
   if (blendState != blendStates.end())
