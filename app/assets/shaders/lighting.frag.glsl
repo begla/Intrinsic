@@ -58,7 +58,7 @@ layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
 const vec4 mainLightDir = vec4(1.0, 0.45, -0.275, 0.0);
-const float mainLightTemp = 2000.0;
+const float mainLightTemp = 1800.0;
 
 const float translDistortion = 0.2;
 const float translPower = 12.0;
@@ -94,7 +94,7 @@ void main()
   d.N = normalize(decodeNormal(normalSample.rg));  
   d.L = normalize(uboPerInstance.viewMatrix * mainLightDir).xyz;
   d.V = -normalize(posVS); 
-  d.energy = 10.0 * vec3(1.0, 1.0, 1.0);
+  d.energy = vec3(10.0);
   calculateLightingData(d);
 
   // Ambient lighting
@@ -163,11 +163,12 @@ void main()
     const vec3 lightDistVec = light.posAndRadius.xyz - posVS;
     const float dist = length(lightDistVec);
     d.L = lightDistVec / dist;
+    d.energy = vec3(light.colorAndIntensity.a);
     calculateLightingData(d);
 
     outColor.rgb += 
       calcInverseSqrFalloff(light.posAndRadius.w, dist) 
-      * calcLighting(d) * light.colorAndIntensity.a * light.colorAndIntensity.rgb 
+      * calcLighting(d) * light.colorAndIntensity.rgb 
       * kelvinToRGB(light.temp.r, kelvinLutTex);
   }
 
