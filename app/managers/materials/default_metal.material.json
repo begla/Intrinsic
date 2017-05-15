@@ -23,7 +23,7 @@
         "normalTextureName": "default_NRM",
         "pbrTextureName": "default_PBR",
         "metalMaskBias": 1.0,
-        "roughnessBias": -0.5,
+        "roughnessBias": 0.0,
         "specularBias": 0.0
     }
 }
