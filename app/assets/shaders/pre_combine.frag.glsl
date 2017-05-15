@@ -43,8 +43,8 @@ layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
 const float fogSunDensity = 12.0;
-const float fogDensity = 0.0004; 
-const float fogStart = 1000.0;
+const float fogDensity = 0.002; 
+const float fogStart = 300.0;
 const float fogMaxBlendFactor = 0.95;
 const vec3 fogSunColor = vec3(1.0, 0.9, 0.8); 
 const vec3 fogSkyColor = vec3(0.2, 0.5, 1.0);
