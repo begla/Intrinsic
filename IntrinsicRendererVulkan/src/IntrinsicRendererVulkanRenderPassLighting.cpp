@@ -63,6 +63,9 @@ struct PerInstanceData
 
   glm::vec4 nearFarWidthHeight;
   glm::vec4 nearFar;
+
+  glm::vec4 mainLightColorAndIntens;
+  glm::vec4 mainLightDirAndTemp;
 } _perInstanceData;
 
 // <-
@@ -286,6 +289,19 @@ void renderLighting(Resources::FramebufferRef p_FramebufferRef,
 
   // Update per instance data
   {
+    // Post effect data
+    _perInstanceData.mainLightColorAndIntens =
+        glm::vec4(Core::Resources::PostEffectManager::_descMainLightColor(
+                      Core::Resources::PostEffectManager::_blendTargetRef),
+                  Core::Resources::PostEffectManager::_descMainLightIntens(
+                      Core::Resources::PostEffectManager::_blendTargetRef));
+    _perInstanceData.mainLightDirAndTemp =
+        glm::vec4(Core::Resources::PostEffectManager::_descMainLightOrientation(
+                      Core::Resources::PostEffectManager::_blendTargetRef) *
+                      glm::vec3(0.0f, 0.0f, 1.0f),
+                  Core::Resources::PostEffectManager::_descMainLightTemp(
+                      Core::Resources::PostEffectManager::_blendTargetRef));
+
     _perInstanceData.invProjectionMatrix =
         Components::CameraManager::_inverseProjectionMatrix(p_CameraRef);
     _perInstanceData.viewMatrix =

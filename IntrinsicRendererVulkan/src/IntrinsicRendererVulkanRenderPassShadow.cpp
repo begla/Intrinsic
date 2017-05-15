@@ -52,8 +52,11 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
   const float worldBoundsHalfExtentLength = glm::length(worldBoundsHalfExtent);
   const glm::vec3 worldBoundsCenter = Math::calcAABBCenter(worldBounds);
 
-  const glm::vec3 eye = worldBoundsHalfExtentLength *
-                        glm::normalize(glm::vec3(1.0f, 0.45f, -0.15));
+  const glm::vec3 eye =
+      worldBoundsHalfExtentLength *
+      (Core::Resources::PostEffectManager::_descMainLightOrientation(
+           Core::Resources::PostEffectManager::_blendTargetRef) *
+       glm::vec3(0.0f, 0.0f, 1.0f));
   const glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f);
 
   glm::mat4& shadowViewMatrix =
