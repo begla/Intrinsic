@@ -23,7 +23,7 @@
         "metalMaskBias": 0.0,
         "roughnessBias": 0.0,
         "specularBias": 0.0,
-        "foamTextureName": "foam",
+        "foamTextureName": "white",
         "foamFadeDistance": 1.0,
         "waterFadeDistance": 0.5,
         "refractionFactor": 0.00009999999747378752
