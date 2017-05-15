@@ -27,6 +27,7 @@ struct Boid
 {
   glm::vec3 pos;
   glm::vec3 vel;
+  glm::vec3 color;
 };
 
 struct SwarmData : Dod::Components::ComponentDataBase
@@ -38,6 +39,8 @@ struct SwarmData : Dod::Components::ComponentDataBase
 
     boids.resize(_INTR_MAX_SWARM_COMPONENT_COUNT);
     nodes.resize(_INTR_MAX_SWARM_COMPONENT_COUNT);
+    lights.resize(_INTR_MAX_SWARM_COMPONENT_COUNT);
+    meshes.resize(_INTR_MAX_SWARM_COMPONENT_COUNT);
 
     currentAverageVelocity.resize(_INTR_MAX_SWARM_COMPONENT_COUNT);
     currentCenterOfMass.resize(_INTR_MAX_SWARM_COMPONENT_COUNT);
@@ -49,6 +52,8 @@ struct SwarmData : Dod::Components::ComponentDataBase
   // Resources
   _INTR_ARRAY(_INTR_ARRAY(Boid)) boids;
   _INTR_ARRAY(_INTR_ARRAY(NodeRef)) nodes;
+  _INTR_ARRAY(_INTR_ARRAY(Dod::Ref)) lights;
+  _INTR_ARRAY(_INTR_ARRAY(Dod::Ref)) meshes;
 
   _INTR_ARRAY(glm::vec3) currentAverageVelocity;
   _INTR_ARRAY(glm::vec3) currentCenterOfMass;
@@ -157,6 +162,14 @@ struct SwarmManager
   _INTR_INLINE static _INTR_ARRAY(NodeRef) & _nodes(SwarmRef p_Ref)
   {
     return _data.nodes[p_Ref._id];
+  }
+  _INTR_INLINE static _INTR_ARRAY(NodeRef) & _lights(SwarmRef p_Ref)
+  {
+    return _data.lights[p_Ref._id];
+  }
+  _INTR_INLINE static _INTR_ARRAY(NodeRef) & _meshes(SwarmRef p_Ref)
+  {
+    return _data.meshes[p_Ref._id];
   }
 
   _INTR_INLINE static glm::vec3& _currentCenterOfMass(SwarmRef p_Ref)
