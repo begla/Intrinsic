@@ -122,7 +122,6 @@ void main()
     //shadowAttenuation = texture(shadowBufferTex, vec4(posLS.xy, shadowMapIdx, posLS.z));
 
     vec4 shadowSample = texture(shadowBufferExpTex, vec3(posLS.xy, shadowMapIdx));
-    //shadowAttenuation = calculateShadowESM(shadowSample, posLS.z);
     shadowAttenuation = clamp(calculateShadowESM(shadowSample, posLS.z)*1.1 - 0.1, 0.0, 1.0);
   }
 
