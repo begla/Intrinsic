@@ -97,11 +97,8 @@ void PostEffectVolumeManager::blendPostEffects(
 
         Resources::PostEffectManager::blendPostEffect(
             Resources::PostEffectManager::_blendTargetRef,
-            Resources::PostEffectManager::getResourceByName(_N(Default)),
-            postEffect, blendFactor);
-
-        // Only possible to blend to one scene setting at once
-        break;
+            Resources::PostEffectManager::_blendTargetRef, postEffect,
+            blendFactor);
       }
     }
   }
