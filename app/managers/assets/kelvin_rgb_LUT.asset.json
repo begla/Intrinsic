@@ -3,6 +3,6 @@
     "properties": {
         "name": "kelvin_rgb_LUT",
         "assetFileName": "kelvin_rgb_LUT.tga",
-        "assetType": 2
+        "assetType": 4
     }
 }

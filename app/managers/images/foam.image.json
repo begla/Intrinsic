@@ -3,7 +3,7 @@
     "properties": {
         "name": "foam",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 10,
         "flags": 16,
         "dimensions": [
             512.0,

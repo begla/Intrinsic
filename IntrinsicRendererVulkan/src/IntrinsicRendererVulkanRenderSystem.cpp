@@ -899,7 +899,7 @@ void RenderSystem::initOrUpdateVkSwapChain()
       {
         colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         colorAttachmentView.pNext = nullptr;
-        colorAttachmentView.format = VK_FORMAT_B8G8R8A8_SRGB;
+        colorAttachmentView.format = surfaceFormatToUse;
         colorAttachmentView.components.r = VK_COMPONENT_SWIZZLE_R;
         colorAttachmentView.components.g = VK_COMPONENT_SWIZZLE_G;
         colorAttachmentView.components.b = VK_COMPONENT_SWIZZLE_B;

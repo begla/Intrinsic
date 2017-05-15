@@ -3,7 +3,7 @@
     "properties": {
         "name": "gravel_01",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 10,
         "flags": 16,
         "dimensions": [
             2048.0,

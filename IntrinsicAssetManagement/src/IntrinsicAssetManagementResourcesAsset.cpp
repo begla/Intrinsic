@@ -84,10 +84,10 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
       Renderer::Vulkan::Resources::MaterialManager::saveToMultipleFiles(
           "managers/materials/", ".material.json");
     }
-    else if (_descAssetType(assetRef) == AssetType::kColorTexture)
+    else if (_descAssetType(assetRef) == AssetType::kLinearColorTexture)
     {
       ImporterTexture::init();
-      ImporterTexture::importTextureFromFile(
+      ImporterTexture::importColorTextureFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
@@ -95,10 +95,21 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
       Renderer::Vulkan::Resources::ImageManager::saveToMultipleFiles(
           "managers/images/", ".image.json");
     }
-    else if (_descAssetType(assetRef) == AssetType::kAlphaTexture)
+    else if (_descAssetType(assetRef) == AssetType::kAlbedoTexture)
     {
       ImporterTexture::init();
-      ImporterTexture::importAlphaTextureFromFile(
+      ImporterTexture::importAlebdoAlphaTextureFromFile(
+          Settings::Manager::_assetTexturePath + "/" +
+          _descAssetFileName(assetRef));
+      ImporterTexture::destroy();
+
+      Renderer::Vulkan::Resources::ImageManager::saveToMultipleFiles(
+          "managers/images/", ".image.json");
+    }
+    else if (_descAssetType(assetRef) == AssetType::kAlbedoAlphaTexture)
+    {
+      ImporterTexture::init();
+      ImporterTexture::importAlebdoAlphaTextureFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();

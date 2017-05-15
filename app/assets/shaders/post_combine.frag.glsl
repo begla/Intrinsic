@@ -127,4 +127,3 @@ void main()
     outColor.rgb = mix(outColor.rgb, mix(result1, result2, L), strength);
   }
 }
- 

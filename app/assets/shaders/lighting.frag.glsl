@@ -58,7 +58,8 @@ layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
 const vec4 mainLightDir = vec4(1.0, 0.45, -0.275, 0.0);
-const float mainLightTemp = 1800.0;
+const float mainLightTemp = 2200.0;
+const float mainLightIntens = 20.0;
 
 const float translDistortion = 0.2;
 const float translPower = 12.0;
@@ -67,10 +68,13 @@ const vec3 translAmbient = vec3(0.0);
 
 void main()
 {
+  const vec4 albedoSample = textureLod(albedoTex, inUV0, 0.0);
   const float depth = textureLod(depthTex, inUV0, 0.0).x;
+
+  // Pass through sky
   if (depth == 1.0)
   { 
-    outColor.rgba = vec4(1.0, 1.0, 1.0, 1.0);
+    outColor.rgba = albedoSample;
     return;
   }
 
@@ -80,7 +84,6 @@ void main()
 
   const vec4 ssaoSample = textureLod(ssaoTex, inUV0, 0.0);
   const vec4 normalSample = textureLod(normalTex, inUV0, 0.0);
-  const vec4 albedoSample = textureLod(albedoTex, inUV0, 0.0);
   const vec4 parameter0Sample = textureLod(parameter0Tex, inUV0, 0.0);
   const MaterialParameters matParams = materialParameters[uint(parameter0Sample.y)];
 
@@ -94,7 +97,7 @@ void main()
   d.N = normalize(decodeNormal(normalSample.rg));  
   d.L = normalize(uboPerInstance.viewMatrix * mainLightDir).xyz;
   d.V = -normalize(posVS); 
-  d.energy = vec3(10.0);
+  d.energy = vec3(mainLightIntens);
   calculateLightingData(d);
 
   // Ambient lighting

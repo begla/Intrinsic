@@ -62,7 +62,6 @@ void main()
   float fogDepth = opaqueDepth.r;
 
   const vec4 albedoTransparents = textureLod(albedoTranspTex, inUV0, 0.0).rgba;
-  const vec3 albedo = textureLod(albedoTex, inUV0, 0.0).rgb;
   
   const vec4 param0 = textureLod(param0Tex, inUV0, 0.0).rgba;
   const uint matBufferEntryIdx = uint(param0.y);
@@ -86,18 +85,17 @@ void main()
     const float distStrength = albedoTransparents.a * matParamsTransp.refractionFactor;
 
     const vec2 distortedUV = inUV0 + normTranspVS.xy * (distStrength / -depthLinTransp);
-    const vec3 albedoDistored = textureLod(albedoTex, distortedUV, 0.0).rgb;
     const float depthDistorted = textureLod(depthBufferTex, distortedUV, 0.0).r;
     const vec3 lightingTransp = textureLod(lightBufferTranspTex, inUV0, 0.0).rgb;
     const vec3 lightingDistored = textureLod(lightBufferTex, distortedUV, 0.0).rgb;
 
-    vec3 opaque = albedoDistored * lightingDistored;
+    vec3 opaque = lightingDistored;
     float waterFogDepth = depthDistorted;
 
     // Only apply refraction if the opaque object is actually behind the transp. surface
     if (depthDistorted.r < depthTransp.r)
     {
-      opaque = albedo * lighting;
+      opaque = lighting;
       waterFogDepth = opaqueDepth;
     }
 
@@ -114,7 +112,7 @@ void main()
   }
   else
   {
-    outColor.rgb = albedo * lighting;
+    outColor.rgb = lighting;
   }
 
   vec4 fog = vec4(vec3(0.0), 1.0);
