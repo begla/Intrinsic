@@ -3,6 +3,6 @@
     "properties": {
         "name": "film_grain_noise",
         "assetFileName": "film_grain_noise.TGA",
-        "assetType": 2
+        "assetType": 4
     }
 }

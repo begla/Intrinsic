@@ -29,10 +29,15 @@ enum Enum
 {
   kNone,
   kMesh,
-  kColorTexture,
-  kAlphaTexture,
+  kAlbedoTexture,
+  kAlbedoAlphaTexture,
+  kLinearColorTexture,
   kNormalTexture,
-  kHdrTexture
+  kHdrTexture,
+
+  kCount,
+  kTexturesBegin = kAlbedoTexture,
+  kTexturesEnd = kHdrTexture
 };
 }
 
@@ -100,11 +105,11 @@ struct AssetManager
         p_Document.GetAllocator());
     p_Properties.AddMember(
         "assetType",
-        _INTR_CREATE_PROP_ENUM(
-            p_Document, p_GenerateDesc, _N(Asset), _N(enum),
-            _descAssetType(p_Ref),
-            "None,Mesh,ColorTexture,AlphaTexture,NormalTexture,HdrTexture",
-            false, false),
+        _INTR_CREATE_PROP_ENUM(p_Document, p_GenerateDesc, _N(Asset), _N(enum),
+                               _descAssetType(p_Ref),
+                               "None,Mesh,AlbedoTexture,AlbedoAlphaTexture,"
+                               "LinearColorTexture,NormalTexture,HDRTexture",
+                               false, false),
         p_Document.GetAllocator());
   }
 
