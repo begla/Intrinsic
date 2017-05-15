@@ -58,7 +58,7 @@ layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
 const vec4 mainLightDir = vec4(1.0, 0.45, -0.275, 0.0);
-const float mainLightTemp = 2200.0;
+const float mainLightTemp = 3200.0;
 const float mainLightIntens = 20.0;
 
 const float translDistortion = 0.2;
@@ -107,22 +107,11 @@ void main()
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
-  const vec3 irrad = d.diffuseColor * textureLod(irradianceTex, R, 0.0).rgb;
+  const vec3 irrad = d.diffuseColor * texture(irradianceTex, R).rgb;
   outColor.rgb += min(ssaoSample.r, parameter0Sample.z) * irrad; 
 
-  const float maxSpecPower = 999999.0;
-  const float k0 = 0.00098; const float k1 = 0.9921;
-  const float maxT = (exp2(-10.0/sqrt(maxSpecPower)) - k0)/k1;
-
-  float specPower = (2.0 / d.roughness2) - 2.0;
-  specPower /= (4.0 * max(dot(normalWS, R), 1.0e-6)); 
-
-  const float smulMaxT = (exp2(-10.0 / sqrt(specPower)) - k0) / k1;
-
-  const int mipOffset = 3;
-  const int numMips = 9;
-
-  const float specLod = float(numMips-1-mipOffset) * (1.0 - clamp(smulMaxT/maxT, 0.0, 1.0));
+  // Specular
+  const float specLod = burleyToMip(d.roughness, dot(normalWS, R0));
   const vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
 
   outColor.rgb += parameter0Sample.z * spec;
@@ -150,7 +139,7 @@ void main()
   const uint clusterIdx = calcClusterIndex(gridPos);
 
   // Point lights
-  uint lightCount = lightIndices[clusterIdx];
+  const uint lightCount = lightIndices[clusterIdx];
 
   // DEBUG: Visualize clusters
   /*if (lightCount > 0)
