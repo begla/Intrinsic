@@ -33,6 +33,9 @@ layout (binding = 0) uniform PerInstance
 
   vec4 nearFarWidthHeight;
   vec4 nearFar;
+
+  vec4 mainLightColorAndIntens;
+  vec4 mainLightDirAndTemp;
 } uboPerInstance; 
 
 layout (binding = 1) uniform sampler2D albedoTex;
@@ -56,10 +59,6 @@ layout (binding = 11) buffer LightIndexBuffer
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
-
-const vec4 mainLightDir = vec4(1.0, 0.45, -0.275, 0.0);
-const float mainLightTemp = 3200.0;
-const float mainLightIntens = 20.0;
 
 const float translDistortion = 0.2;
 const float translPower = 12.0;
@@ -95,9 +94,9 @@ void main()
   initLightingDataFromGBuffer(d);
 
   d.N = normalize(decodeNormal(normalSample.rg));  
-  d.L = normalize(uboPerInstance.viewMatrix * mainLightDir).xyz;
+  d.L = normalize(uboPerInstance.viewMatrix * vec4(uboPerInstance.mainLightDirAndTemp.xyz, 0.0)).xyz;
   d.V = -normalize(posVS); 
-  d.energy = vec3(mainLightIntens);
+  d.energy = vec3(uboPerInstance.mainLightColorAndIntens.w);
   calculateLightingData(d);
 
   // Ambient lighting
@@ -119,7 +118,8 @@ void main()
   // Emissive
   outColor.rgb += matParams.emissiveIntensity * d.baseColor;
 
-  const vec3 mainLightColor = kelvinToRGB(mainLightTemp, kelvinLutTex);
+  const vec3 mainLightColor = uboPerInstance.mainLightColorAndIntens.rgb 
+    * kelvinToRGB(uboPerInstance.mainLightDirAndTemp.w, kelvinLutTex);
 
   // Direct lighting
   float shadowAttenuation = calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
