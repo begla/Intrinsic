@@ -14,6 +14,9 @@
 
 #define PSSM_SPLIT_COUNT 4u
 #define MAX_SHADOW_MAP_COUNT 16u
+#define EPSILON 1.0e-6
+#define IBL_MIP_OFFSET 3
+#define IBL_MIP_COUNT 9
 
 #define ESM_POSITIVE_EXPONENT 300.0
 #define ESM_NEGATIVE_EXPONENT 80.0
@@ -114,6 +117,41 @@ float D_GGX(float NdH, float roughness2)
   const float f = (NdH * r - NdH) * NdH + 1.0;
   return r / (MATH_PI * f * f);
 }
+
+// IBL
+// ->
+
+float roughnessFromPerceptualRoughness(float perceptualRoughness)
+{
+  return perceptualRoughness*perceptualRoughness;
+}
+
+float specularPowerFromPerceptualRoughness(float perceptualRoughness)
+{
+  const float roughness = roughnessFromPerceptualRoughness(perceptualRoughness);
+  return (2.0 / max(EPSILON, roughness*roughness)) - 2.0;
+}
+
+float perceptualRoughnessFromRoughness(float roughness)
+{
+  return sqrt(max(0.0, roughness));
+}
+
+float perceptualRoughnessFromSpecularPower(float specPower)
+{
+  const float roughness = sqrt(2.0/(specPower + 2.0));
+  return perceptualRoughnessFromRoughness(roughness);
+}
+
+float burleyToMip(float perceptualRoughness, float NdotR)
+{
+  float specPower = specularPowerFromPerceptualRoughness(perceptualRoughness);
+  specPower /= (4.0 * max(NdotR, EPSILON));
+  const float scale = perceptualRoughnessFromSpecularPower(specPower);
+  return scale * (IBL_MIP_COUNT - 1 - IBL_MIP_OFFSET);
+}
+
+// <-
 
 void initLightingDataFromGBuffer(inout LightingData d)
 {
