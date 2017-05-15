@@ -66,7 +66,9 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
     SwarmRef swarmRef = p_Swarms[swarmIdx];
 
     _INTR_ARRAY(Boid)& boids = Components::SwarmManager::_boids(swarmRef);
-    const NodeRefArray nodes = Components::SwarmManager::_nodes(swarmRef);
+    const NodeRefArray& nodes = Components::SwarmManager::_nodes(swarmRef);
+    const LightRefArray& lights = Components::SwarmManager::_lights(swarmRef);
+    const MeshRefArray& meshes = Components::SwarmManager::_meshes(swarmRef);
     _INTR_ASSERT(boids.size() == nodes.size() &&
                  "Node vs boid count does not match");
     glm::vec3& currentCenterOfMass =
@@ -108,10 +110,10 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
         static uint32_t boidsToCheck = 10u;
 
         // Fly towards center of mass
-        {
-          const glm::vec3 boidToCenter = currentCenterOfMass - boid.pos;
-          const float boidToCenterDist = glm::length(boidToCenter);
 
+        const glm::vec3 boidToCenter = currentCenterOfMass - boid.pos;
+        const float boidToCenterDist = glm::length(boidToCenter);
+        {
           if (boidToCenterDist > _INTR_EPSILON)
             boid.vel += boidToCenter / boidToCenterDist * p_DeltaT * boidAcc *
                         centerOfMassWeight;
@@ -175,10 +177,32 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
 
         newAvgVelocity += boid.vel;
 
+        // Integrate
         boid.pos += boid.vel * p_DeltaT;
+
+        // Update node
         Components::NodeManager::_position(nodeRef) = boid.pos;
         Components::NodeManager::_orientation(nodeRef) = glm::rotation(
             glm::vec3(0.0f, 0.0f, 1.0f), glm::normalize(boid.vel + 0.01f));
+
+        // Update lights and mesh color
+        glm::vec4 boidColor = glm::vec4(boid.color, 1.0f);
+
+        /*  const float lightFactor =
+              1.0f - glm::clamp(boidToCenterDist / 15.0f, 0.0f, 1.0f);
+          boidColor =
+              glm::mix(boidColor, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
+          lightFactor);*/
+        boidColor *=
+            (std::sin(2.0f * TaskManager::_totalTimePassed * glm::pi<float>() +
+                      boidIdx * glm::quarter_pi<float>()) *
+                 0.5f +
+             0.5f) *
+                0.9f +
+            0.1f;
+
+        Components::MeshManager::_descColorTint(meshes[boidIdx]) = boidColor;
+        Components::LightManager::_descColor(lights[boidIdx]) = boidColor;
       }
 
       Components::NodeManager::updateTransforms(nodes);
@@ -209,22 +233,22 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
           Components::NodeFlags::kSpawned;
       Components::NodeManager::_size(nodeRef) = glm::vec3(0.45f, 0.45f, 0.45f);
 
-      glm::vec4 boidColor =
-          glm::vec4(Math::calcRandomFloatMinMax(0.0f, 1.0f),
+      const glm::vec3 boidColor =
+          glm::vec3(Math::calcRandomFloatMinMax(0.0f, 1.0f),
                     Math::calcRandomFloatMinMax(0.0f, 1.0f),
-                    Math::calcRandomFloatMinMax(0.0f, 1.0f), 1.0f);
+                    Math::calcRandomFloatMinMax(0.0f, 1.0f));
 
       Components::MeshRef meshRef =
           Components::MeshManager::createMesh(entityRef);
       Components::MeshManager::resetToDefault(meshRef);
       Components::MeshManager::_descMeshName(meshRef) =
           _descBoidMeshName(swarmRef);
-      Components::MeshManager::_descColorTint(meshRef) = boidColor;
 
       Components::LightRef lightRef =
           Components::LightManager::createLight(entityRef);
       Components::LightManager::resetToDefault(lightRef);
-      Components::LightManager::_descColor(lightRef) = boidColor;
+      Components::LightManager::_descRadius(lightRef) = 10.0f;
+      Components::LightManager::_descIntensity(lightRef) = 15.0f;
 
       Components::NodeRef swarmNodeRef =
           Components::NodeManager::getComponentForEntity(
@@ -232,8 +256,10 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
 
       Components::SwarmManager::_boids(swarmRef).push_back(
           {Components::NodeManager::_worldPosition(swarmNodeRef),
-           glm::vec3(0.0f)});
+           glm::vec3(0.0f), boidColor});
       Components::SwarmManager::_nodes(swarmRef).push_back(nodeRef);
+      Components::SwarmManager::_lights(swarmRef).push_back(lightRef);
+      Components::SwarmManager::_meshes(swarmRef).push_back(meshRef);
       meshComponentsToCreate.push_back(meshRef);
     }
   }
@@ -250,6 +276,8 @@ void SwarmManager::destroyResources(const SwarmRefArray& p_Swarms)
 
     _INTR_ARRAY(Boid)& boids = Components::SwarmManager::_boids(swarmRef);
     NodeRefArray& nodes = Components::SwarmManager::_nodes(swarmRef);
+    Dod::RefArray& lights = Components::SwarmManager::_lights(swarmRef);
+    Dod::RefArray& meshes = Components::SwarmManager::_meshes(swarmRef);
 
     if (World::getRootNode().isValid())
     {
@@ -262,6 +290,8 @@ void SwarmManager::destroyResources(const SwarmRefArray& p_Swarms)
 
     boids.clear();
     nodes.clear();
+    lights.clear();
+    meshes.clear();
   }
 }
 }
