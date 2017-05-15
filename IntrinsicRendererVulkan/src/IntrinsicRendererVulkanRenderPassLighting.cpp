@@ -579,16 +579,14 @@ void Lighting::onReinitRendering()
         _drawCallRef, _N(kelvinLutTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
         Samplers::kLinearClamp);
-    DrawCallManager::bindImage(_drawCallRef, _N(irradianceTex),
-                               GpuProgramType::kFragment,
-                               ImageManager::getResourceByName(
-                                   _N(GCanyon_C_YumaPoint_3k_cube_irradiance)),
-                               Samplers::kLinearClamp);
-    DrawCallManager::bindImage(_drawCallRef, _N(specularTex),
-                               GpuProgramType::kFragment,
-                               ImageManager::getResourceByName(
-                                   _N(GCanyon_C_YumaPoint_3k_cube_specular)),
-                               Samplers::kLinearClamp);
+    DrawCallManager::bindImage(
+        _drawCallRef, _N(irradianceTex), GpuProgramType::kFragment,
+        ImageManager::getResourceByName(_N(default_ibl_cube_irradiance)),
+        Samplers::kLinearClamp);
+    DrawCallManager::bindImage(
+        _drawCallRef, _N(specularTex), GpuProgramType::kFragment,
+        ImageManager::getResourceByName(_N(default_ibl_cube_specular)),
+        Samplers::kLinearClamp);
     DrawCallManager::bindImage(
         _drawCallRef, _N(shadowBufferTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(ShadowBuffer)), Samplers::kShadow);
@@ -645,16 +643,14 @@ void Lighting::onReinitRendering()
         _drawCallTransparentsRef, _N(kelvinLutTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
         Samplers::kLinearClamp);
-    DrawCallManager::bindImage(_drawCallTransparentsRef, _N(irradianceTex),
-                               GpuProgramType::kFragment,
-                               ImageManager::getResourceByName(
-                                   _N(GCanyon_C_YumaPoint_3k_cube_irradiance)),
-                               Samplers::kLinearClamp);
-    DrawCallManager::bindImage(_drawCallTransparentsRef, _N(specularTex),
-                               GpuProgramType::kFragment,
-                               ImageManager::getResourceByName(
-                                   _N(GCanyon_C_YumaPoint_3k_cube_specular)),
-                               Samplers::kLinearClamp);
+    DrawCallManager::bindImage(
+        _drawCallTransparentsRef, _N(irradianceTex), GpuProgramType::kFragment,
+        ImageManager::getResourceByName(_N(default_ibl_cube_irradiance)),
+        Samplers::kLinearClamp);
+    DrawCallManager::bindImage(
+        _drawCallTransparentsRef, _N(specularTex), GpuProgramType::kFragment,
+        ImageManager::getResourceByName(_N(default_ibl_cube_specular)),
+        Samplers::kLinearClamp);
     DrawCallManager::bindImage(
         _drawCallTransparentsRef, _N(shadowBufferTex),
         GpuProgramType::kFragment,
