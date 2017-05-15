@@ -123,7 +123,7 @@ void main()
     vec3 result1 = 2.0 * outColor.rgb * blend;
     vec3 result2 = 1.0 - 2.0 * (1.0 - blend) * (1.0 - outColor.rgb);
 
-    const float strength = 0.7;
+    const float strength = 0.5;
     outColor.rgb = mix(outColor.rgb, mix(result1, result2, L), strength);
   }
 }
