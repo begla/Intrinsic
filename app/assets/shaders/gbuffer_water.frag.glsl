@@ -43,7 +43,7 @@ layout (location = 5) in vec4 inPosition;
 OUTPUT
 
 const float edgeFadeDistance = 15.0;
-const float waterBaseAlpha = 0.5;
+const float waterBaseAlpha = 0.7;
 
 void main()
 { 
@@ -63,24 +63,21 @@ void main()
   const vec2 uv0 = UV0_TRANSFORMED_ANIMATED;
   const vec2 uv0InverseAnim = UV0_TRANSFORMED_ANIMATED_FACTOR(vec2(0.2, 0.9));
 
-  const vec4 albedo0 = texture(albedoTex, uv0);
+  vec4 albedo = texture(albedoTex, uv0);
+  albedo.a = waterBaseAlpha;
+
   const vec4 normal0 = texture(normalTex, uv0);
-  const vec4 albedo1 = texture(albedoTex, uv0InverseAnim * 0.2);
   const vec4 normal1 = texture(normalTex, uv0InverseAnim * 0.2);
   const vec4 noise = texture(noiseTex, uv0 * 2.0);
 
   const float blend = 0.5;
-  vec4 albedo = mix(albedo0, albedo1, blend);
   const vec4 normal = mix(normal0, normal1, blend);
 
-  const vec4 foam = texture(foamTex, uv0 * 5.0);
-  vec4 pbr = texture(pbrTex, uv0);
-
-  albedo.a = waterBaseAlpha;
+  const vec4 foam = texture(foamTex, uv0 * 15.0);
 
   float foamFade = 1.0 
     - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
-      * uboPerInstance.camParams.y / uboPerMaterial.waterParams.x * foam.r, 0.0, 1.0);
+      * uboPerInstance.camParams.y / uboPerMaterial.waterParams.x, 0.0, 1.0);
 
   // Add foam based on noise texture
   foamFade += clamp(noise.r - 0.4, 0.0, 1.0);
@@ -89,17 +86,18 @@ void main()
     - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
       * uboPerInstance.camParams.y / uboPerMaterial.waterParams.y, 0.0, 1.0);
 
+  albedo.a = mix(albedo.a, 1.0, foamFade);    
   albedo.a = mix(albedo.a, 0.0, edgeFade);
   albedo.rgb = mix(albedo.rgb, foam.rgb, foamFade);
-  pbr.xz = mix(pbr.xz, vec2(0.0, 1.0), foamFade);
+  vec2 metalRoughness = mix(vec2(1.0, 0.15), vec2(0.0, 1.0), foamFade);
 
   GBuffer gbuffer;
   {
     gbuffer.albedo = albedo;
     gbuffer.normal = normalize(TBN * (normal.xyz * 2.0 - 1.0));
-    gbuffer.metalMask = pbr.r + uboPerMaterial.pbrBias.r;
-    gbuffer.specular = pbr.g + uboPerMaterial.pbrBias.g;
-    gbuffer.roughness = pbr.b + uboPerMaterial.pbrBias.b;
+    gbuffer.metalMask = metalRoughness.x;
+    gbuffer.specular = 0.0;
+    gbuffer.roughness = metalRoughness.y;
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;   
   }
   writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);

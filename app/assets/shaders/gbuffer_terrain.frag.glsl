@@ -80,7 +80,7 @@ void main()
   vec3 pbr = blend(pbr0.rgb, pbr1.rgb, pbr2.rgb, blendMask, noise);
 
   float occlusion = clamp(mix(clamp(noise * 5.0, 0.0, 1.0) * blendMask.b, 1.0 - blendMask.r, 
-  clamp((1.0 - blendMask.g) * 1.0 - 0.7, 0.0, 1.0)) * 2.0 + 0.5, 0.0, 1.0);
+  clamp((1.0 - blendMask.g) * 2.0 - 0.9, 0.0, 1.0)) * 2.0 + 0.2, 0.0, 1.0);
   albedo *= clamp(occlusion , 0.0, 1.0);
 
   GBuffer gbuffer;
