@@ -313,6 +313,10 @@ void IntrinsicEdManagerWindowAsset::dropEvent(QDropEvent* event)
         {
           assetType = AssetType::kAlbedoTexture;
         }
+        else if (extension == ".dds")
+        {
+          assetType = AssetType::kHdrTexture;
+        }
 
         if (assetType != AssetType::kNone)
         {
