@@ -1,0 +1,17 @@
+{
+    "name": "default_ibl_cube_irradiance",
+    "properties": {
+        "name": "default_ibl_cube_irradiance",
+        "imageType": 1,
+        "imageFormat": 15,
+        "flags": 16,
+        "dimensions": [
+            128.0,
+            128.0,
+            1.0
+        ],
+        "arrayLayerCount": 1,
+        "mipLevelCount": 8,
+        "fileName": "default_ibl_cube_irradiance.dds"
+    }
+}

@@ -5,7 +5,7 @@
         "materialPassMask": [
             "GBufferSky"
         ],
-        "albedoTextureName": "GCanyon_C_YumaPoint_3k_cube_radiance",
+        "albedoTextureName": "default_ibl_cube_radiance",
         "uvOffsetScale": [
             0.0,
             0.0,

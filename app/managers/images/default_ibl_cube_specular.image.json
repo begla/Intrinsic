@@ -1,0 +1,17 @@
+{
+    "name": "default_ibl_cube_specular",
+    "properties": {
+        "name": "default_ibl_cube_specular",
+        "imageType": 1,
+        "imageFormat": 15,
+        "flags": 16,
+        "dimensions": [
+            591.0,
+            591.0,
+            1.0
+        ],
+        "arrayLayerCount": 1,
+        "mipLevelCount": 10,
+        "fileName": "default_ibl_cube_specular.dds"
+    }
+}
