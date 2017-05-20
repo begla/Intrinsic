@@ -41,8 +41,7 @@
 
 #define BINDINGS_GBUFFER layout (binding = 3) uniform sampler2D albedoTex; \
 layout (binding = 4) uniform sampler2D normalTex; \
-layout (binding = 5) uniform sampler2D pbrTex; \
-layout (binding = 6) uniform sampler2D emissiveTex
+layout (binding = 5) uniform sampler2D pbrTex
 
 #define BINDINGS_TERRAIN layout (binding = 3) uniform sampler2D albedoTex0; \
 layout (binding = 4) uniform sampler2D normalTex0; \
