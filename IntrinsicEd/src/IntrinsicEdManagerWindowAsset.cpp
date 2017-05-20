@@ -332,7 +332,7 @@ void IntrinsicEdManagerWindowAsset::dropEvent(QDropEvent* event)
       else
       {
         QTreeWidgetItem* item = _resourceToItemMapping[existingAsset];
-        item->setSelected(true);
+        _ui.resourceView->setCurrentItem(item);
         item->parent()->setExpanded(true);
         onItemSelected(item, nullptr);
       }
@@ -343,7 +343,7 @@ void IntrinsicEdManagerWindowAsset::dropEvent(QDropEvent* event)
       onPopulateResourceTree();
       QTreeWidgetItem* item = _resourceToItemMapping[lastCreatedAsset];
 
-      item->setSelected(true);
+      _ui.resourceView->setCurrentItem(item);
       item->parent()->setExpanded(true);
       onItemSelected(item, nullptr);
     }
