@@ -4,6 +4,7 @@ app/*.lib
 app/*.pdb
 app/*.dll
 app/*.ilk
+!app/BsSndRpt64.exe
 app/platforms
 app/assets/world_machine/*.tmd.session
 
