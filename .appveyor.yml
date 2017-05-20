@@ -38,7 +38,7 @@ install:
   - cd ..
   
 # Download and install Vulkan SDK
-  - appveyor DownloadFile https://vulkan.lunarg.com/sdk/download/1.0.46.0/windows/VulkanSDK-1.0.46.0-Installer.exe -FileName vulkan.exe
+  - appveyor DownloadFile https://vulkan.lunarg.com/sdk/download/1.0.49.0/windows/VulkanSDK-1.0.49.0-Installer.exe -FileName vulkan.exe
   - vulkan.exe /S
 
 build_script:
