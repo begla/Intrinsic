@@ -27,6 +27,7 @@ PER_INSTANCE_UBO;
 
 // Bindings
 BINDINGS_GBUFFER;
+layout (binding = 6) uniform sampler2D emissiveTex;
 
 // Input
 layout (location = 0) in vec3 inNormal;
