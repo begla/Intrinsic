@@ -37,7 +37,7 @@ struct EntityManager : Dod::ManagerBase<_INTR_MAX_ENTITY_COUNT, EntityData>
   _INTR_INLINE static EntityRef createEntity(const Name& p_Name = 0u)
   {
     EntityRef ref = allocate();
-    _name(ref) = p_Name;
+    rename(ref, p_Name);
     _nameResourceMap[p_Name] = ref;
     return ref;
   }
@@ -57,17 +57,20 @@ struct EntityManager : Dod::ManagerBase<_INTR_MAX_ENTITY_COUNT, EntityData>
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember(
-        "name", _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Entity),
-                                  _N(string), _name(p_Ref), false, false),
-        p_Document.GetAllocator());
+    p_Properties.AddMember("name",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(Entity), _N(string),
+                                             _name(p_Ref), false, false),
+                           p_Document.GetAllocator());
   }
 
   _INTR_INLINE static void initFromDescriptor(EntityRef p_Ref,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("name"))
-      _name(p_Ref) = JsonHelper::readPropertyName(p_Properties["name"]);
+    {
+      rename(p_Ref, JsonHelper::readPropertyName(p_Properties["name"]));
+    }
   }
 
   _INTR_INLINE static EntityRef getEntityByName(const Name& p_Name)
@@ -100,10 +103,26 @@ struct EntityManager : Dod::ManagerBase<_INTR_MAX_ENTITY_COUNT, EntityData>
     return newEntityName;
   }
 
+  _INTR_INLINE static void rename(EntityRef p_Ref, const Name& p_NewName)
+  {
+    // Delete the old name => entity mapping
+    auto currentNameRefIt = _nameResourceMap.find(_name(p_Ref));
+    if (currentNameRefIt != _nameResourceMap.end() &&
+        currentNameRefIt->second == p_Ref)
+    {
+      _nameResourceMap.erase(currentNameRefIt);
+    }
+
+    // Find a unique name
+    _data.name[p_Ref._id] = makeNameUnique(p_NewName.getString().c_str());
+    // ... and finally update the name => entity mapping and the actual name
+    _nameResourceMap[_data.name[p_Ref._id]] = p_Ref;
+  }
+
   // Getter/Setter
   // ->
 
-  _INTR_INLINE static Name& _name(EntityRef p_Ref)
+  _INTR_INLINE static const Name& _name(EntityRef p_Ref)
   {
     return _data.name[p_Ref._id];
   }
