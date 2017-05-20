@@ -27,7 +27,7 @@ layout (binding = 0) uniform PerInstance
 } uboPerInstance; 
 
 layout (binding = 1) uniform sampler3D volLightBufferTex;
-layout (binding = 2, rgba16f) uniform image3D volLightScatterBufferTex;
+layout (binding = 2, r11f_g11f_b10f) uniform image3D volLightScatterBufferTex;
 
 // Based on AC4 volumetric fog
 // https://goo.gl/xEgT9O
@@ -46,7 +46,7 @@ vec4 accum(vec4 prev, vec4 next)
 layout (local_size_x = 8u, local_size_y = 8u, local_size_z = 1u) in;
 void main()
 {
-  vec4 currentValue = texelFetch(volLightBufferTex, ivec3(gl_GlobalInvocationID.xy, 0), 0);
+  vec4 currentValue = texelFetch(volLightBufferTex, ivec3(gl_GlobalInvocationID.xy, 0), 0) * 0.0001;
   write(ivec3(gl_GlobalInvocationID.xy, 0), currentValue);
 
   for (int z=1; z<VOLUME_DEPTH; ++z)

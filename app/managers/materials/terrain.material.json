@@ -8,6 +8,7 @@
             "PerPixelPicking"
         ],
         "albedoTextureName": "grassleaves_01",
+        "emissiveTextureName": "white",
         "uvOffsetScale": [
             0.0,
             0.0,

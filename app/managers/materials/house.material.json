@@ -1,0 +1,30 @@
+{
+    "name": "house",
+    "properties": {
+        "name": "house",
+        "materialPassMask": [
+            "GBufferDefault",
+            "Shadow",
+            "PerPixelPicking"
+        ],
+        "albedoTextureName": "house_01",
+        "emissiveTextureName": "house_01_E",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 0.0,
+        "emissiveIntensity": 3.0,
+        "normalTextureName": "house_01_NRM",
+        "pbrTextureName": "house_01_PBR",
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": 0.0
+    }
+}

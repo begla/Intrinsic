@@ -6,6 +6,7 @@
             "DebugGrid"
         ],
         "albedoTextureName": "checkerboard",
+        "emissiveTextureName": "white",
         "uvOffsetScale": [
             0.0,
             0.0,

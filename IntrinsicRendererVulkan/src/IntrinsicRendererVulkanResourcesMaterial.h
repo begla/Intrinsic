@@ -80,6 +80,7 @@ struct MaterialData : Dod::Resources::ResourceDataBase
   MaterialData() : Dod::Resources::ResourceDataBase(_INTR_MAX_MATERIAL_COUNT)
   {
     descAlbedoTextureName.resize(_INTR_MAX_MATERIAL_COUNT);
+    descEmissiveTextureName.resize(_INTR_MAX_MATERIAL_COUNT);
     descAlbedo1TextureName.resize(_INTR_MAX_MATERIAL_COUNT);
     descAlbedo2TextureName.resize(_INTR_MAX_MATERIAL_COUNT);
     descNormalTextureName.resize(_INTR_MAX_MATERIAL_COUNT);
@@ -118,6 +119,7 @@ struct MaterialData : Dod::Resources::ResourceDataBase
 
   // Description
   _INTR_ARRAY(Name) descAlbedoTextureName;
+  _INTR_ARRAY(Name) descEmissiveTextureName;
   _INTR_ARRAY(Name) descAlbedo1TextureName;
   _INTR_ARRAY(Name) descAlbedo2TextureName;
   _INTR_ARRAY(Name) descNormalTextureName;
@@ -164,6 +166,7 @@ struct MaterialManager
   _INTR_INLINE static void resetToDefault(MaterialRef p_Ref)
   {
     _descAlbedoTextureName(p_Ref) = _N(checkerboard);
+    _descEmissiveTextureName(p_Ref) = _N(white);
     _descAlbedo1TextureName(p_Ref) = _N(checkerboard);
     _descAlbedo2TextureName(p_Ref) = _N(checkerboard);
     _descNormalTextureName(p_Ref) = _N(default_NRM);
@@ -224,6 +227,11 @@ struct MaterialManager
           "albedoTextureName",
           _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
                             _descAlbedoTextureName(p_Ref), false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "emissiveTextureName",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
+                            _descEmissiveTextureName(p_Ref), false, false),
           p_Document.GetAllocator());
       p_Properties.AddMember(
           "uvOffsetScale",
@@ -374,6 +382,9 @@ struct MaterialManager
     if (p_Properties.HasMember("albedoTextureName"))
       _descAlbedoTextureName(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["albedoTextureName"]);
+    if (p_Properties.HasMember("emissiveTextureName"))
+      _descEmissiveTextureName(p_Ref) =
+          JsonHelper::readPropertyString(p_Properties["emissiveTextureName"]);
     if (p_Properties.HasMember("normalTextureName"))
       _descNormalTextureName(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["normalTextureName"]);
@@ -500,6 +511,10 @@ struct MaterialManager
   _INTR_INLINE static Name& _descAlbedoTextureName(MaterialRef p_Ref)
   {
     return _data.descAlbedoTextureName[p_Ref._id];
+  }
+  _INTR_INLINE static Name& _descEmissiveTextureName(MaterialRef p_Ref)
+  {
+    return _data.descEmissiveTextureName[p_Ref._id];
   }
   _INTR_INLINE static Name& _descNormalTextureName(MaterialRef p_Ref)
   {

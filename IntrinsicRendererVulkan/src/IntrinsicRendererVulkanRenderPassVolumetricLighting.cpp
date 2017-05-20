@@ -40,10 +40,7 @@ struct PerInstanceDataESMBlur
 struct PerInstanceData
 {
   glm::mat4 projMatrix;
-  glm::mat4 viewProjMatrix;
   glm::mat4 prevViewProjMatrix;
-  glm::mat4 viewMatrix;
-  glm::mat4 invViewMatrix;
 
   glm::vec4 eyeVSVectorX;
   glm::vec4 eyeVSVectorY;
@@ -61,7 +58,14 @@ struct PerInstanceData
 
   glm::vec4 nearFar;
   glm::vec4 nearFarWidthHeight;
+
+  glm::vec4 mainLightDirAndTemp;
+  glm::vec4 mainLightColorAndIntens;
+
+  glm::vec4 haltonSamples;
 } _perInstanceData;
+
+glm::mat4 prevViewProjMatrix;
 
 Resources::ImageRef _volLightingBufferImageRef;
 Resources::ImageRef _volLightingBufferPrevFrameImageRef;
@@ -96,22 +100,36 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
           Components::CameraManager::_entity(p_CameraRef));
 
   // Post effect data
-  _perInstanceData.data0.x =
-      Core::Resources::PostEffectManager::_descVolumetricLightingScattering(
-          Core::Resources::PostEffectManager::_blendTargetRef);
-  _perInstanceData.data0.y = Core::Resources::PostEffectManager::
-      _descVolumetricLightingLocalLightIntensity(
-          Core::Resources::PostEffectManager::_blendTargetRef);
+  {
+    const glm::vec3 mainLightDir =
+        Core::Resources::PostEffectManager::_descMainLightOrientation(
+            Core::Resources::PostEffectManager::_blendTargetRef) *
+        glm::vec3(0.0f, 0.0f, 1.0f);
 
-  _perInstanceData.prevViewProjMatrix = _perInstanceData.viewProjMatrix;
-  _perInstanceData.viewProjMatrix =
+    _perInstanceData.data0.x =
+        Core::Resources::PostEffectManager::_descVolumetricLightingScattering(
+            Core::Resources::PostEffectManager::_blendTargetRef);
+    _perInstanceData.data0.z =
+        Core::Resources::PostEffectManager::_descAmbientFactor(
+            Core::Resources::PostEffectManager::_blendTargetRef);
+    _perInstanceData.mainLightDirAndTemp = glm::vec4(
+        mainLightDir, Core::Resources::PostEffectManager::_descMainLightTemp(
+                          Core::Resources::PostEffectManager::_blendTargetRef));
+    _perInstanceData.mainLightColorAndIntens =
+        glm::vec4(Core::Resources::PostEffectManager::_descMainLightColor(
+                      Core::Resources::PostEffectManager::_blendTargetRef),
+                  Core::Resources::PostEffectManager::_descMainLightIntens(
+                      Core::Resources::PostEffectManager::_blendTargetRef));
+  }
+
+  _perInstanceData.haltonSamples =
+      RenderProcess::UniformManager::_uniformDataSource.haltonSamples32;
+
+  _perInstanceData.prevViewProjMatrix = prevViewProjMatrix;
+  prevViewProjMatrix =
       Components::CameraManager::_viewProjectionMatrix(p_CameraRef);
   _perInstanceData.projMatrix =
       Components::CameraManager::_projectionMatrix(p_CameraRef);
-  _perInstanceData.viewMatrix =
-      Components::CameraManager::_viewMatrix(p_CameraRef);
-  _perInstanceData.invViewMatrix =
-      Components::CameraManager::_inverseViewMatrix(p_CameraRef);
 
   _perInstanceData.camPos =
       glm::vec4(Components::NodeManager::_worldPosition(camNodeRef),
@@ -122,15 +140,16 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
   _perInstanceData.eyeVSVectorY = glm::vec4(
       glm::vec3(0.0, 1.0 / _perInstanceData.projMatrix[1][1], 0.0), 0.0);
   _perInstanceData.eyeVSVectorZ = glm::vec4(glm::vec3(0.0, 0.0, -1.0), 0.0);
-
   _perInstanceData.eyeWSVectorX =
-      _perInstanceData.invViewMatrix * _perInstanceData.eyeVSVectorX;
-  _perInstanceData.eyeWSVectorY =
-      _perInstanceData.invViewMatrix * _perInstanceData.eyeVSVectorY;
-  _perInstanceData.eyeWSVectorZ =
-      _perInstanceData.invViewMatrix * _perInstanceData.eyeVSVectorZ;
-
+      Components::CameraManager::_inverseViewMatrix(p_CameraRef) *
+      _perInstanceData.eyeVSVectorX;
   _perInstanceData.eyeWSVectorX.w = TaskManager::_totalTimePassed;
+  _perInstanceData.eyeWSVectorY =
+      Components::CameraManager::_inverseViewMatrix(p_CameraRef) *
+      _perInstanceData.eyeVSVectorY;
+  _perInstanceData.eyeWSVectorZ =
+      Components::CameraManager::_inverseViewMatrix(p_CameraRef) *
+      _perInstanceData.eyeVSVectorZ;
 
   _perInstanceData.nearFar = glm::vec4(
       Components::CameraManager::_descNearPlane(p_CameraRef),
@@ -208,6 +227,10 @@ createComputeCallAccumulation(glm::vec3 p_Dim,
         computeCallRef, _N(kelvinLutTex), GpuProgramType::kCompute,
         ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
         Samplers::kLinearClamp);
+    ComputeCallManager::bindImage(
+        computeCallRef, _N(irradianceTex), GpuProgramType::kCompute,
+        ImageManager::getResourceByName(_N(default_ibl_cube_irradiance)),
+        Samplers::kLinearClamp);
     ComputeCallManager::bindBuffer(
         computeCallRef, _N(LightBuffer), GpuProgramType::kCompute,
         p_LightBuffer, UboType::kInvalidUbo,
@@ -248,7 +271,7 @@ createComputeCallScattering(glm::vec3 p_Dim,
     ComputeCallManager::bindImage(
         computeCallScatteringRef, _N(volLightBufferTex),
         GpuProgramType::kCompute, p_CurrentVolLightingBuffer,
-        Samplers::kLinearClamp);
+        Samplers::kNearestClamp);
     ComputeCallManager::bindImage(
         computeCallScatteringRef, _N(volLightScatterBufferTex),
         GpuProgramType::kCompute, _volLightingScatteringBufferImageRef,
@@ -305,7 +328,7 @@ _INTR_INLINE void blurExponentialShadowMaps(uint32_t p_ShadowMapCount)
     instanceData.arrayIdx.x = shadowMapIndex;
     instanceData.blurParams = glm::vec4(blurRadius, 0.0f, 1.0f, 0.0f);
 
-    // Blur vertically
+    // Blur horizontally
     DrawCallManager::allocateAndUpdateUniformMemory(
         {_drawCallEsmBlurRef}, nullptr, 0u, &instanceData,
         sizeof(PerInstanceDataESMBlur));
@@ -332,10 +355,10 @@ _INTR_INLINE void blurExponentialShadowMaps(uint32_t p_ShadowMapCount)
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 0u, shadowMapIndex);
 
     // Blur vertically
-    instanceData.blurParams = glm::vec4(blurRadius, 0.0f, 1.0f, 0.0f);
+    instanceData.blurParams = glm::vec4(blurRadius, 0.0f, 0.0f, 1.0f);
 
     DrawCallManager::allocateAndUpdateUniformMemory(
-        {_drawCallEsmBlurRef}, nullptr, 0u, &instanceData,
+        {_drawCallEsmBlurPingPongRef}, nullptr, 0u, &instanceData,
         sizeof(PerInstanceDataESMBlur));
 
     RenderSystem::beginRenderPass(_renderPassRef,

@@ -41,7 +41,8 @@
 
 #define BINDINGS_GBUFFER layout (binding = 3) uniform sampler2D albedoTex; \
 layout (binding = 4) uniform sampler2D normalTex; \
-layout (binding = 5) uniform sampler2D pbrTex
+layout (binding = 5) uniform sampler2D pbrTex; \
+layout (binding = 6) uniform sampler2D emissiveTex
 
 #define BINDINGS_TERRAIN layout (binding = 3) uniform sampler2D albedoTex0; \
 layout (binding = 4) uniform sampler2D normalTex0; \
@@ -68,6 +69,8 @@ struct GBuffer
   float specular;
   float metalMask;
   uint materialBufferIdx;
+  float emissive;
+  float occlusion;
 };
 
 void writeGBuffer(in GBuffer gbuffer, inout vec4 outAlbedo, inout vec4 outNormal, inout vec4 outParameter0)
@@ -76,5 +79,5 @@ void writeGBuffer(in GBuffer gbuffer, inout vec4 outAlbedo, inout vec4 outNormal
   outNormal.rg = encodeNormal(gbuffer.normal);
   outNormal.b = clamp(gbuffer.specular, 0.0, 1.0);
   outNormal.a = clamp(gbuffer.roughness, 0.05, 1.0);
-  outParameter0.rgba = vec4(clamp(gbuffer.metalMask, 0.0, 1.0), gbuffer.materialBufferIdx, 1.0, 0.0);
+  outParameter0.rgba = vec4(clamp(gbuffer.metalMask, 0.0, 1.0), gbuffer.materialBufferIdx, gbuffer.occlusion, gbuffer.emissive);
 }

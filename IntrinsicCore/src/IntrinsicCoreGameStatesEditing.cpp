@@ -316,6 +316,7 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
                  0.1f);
   }
 
+  camRot = glm::quat(_eulerAngles);
   Components::NodeManager::_orientation(camNodeRef) = _eulerAngles;
   Components::NodeManager::_position(camNodeRef) =
       _orbitCamCenter + camRot * glm::vec3(0.0f, 0.0f, -_orbitRadius);

@@ -6,6 +6,7 @@
             "GBufferSky"
         ],
         "albedoTextureName": "default_ibl_cube_radiance",
+        "emissiveTextureName": "white",
         "uvOffsetScale": [
             0.0,
             0.0,

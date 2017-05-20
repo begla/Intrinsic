@@ -15,7 +15,7 @@
 // Precompiled header file
 #include "stdafx.h"
 
-#define BOID_COUNT 200u
+#define BOID_COUNT 64u
 
 namespace Intrinsic
 {
@@ -248,7 +248,7 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
           Components::LightManager::createLight(entityRef);
       Components::LightManager::resetToDefault(lightRef);
       Components::LightManager::_descRadius(lightRef) = 10.0f;
-      Components::LightManager::_descIntensity(lightRef) = 15.0f;
+      Components::LightManager::_descIntensity(lightRef) = 50.0f;
 
       Components::NodeRef swarmNodeRef =
           Components::NodeManager::getComponentForEntity(

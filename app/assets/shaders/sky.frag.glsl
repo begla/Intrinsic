@@ -36,7 +36,8 @@ layout (location = 1) in vec3 inNormal;
 layout (location = 0) out vec4 outAlbedo;
 
 void main()
-{ 
-  const vec4 albedo = textureLod(albedoTex, inNormal, 1.0);
+{
+	// TODO: Hack that fades sky with ambient factor
+  const vec4 albedo = textureLod(albedoTex, inNormal, 1.0) * uboPerInstance.data0.x;
   outAlbedo = vec4(albedo.rgb, 1.0);
 }

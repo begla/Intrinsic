@@ -14,11 +14,7 @@
 
 #pragma once
 
-#define BLUR_X_THREADS_X 4
-#define BLUR_X_THREADS_Y 64
-
-#define BLUR_Y_THREADS_X 64
-#define BLUR_Y_THREADS_Y 4
+#define BLUR_THREADS 128
 
 namespace Intrinsic
 {

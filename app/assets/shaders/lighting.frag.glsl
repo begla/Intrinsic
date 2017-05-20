@@ -36,6 +36,8 @@ layout (binding = 0) uniform PerInstance
 
   vec4 mainLightColorAndIntens;
   vec4 mainLightDirAndTemp;
+
+  vec4 data0;
 } uboPerInstance; 
 
 layout (binding = 1) uniform sampler2D albedoTex;
@@ -43,7 +45,6 @@ layout (binding = 2) uniform sampler2D normalTex;
 layout (binding = 3) uniform sampler2D parameter0Tex;
 layout (binding = 4) uniform sampler2D depthTex;
 layout (binding = 5) uniform sampler2D ssaoTex;
-layout (binding = 12) uniform sampler2D kelvinLutTex;
 layout (binding = 6) uniform samplerCube irradianceTex;
 layout (binding = 7) uniform samplerCube specularTex;
 layout (binding = 8) uniform sampler2DArrayShadow shadowBufferTex;
@@ -56,6 +57,8 @@ layout (binding = 11) buffer LightIndexBuffer
 {
   uint lightIndices[];
 };
+layout (binding = 12) uniform sampler2D kelvinLutTex;
+layout (binding = 13) uniform sampler2D noiseTex;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
@@ -94,7 +97,7 @@ void main()
   initLightingDataFromGBuffer(d);
 
   d.N = normalize(decodeNormal(normalSample.rg));  
-  d.L = normalize(uboPerInstance.viewMatrix * vec4(uboPerInstance.mainLightDirAndTemp.xyz, 0.0)).xyz;
+  d.L = uboPerInstance.mainLightDirAndTemp.xyz;
   d.V = -normalize(posVS); 
   d.energy = vec3(uboPerInstance.mainLightColorAndIntens.w);
   calculateLightingData(d);
@@ -107,63 +110,94 @@ void main()
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
   const vec3 irrad = d.diffuseColor * texture(irradianceTex, R).rgb;
-  outColor.rgb += min(ssaoSample.r, parameter0Sample.z) * irrad; 
+  outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, parameter0Sample.z) * irrad; 
 
   // Specular
-  const float specLod = burleyToMip(d.roughness, dot(normalWS, R0));
+  //const float specLod = burleyToMip(d.roughness, dot(normalWS, R0));
+  const float specLod = burleyToMipApprox(d.roughness);
   const vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
 
-  outColor.rgb += parameter0Sample.z * spec;
+  outColor.rgb += uboPerInstance.data0.y * parameter0Sample.z * spec;
 
   // Emissive
-  outColor.rgb += matParams.emissiveIntensity * d.baseColor;
+  outColor.rgb += parameter0Sample.w * matParams.emissiveIntensity * d.baseColor;
 
   const vec3 mainLightColor = uboPerInstance.mainLightColorAndIntens.rgb 
     * kelvinToRGB(uboPerInstance.mainLightDirAndTemp.w, kelvinLutTex);
 
+  // Cloud shadows
+  const vec4 posWS = uboPerInstance.invViewMatrix * vec4(posVS, 1.0);
+  const float cloudShadows = clamp(texture(noiseTex, 
+    clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0 + uboPerInstance.data0.x * 0.01).r * 3.0 - 0.5, 0.0, 1.0);
+
   // Direct lighting
-  float shadowAttenuation = calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
+  float shadowAttenuation = cloudShadows * calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
   outColor.rgb += shadowAttenuation * mainLightColor * calcLighting(d);
 
   // Translucency
+  // TODO: Move this to a library
+
   const float translThickness = matParams.translucencyThickness;
-
-  vec3 translLightVector = d.L + d.N * translDistortion;
-  float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
-  vec3 transl = (translDot + translAmbient) * translThickness;
-  vec3 translColor = d.diffuseColor * mainLightColor * transl;
-
-  outColor.rgb += translColor;
-
-  const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
-  const uint clusterIdx = calcClusterIndex(gridPos);
-
-  // Point lights
-  const uint lightCount = lightIndices[clusterIdx];
-
-  // DEBUG: Visualize clusters
-  /*if (lightCount > 0)
+  if (translThickness > EPSILON)
   {
-    outColor = vec4(gridPos / vec3(gridRes), 0.0);
-    return;
-  }*/
+    const vec3 translLightVector = d.L + d.N * translDistortion;
+    const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
+    const vec3 transl = (translDot + translAmbient) * translThickness;
+    const vec3 translColor = uboPerInstance.mainLightColorAndIntens.w * d.diffuseColor * mainLightColor * transl;
 
-  for (uint li=0; li<lightCount; ++li)
-  {
-    Light light = lights[lightIndices[clusterIdx + li + 1]];
-
-    const vec3 lightDistVec = light.posAndRadius.xyz - posVS;
-    const float dist = length(lightDistVec);
-    d.L = lightDistVec / dist;
-    d.energy = vec3(light.colorAndIntensity.a);
-    calculateLightingData(d);
-
-    outColor.rgb += 
-      calcInverseSqrFalloff(light.posAndRadius.w, dist) 
-      * calcLighting(d) * light.colorAndIntensity.rgb 
-      * kelvinToRGB(light.temp.r, kelvinLutTex);
+    outColor.rgb += translColor;    
   }
 
+  const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
+
+  if (isGridPosValid(gridPos))
+  {
+    const uint clusterIdx = calcClusterIndex(gridPos);
+
+    // Point lights
+    const uint lightCount = lightIndices[clusterIdx];
+
+    // DEBUG: Visualize clusters
+    /*if (lightCount > 0)
+    {
+      outColor = vec4(gridPos / vec3(gridRes), 0.0);
+      return;
+    }*/
+
+    for (uint li=0; li<lightCount; ++li)
+    {
+      Light light = lights[lightIndices[clusterIdx + li + 1]];
+
+      const vec3 lightDistVec = light.posAndRadius.xyz - posVS;
+      const float dist = length(lightDistVec);
+      const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
+      if (att * light.colorAndIntensity.w < MIN_FALLOFF) continue;
+
+      d.L = lightDistVec / dist;
+      d.energy = vec3(light.colorAndIntensity.a);
+      calculateLightingData(d);
+
+      const vec3 lightColor = light.colorAndIntensity.rgb 
+        * kelvinToRGB(light.temp.r, kelvinLutTex);
+
+      outColor.rgb += calcLighting(d) * att * lightColor;
+
+      const float localTranslThickness = matParams.translucencyThickness;
+
+      if (localTranslThickness > EPSILON)
+      {
+        // Translucency
+        // TODO: Move this to a library
+        const vec3 translLightVector = d.L + d.N * translDistortion;
+        const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
+        const vec3 transl = (translDot + translAmbient) * localTranslThickness;
+        const vec3 translColor = att * light.colorAndIntensity.w * lightColor * transl * d.diffuseColor;
+
+        outColor.rgb += translColor;
+      }
+    }
+  }
+  
   outColor.a = 1.0;
 }
   

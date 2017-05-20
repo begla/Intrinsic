@@ -1,4 +1,5 @@
 set(SOURCES
+    hlslAttributes.cpp
     hlslParseHelper.cpp
     hlslScanContext.cpp
     hlslOpMap.cpp
@@ -7,6 +8,7 @@ set(SOURCES
     hlslParseables.cpp)
 
 set(HEADERS
+    hlslAttributes.h
     hlslParseHelper.h
     hlslTokens.h
     hlslScanContext.h
@@ -16,11 +18,11 @@ set(HEADERS
     hlslParseables.h)
 
 add_library(HLSL STATIC ${SOURCES} ${HEADERS})
-set_property(TARGET HLSL PROPERTY FOLDER hlsl)
+set_property(TARGET HLSL PROPERTY FOLDER hlsl POSITION_INDEPENDENT_CODE ON)
 
 if(WIN32)
     source_group("Source" FILES ${SOURCES} ${HEADERS})
 endif(WIN32)
 
 install(TARGETS HLSL
-        ARCHIVE DESTINATION lib)
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})

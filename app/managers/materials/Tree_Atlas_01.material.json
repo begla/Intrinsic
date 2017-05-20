@@ -9,6 +9,7 @@
             "PerPixelPicking"
         ],
         "albedoTextureName": "Tree_Atlas_01",
+        "emissiveTextureName": "white",
         "uvOffsetScale": [
             0.0,
             0.0,
@@ -19,7 +20,7 @@
             0.0,
             0.0
         ],
-        "translucencyThickness": 2.5,
+        "translucencyThickness": 1.0,
         "emissiveIntensity": 0.0,
         "normalTextureName": "Tree_Atlas_01_NRM",
         "pbrTextureName": "Tree_Atlas_01_PBR",

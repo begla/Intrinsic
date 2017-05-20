@@ -4,14 +4,14 @@ struct PS_OUTPUT
     float  Depth : SV_Depth;
 };
 
-void MyFunc(in float x, out float y, inout float z)
+inline void MyFunc(in float x, out float y, inout float z)
 {
     y = x;
     z = y;
     x = -1; // no effect since x = in param
 }
 
-PS_OUTPUT main(noperspective in float4 inpos : SV_Position)
+PS_OUTPUT main(noperspective in float4 inpos : SV_Position, out int sampleMask : SV_Coverage)
 {
    PS_OUTPUT psout;
 

@@ -1,17 +1,17 @@
 
-#define gs     // TODO: define as groupshared when available in the grammar
-gs uint gs_ua;
-gs uint gs_ub;
-gs uint gs_uc;
-gs uint2 gs_ua2;
-gs uint2 gs_ub2;
-gs uint2 gs_uc2;
-gs uint3 gs_ua3;
-gs uint3 gs_ub3;
-gs uint3 gs_uc3;
-gs uint4 gs_ua4;
-gs uint4 gs_ub4;
-gs uint4 gs_uc4;
+
+groupshared uint gs_ua;
+groupshared uint gs_ub;
+groupshared uint gs_uc;
+groupshared uint2 gs_ua2;
+groupshared uint2 gs_ub2;
+groupshared uint2 gs_uc2;
+groupshared uint3 gs_ua3;
+groupshared uint3 gs_ub3;
+groupshared uint3 gs_uc3;
+groupshared uint4 gs_ua4;
+groupshared uint4 gs_ub4;
+groupshared uint4 gs_uc4;
 
 float PixelShaderFunctionS(float inF0, float inF1, float inF2, uint inU0, uint inU1)
 {
@@ -33,7 +33,7 @@ float PixelShaderFunctionS(float inF0, float inF1, float inF2, uint inU0, uint i
     clip(inF0);
     float r014 = cos(inF0);
     float r015 = cosh(inF0);
-    uint r016 = countbits(7);
+    int r016 = countbits(7);
     float r017 = ddx(inF0);
     float r018 = ddx_coarse(inF0);
     float r019 = ddx_fine(inF0);
@@ -52,7 +52,6 @@ float PixelShaderFunctionS(float inF0, float inF1, float inF2, uint inU0, uint i
     // TODO: fma(inD0, inD1, inD2);
     float r033 = fmod(inF0, inF1);
     float r034 = frac(inF0);
-    float r035 = frexp(inF0, inF1);
     float r036 = fwidth(inF0);
     bool r037 = isinf(inF0);
     bool r038 = isnan(inF0);
@@ -111,7 +110,7 @@ float2 PixelShaderFunction2(float2 inF0, float2 inF1, float2 inF2, uint2 inU0, u
     clip(inF0);
     float2 r013 = cos(inF0);
     float2 r015 = cosh(inF0);
-    uint2 r016 = countbits(int2(7,3));
+    int2 r016 = countbits(int2(7,3));
     float2 r017 = ddx(inF0);
     float2 r018 = ddx_coarse(inF0);
     float2 r019 = ddx_fine(inF0);
@@ -136,7 +135,6 @@ float2 PixelShaderFunction2(float2 inF0, float2 inF1, float2 inF2, uint2 inU0, u
     // TODO: fma(inD0, inD1, inD2);
     float2 r035 = fmod(inF0, inF1);
     float2 r036 = frac(inF0);
-    float2 r037 = frexp(inF0, inF1);
     float2 r038 = fwidth(inF0);
     bool2 r039 = isinf(inF0);
     bool2 r040 = isnan(inF0);
@@ -217,7 +215,6 @@ float3 PixelShaderFunction3(float3 inF0, float3 inF1, float3 inF2, uint3 inU0, u
     // TODO: fma(inD0, inD1, inD2);
     float3 r036 = fmod(inF0, inF1);
     float3 r037 = frac(inF0);
-    float3 r038 = frexp(inF0, inF1);
     float3 r039 = fwidth(inF0);
     bool3 r040 = isinf(inF0);
     bool3 r041 = isnan(inF0);
@@ -299,7 +296,6 @@ float4 PixelShaderFunction(float4 inF0, float4 inF1, float4 inF2, uint4 inU0, ui
     // TODO: fma(inD0, inD1, inD2);
     float4 r036 = fmod(inF0, inF1);
     float4 r037 = frac(inF0);
-    float4 r038 = frexp(inF0, inF1);
     float4 r039 = fwidth(inF0);
     bool4 r040 = isinf(inF0);
     bool4 r041 = isnan(inF0);
@@ -369,7 +365,6 @@ float4 PixelShaderFunction(float4 inF0, float4 inF1, float4 inF2, uint4 inU0, ui
     MT r021 = floor(inF0);                  \
     MT r022 = fmod(inF0, inF1);             \
     MT r023 = frac(inF0);                   \
-    MT r024 = frexp(inF0, inF1);            \
     MT r025 = fwidth(inF0);                 \
     MT r026 = ldexp(inF0, inF1);            \
     MT r026a = lerp(inF0, inF1, inF2);      \

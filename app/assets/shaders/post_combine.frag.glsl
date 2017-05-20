@@ -63,6 +63,15 @@ vec3 sampleColorOffsets(sampler2D scene, vec2 uv0, vec3 offsets, vec2 framebuffe
     textureLod(scene, uv0 - direction * offsets.z * pixelSize, 0.0).b);
 }
 
+const float lensDirtLumThreshold = 0.2;
+const float lensDirtIntens = 0.9;
+const float toneMappingLumTarget = 0.9;
+const float toneMappingMaxExposure = 3.0;
+const float bloomFactor = 1.0;
+const float filmGrainBias = 0.0;
+const float filmGrainMax = 1.0;
+const float lensFlareFactor = 1.0;
+
 void main()
 {
   const vec2 framebufferSize = vec2(textureSize(sceneTex, 0));
@@ -83,15 +92,6 @@ void main()
   const vec4 lensDirt = textureLod(lensDirtTex, inUV0, 0.0).rgba;
   const vec4 lensFlare = textureLod(lensFlareTex, inUV0, 0.0).rgba;
 
-  const float lensDirtLumThreshold = 0.2;
-  const float lensDirtIntens = 0.9;
-  const float toneMappingLumTarget = 0.7;
-  const float toneMappingMaxExposure = 3.0;
-  const float bloomFactor = 1.0;
-  const float filmGrainBias = 0.0;
-  const float filmGrainMax = 1.0;
-  const float lensFlareFactor = 1.0;
-
   const float exposure = min(toneMappingLumTarget / avgLum[0], toneMappingMaxExposure);
 
   // Bloom
@@ -101,11 +101,11 @@ void main()
   // Lens dirt
   outColor.rgb += lensDirtIntens * lensDirt.rgb * clamp(max(bloom.a - lensDirtLumThreshold, 0.0), 0.0, 1.0);
   // Vignette
-  outColor.rgb *= 1.0 - clamp(length(inUV0 * 2.0 - 1.0) - 0.5, 0.0, 1.0);
+  outColor.rgb *= 1.0 - clamp(pow(length(inUV0 * 2.0 - 1.0), 1.5) * 0.5, 0.0, 1.0);
 
   // Film grain
   const vec4 grain = texelFetch(filmGrainTex, 
-    (ivec2(inUV0 * framebufferSize.xy) + uboPerInstance.haltonSamples.xy) & 255, 0).rgba;
+    (ivec2(inUV0 * framebufferSize.xy) + ivec2(uboPerInstance.haltonSamples.xy * 255.0)) & 255, 0).rgba;
   outColor.rgb = grain.rgb * min(outColor.rgb + filmGrainBias, filmGrainMax) + outColor.rgb;
 
   // Tonemapping
