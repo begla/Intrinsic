@@ -101,6 +101,9 @@ void updateThirdPersonCamera(CameraControllerRef p_Ref, float p_DeltaT)
   NodeRef cameraNodeRef = NodeManager::getComponentForEntity(
       CameraControllerManager::_entity(p_Ref));
 
+  float rotationSpeed = 4.0f;
+  float movementSpeed = 4.0f;
+
   // If the player doesn't use the camera controls, position the camera behind
   // the player model automatically
   if (timeSinceLastOrientationChange > 2.0f)
@@ -124,6 +127,8 @@ void updateThirdPersonCamera(CameraControllerRef p_Ref, float p_DeltaT)
 
     const glm::vec3 currentCameraOrientation =
         NodeManager::_orientation(cameraNodeRef) * glm::vec3(0.0f, 0.0f, -1.0f);
+
+    movementSpeed *= 0.5f;
 
     // Allow the player to turn
     if (glm::dot(currentCameraOrientation, newTargetVector) > 0.0f)
@@ -188,9 +193,6 @@ void updateThirdPersonCamera(CameraControllerRef p_Ref, float p_DeltaT)
     minHitDistance = glm::max(minHitDistance, minOffsetDist);
     worldCamTargetPosition = nearestCamPos - camOut * minHitDistance;
   }
-
-  static const float rotationSpeed = 4.0f;
-  static const float movementSpeed = 4.0f;
 
   NodeManager::_orientation(cameraNodeRef) =
       glm::slerp(NodeManager::_orientation(cameraNodeRef), targetOrientation,
