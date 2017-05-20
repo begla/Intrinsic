@@ -71,6 +71,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   Application::initEventSystem();
 
   _ui.setupUi(this);
+  setWindowTitle(QString("IntrinsicEd - ") + _INTR_VERSION_STRING);
 
   // Init. Intrinsic
   Application::init(qWinAppInst(), (void*)_ui.viewPort->winId());

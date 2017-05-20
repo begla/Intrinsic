@@ -72,6 +72,7 @@
 #include "glm/gtx/rotate_vector.hpp"
 
 // Core related includes
+#include "IntrinsicCoreVersion.h"
 #include "IntrinsicCorePrerequisites.h"
 
 // Logging

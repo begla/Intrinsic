@@ -20,6 +20,11 @@
 #endif // _MSC_VER
 
 #if defined(_WIN32)
+//#define GENERATE_CRASH_DUMPS
+#include "BugSplat.h"
+#endif //_WIN32
+
+#if defined(GENERATE_CRASH_DUMPS)
 #include "IntrinsicCoreCrashDumpGeneratorWin32.h"
 #endif // _WIN32
 
@@ -59,7 +64,8 @@ int _main(int argc, char* argv[])
   }
 
   SDL_Window* sdlWindow = SDL_CreateWindow(
-      "Intrinsic", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      (_INTR_STRING("Intrinsic - ") + _INTR_VERSION_STRING).c_str(),
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
       Settings::Manager::_screenResolutionWidth,
       Settings::Manager::_screenResolutionHeight, windowFlags);
   _INTR_ASSERT(sdlWindow);
@@ -96,7 +102,7 @@ int _main(int argc, char* argv[])
   return 0;
 }
 
-#if defined(_WIN32)
+#if defined(GENERATE_CRASH_DUMPS)
 int main(int argc, char* argv[])
 {
   __try
@@ -110,5 +116,24 @@ int main(int argc, char* argv[])
   }
 }
 #else
-int main(int argc, char* argv[]) { return _main(argc, argv); }
-#endif // _WIN32
+
+#if defined(BUGSPLAT_H)
+MiniDmpSender* miniDmpSender = nullptr;
+
+bool ExceptionCallback(UINT nCode, LPVOID lpVal1, LPVOID lpVal2)
+{
+  miniDmpSender->sendAdditionalFile(L"Intrinsic.log");
+  return false;
+}
+#endif // BUGSPLAT_H
+
+int main(int argc, char* argv[])
+{
+#if defined(BUGSPLAT_H)
+  miniDmpSender =
+      new MiniDmpSender(L"Intrinsic", L"Intrinsic", _INTR_VERSION_STRING_L);
+  miniDmpSender->setCallback(ExceptionCallback);
+#endif // BUGSPLAT_H
+  return _main(argc, argv);
+}
+#endif // GENERATE_CRASH_DUMPS

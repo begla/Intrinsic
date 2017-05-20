@@ -16,8 +16,13 @@
 #include "stdafx_editor.h"
 
 #if defined(_WIN32)
-#include "IntrinsicCoreCrashDumpGeneratorWin32.h"
+//#define GENERATE_CRASH_DUMPS
+#include "BugSplat.h"
 #endif // _WIN32
+
+#if defined(GENERATE_CRASH_DUMPS)
+#include "IntrinsicCoreCrashDumpGeneratorWin32.h"
+#endif // GENERATE_CRASH_DUMPS
 
 QSplashScreen* splash = nullptr;
 
@@ -32,7 +37,7 @@ int _main(int argc, char* argv[])
   QCoreApplication::setOrganizationDomain("com");
   QCoreApplication::setOrganizationName("intrinsic-engine");
   QCoreApplication::setApplicationName("Intrinsic");
-  QCoreApplication::setApplicationVersion("1.0.0");
+  QCoreApplication::setApplicationVersion(_INTR_VERSION_STRING);
 
   // Style
   {
@@ -83,7 +88,7 @@ int _main(int argc, char* argv[])
   return w.enterMainLoop();
 }
 
-#if defined(_WIN32)
+#if defined(GENERATE_CRASH_DUMPS)
 int main(int argc, char* argv[])
 {
   __try
@@ -97,5 +102,25 @@ int main(int argc, char* argv[])
   }
 }
 #else
-int main(int argc, char* argv[]) { return _main(argc, argv); }
-#endif // _WIN32
+
+#if defined(BUGSPLAT_H)
+MiniDmpSender* miniDmpSender = nullptr;
+
+bool ExceptionCallback(UINT nCode, LPVOID lpVal1, LPVOID lpVal2)
+{
+  miniDmpSender->sendAdditionalFile(L"Intrinsic.log");
+  return false;
+}
+#endif // BUGSPLAT_H
+
+int main(int argc, char* argv[])
+{
+#if defined(BUGSPLAT_H)
+  miniDmpSender =
+      new MiniDmpSender(L"Intrinsic", L"IntrinsicEd", _INTR_VERSION_STRING_L);
+  miniDmpSender->setCallback(ExceptionCallback);
+#endif // BUGSPLAT_
+
+  return _main(argc, argv);
+}
+#endif // GENERATE_CRASH_DUMPS
