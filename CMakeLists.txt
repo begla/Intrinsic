@@ -74,6 +74,9 @@ if (BUILD_INTRINSICED)
   find_package(Qt5 REQUIRED)
   find_package(FBX REQUIRED)
 endif()
+if (WIN32)
+  find_package(BugSplat REQUIRED)
+endif()
 
 file(GLOB INTR_RENDERER_VULKAN_SOURCE_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.cpp)
 file(GLOB INTR_RENDERER_VULKAN_HEADER_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.h)
@@ -210,6 +213,7 @@ set(INTR_DEPENDENCIES
   "${SDL2_INCLUDE_DIR}"
   "dependencies/spirvcross/"
   "${Vulkan_INCLUDE_DIR}"
+  "${BUGSPLAT_INCLUDE_DIR}"
 )
 
 if(WIN32)
@@ -249,6 +253,9 @@ set(INTR_EXTERNAL_LIBS
 
   # PhysX
   ${PhysX_LIBRARIES}
+
+  # BugSplat
+  ${BUGSPLAT_LIBRARIES}
 )
 
 if(UNIX)
