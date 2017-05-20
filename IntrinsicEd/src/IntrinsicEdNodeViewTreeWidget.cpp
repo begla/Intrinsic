@@ -325,11 +325,8 @@ void IntrinsicEdNodeViewTreeWidget::onCreateRootNode() { createNode(nullptr); }
 
 void IntrinsicEdNodeViewTreeWidget::createNode(QTreeWidgetItem* p_Parent)
 {
-  const Name newNodeName = Entity::EntityManager::makeNameUnique("Node");
-
   {
-    Entity::EntityRef entityRef =
-        Entity::EntityManager::createEntity(newNodeName);
+    Entity::EntityRef entityRef = Entity::EntityManager::createEntity("Node");
     Components::NodeRef nodeRef =
         Components::NodeManager::createNode(entityRef);
 
@@ -519,16 +516,15 @@ void IntrinsicEdNodeViewTreeWidget::onItemChanged(QTreeWidgetItem* item,
     if (currentItem != _itemToNodeMap.end())
     {
       Components::NodeRef node = currentItem->second;
-      Entity::EntityRef entity = Components::NodeManager::_entity(node);
+      Entity::EntityRef entityRef = Components::NodeManager::_entity(node);
       Name newName = item->text(column).toStdString().c_str();
 
       // Adjust the name of the node if it changed
-      if (newName != Entity::EntityManager::_name(entity))
+      if (newName != Entity::EntityManager::_name(entityRef))
       {
-        Name newNodeName =
-            Entity::EntityManager::makeNameUnique(newName._string.c_str());
-        Entity::EntityManager::_name(entity) = newNodeName;
-        item->setText(0, newNodeName._string.c_str());
+        Entity::EntityManager::rename(entityRef, newName);
+        item->setText(
+            0, Entity::EntityManager::_name(entityRef).getString().c_str());
       }
     }
   }

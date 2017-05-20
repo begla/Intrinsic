@@ -69,10 +69,8 @@ Components::NodeRef World::cloneNodeFull(Components::NodeRef p_Ref)
     Entity::EntityRef referenceEntityRef =
         Components::NodeManager::_entity(referenceNodes[i]);
 
-    const Name uniqueName = Entity::EntityManager::makeNameUnique(
+    Entity::EntityRef clonedEntityRef = Entity::EntityManager::createEntity(
         Entity::EntityManager::_name(referenceEntityRef)._string.c_str());
-    Entity::EntityRef clonedEntityRef =
-        Entity::EntityManager::createEntity(uniqueName);
 
     for (auto propCompIt =
              Application::_componentPropertyCompilerMapping.begin();
