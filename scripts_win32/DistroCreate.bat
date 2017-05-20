@@ -17,6 +17,7 @@ robocopy app/media/ distro/media /E
 robocopy app/scripts distro/scripts /E
 robocopy app/tools distro/tools /E
 robocopy app/worlds distro/worlds /E
+robocopy app/assets distro/assets /E
 
 cd scripts_win32
 
