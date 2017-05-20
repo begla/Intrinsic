@@ -596,7 +596,7 @@ void IntrinsicEdNodeViewTreeWidget::onItemSelected(QTreeWidgetItem* current,
 void IntrinsicEdNodeViewTreeWidget::onCurrentlySelectedEntityChanged(
     Resources::EventRef p_Event)
 {
-  clearSelection();
+  setCurrentItem(nullptr);
 
   if (GameStates::Editing::_currentlySelectedEntity.isValid())
   {
@@ -610,7 +610,7 @@ void IntrinsicEdNodeViewTreeWidget::onCurrentlySelectedEntityChanged(
 
       if (item)
       {
-        item->setSelected(true);
+        setCurrentItem(item);
         onItemSelected(item, nullptr);
 
         if (item->parent())
