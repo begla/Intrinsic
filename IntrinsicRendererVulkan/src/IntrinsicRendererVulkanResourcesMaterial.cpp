@@ -31,6 +31,7 @@ MaterialManager::_materialPassBoundResources;
 _INTR_HASH_MAP(Name, MaterialResourceFunction)
 MaterialManager::_materialResourceFunctionMapping = {
     {_N(MaterialAlbedo), MaterialManager::_descAlbedoTextureName},
+    {_N(MaterialEmissive), MaterialManager::_descEmissiveTextureName},
     {_N(MaterialNormal), MaterialManager::_descNormalTextureName},
     {_N(MaterialRoughness), MaterialManager::_descPbrTextureName},
     {_N(MaterialFoam), MaterialManager::_descFoamTextureName},

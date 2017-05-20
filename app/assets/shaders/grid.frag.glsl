@@ -115,7 +115,9 @@ void main()
     gbuffer.metalMask = 0.0;
     gbuffer.specular = 0.5;
     gbuffer.roughness = 0.5;
-    gbuffer.materialBufferIdx = 0;   
+    gbuffer.materialBufferIdx = 0;
+    gbuffer.occlusion = 1.0;
+    gbuffer.emissive = 0.0;
   }
   writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
 }

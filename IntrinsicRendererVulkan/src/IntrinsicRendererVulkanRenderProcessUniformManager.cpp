@@ -26,30 +26,14 @@ namespace Vulkan
 {
 namespace RenderProcess
 {
+// Static members
+UniformManager::UniformDataSource
+    UniformManager::UniformManager::_uniformDataSource;
+
 // Uniform data decl.
 namespace
 {
-struct UniformDataSource
-{
-  glm::mat4 projectionMatrix;
-  glm::mat4 inverseProjectionMatrix;
-  glm::mat4 inverseViewProjectionMatrix;
-  glm::vec4 cameraWorldPosition;
-  glm::mat4 normalMatrix;
-  glm::mat4 viewMatrix;
-  glm::mat4 prevViewMatrix;
-  glm::ivec4 haltonSamples;
-  glm::vec4 blurParamsXNormal;
-  glm::vec4 blurParamsYNormal;
-  glm::vec4 blurParamsXMedium;
-  glm::vec4 blurParamsYMedium;
-  glm::vec4 blurParamsXLow;
-  glm::vec4 blurParamsYLow;
-  glm::vec4 cameraParameters;
-
-} _uniformDataSource;
-
-glm::vec2 _haltonSamples[HALTON_SAMPLE_COUNT];
+glm::vec3 _haltonSamples[HALTON_SAMPLE_COUNT];
 
 _INTR_INLINE void initStaticUniformData()
 {
@@ -57,17 +41,24 @@ _INTR_INLINE void initStaticUniformData()
   {
     for (uint32_t i = 0u; i < HALTON_SAMPLE_COUNT; ++i)
     {
-      _haltonSamples[i] = glm::vec2(Math::calcHaltonSequence(i, 2u),
-                                    Math::calcHaltonSequence(i, 3u));
+      _haltonSamples[i] = glm::vec3(Math::calcHaltonSequence(i, 2u),
+                                    Math::calcHaltonSequence(i, 3u),
+                                    Math::calcHaltonSequence(i, 4u));
     }
   }
 
-  _uniformDataSource.blurParamsXNormal = glm::vec4(3.0f, 0.0f, 1.0f, 0.0f);
-  _uniformDataSource.blurParamsYNormal = glm::vec4(3.0f, 0.0f, 0.0f, 1.0f);
-  _uniformDataSource.blurParamsXMedium = glm::vec4(6.0f, 0.0f, 1.0f, 0.0f);
-  _uniformDataSource.blurParamsYMedium = glm::vec4(6.0f, 0.0f, 0.0f, 1.0f);
-  _uniformDataSource.blurParamsXLow = glm::vec4(1.0f, 0.0f, 1.0f, 0.0f);
-  _uniformDataSource.blurParamsYLow = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+  UniformManager::_uniformDataSource.blurParamsXNormal =
+      glm::vec4(3.0f, 0.0f, 1.0f, 0.0f);
+  UniformManager::_uniformDataSource.blurParamsYNormal =
+      glm::vec4(3.0f, 0.0f, 0.0f, 1.0f);
+  UniformManager::_uniformDataSource.blurParamsXMedium =
+      glm::vec4(6.0f, 0.0f, 1.0f, 0.0f);
+  UniformManager::_uniformDataSource.blurParamsYMedium =
+      glm::vec4(6.0f, 0.0f, 0.0f, 1.0f);
+  UniformManager::_uniformDataSource.blurParamsXLow =
+      glm::vec4(1.0f, 0.0f, 1.0f, 0.0f);
+  UniformManager::_uniformDataSource.blurParamsYLow =
+      glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }
 }
 
@@ -80,7 +71,8 @@ struct UniformDataRef
   UniformDataRef(const void* p_Ptr, uint32_t p_Size)
   {
     const uint64_t address = (uint64_t)p_Ptr;
-    offset = (uint16_t)(address - (uint64_t)&_uniformDataSource);
+    offset =
+        (uint16_t)(address - (uint64_t)&UniformManager::_uniformDataSource);
     size = (uint16_t)p_Size;
   }
 
@@ -102,38 +94,54 @@ struct UniformBuffer
 _INTR_HASH_MAP(Name, UniformDataRef)
 _uniformOffsetMapping = {
     {"ProjectionMatrix",
-     UniformDataRef(&_uniformDataSource.projectionMatrix, sizeof(glm::mat4))},
+     UniformDataRef(&UniformManager::_uniformDataSource.projectionMatrix,
+                    sizeof(glm::mat4))},
     {"ViewMatrix",
-     UniformDataRef(&_uniformDataSource.viewMatrix, sizeof(glm::mat4))},
+     UniformDataRef(&UniformManager::_uniformDataSource.viewMatrix,
+                    sizeof(glm::mat4))},
     {"PrevViewMatrix",
-     UniformDataRef(&_uniformDataSource.prevViewMatrix, sizeof(glm::mat4))},
+     UniformDataRef(&UniformManager::_uniformDataSource.prevViewMatrix,
+                    sizeof(glm::mat4))},
     {"NormalMatrix",
-     UniformDataRef(&_uniformDataSource.normalMatrix, sizeof(glm::mat4))},
+     UniformDataRef(&UniformManager::_uniformDataSource.normalMatrix,
+                    sizeof(glm::mat4))},
     {"InverseProjectionMatrix",
-     UniformDataRef(&_uniformDataSource.inverseProjectionMatrix,
+     UniformDataRef(&UniformManager::_uniformDataSource.inverseProjectionMatrix,
                     sizeof(glm::mat4))},
     {"InverseViewProjectionMatrix",
-     UniformDataRef(&_uniformDataSource.inverseViewProjectionMatrix,
-                    sizeof(glm::mat4))},
+     UniformDataRef(
+         &UniformManager::_uniformDataSource.inverseViewProjectionMatrix,
+         sizeof(glm::mat4))},
     {"CameraWorldPosition",
-     UniformDataRef(&_uniformDataSource.cameraWorldPosition,
+     UniformDataRef(&UniformManager::_uniformDataSource.cameraWorldPosition,
                     sizeof(glm::vec4))},
     {"BlurParamsXNormal",
-     UniformDataRef(&_uniformDataSource.blurParamsXNormal, sizeof(glm::vec4))},
+     UniformDataRef(&UniformManager::_uniformDataSource.blurParamsXNormal,
+                    sizeof(glm::vec4))},
     {"BlurParamsYNormal",
-     UniformDataRef(&_uniformDataSource.blurParamsYNormal, sizeof(glm::vec4))},
+     UniformDataRef(&UniformManager::_uniformDataSource.blurParamsYNormal,
+                    sizeof(glm::vec4))},
     {"BlurParamsXMedium",
-     UniformDataRef(&_uniformDataSource.blurParamsXMedium, sizeof(glm::vec4))},
+     UniformDataRef(&UniformManager::_uniformDataSource.blurParamsXMedium,
+                    sizeof(glm::vec4))},
     {"BlurParamsYMedium",
-     UniformDataRef(&_uniformDataSource.blurParamsYMedium, sizeof(glm::vec4))},
+     UniformDataRef(&UniformManager::_uniformDataSource.blurParamsYMedium,
+                    sizeof(glm::vec4))},
     {"BlurParamsXLow",
-     UniformDataRef(&_uniformDataSource.blurParamsXLow, sizeof(glm::vec4))},
+     UniformDataRef(&UniformManager::_uniformDataSource.blurParamsXLow,
+                    sizeof(glm::vec4))},
     {"BlurParamsYLow",
-     UniformDataRef(&_uniformDataSource.blurParamsYLow, sizeof(glm::vec4))},
+     UniformDataRef(&UniformManager::_uniformDataSource.blurParamsYLow,
+                    sizeof(glm::vec4))},
     {"CameraParameters",
-     UniformDataRef(&_uniformDataSource.cameraParameters, sizeof(glm::vec4))},
+     UniformDataRef(&UniformManager::_uniformDataSource.cameraParameters,
+                    sizeof(glm::vec4))},
+    {"PostParams0",
+     UniformDataRef(&UniformManager::_uniformDataSource.postParams0,
+                    sizeof(glm::vec4))},
     {"HaltonSamples",
-     UniformDataRef(&_uniformDataSource.haltonSamples, sizeof(glm::ivec4))}};
+     UniformDataRef(&UniformManager::_uniformDataSource.haltonSamples,
+                    sizeof(glm::ivec4))}};
 
 _INTR_HASH_MAP(Name, UniformBuffer) _uniformBuffers;
 uint8_t* _uniformBufferMemory = nullptr;
@@ -182,41 +190,45 @@ void UniformManager::load(const rapidjson::Value& p_UniformBuffers)
 
 void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 {
-  _uniformDataSource.cameraParameters.x =
+  UniformManager::_uniformDataSource.postParams0.x =
+      Core::Resources::PostEffectManager::_descAmbientFactor(
+          Core::Resources::PostEffectManager::_blendTargetRef);
+
+  UniformManager::_uniformDataSource.cameraParameters.x =
       Components::CameraManager::_descNearPlane(p_Camera);
-  _uniformDataSource.cameraParameters.y =
+  UniformManager::_uniformDataSource.cameraParameters.y =
       Components::CameraManager::_descFarPlane(p_Camera);
-  _uniformDataSource.cameraParameters.z =
-      1.0f / _uniformDataSource.cameraParameters.x;
-  _uniformDataSource.cameraParameters.w =
-      1.0f / _uniformDataSource.cameraParameters.y;
-  _uniformDataSource.projectionMatrix =
+  UniformManager::_uniformDataSource.cameraParameters.z =
+      1.0f / UniformManager::_uniformDataSource.cameraParameters.x;
+  UniformManager::_uniformDataSource.cameraParameters.w =
+      1.0f / UniformManager::_uniformDataSource.cameraParameters.y;
+  UniformManager::_uniformDataSource.projectionMatrix =
       Components::CameraManager::_projectionMatrix(p_Camera);
-  _uniformDataSource.prevViewMatrix =
+  UniformManager::_uniformDataSource.prevViewMatrix =
       Components::CameraManager::_prevViewMatrix(p_Camera);
-  _uniformDataSource.viewMatrix =
+  UniformManager::_uniformDataSource.viewMatrix =
       Components::CameraManager::_viewMatrix(p_Camera);
-  _uniformDataSource.normalMatrix =
+  UniformManager::_uniformDataSource.normalMatrix =
       Components::CameraManager::_viewMatrix(p_Camera);
-  _uniformDataSource.inverseProjectionMatrix =
+  UniformManager::_uniformDataSource.inverseProjectionMatrix =
       Components::CameraManager::_inverseProjectionMatrix(p_Camera);
-  _uniformDataSource.inverseViewProjectionMatrix =
+  UniformManager::_uniformDataSource.inverseViewProjectionMatrix =
       Components::CameraManager::_inverseViewProjectionMatrix(p_Camera);
 
   Components::NodeRef cameraNode =
       Components::NodeManager::getComponentForEntity(
           Components::CameraManager::_entity(p_Camera));
-  _uniformDataSource.cameraWorldPosition =
+  UniformManager::_uniformDataSource.cameraWorldPosition =
       glm::vec4(Components::NodeManager::_worldPosition(cameraNode), 0.0f);
 
-  _uniformDataSource.haltonSamples = glm::ivec4(
-      (int32_t)(
-          _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].x *
-          255),
-      (int32_t)(
-          _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].y *
-          255),
-      0, 0);
+  UniformManager::_uniformDataSource.haltonSamples = glm::vec4(
+      _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].x,
+      _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].y,
+      _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].z, 0.0f);
+  UniformManager::_uniformDataSource.haltonSamples32 =
+      glm::vec4(_haltonSamples[TaskManager::_frameCounter % 32].x,
+                _haltonSamples[TaskManager::_frameCounter % 32].y,
+                _haltonSamples[TaskManager::_frameCounter % 32].z, 0.0f);
 }
 
 // <-
@@ -236,7 +248,8 @@ void UniformManager::updateUniformBuffers()
     {
       const UniformDataRef dataRef = uniformBuffer.refs[refIdx];
       memcpy(bufferData + currentOffset,
-             ((uint8_t*)&_uniformDataSource) + dataRef.offset, dataRef.size);
+             ((uint8_t*)&UniformManager::_uniformDataSource) + dataRef.offset,
+             dataRef.size);
       currentOffset += dataRef.size;
     }
 

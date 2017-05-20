@@ -34,9 +34,9 @@ _INTR_STRING _shaderCacheFilePath = _shaderCachePath + "ShaderCache.json";
 class GlslangIncluder : public glslang::TShader::Includer
 {
 public:
-  IncludeResult* include(const char* p_RequestedSource, IncludeType p_Type,
-                         const char* p_RequestingSource,
-                         size_t p_InclusionDepth) override
+  IncludeResult* includeLocal(const char* p_RequestedSource,
+                              const char* p_RequestingSource,
+                              size_t p_InclusionDepth) override
   {
     const _INTR_STRING filePath = _shaderPath + p_RequestedSource;
 
@@ -61,7 +61,7 @@ public:
 
   virtual void releaseInclude(IncludeResult* result) override
   {
-    Tlsf::MainAllocator::free((void*)result->file_data);
+    Tlsf::MainAllocator::free((void*)result->headerData);
     delete result;
   }
 } _includer;

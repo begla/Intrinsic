@@ -18,8 +18,8 @@
 
 #define LUM_AND_BRIGHT_THREADS 8u
 
-#define ADD_THREADS_X 64
-#define ADD_THREADS_Y 2
+#define ADD_THREADS_X 64u
+#define ADD_THREADS_Y 2u
 
 namespace Intrinsic
 {
@@ -610,10 +610,8 @@ void Bloom::onReinitRendering()
 
       Vulkan::Resources::ComputeCallManager::_descDimensions(
           computeCallBlurXRef) =
-          glm::vec3(
-              calculateThreadGroups((dim.x * 2u) >> (i + 1), BLUR_X_THREADS_X),
-              calculateThreadGroups((dim.y * 2u) >> (i + 1), BLUR_X_THREADS_Y),
-              1);
+          glm::vec3(calculateThreadGroups(dim.x >> i, BLUR_THREADS), dim.y >> i,
+                    1);
 
       ComputeCallManager::bindBuffer(
           computeCallBlurXRef, _N(PerInstance), GpuProgramType::kCompute,
@@ -643,11 +641,8 @@ void Bloom::onReinitRendering()
 
         Vulkan::Resources::ComputeCallManager::_descDimensions(
             computeCallBlurYRef) =
-            glm::vec3(calculateThreadGroups((dim.x * 2u) >> (i + 1),
-                                            BLUR_Y_THREADS_X),
-                      calculateThreadGroups((dim.y * 2u) >> (i + 1),
-                                            BLUR_Y_THREADS_Y),
-                      1);
+            glm::vec3(calculateThreadGroups(dim.y >> i, BLUR_THREADS),
+                      dim.x >> i, 1);
 
         ComputeCallManager::bindBuffer(
             computeCallBlurYRef, _N(PerInstance), GpuProgramType::kCompute,
@@ -680,10 +675,8 @@ void Bloom::onReinitRendering()
 
           Vulkan::Resources::ComputeCallManager::_descDimensions(
               computeCallAddRef) =
-              glm::uvec3(
-                  calculateThreadGroups((dim.x * 2u) >> (i + 1), ADD_THREADS_X),
-                  calculateThreadGroups((dim.y * 2u) >> (i + 1), ADD_THREADS_Y),
-                  1u);
+              glm::uvec3(calculateThreadGroups(dim.x >> i, ADD_THREADS_X),
+                         calculateThreadGroups(dim.y >> i, ADD_THREADS_Y), 1u);
 
           ComputeCallManager::bindBuffer(
               computeCallAddRef, _N(PerInstance), GpuProgramType::kCompute,
@@ -742,7 +735,6 @@ void Bloom::render(float p_DeltaT, Components::CameraRef p_CameraRef)
       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
 
   dispatchLum(primaryCmdBuffer);
-
   dispatchAvgLum(primaryCmdBuffer);
 
   dispatchBlur(primaryCmdBuffer, 3u);

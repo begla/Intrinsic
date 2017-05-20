@@ -17,9 +17,10 @@
 #define EPSILON 1.0e-6
 #define IBL_MIP_OFFSET 3
 #define IBL_MIP_COUNT 9
+#define MIN_FALLOFF 0.005
 
-#define ESM_POSITIVE_EXPONENT 300.0
-#define ESM_NEGATIVE_EXPONENT 80.0
+#define ESM_POSITIVE_EXPONENT 100.0
+#define ESM_NEGATIVE_EXPONENT 20.0
 #define ESM_EXPONENTS vec2(ESM_POSITIVE_EXPONENT, ESM_NEGATIVE_EXPONENT)
 
 // Clustered lighting
@@ -63,6 +64,12 @@ uvec3 calcGridPosForViewPos(vec3 posVS, vec4 nearFar, vec4 nearFarWidthHeight)
   return uvec3(uvec2((localPos.xy * 0.5 + 0.5) * gridRes.xy), gridDepthIdx);
 }
 
+bool isGridPosValid(uvec3 gridPos)
+{
+  return all(lessThan(gridPos, gridRes))
+    && all(greaterThanEqual(gridPos, uvec3(0)));
+}
+
 // <-
 
 struct Light
@@ -98,17 +105,23 @@ struct LightingData
   float roughness2;
 };
 
-vec3 F_Schlick(vec3 specularColor, float VdH)
+float F_Schlick(float value, float VdH)
 {
-  float fc = pow(1.0 - VdH, 5.0);
-  return clamp(50.0 * specularColor.g, 0.0, 1.0) * fc + (1.0 - fc) * specularColor;
+  const float fc = pow(1.0 - VdH, 5.0);
+  return fc + value * (1.0 - fc);
 }
 
-float V_SmithJointApprox(float NdV, float NdL, float roughness2)
+vec3 F_Schlick(vec3 value, float VdH)
 {
-  const float Vis_SmithV = NdL * (NdV * (1.0 - roughness2) + roughness2);
-  const float Vis_SmithL = NdV * (NdL * (1.0 - roughness2) + roughness2);
-  return 0.5 * (1.0 / (Vis_SmithV + Vis_SmithL + 1.0e-6));
+  const float fc = pow(1.0 - VdH, 5.0);
+  return fc + value * (1.0 - fc);
+}
+
+float V_Smith(float NdV, float NdL, float roughness2)
+{
+  const float VisSmithV = NdL * (NdV * (1.0 - roughness2) + roughness2);
+  const float VisSmithL = NdV * (NdL * (1.0 - roughness2) + roughness2);
+  return 0.5 * (1.0 / (VisSmithV + VisSmithL + 1.0e-6));
 }
 
 float D_GGX(float NdH, float roughness2)
@@ -151,6 +164,13 @@ float burleyToMip(float perceptualRoughness, float NdotR)
   return scale * (IBL_MIP_COUNT - 1 - IBL_MIP_OFFSET);
 }
 
+
+float burleyToMipApprox(float perceptualRoughness)
+{
+  const float scale = perceptualRoughness * (1.7 - 0.7 * perceptualRoughness);
+  return scale * (IBL_MIP_COUNT - 1 - IBL_MIP_OFFSET);
+}
+
 // <-
 
 void initLightingDataFromGBuffer(inout LightingData d)
@@ -171,16 +191,16 @@ void calculateLightingData(inout LightingData d)
 
 vec3 calcDiffuse(LightingData d)
 {
-  return d.energy.x * (d.diffuseColor / MATH_PI);
+  return d.energy.x * d.diffuseColor * (1.0 / MATH_PI);
 }
 
 vec3 calcSpecular(LightingData d)
 {
   const vec3 F = F_Schlick(d.specularColor, d.VdH);
-  const float Vis = V_SmithJointApprox(d.NdV, d.NdL, d.roughness2);
+  const float Vis = V_Smith(d.NdV, d.NdL, d.roughness2);
   const float D = D_GGX(d.NdH, d.roughness2) * d.energy.y;
   
-  return D * F * Vis;
+  return F * Vis * D;
 }
 
 vec3 calcLighting(LightingData d)
@@ -205,13 +225,12 @@ vec3 kelvinToRGB(float kelvin, sampler2D kelvinLutTex)
 // Shadows
 // ->
 
-vec4 calcPosLS(vec3 posVS, uint shadowMapIdx, mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT])
+vec4 calcPosLS(vec3 posVS, uint shadowMapIdx, in mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT])
 {
   vec4 posLS = shadowViewProjMatrix[shadowMapIdx] * vec4(posVS, 1.0);
 
-  posLS /= posLS.w;
-  posLS.xy *= 0.5;
-  posLS.xy += 0.5;
+  posLS.xyz /= posLS.www;
+  posLS.xy = posLS.xy * 0.5 + 0.5;
 
   const float splitBias[] = { 0.000025, 0.0002, 0.001, 0.0025 };
   posLS.z -= splitBias[shadowMapIdx];
@@ -219,7 +238,7 @@ vec4 calcPosLS(vec3 posVS, uint shadowMapIdx, mat4 shadowViewProjMatrix[MAX_SHAD
   return posLS;
 }
 
-uint findBestFittingSplit(vec3 posVS, out vec4 posLS, mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT])
+uint findBestFittingSplit(vec3 posVS, out vec4 posLS, in mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT])
 {
   for (uint i=0u; i<PSSM_SPLIT_COUNT; ++i)
   {
@@ -296,7 +315,7 @@ float witnessPCF(vec3 shadowPos, uint shadowMapIdx, sampler2DArrayShadow shadowT
   return sum * 1.0 / 144.0;
 }
 
-float calcShadowAttenuation(vec3 posVS, mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT], sampler2DArrayShadow shadowTex)
+float calcShadowAttenuation(vec3 posVS, in mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT], sampler2DArrayShadow shadowTex)
 {
   float shadowAttenuation = 1.0;
 
@@ -335,7 +354,7 @@ vec2 warpDepth(float depth)
   return vec2(pos, neg);
 }
 
-float chebyshev(vec2 moments, float mean, float minVariance)
+/*float chebyshev(vec2 moments, float mean, float minVariance)
 {
   // Compute variance
   float variance = moments.y - (moments.x * moments.x);
@@ -360,7 +379,7 @@ float calculateShadowEVSM(vec4 moments, float shadowDepth)
   float posResult = chebyshev(posMoments, warpedDepth.x, minVariance.x);
   float negResult = chebyshev(negMoments, warpedDepth.y, minVariance.y);
   return min(posResult, negResult);
-}
+}*/
 
 float calculateShadowESM(vec4 moments, float shadowDepth)
 {

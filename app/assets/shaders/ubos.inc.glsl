@@ -4,11 +4,12 @@
   mat4 invViewProjMatrix; \
   vec4 camPosition; \
   vec4 camParams; \
+  vec4 postParams0; \
 } uboPerInstance
 
 #define PER_INSTANCE_DATA_POST_COMBINE layout (binding = 0) uniform PerInstance \
 { \
-  ivec4 haltonSamples; \
+  vec4 haltonSamples; \
   vec4 camParams; \
 } uboPerInstance
 

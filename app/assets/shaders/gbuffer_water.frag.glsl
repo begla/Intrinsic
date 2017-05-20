@@ -69,6 +69,7 @@ void main()
   const vec4 normal0 = texture(normalTex, uv0);
   const vec4 normal1 = texture(normalTex, uv0InverseAnim * 0.2);
   const vec4 noise = texture(noiseTex, uv0 * 2.0);
+  const vec4 noise1 = texture(noiseTex, uv0);
 
   const float blend = 0.5;
   const vec4 normal = mix(normal0, normal1, blend);
@@ -81,6 +82,7 @@ void main()
 
   // Add foam based on noise texture
   foamFade += clamp(noise.r - 0.4, 0.0, 1.0);
+  foamFade *= clamp(noise1.r * 2.0 - 0.2, 0.0, 1.0);
 
   const float edgeFade = 1.0 
     - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
@@ -98,7 +100,9 @@ void main()
     gbuffer.metalMask = metalRoughness.x;
     gbuffer.specular = 0.0;
     gbuffer.roughness = metalRoughness.y;
-    gbuffer.materialBufferIdx = uboPerMaterial.data0.x;   
+    gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
+    gbuffer.emissive = 0.0;
+    gbuffer.occlusion = 1.0; 
   }
   writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
 }

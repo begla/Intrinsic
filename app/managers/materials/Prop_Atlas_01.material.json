@@ -8,6 +8,7 @@
             "PerPixelPicking"
         ],
         "albedoTextureName": "Prop_Atlas_01",
+        "emissiveTextureName": "white",
         "uvOffsetScale": [
             0.0,
             0.0,

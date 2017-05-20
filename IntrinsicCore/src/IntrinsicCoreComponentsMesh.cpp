@@ -77,7 +77,9 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
         perInstanceDataFragment.camParams.w =
             1.0f / perInstanceDataFragment.camParams.y;
 
-        perInstanceDataFragment.data0.x = 0.0f; // Unused
+        perInstanceDataFragment.data0.x =
+            Core::Resources::PostEffectManager::_descAmbientFactor(
+                Core::Resources::PostEffectManager::_blendTargetRef);
         perInstanceDataFragment.data0.y = distToCamera;
         perInstanceDataFragment.data0.z = (float)nodeRef._id;
         perInstanceDataFragment.data0.w = TaskManager::_totalTimePassed;

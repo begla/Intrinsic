@@ -9,7 +9,8 @@
         ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
         ["Image", "MaterialAlbedo", "albedoTex", "Fragment"],
         ["Image", "MaterialNormal", "normalTex", "Fragment"],
-        ["Image", "MaterialRoughness", "pbrTex", "Fragment"]
+        ["Image", "MaterialRoughness", "pbrTex", "Fragment"],
+        ["Image", "MaterialEmissive", "emissiveTex", "Fragment"]
       ]
     },
     {

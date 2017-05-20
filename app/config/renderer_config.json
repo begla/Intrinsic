@@ -7,7 +7,8 @@
 				"InverseProjectionMatrix",
 				"InverseViewProjectionMatrix",
 				"CameraWorldPosition",
-				"CameraParameters"
+				"CameraParameters",
+				"PostParams0"
 			]
 		},
 		{
@@ -560,7 +561,8 @@
 				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"],
 				["Image", "GBufferTransparentsDepth", "depthBufferTranspTex", "Fragment", "NearestClamp"],
 				["Buffer", "MaterialBuffer", "MaterialBuffer", "Fragment"],
-				["Image", "VolumetricLightingScatteringBuffer", "volLightScatteringBufferTex", "Fragment", "LinearClamp"]
+				["Image", "VolumetricLightingScatteringBuffer", "volLightScatteringBufferTex", "Fragment", "LinearClamp"],
+				["Image", "default_ibl_cube_irradiance", "irradianceTex", "Fragment", "LinearClamp"]
 			],
 			"outputs" : [
 				["Scene"]

@@ -22,6 +22,7 @@
 #include "lib_buffers.glsl"
 #include "lib_vol_lighting.glsl"
 #include "ubos.inc.glsl"
+#include "lib_lighting.glsl"
 
 PER_INSTANCE_DATA_PRE_COMBINE;
 
@@ -36,23 +37,21 @@ layout (binding = 8) uniform sampler2D lightBufferTranspTex;
 layout (binding = 9) uniform sampler2D depthBufferTex;
 layout (binding = 10) uniform sampler2D depthBufferTranspTex;
 layout (binding = 11) MATERIAL_BUFFER;
-
 layout (binding = 12) uniform sampler3D volLightScatteringBufferTex;
+layout (binding = 13) uniform samplerCube irradianceTex;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
-const float fogSunDensity = 12.0;
-const float fogDensity = 0.002; 
-const float fogStart = 300.0;
+const float fogDensity = 0.003; 
+const float fogStart = 900.0;
 const float fogMaxBlendFactor = 0.95;
-const vec3 fogSunColor = vec3(1.0, 0.9, 0.8); 
-const vec3 fogSkyColor = vec3(0.2, 0.5, 1.0);
 
-const float waterFogDensity = 20.0;
-const float waterFogMaxBlendFactor = 0.8;
-const vec3 waterFogColor0 = vec3(0.2, 0.5, 1.0);
-const vec3 waterFogColor1 = vec3(0.0, 0.0, 0.0);
+const float waterFogDensity = 90.0;
+const float waterFogMaxBlendFactor = 0.95;
+const float waterFogDecayExp = 16.0;
+const vec3 waterFogColor0 = vec3(0.0, 1.0, 1.0);
+const vec3 waterFogColor1 = vec3(0.0, 0.2, 0.2);
 
 void main()
 {
@@ -61,7 +60,7 @@ void main()
   const float opaqueDepth = textureLod(depthBufferTex, inUV0, 0.0).r;
   float fogDepth = opaqueDepth.r;
 
-  const vec4 albedoTransparents = textureLod(albedoTranspTex, inUV0, 0.0).rgba;
+  vec4 albedoTransparents = textureLod(albedoTranspTex, inUV0, 0.0).rgba;
   
   const vec4 param0 = textureLod(param0Tex, inUV0, 0.0).rgba;
   const uint matBufferEntryIdx = uint(param0.y);
@@ -72,12 +71,17 @@ void main()
   if (albedoTransparents.a > 0.0) 
   {
     const vec3 normTranspVS = decodeNormal(textureLod(normTranspTex, inUV0, 0.0).rg);
+    const float depthTransp = textureLod(depthBufferTranspTex, inUV0, 0.0).r;
+
+    // Fresnel
+    const vec3 posVS = unproject(inUV0, depthTransp, uboPerInstance.invProjMatrix);
+    const vec3 V = -normalize(posVS);
+    albedoTransparents.a = F_Schlick(albedoTransparents.a, clamp(dot(V, normTranspVS), 0.0, 1.0));
 
     const vec4 param0Transp = textureLod(param0TranspTex, inUV0, 0.0).rgba;
     const uint matBufferEntryIdxTransp = uint(param0Transp.y);
     const MaterialParameters matParamsTransp = materialParameters[matBufferEntryIdxTransp];
 
-    const float depthTransp = textureLod(depthBufferTranspTex, inUV0, 0.0).r;
     fogDepth = min(fogDepth, depthTransp.r);
     const float depthLinTransp = linearizeDepth(depthTransp, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
 
@@ -104,9 +108,9 @@ void main()
     const float linDepthTransp = linearizeDepth(depthTransp, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
 
     const float waterFog = min(1.0 - exp(-(linDepthOpaque - linDepthTransp) * waterFogDensity), waterFogMaxBlendFactor);
-    const float waterFogDecay = clamp(pow(waterFog, 4.0), 0.0, 1.0);
+    const float waterFogDecay = clamp(pow(waterFog, waterFogDecayExp), 0.0, 1.0);
 
-    opaque.rgb = mix(opaque.rgb, mix(waterFogColor0, waterFogColor1, waterFogDecay), albedoTransparents.a * waterFog);
+    opaque.rgb = mix(opaque.rgb, mix(waterFogColor0, waterFogColor1, waterFogDecay), albedoTransparents.a * waterFog * uboPerInstance.postParams0.x);
     const vec3 transp = albedoTransparents.rgb * lightingTransp;
     outColor.rgb = mix(opaque, transp, albedoTransparents.a);
   }
@@ -126,9 +130,8 @@ void main()
     const vec3 rayDir = ray / rayDist;
 
     const vec3 lightVec = vec3(1.0, 0.45, -0.15);
-    const float sunAmount = max(dot(rayDir, lightVec), 0.0);
     fog.a = 1.0 - min(max((1.0 - exp((-rayDist + fogStart) * fogDensity)), 0.0), fogMaxBlendFactor);
-    fog.rgb = (1.0 - fog.a) * mix(fogSkyColor, fogSunColor, pow(sunAmount, fogSunDensity));
+    fog.rgb = (1.0 - fog.a) * texture(irradianceTex, ray).rgb * uboPerInstance.postParams0.x;
   }
 
   // Volumetrics

@@ -40,6 +40,28 @@ struct UniformManager
   static void updateUniformBuffers();
   static void resetAllocator();
   static UniformBufferDataEntry requestUniformBufferData(const Name& p_Name);
+
+  static struct UniformDataSource
+  {
+    glm::mat4 projectionMatrix;
+    glm::mat4 inverseProjectionMatrix;
+    glm::mat4 inverseViewProjectionMatrix;
+    glm::vec4 cameraWorldPosition;
+    glm::mat4 normalMatrix;
+    glm::mat4 viewMatrix;
+    glm::mat4 prevViewMatrix;
+    glm::vec4 haltonSamples;
+    glm::vec4 haltonSamples32;
+    glm::vec4 blurParamsXNormal;
+    glm::vec4 blurParamsYNormal;
+    glm::vec4 blurParamsXMedium;
+    glm::vec4 blurParamsYMedium;
+    glm::vec4 blurParamsXLow;
+    glm::vec4 blurParamsYLow;
+    glm::vec4 cameraParameters;
+    glm::vec4 postParams0;
+
+  } _uniformDataSource;
 };
 }
 }

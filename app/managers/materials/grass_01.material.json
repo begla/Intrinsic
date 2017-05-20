@@ -9,6 +9,7 @@
             "GBufferFoliagePrePass"
         ],
         "albedoTextureName": "grass_atlas_01",
+        "emissiveTextureName": "white",
         "uvOffsetScale": [
             0.0,
             0.0,

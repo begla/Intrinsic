@@ -41,7 +41,7 @@ vec4 blur(vec2 uv, inout float w_total)
 
 void main()
 {
-	vec4  center_c = texture(inputTex, vec3(inUV0, uboPerInstance.arrayIdx.x));
+	vec4 center_c = texture(inputTex, vec3(inUV0, uboPerInstance.arrayIdx.x));
 
   vec2 resDir = textureSize(inputTex, 0).xy;
   resDir = 1.0 / resDir * uboPerInstance.blurParams.zw;

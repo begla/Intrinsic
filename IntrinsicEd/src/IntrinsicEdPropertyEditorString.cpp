@@ -45,7 +45,8 @@ void IntrinsicEdPropertyEditorString::updateFromProperty()
     _ui.value->setReadOnly(true);
   }
 
-  if (_ui.value->text().toStdString().c_str() != prop["value"])
+  if (_ui.value->text().toStdString().c_str() != prop["value"] &&
+      !_ui.value->hasFocus())
   {
     _ui.value->blockSignals(true);
     _ui.value->setText(prop["value"].GetString());

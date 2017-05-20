@@ -66,6 +66,8 @@ struct PerInstanceData
 
   glm::vec4 mainLightColorAndIntens;
   glm::vec4 mainLightDirAndTemp;
+
+  glm::vec4 data0;
 } _perInstanceData;
 
 // <-
@@ -290,15 +292,21 @@ void renderLighting(Resources::FramebufferRef p_FramebufferRef,
   // Update per instance data
   {
     // Post effect data
+    const glm::vec3 mainLightDir =
+        Core::Resources::PostEffectManager::_descMainLightOrientation(
+            Core::Resources::PostEffectManager::_blendTargetRef) *
+        glm::vec3(0.0f, 0.0f, 1.0f);
+    const glm::vec3 mainLightDirVS =
+        Components::CameraManager::_viewMatrix(p_CameraRef) *
+        glm::vec4(mainLightDir, 0.0f);
+
     _perInstanceData.mainLightColorAndIntens =
         glm::vec4(Core::Resources::PostEffectManager::_descMainLightColor(
                       Core::Resources::PostEffectManager::_blendTargetRef),
                   Core::Resources::PostEffectManager::_descMainLightIntens(
                       Core::Resources::PostEffectManager::_blendTargetRef));
     _perInstanceData.mainLightDirAndTemp =
-        glm::vec4(Core::Resources::PostEffectManager::_descMainLightOrientation(
-                      Core::Resources::PostEffectManager::_blendTargetRef) *
-                      glm::vec3(0.0f, 0.0f, 1.0f),
+        glm::vec4(mainLightDirVS,
                   Core::Resources::PostEffectManager::_descMainLightTemp(
                       Core::Resources::PostEffectManager::_blendTargetRef));
 
@@ -308,6 +316,11 @@ void renderLighting(Resources::FramebufferRef p_FramebufferRef,
         Components::CameraManager::_viewMatrix(p_CameraRef);
     _perInstanceData.invViewMatrix =
         Components::CameraManager::_inverseViewMatrix(p_CameraRef);
+
+    _perInstanceData.data0.x = TaskManager::_totalTimePassed;
+    _perInstanceData.data0.y =
+        Core::Resources::PostEffectManager::_descAmbientFactor(
+            Core::Resources::PostEffectManager::_blendTargetRef);
 
     const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
         RenderProcess::Default::_shadowFrustums[p_CameraRef];
@@ -372,7 +385,7 @@ void Lighting::init()
     _renderPassRef = RenderPassManager::createRenderPass(_N(Lighting));
     RenderPassManager::resetToDefault(_renderPassRef);
 
-    AttachmentDescription colorAttachment = {Format::kR16G16B16A16Float, 0u};
+    AttachmentDescription colorAttachment = {Format::kB10G11R11UFloat, 0u};
 
     RenderPassManager::_descAttachments(_renderPassRef)
         .push_back(colorAttachment);
@@ -494,7 +507,7 @@ void Lighting::onReinitRendering()
 
     ImageManager::_descDimensions(_lightingBufferImageRef) = dim;
     ImageManager::_descImageFormat(_lightingBufferImageRef) =
-        Format::kR16G16B16A16Float;
+        Format::kB10G11R11UFloat;
     ImageManager::_descImageType(_lightingBufferImageRef) = ImageType::kTexture;
   }
   imgsToCreate.push_back(_lightingBufferImageRef);
@@ -511,7 +524,7 @@ void Lighting::onReinitRendering()
 
     ImageManager::_descDimensions(_lightingBufferTransparentsImageRef) = dim;
     ImageManager::_descImageFormat(_lightingBufferTransparentsImageRef) =
-        Format::kR16G16B16A16Float;
+        Format::kB10G11R11UFloat;
     ImageManager::_descImageType(_lightingBufferTransparentsImageRef) =
         ImageType::kTexture;
   }
@@ -604,6 +617,9 @@ void Lighting::onReinitRendering()
         ImageManager::getResourceByName(_N(default_ibl_cube_specular)),
         Samplers::kLinearClamp);
     DrawCallManager::bindImage(
+        _drawCallRef, _N(noiseTex), GpuProgramType::kFragment,
+        ImageManager::getResourceByName(_N(noise)), Samplers::kLinearRepeat);
+    DrawCallManager::bindImage(
         _drawCallRef, _N(shadowBufferTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(ShadowBuffer)), Samplers::kShadow);
     DrawCallManager::bindBuffer(
@@ -667,6 +683,9 @@ void Lighting::onReinitRendering()
         _drawCallTransparentsRef, _N(specularTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(default_ibl_cube_specular)),
         Samplers::kLinearClamp);
+    DrawCallManager::bindImage(
+        _drawCallTransparentsRef, _N(noiseTex), GpuProgramType::kFragment,
+        ImageManager::getResourceByName(_N(noise)), Samplers::kLinearRepeat);
     DrawCallManager::bindImage(
         _drawCallTransparentsRef, _N(shadowBufferTex),
         GpuProgramType::kFragment,

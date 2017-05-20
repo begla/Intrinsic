@@ -30,7 +30,7 @@ float noise(in vec3 x)
 void applyWind(vec3 worldPos, vec3 worldNormal, float intensity, float time, inout vec3 localPos)
 {
   const float freq = 2.0;
-  const float windStrength = clamp(noise(vec3(worldPos.xz * 0.001, time * 0.1)) * 2.0 - 1.0, 0.1, 1.0);
+  const float windStrength = clamp(noise(vec3(worldPos.xz * 0.001, time * 0.5)) , 0.1, 1.0);
   localPos += windStrength * worldNormal * intensity * vec3(
       noise(worldPos.xyz + 0.17281 + vec3(time * freq)) * 2.0 - 1.0
     , noise(worldPos.xyz + 0.38791 + vec3(time * freq)) * 2.0 - 1.0
