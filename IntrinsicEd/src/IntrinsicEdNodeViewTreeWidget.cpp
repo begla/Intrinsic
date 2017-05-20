@@ -369,7 +369,10 @@ void IntrinsicEdNodeViewTreeWidget::cloneNode(QTreeWidgetItem* p_Node)
   QTreeWidgetItem* currIt = currentItem();
   Components::NodeRef currentNode = _itemToNodeMap[currIt];
 
-  World::cloneNodeFull(currentNode);
+  Components::NodeRef nodeRef = World::cloneNodeFull(currentNode);
+  Entity::EntityRef entityRef = Components::NodeManager::_entity(nodeRef);
+  GameStates::Editing::_currentlySelectedEntity = entityRef;
+
   onPopulateNodeTree();
 }
 
