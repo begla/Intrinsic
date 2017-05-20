@@ -152,9 +152,17 @@ void loadShaderFromCache(const char* p_GpuProgranName,
   std::streamoff size = ifs.tellg();
   ifs.seekg(0);
 
-  p_SpirvBuffer.resize((size_t)size / sizeof(uint32_t));
+  if (size != -1)
+  {
+    p_SpirvBuffer.resize((size_t)size / sizeof(uint32_t));
+    ifs.read((char*)p_SpirvBuffer.data(), size);
+  }
+  else
+  {
+    _INTR_LOG_WARNING("Shader cache file '%s' not found!",
+                      cacheFileName.c_str());
+  }
 
-  ifs.read((char*)p_SpirvBuffer.data(), size);
   ifs.close();
 }
 
@@ -372,6 +380,9 @@ void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
     }
     else
     {
+      _INTR_LOG_WARNING(
+          "Shader for GPU program '%s' not found, trying to load from cache...",
+          _descGpuProgramName(ref).c_str());
       loadShaderFromCache(gpuProgramName.c_str(), spirvBuffer);
       continue;
     }
