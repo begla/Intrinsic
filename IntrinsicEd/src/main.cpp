@@ -108,7 +108,9 @@ MiniDmpSender* miniDmpSender = nullptr;
 
 bool ExceptionCallback(UINT nCode, LPVOID lpVal1, LPVOID lpVal2)
 {
-  miniDmpSender->sendAdditionalFile(L"Intrinsic.log");
+  wchar_t full[_MAX_PATH];
+  miniDmpSender->sendAdditionalFile(
+      _wfullpath(full, L"Intrinsic.log", _MAX_PATH));
   return false;
 }
 #endif // BUGSPLAT_H
