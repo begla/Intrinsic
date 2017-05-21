@@ -62,6 +62,7 @@ void main()
 
   const vec2 uv0 = UV0_TRANSFORMED_ANIMATED;
   const vec2 uv0InverseAnim = UV0_TRANSFORMED_ANIMATED_FACTOR(vec2(0.2, 0.9));
+  const vec2 uv0Raw = UV0;
 
   vec4 albedo = texture(albedoTex, uv0);
   albedo.a = waterBaseAlpha;
@@ -70,20 +71,30 @@ void main()
   const vec4 normal1 = texture(normalTex, uv0InverseAnim * 0.2);
   const vec4 noise = texture(noiseTex, uv0 * 2.0);
   const vec4 noise1 = texture(noiseTex, uv0);
+  const vec4 noise2 = texture(noiseTex, uv0 * 4.0);
 
   const float blend = 0.5;
   const vec4 normal = mix(normal0, normal1, blend);
 
   const vec4 foam = texture(foamTex, uv0 * 15.0);
 
+  // Shore waves fakery
+  float waveFade = clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
+      * uboPerInstance.camParams.y / (uboPerMaterial.waterParams.x * 2.0), 0.0, 1.0);
+  float wave = sin(1.0 - length(uv0Raw.xy * 2.0 - 1.0) * 64.0 + uboPerInstance.data0.w);
+  wave = clamp(wave - noise2.r + 0.5, 0.0, 1.0);
+  albedo.a *= mix(wave, 1.0, waveFade);
+
+  // Foam
   float foamFade = 1.0 
     - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
       * uboPerInstance.camParams.y / uboPerMaterial.waterParams.x, 0.0, 1.0);
 
-  // Add foam based on noise texture
   foamFade += clamp(noise.r - 0.4, 0.0, 1.0);
   foamFade *= clamp(noise1.r * 2.0 - 0.2, 0.0, 1.0);
+  foamFade = min(foamFade, albedo.a);
 
+  // Smooth edges
   const float edgeFade = 1.0 
     - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
       * uboPerInstance.camParams.y / uboPerMaterial.waterParams.y, 0.0, 1.0);
