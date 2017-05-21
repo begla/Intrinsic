@@ -91,10 +91,12 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
                 GameStates::GameState::kEditing &&
             GameStates::Editing::_currentlySelectedEntity == entityRef)
         {
-          perInstanceDataFragment.colorTint =
-              glm::mix(perInstanceDataFragment.colorTint,
-                       glm::vec4(1.0f, 0.6f, 0.0f, 1.0f),
-                       abs(sin(TaskManager::_totalTimePassed * 2.0f)));
+          perInstanceDataFragment.colorTint = glm::mix(
+              perInstanceDataFragment.colorTint,
+              glm::vec4(1.0f, 0.6f, 0.0f, 1.0f),
+              glm::clamp(abs(sin(TaskManager::_totalTimePassed * 4.0f)) * 0.5f +
+                             0.5f,
+                         0.0f, 1.0f));
         }
       }
     }
