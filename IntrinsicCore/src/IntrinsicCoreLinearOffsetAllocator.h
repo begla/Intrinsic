@@ -38,13 +38,12 @@ struct LinearOffsetAllocator
 
   _INTR_INLINE uint32_t allocate(uint32_t p_Size, uint32_t p_Alignment)
   {
-    // Align current offset
-    const uint32_t newOffset =
+    const uint32_t alignedNewOffset =
         (_currentOffsetInBytes + p_Alignment) & ~(p_Alignment - 1u);
-    _currentOffsetInBytes = newOffset + p_Size;
+    _currentOffsetInBytes = alignedNewOffset + p_Size;
     _INTR_ASSERT((_currentOffsetInBytes - _initialOffset) <= _sizeInBytes &&
                  "Out of memory");
-    return newOffset;
+    return alignedNewOffset;
   }
 
   // <-
@@ -64,6 +63,16 @@ struct LinearOffsetAllocator
   _INTR_INLINE uint32_t calcAvailableMemoryInBytes() const
   {
     return _sizeInBytes - (_currentOffsetInBytes - _initialOffset);
+  }
+
+  // <-
+
+  _INTR_INLINE bool fits(uint32_t p_Size, uint32_t p_Alignment) const
+  {
+    const uint32_t startOffset =
+        ((_currentOffsetInBytes + p_Alignment) & ~(p_Alignment - 1u)) + p_Size;
+
+    return (startOffset - _initialOffset) <= _sizeInBytes;
   }
 
 private:

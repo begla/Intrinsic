@@ -59,7 +59,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(VkImage) vkImage;
   _INTR_ARRAY(VkImageView) vkImageView;
   _INTR_ARRAY(ImageViewArray) vkSubResourceImageViews;
-  _INTR_ARRAY(MemoryAllocationInfo) memoryAllocationInfo;
+  _INTR_ARRAY(GpuMemoryAllocationInfo) memoryAllocationInfo;
 };
 
 struct ImageManager
@@ -381,7 +381,7 @@ struct ImageManager
   {
     return _data.vkSubResourceImageViews[p_Ref._id];
   }
-  _INTR_INLINE static MemoryAllocationInfo&
+  _INTR_INLINE static GpuMemoryAllocationInfo&
   _memoryAllocationInfo(ImageRef p_Ref)
   {
     return _data.memoryAllocationInfo[p_Ref._id];
