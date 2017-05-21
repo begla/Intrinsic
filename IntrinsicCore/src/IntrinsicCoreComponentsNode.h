@@ -439,7 +439,7 @@ struct NodeManager
 
   ///
   _INTR_INLINE static void
-  updateFromWorldOrientation(NodeRef p_Ref, glm::quat& p_WorldOrientation)
+  updateFromWorldOrientation(NodeRef p_Ref, const glm::quat& p_WorldOrientation)
   {
     Components::NodeRef parentNode = _parent(p_Ref);
     if (parentNode.isValid())
@@ -456,8 +456,8 @@ struct NodeManager
   }
 
   ///
-  _INTR_INLINE static void updateFromWorldPosition(NodeRef p_Ref,
-                                                   glm::vec3& p_WorldPosition)
+  _INTR_INLINE static void
+  updateFromWorldPosition(NodeRef p_Ref, const glm::vec3& p_WorldPosition)
   {
     Components::NodeRef parentNode = _parent(p_Ref);
     if (parentNode.isValid())
