@@ -141,6 +141,7 @@ Intrinsic uses the following proprietary libraries:
 
 * PhysX 3 (see https://developer.nvidia.com/physx-sdk)
 * FBX SDK (IntrinsicEd only, see http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775847)
+* BugSplat (see http://www.bugsplat.com/)
 
 ... and the following tools in binary format:
 
@@ -150,5 +151,6 @@ Intrinsic uses the following proprietary libraries:
 
 Assets (amongst other things) sourced from:
 
-* https://cloud.blender.org/ (Bunny character mesh)
-* http://www.hdrlabs.com/sibl/archive.html (HDR cubemaps)
+* https://cloud.blender.org/
+* http://www.hdrlabs.com/sibl/archive.html
+
