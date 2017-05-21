@@ -128,6 +128,7 @@ struct MeshManager
                                                             p_GenerateDesc,
                                                             p_Properties,
                                                             p_Document);
+    if (!p_GenerateDesc)
     {
       rapidjson::Value positionsPerSubMesh =
           rapidjson::Value(rapidjson::kArrayType);
