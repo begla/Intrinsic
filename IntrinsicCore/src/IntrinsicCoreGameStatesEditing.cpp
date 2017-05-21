@@ -986,11 +986,17 @@ void Editing::update(float p_DeltaT)
                            glm::vec3(0.0f, -1.0f, 0.0f)};
     if (PhysxHelper::raycast(ray, hit, 1000.0f))
     {
-      Components::NodeManager::_position(nodeRef) =
-          glm::vec3(hit.position.x, hit.position.y, hit.position.z);
-      Components::NodeManager::_orientation(nodeRef) =
-          glm::rotation(glm::vec3(0.0f, 1.0f, 0.0f),
-                        glm::vec3(hit.normal.x, hit.normal.y, hit.normal.z));
+      Components::NodeManager::updateFromWorldPosition(
+          nodeRef, glm::vec3(hit.position.x, hit.position.y, hit.position.z));
+
+      const glm::vec3 hitNormal =
+          glm::vec3(hit.normal.x, hit.normal.y, hit.normal.z);
+      const glm::vec3 currentNormal =
+          Components::NodeManager::_worldOrientation(nodeRef) *
+          glm::vec3(0.0f, 1.0f, 0.0f);
+      Components::NodeManager::updateFromWorldOrientation(
+          nodeRef, glm::rotation(currentNormal, hitNormal) *
+                       Components::NodeManager::_worldOrientation(nodeRef));
 
       Components::NodeManager::updateTransforms(nodeRef);
     }
