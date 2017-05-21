@@ -149,9 +149,10 @@ QFrame* IntrinsicEdPropertyView::createCategoryHeaderWidget(const char* p_Title,
   frame->layout()->addWidget(label);
   frame->layout()->addItem(
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-  frame->setStyleSheet(".QFrame { border: 1px solid black; border-radius: 0px;"
-                       "background-color: qlineargradient(x1: 0 y1: 0, x2: 0 "
-                       "y2: 1, stop: 0 #24323B, stop: 1 #1C272E); }");
+  frame->setStyleSheet(
+      ".QFrame { border: 1px solid #2d3339; border-radius: 6px;"
+      "background-color: qlineargradient(x1: 0 y1: 0, x2: 0 "
+      "y2: 1, stop: 0 #22262a, stop: 1 #202428); }");
 
   return frame;
 }
