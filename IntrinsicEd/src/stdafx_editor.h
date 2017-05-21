@@ -32,6 +32,7 @@
 #include "IntrinsicEdPropertyEditorVec3.h"
 #include "IntrinsicEdPropertyEditorRotation.h"
 #include "IntrinsicEdPropertyEditorVec4.h"
+#include "IntrinsicEdPropertyEditorColor.h"
 #include "IntrinsicEdPropertyEditorFloat.h"
 #include "IntrinsicEdPropertyEditorString.h"
 #include "IntrinsicEdPropertyEditorEnum.h"

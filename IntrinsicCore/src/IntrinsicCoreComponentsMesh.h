@@ -95,7 +95,7 @@ struct MeshManager
         p_Document.GetAllocator());
     p_Properties.AddMember(
         "colorTint",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Mesh), _N(vec4),
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Mesh), _N(color),
                           _descColorTint(p_Ref), false, false),
         p_Document.GetAllocator());
   }
