@@ -437,6 +437,24 @@ struct NodeManager
     }
   }
 
+  ///
+  _INTR_INLINE static void updateFromWorldPosition(NodeRef p_Ref,
+                                                   glm::vec3& p_WorldPosition)
+  {
+    Components::NodeRef parentNode = _parent(p_Ref);
+    if (parentNode.isValid())
+    {
+      // Undo parent transform first
+      _position(p_Ref) =
+          glm::normalize(glm::inverse(_worldOrientation(parentNode))) *
+          (p_WorldPosition - _worldPosition(parentNode));
+    }
+    else
+    {
+      _position(p_Ref) = p_WorldPosition;
+    }
+  }
+
   // Getter/Setter
   // ->
 
