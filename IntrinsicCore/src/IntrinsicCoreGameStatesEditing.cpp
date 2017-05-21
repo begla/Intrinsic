@@ -491,7 +491,6 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
                      newWorldPos,
                      Components::CameraManager::_viewProjectionMatrix(camRef),
                      0.1f);
-      _gridPosition = snapToGrid(newWorldPos, Editing::_gridSize);
 
       if (_translScaleXAxisSelected)
       {
@@ -518,39 +517,28 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
         newWorldPos.z = planeIntersectionPoint.z - _initialPosOffset.z;
       }
 
-      // Snap to grid
-      newSize = snapToGrid(newSize, Editing::_gridSize);
-
       // Execute Gizmo transformation
       if (Editing::_editingMode == EditingMode::kTranslation)
       {
-        _gridPosition = snapToGrid(newWorldPos, Editing::_gridSize);
-
-        if (parentNode.isValid())
-        {
-          Components::NodeManager::_position(currentEntityNodeRef) =
-              glm::inverse(
-                  Components::NodeManager::_worldOrientation(parentNode)) *
-              (_gridPosition -
-               Components::NodeManager::_worldPosition(parentNode));
-        }
-        else
-        {
-          Components::NodeManager::_position(currentEntityNodeRef) =
-              _gridPosition;
-        }
+        newWorldPos = snapToGrid(newWorldPos, Editing::_gridSize);
+        Components::NodeManager::updateFromWorldPosition(currentEntityNodeRef,
+                                                         newWorldPos);
       }
       else if (Editing::_editingMode == EditingMode::kScale)
       {
+        newSize = snapToGrid(newSize, Editing::_gridSize);
         Components::NodeManager::_size(currentEntityNodeRef) = newSize;
       }
       else if (Editing::_editingMode == EditingMode::kRotation)
       {
+        // TODO: Quantize rotation
         Components::NodeManager::_orientation(currentEntityNodeRef) =
             glm::quat(newRotation) * _initialOrientation;
       }
 
       Components::NodeManager::updateTransforms(currentEntityNodeRef);
+      _gridPosition =
+          Components::NodeManager::_worldPosition(currentEntityNodeRef);
     }
   }
   else
