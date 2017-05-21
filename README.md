@@ -5,6 +5,7 @@
 Intrinsic is a Vulkan based cross-platform game and rendering engine. The project is currently in an early stage of development.
 
 ![Intrinsic](media/screenshot_0.jpg)
+![IntrinsicEd](media/screenshot_1.jpg)
 
 # Getting Started
 
