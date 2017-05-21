@@ -45,13 +45,15 @@ enum Enum
 };
 }
 
-struct MemoryAllocationInfo
+struct GpuMemoryAllocationInfo
 {
-  VkDeviceMemory vkDeviceMemory;
-  uint32_t sizeInBytes;
-  uint32_t alignmentInBytes;
-  uint32_t offsetInBytes;
-  uint8_t memoryPoolType;
+  MemoryPoolType::Enum _memoryPoolType;
+  uint32_t _pageIdx;
+  uint32_t _offset;
+  VkDeviceMemory _vkDeviceMemory;
+  uint32_t _sizeInBytes;
+  uint32_t _alignmentInBytes;
+  uint8_t* _mappedMemory;
 };
 
 namespace RenderSize
@@ -116,7 +118,9 @@ namespace MemoryLocation
 enum Enum
 {
   kDeviceLocal,
-  kHostVisible
+  kHostVisible,
+
+  kCount
 };
 }
 

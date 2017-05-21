@@ -14,12 +14,22 @@
 
 #pragma once
 
+#define _INTR_GPU_PAGE_SIZE_IN_BYTES (80u * 1024u * 1024u)
+
 namespace Intrinsic
 {
 namespace Renderer
 {
 namespace Vulkan
 {
+struct GpuMemoryPage
+{
+  Core::LinearOffsetAllocator _allocator;
+  VkDeviceMemory _vkDeviceMemory;
+  uint8_t* _mappedMemory;
+  uint32_t _memoryTypeIdx;
+};
+
 struct GpuMemoryManager
 {
   static void init();
@@ -28,66 +38,56 @@ struct GpuMemoryManager
 
   // <-
 
-  _INTR_INLINE static uint8_t* getHostVisibleMemoryForOffset(uint32_t p_Offset)
-  {
-    return &_mappedHostVisibleMemory[p_Offset];
-  }
-
-  // <-
-
-  _INTR_INLINE static uint32_t
+  static GpuMemoryAllocationInfo
   allocateOffset(MemoryPoolType::Enum p_MemoryPoolType, uint32_t p_Size,
-                 uint32_t p_Alignment)
-  {
-    return _memoryAllocators[p_MemoryPoolType].allocate(p_Size, p_Alignment);
-  }
-
+                 uint32_t p_Alignment, uint32_t p_MemoryTypeFlags);
   // <-
 
-  _INTR_INLINE static void resetAllocator(MemoryPoolType::Enum p_MemoryPoolType)
+  _INTR_INLINE static void resetPool(MemoryPoolType::Enum p_MemoryPoolType)
   {
-    _memoryAllocators[p_MemoryPoolType].reset();
+    for (uint32_t pageIdx = 0u; pageIdx < _memoryPools[p_MemoryPoolType].size();
+         ++pageIdx)
+    {
+      _memoryPools[p_MemoryPoolType][pageIdx]._allocator.reset();
+    }
   }
 
   // <-
 
   _INTR_INLINE static uint32_t
-  calcAvailableMemoryInBytes(MemoryPoolType::Enum p_MemoryPoolType)
+  calcAvailablePoolMemoryInBytes(MemoryPoolType::Enum p_MemoryPoolType)
   {
-    return _memoryAllocators[p_MemoryPoolType].calcAvailableMemoryInBytes();
+    uint32_t totalAvailableMemoryInBytes = 0u;
+    for (uint32_t pageIdx = 0u; pageIdx < _memoryPools[p_MemoryPoolType].size();
+         ++pageIdx)
+    {
+      totalAvailableMemoryInBytes +=
+          _memoryPools[p_MemoryPoolType][pageIdx]
+              ._allocator.calcAvailableMemoryInBytes();
+    }
+    return totalAvailableMemoryInBytes;
   }
 
-  // <-
-
-  _INTR_INLINE static VkDeviceMemory
-  getDeviceMemory(MemoryPoolType::Enum p_MemoryPoolType)
+  _INTR_INLINE static uint32_t
+  calcPoolSizeInBytes(MemoryPoolType::Enum p_MemoryPoolType)
   {
-    return _memoryPoolUsages[p_MemoryPoolType] == MemoryLocation::kDeviceLocal
-               ? _vkDeviceLocalMemory
-               : _vkHostVisibleMemory;
-  }
-
-  // <-
-
-  _INTR_INLINE static MemoryLocation::Enum
-  getMemoryUsage(MemoryPoolType::Enum p_MemoryPoolType)
-  {
-    return _memoryPoolUsages[p_MemoryPoolType];
+    uint32_t totalSizeInBytes = 0u;
+    for (uint32_t pageIdx = 0u; pageIdx < _memoryPools[p_MemoryPoolType].size();
+         ++pageIdx)
+    {
+      totalSizeInBytes +=
+          _memoryPools[p_MemoryPoolType][pageIdx]._allocator.size();
+    }
+    return totalSizeInBytes;
   }
 
 private:
-  static Core::LinearOffsetAllocator _memoryAllocators[MemoryPoolType::kCount];
+  static _INTR_ARRAY(GpuMemoryPage) _memoryPools[MemoryPoolType::kCount];
 
-  static uint32_t _deviceLocalMemorySizeInBytes;
-  static uint32_t _hostVisibleMemorySizeInBytes;
-  static VkDeviceMemory _vkDeviceLocalMemory;
-  static VkDeviceMemory _vkHostVisibleMemory;
-
-  static uint8_t* _mappedHostVisibleMemory;
-
-  static uint32_t _memoryPoolSizesInBytes[MemoryPoolType::kCount];
-  static MemoryLocation::Enum _memoryPoolUsages[MemoryPoolType::kCount];
+  static MemoryLocation::Enum
+      _memoryPoolToMemoryLocation[MemoryPoolType::kCount];
   static const char* _memoryPoolNames[MemoryPoolType::kCount];
+  static uint32_t _memoryLocationToMemoryPropertyFlags[MemoryLocation::kCount];
 };
 }
 }

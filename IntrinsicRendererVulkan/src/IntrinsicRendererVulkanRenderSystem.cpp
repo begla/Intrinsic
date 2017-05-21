@@ -240,8 +240,8 @@ void RenderSystem::reinitRendering()
   _INTR_PROFILE_AUTO("Reinit. Rendering");
 
   // Reset allocators
-  GpuMemoryManager::resetAllocator(MemoryPoolType::kResolutionDependentBuffers);
-  GpuMemoryManager::resetAllocator(MemoryPoolType::kResolutionDependentImages);
+  GpuMemoryManager::resetPool(MemoryPoolType::kResolutionDependentBuffers);
+  GpuMemoryManager::resetPool(MemoryPoolType::kResolutionDependentImages);
 
   // Update from config files
   RenderProcess::Default::loadRendererConfig();

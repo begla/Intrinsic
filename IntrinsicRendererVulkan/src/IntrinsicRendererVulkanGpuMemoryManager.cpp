@@ -23,18 +23,15 @@ namespace Renderer
 namespace Vulkan
 {
 // Static members
-Core::LinearOffsetAllocator
-    GpuMemoryManager::_memoryAllocators[MemoryPoolType::kCount];
+_INTR_ARRAY(GpuMemoryPage)
+GpuMemoryManager::_memoryPools[MemoryPoolType::kCount];
 
-uint32_t GpuMemoryManager::_deviceLocalMemorySizeInBytes = 0u;
-uint32_t GpuMemoryManager::_hostVisibleMemorySizeInBytes = 0u;
-VkDeviceMemory GpuMemoryManager::_vkDeviceLocalMemory = VK_NULL_HANDLE;
-VkDeviceMemory GpuMemoryManager::_vkHostVisibleMemory = VK_NULL_HANDLE;
-uint8_t* GpuMemoryManager::_mappedHostVisibleMemory = nullptr;
-
-uint32_t GpuMemoryManager::_memoryPoolSizesInBytes[MemoryPoolType::kCount] = {};
 MemoryLocation::Enum
-    GpuMemoryManager::_memoryPoolUsages[MemoryPoolType::kCount] = {};
+    GpuMemoryManager::_memoryPoolToMemoryLocation[MemoryPoolType::kCount] = {};
+uint32_t GpuMemoryManager::_memoryLocationToMemoryPropertyFlags
+    [MemoryLocation::kCount] = {VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 const char* GpuMemoryManager::_memoryPoolNames[MemoryPoolType::kCount] = {};
 
 namespace
@@ -44,184 +41,140 @@ namespace
 void GpuMemoryManager::init()
 {
   _INTR_LOG_INFO("Initializing GPU Memory Manager...");
-  _INTR_LOG_PUSH();
 
   // Setup memory pools
   {
-    _memoryPoolSizesInBytes[MemoryPoolType::kStaticImages] =
-        512u * 1024u * 1024u;
-    _memoryPoolUsages[MemoryPoolType::kStaticImages] =
+    _memoryPoolToMemoryLocation[MemoryPoolType::kStaticImages] =
         MemoryLocation::kDeviceLocal;
     _memoryPoolNames[MemoryPoolType::kStaticImages] = "Static Images";
 
-    _memoryPoolSizesInBytes[MemoryPoolType::kStaticBuffers] =
-        64u * 1024u * 1024u;
-    _memoryPoolUsages[MemoryPoolType::kStaticBuffers] =
+    _memoryPoolToMemoryLocation[MemoryPoolType::kStaticBuffers] =
         MemoryLocation::kDeviceLocal;
     _memoryPoolNames[MemoryPoolType::kStaticBuffers] = "Static Buffers";
 
-    _memoryPoolSizesInBytes[MemoryPoolType::kStaticStagingBuffers] =
-        64u * 1024u * 1024u;
-    _memoryPoolUsages[MemoryPoolType::kStaticStagingBuffers] =
+    _memoryPoolToMemoryLocation[MemoryPoolType::kStaticStagingBuffers] =
         MemoryLocation::kHostVisible;
     _memoryPoolNames[MemoryPoolType::kStaticStagingBuffers] =
         "Static Staging Buffers";
 
-    _memoryPoolSizesInBytes[MemoryPoolType::kResolutionDependentImages] =
-        512u * 1024u * 1024u;
-    _memoryPoolUsages[MemoryPoolType::kResolutionDependentImages] =
+    _memoryPoolToMemoryLocation[MemoryPoolType::kResolutionDependentImages] =
         MemoryLocation::kDeviceLocal;
     _memoryPoolNames[MemoryPoolType::kResolutionDependentImages] =
         "Resolution Dependent Images";
 
-    _memoryPoolSizesInBytes[MemoryPoolType::kResolutionDependentBuffers] =
-        64u * 1024u * 1024u;
-    _memoryPoolUsages[MemoryPoolType::kResolutionDependentBuffers] =
+    _memoryPoolToMemoryLocation[MemoryPoolType::kResolutionDependentBuffers] =
         MemoryLocation::kDeviceLocal;
     _memoryPoolNames[MemoryPoolType::kResolutionDependentBuffers] =
         "Resolution Dependent Buffers";
 
-    _memoryPoolSizesInBytes
+    _memoryPoolToMemoryLocation
         [MemoryPoolType::kResolutionDependentStagingBuffers] =
-            64u * 1024u * 1024u;
-    _memoryPoolUsages[MemoryPoolType::kResolutionDependentStagingBuffers] =
-        MemoryLocation::kHostVisible;
+            MemoryLocation::kHostVisible;
     _memoryPoolNames[MemoryPoolType::kResolutionDependentStagingBuffers] =
         "Resolution Dependent Staging Buffers";
 
-    _memoryPoolSizesInBytes[MemoryPoolType::kVolatileStagingBuffers] =
-        64u * 1024u * 1024u;
-    _memoryPoolUsages[MemoryPoolType::kVolatileStagingBuffers] =
+    _memoryPoolToMemoryLocation[MemoryPoolType::kVolatileStagingBuffers] =
         MemoryLocation::kHostVisible;
     _memoryPoolNames[MemoryPoolType::kVolatileStagingBuffers] =
         "Volatile Staging Buffers";
   }
+}
 
-  static const uint32_t deviceLocalMemoryPropertyFlags =
-      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-  uint32_t deviceLocalMemoryTypeIdx = (uint32_t)-1;
+// <-
 
-  static const uint32_t hostVisiblePropertyFlags =
-      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-      VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-  uint32_t hostVisibleMemoryTypeIdx = (uint32_t)-1;
+GpuMemoryAllocationInfo
+GpuMemoryManager::allocateOffset(MemoryPoolType::Enum p_MemoryPoolType,
+                                 uint32_t p_Size, uint32_t p_Alignment,
+                                 uint32_t p_MemoryTypeFlags)
+{
+  _INTR_ARRAY(GpuMemoryPage)& poolPages = _memoryPools[p_MemoryPoolType];
 
-  for (uint32_t i = 0;
-       i < RenderSystem::_vkPhysicalDeviceMemoryProperties.memoryTypeCount; ++i)
+  // Try to find a fitting page
+  for (uint32_t pageIdx = 0u; pageIdx < _memoryPools[p_MemoryPoolType].size();
+       ++pageIdx)
+  {
+    GpuMemoryPage& page = poolPages[pageIdx];
+
+    if ((p_MemoryTypeFlags & (1u << page._memoryTypeIdx)) > 0u &&
+        page._allocator.fits(p_Size, p_Alignment))
+    {
+      const uint32_t offset = page._allocator.allocate(p_Size, p_Alignment);
+      return {p_MemoryPoolType,
+              pageIdx,
+              offset,
+              page._vkDeviceMemory,
+              p_Size,
+              p_Alignment,
+              page._mappedMemory != nullptr ? &page._mappedMemory[offset]
+                                            : nullptr};
+    }
+  }
+
+  // No existing page found, allocate a new one
+  for (uint32_t memoryTypeIdx = 0;
+       memoryTypeIdx <
+       RenderSystem::_vkPhysicalDeviceMemoryProperties.memoryTypeCount;
+       ++memoryTypeIdx)
   {
     const VkMemoryType& memoryType =
-        RenderSystem::_vkPhysicalDeviceMemoryProperties.memoryTypes[i];
+        RenderSystem::_vkPhysicalDeviceMemoryProperties
+            .memoryTypes[memoryTypeIdx];
 
-    if (deviceLocalMemoryTypeIdx == (uint32_t)-1)
+    const MemoryLocation::Enum memLocation =
+        _memoryPoolToMemoryLocation[p_MemoryPoolType];
+    const uint32_t memoryPropertyFlags =
+        _memoryLocationToMemoryPropertyFlags[memLocation];
+
+    if ((memoryType.propertyFlags & memoryPropertyFlags) ==
+            memoryPropertyFlags &&
+        (p_MemoryTypeFlags & (1u << memoryTypeIdx)) > 0u)
     {
-      if ((memoryType.propertyFlags & deviceLocalMemoryPropertyFlags) ==
-          deviceLocalMemoryPropertyFlags)
+      poolPages.resize(poolPages.size() + 1u);
+      GpuMemoryPage& page = poolPages.back();
       {
-        deviceLocalMemoryTypeIdx = i;
+        page._allocator.init(_INTR_GPU_PAGE_SIZE_IN_BYTES);
+        page._memoryTypeIdx = memoryTypeIdx;
+
+        VkMemoryAllocateInfo memAllocInfo = {};
+        {
+          memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+          memAllocInfo.pNext = 0u;
+          memAllocInfo.allocationSize = _INTR_GPU_PAGE_SIZE_IN_BYTES;
+          memAllocInfo.memoryTypeIndex = memoryTypeIdx;
+        }
+
+        VkResult result =
+            vkAllocateMemory(RenderSystem::_vkDevice, &memAllocInfo, nullptr,
+                             &page._vkDeviceMemory);
+        _INTR_VK_CHECK_RESULT(result);
       }
-    }
-    if (hostVisibleMemoryTypeIdx == (uint32_t)-1)
-    {
-      if ((memoryType.propertyFlags & hostVisiblePropertyFlags) ==
-          hostVisiblePropertyFlags)
+
+      // Map device local memory
+      if (memLocation == MemoryLocation::kHostVisible)
       {
-        hostVisibleMemoryTypeIdx = i;
+        VkResult result = vkMapMemory(
+            RenderSystem::_vkDevice, page._vkDeviceMemory, 0u,
+            _INTR_GPU_PAGE_SIZE_IN_BYTES, 0u, (void**)&page._mappedMemory);
+        _INTR_VK_CHECK_RESULT(result);
       }
-    }
-  }
-  _INTR_ASSERT(deviceLocalMemoryTypeIdx != (uint32_t)-1 &&
-               hostVisibleMemoryTypeIdx != (uint32_t)-1 &&
-               "Required memory type not available");
 
-  // Allocate device local memory
-  {
-    _deviceLocalMemorySizeInBytes = 0u;
+      _INTR_ASSERT(page._allocator.fits(p_Size, p_Alignment) &&
+                   "Allocation does not fit in a single page");
 
-    for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
-    {
-      if (_memoryPoolUsages[i] == MemoryLocation::kDeviceLocal)
-      {
-        _deviceLocalMemorySizeInBytes += _memoryPoolSizesInBytes[i];
-      }
-    }
-
-    VkMemoryAllocateInfo memAllocInfo = {};
-    {
-      memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-      memAllocInfo.pNext = 0u;
-      memAllocInfo.allocationSize = _deviceLocalMemorySizeInBytes;
-      memAllocInfo.memoryTypeIndex = deviceLocalMemoryTypeIdx;
-    }
-
-    VkResult result = vkAllocateMemory(RenderSystem::_vkDevice, &memAllocInfo,
-                                       nullptr, &_vkDeviceLocalMemory);
-    _INTR_VK_CHECK_RESULT(result);
-
-    _INTR_LOG_INFO("Allocated %.2f MB of device local memory...",
-                   Math::bytesToMegaBytes(_deviceLocalMemorySizeInBytes));
-  }
-
-  // Allocate host visible memory
-  {
-    for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
-    {
-      if (_memoryPoolUsages[i] == MemoryLocation::kHostVisible)
-      {
-        _hostVisibleMemorySizeInBytes += _memoryPoolSizesInBytes[i];
-      }
-    }
-
-    VkMemoryAllocateInfo memAllocInfo = {};
-    {
-      memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-      memAllocInfo.pNext = 0u;
-      memAllocInfo.allocationSize = _hostVisibleMemorySizeInBytes;
-      memAllocInfo.memoryTypeIndex = hostVisibleMemoryTypeIdx;
-    }
-
-    VkResult result = vkAllocateMemory(RenderSystem::_vkDevice, &memAllocInfo,
-                                       nullptr, &_vkHostVisibleMemory);
-    _INTR_VK_CHECK_RESULT(result);
-
-    _INTR_LOG_INFO("Allocated %.2f MB of host visible memory...",
-                   Math::bytesToMegaBytes(_hostVisibleMemorySizeInBytes));
-  }
-
-  // Setup allocators
-  {
-    uint32_t deviceLocalOffset = 0u;
-    uint32_t hostVisibleOffset = 0u;
-
-    for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
-    {
-      if (_memoryPoolUsages[i] == MemoryLocation::kDeviceLocal)
-      {
-        _memoryAllocators[i].init(_memoryPoolSizesInBytes[i],
-                                  deviceLocalOffset);
-        deviceLocalOffset += _memoryPoolSizesInBytes[i];
-      }
-      else if (_memoryPoolUsages[i] == MemoryLocation::kHostVisible)
-      {
-        _memoryAllocators[i].init(_memoryPoolSizesInBytes[i],
-                                  hostVisibleOffset);
-        hostVisibleOffset += _memoryPoolSizesInBytes[i];
-      }
-      else
-      {
-        _INTR_ASSERT(false);
-      }
+      const uint32_t offset = page._allocator.allocate(p_Size, p_Alignment);
+      return {p_MemoryPoolType,
+              (uint32_t)poolPages.size() - 1u,
+              offset,
+              page._vkDeviceMemory,
+              p_Size,
+              p_Alignment,
+              page._mappedMemory != nullptr ? &page._mappedMemory[offset]
+                                            : nullptr};
     }
   }
 
-  // Map host visible memory
-  {
-    VkResult result = vkMapMemory(RenderSystem::_vkDevice, _vkHostVisibleMemory,
-                                  0u, _hostVisibleMemorySizeInBytes, 0u,
-                                  (void**)&_mappedHostVisibleMemory);
-    _INTR_VK_CHECK_RESULT(result);
-  }
-
-  _INTR_LOG_POP();
+  _INTR_ASSERT(false && "Failed to allocate a new GPU memory page");
+  return {};
 }
 
 // <-
@@ -234,26 +187,32 @@ void GpuMemoryManager::updateMemoryStats()
 
   if (!init)
   {
-    for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
+    for (uint32_t memoryPoolType = 0u; memoryPoolType < MemoryPoolType::kCount;
+         ++memoryPoolType)
     {
       static char charBuffer[128];
-      sprintf(charBuffer, "Total %s Memory (MB)", _memoryPoolNames[i]);
-      tokens[i][0] = MicroProfileGetCounterToken(charBuffer);
+      sprintf(charBuffer, "Total %s Memory (MB)",
+              _memoryPoolNames[memoryPoolType]);
+      tokens[memoryPoolType][0] = MicroProfileGetCounterToken(charBuffer);
 
-      sprintf(charBuffer, "Available %s Memory (MB)", _memoryPoolNames[i]);
-      tokens[i][1] = MicroProfileGetCounterToken(charBuffer);
+      sprintf(charBuffer, "Available %s Memory (MB)",
+              _memoryPoolNames[memoryPoolType]);
+      tokens[memoryPoolType][1] = MicroProfileGetCounterToken(charBuffer);
     }
 
     init = true;
   }
 
-  for (uint32_t i = 0u; i < MemoryPoolType::kCount; ++i)
+  for (uint32_t memoryPoolType = 0u; memoryPoolType < MemoryPoolType::kCount;
+       ++memoryPoolType)
   {
-    MicroProfileCounterSet(tokens[i][0], (uint64_t)Math::bytesToMegaBytes(
-                                             _memoryAllocators[i].size()));
+    MicroProfileCounterSet(tokens[memoryPoolType][0],
+                           (uint64_t)Math::bytesToMegaBytes(calcPoolSizeInBytes(
+                               (MemoryPoolType::Enum)memoryPoolType)));
     MicroProfileCounterSet(
-        tokens[i][1], (uint64_t)Math::bytesToMegaBytes(
-                          _memoryAllocators[i].calcAvailableMemoryInBytes()));
+        tokens[memoryPoolType][1],
+        (uint64_t)Math::bytesToMegaBytes(calcAvailablePoolMemoryInBytes(
+            (MemoryPoolType::Enum)memoryPoolType)));
   }
 #endif // _INTR_PROFILING_ENABLED
 }
