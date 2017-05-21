@@ -128,104 +128,108 @@ struct MeshManager
                                                             p_GenerateDesc,
                                                             p_Properties,
                                                             p_Document);
-
-    rapidjson::Value positionsPerSubMesh =
-        rapidjson::Value(rapidjson::kArrayType);
-    rapidjson::Value uv0sPerSubMesh = rapidjson::Value(rapidjson::kArrayType);
-    rapidjson::Value normalPerSubMesh = rapidjson::Value(rapidjson::kArrayType);
-    rapidjson::Value tangentsPerSubMesh =
-        rapidjson::Value(rapidjson::kArrayType);
-    rapidjson::Value binormalsPerSubMesh =
-        rapidjson::Value(rapidjson::kArrayType);
-    rapidjson::Value vertexColorsPerSubMesh =
-        rapidjson::Value(rapidjson::kArrayType);
-    rapidjson::Value indicesPerSubMesh =
-        rapidjson::Value(rapidjson::kArrayType);
-    rapidjson::Value materialNamesPerSubMesh =
-        rapidjson::Value(rapidjson::kArrayType);
-
-    for (uint32_t subMeshIdx = 0u;
-         subMeshIdx < _descPositionsPerSubMesh(p_Ref).size(); ++subMeshIdx)
     {
-      rapidjson::Value positions = rapidjson::Value(rapidjson::kArrayType);
-      rapidjson::Value uv0s = rapidjson::Value(rapidjson::kArrayType);
-      rapidjson::Value normals = rapidjson::Value(rapidjson::kArrayType);
-      rapidjson::Value tangents = rapidjson::Value(rapidjson::kArrayType);
-      rapidjson::Value binormals = rapidjson::Value(rapidjson::kArrayType);
-      rapidjson::Value vertexColors = rapidjson::Value(rapidjson::kArrayType);
-      rapidjson::Value indices = rapidjson::Value(rapidjson::kArrayType);
+      rapidjson::Value positionsPerSubMesh =
+          rapidjson::Value(rapidjson::kArrayType);
+      rapidjson::Value uv0sPerSubMesh = rapidjson::Value(rapidjson::kArrayType);
+      rapidjson::Value normalPerSubMesh =
+          rapidjson::Value(rapidjson::kArrayType);
+      rapidjson::Value tangentsPerSubMesh =
+          rapidjson::Value(rapidjson::kArrayType);
+      rapidjson::Value binormalsPerSubMesh =
+          rapidjson::Value(rapidjson::kArrayType);
+      rapidjson::Value vertexColorsPerSubMesh =
+          rapidjson::Value(rapidjson::kArrayType);
+      rapidjson::Value indicesPerSubMesh =
+          rapidjson::Value(rapidjson::kArrayType);
+      rapidjson::Value materialNamesPerSubMesh =
+          rapidjson::Value(rapidjson::kArrayType);
 
-      for (uint32_t vtxIdx = 0u;
-           vtxIdx < _descPositionsPerSubMesh(p_Ref)[subMeshIdx].size();
-           ++vtxIdx)
+      for (uint32_t subMeshIdx = 0u;
+           subMeshIdx < _descPositionsPerSubMesh(p_Ref).size(); ++subMeshIdx)
       {
-        const glm::vec3 position =
-            _descPositionsPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
-        positions.PushBack(JsonHelper::createVec(p_Document, position),
+        rapidjson::Value positions = rapidjson::Value(rapidjson::kArrayType);
+        rapidjson::Value uv0s = rapidjson::Value(rapidjson::kArrayType);
+        rapidjson::Value normals = rapidjson::Value(rapidjson::kArrayType);
+        rapidjson::Value tangents = rapidjson::Value(rapidjson::kArrayType);
+        rapidjson::Value binormals = rapidjson::Value(rapidjson::kArrayType);
+        rapidjson::Value vertexColors = rapidjson::Value(rapidjson::kArrayType);
+        rapidjson::Value indices = rapidjson::Value(rapidjson::kArrayType);
+
+        for (uint32_t vtxIdx = 0u;
+             vtxIdx < _descPositionsPerSubMesh(p_Ref)[subMeshIdx].size();
+             ++vtxIdx)
+        {
+          const glm::vec3 position =
+              _descPositionsPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
+          positions.PushBack(JsonHelper::createVec(p_Document, position),
+                             p_Document.GetAllocator());
+
+          const glm::vec2 uv0 = _descUV0sPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
+          uv0s.PushBack(JsonHelper::createVec(p_Document, uv0),
+                        p_Document.GetAllocator());
+
+          const glm::vec3 normal =
+              _descNormalsPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
+          normals.PushBack(JsonHelper::createVec(p_Document, normal),
                            p_Document.GetAllocator());
 
-        const glm::vec2 uv0 = _descUV0sPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
-        uv0s.PushBack(JsonHelper::createVec(p_Document, uv0),
-                      p_Document.GetAllocator());
+          const glm::vec3 tangent =
+              _descTangentsPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
+          tangents.PushBack(JsonHelper::createVec(p_Document, tangent),
+                            p_Document.GetAllocator());
 
-        const glm::vec3 normal =
-            _descNormalsPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
-        normals.PushBack(JsonHelper::createVec(p_Document, normal),
-                         p_Document.GetAllocator());
+          const glm::vec3 binormal =
+              _descBinormalsPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
+          binormals.PushBack(JsonHelper::createVec(p_Document, binormal),
+                             p_Document.GetAllocator());
 
-        const glm::vec3 tangent =
-            _descTangentsPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
-        tangents.PushBack(JsonHelper::createVec(p_Document, tangent),
-                          p_Document.GetAllocator());
+          const glm::vec4 vtxColor =
+              _descVertexColorsPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
+          vertexColors.PushBack(JsonHelper::createVec(p_Document, vtxColor),
+                                p_Document.GetAllocator());
+        }
 
-        const glm::vec3 binormal =
-            _descBinormalsPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
-        binormals.PushBack(JsonHelper::createVec(p_Document, binormal),
-                           p_Document.GetAllocator());
+        for (uint32_t i = 0u;
+             i < _descIndicesPerSubMesh(p_Ref)[subMeshIdx].size(); ++i)
+        {
+          const uint32_t idx = _descIndicesPerSubMesh(p_Ref)[subMeshIdx][i];
+          indices.PushBack(idx, p_Document.GetAllocator());
+        }
 
-        const glm::vec4 vtxColor =
-            _descVertexColorsPerSubMesh(p_Ref)[subMeshIdx][vtxIdx];
-        vertexColors.PushBack(JsonHelper::createVec(p_Document, vtxColor),
-                              p_Document.GetAllocator());
+        positionsPerSubMesh.PushBack(positions, p_Document.GetAllocator());
+        uv0sPerSubMesh.PushBack(uv0s, p_Document.GetAllocator());
+        normalPerSubMesh.PushBack(normals, p_Document.GetAllocator());
+        tangentsPerSubMesh.PushBack(tangents, p_Document.GetAllocator());
+        binormalsPerSubMesh.PushBack(binormals, p_Document.GetAllocator());
+        vertexColorsPerSubMesh.PushBack(vertexColors,
+                                        p_Document.GetAllocator());
+        indicesPerSubMesh.PushBack(indices, p_Document.GetAllocator());
+
+        rapidjson::Value mateiralName = rapidjson::Value(
+            _descMaterialNamesPerSubMesh(p_Ref)[subMeshIdx]._string.c_str(),
+            p_Document.GetAllocator());
+        materialNamesPerSubMesh.PushBack(mateiralName,
+                                         p_Document.GetAllocator());
       }
 
-      for (uint32_t i = 0u;
-           i < _descIndicesPerSubMesh(p_Ref)[subMeshIdx].size(); ++i)
-      {
-        const uint32_t idx = _descIndicesPerSubMesh(p_Ref)[subMeshIdx][i];
-        indices.PushBack(idx, p_Document.GetAllocator());
-      }
-
-      positionsPerSubMesh.PushBack(positions, p_Document.GetAllocator());
-      uv0sPerSubMesh.PushBack(uv0s, p_Document.GetAllocator());
-      normalPerSubMesh.PushBack(normals, p_Document.GetAllocator());
-      tangentsPerSubMesh.PushBack(tangents, p_Document.GetAllocator());
-      binormalsPerSubMesh.PushBack(binormals, p_Document.GetAllocator());
-      vertexColorsPerSubMesh.PushBack(vertexColors, p_Document.GetAllocator());
-      indicesPerSubMesh.PushBack(indices, p_Document.GetAllocator());
-
-      rapidjson::Value mateiralName = rapidjson::Value(
-          _descMaterialNamesPerSubMesh(p_Ref)[subMeshIdx]._string.c_str(),
-          p_Document.GetAllocator());
-      materialNamesPerSubMesh.PushBack(mateiralName, p_Document.GetAllocator());
+      p_Properties.AddMember("positionsPerSubMesh", positionsPerSubMesh,
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("uv0sPerSubMesh", uv0sPerSubMesh,
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("normalPerSubMesh", normalPerSubMesh,
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("tangentsPerSubMesh", tangentsPerSubMesh,
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("binormalsPerSubMesh", binormalsPerSubMesh,
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("vertexColorsPerSubMesh", vertexColorsPerSubMesh,
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("indicesPerSubMesh", indicesPerSubMesh,
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("materialNamesPerSubMesh", materialNamesPerSubMesh,
+                             p_Document.GetAllocator());
     }
-
-    p_Properties.AddMember("positionsPerSubMesh", positionsPerSubMesh,
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("uv0sPerSubMesh", uv0sPerSubMesh,
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("normalPerSubMesh", normalPerSubMesh,
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("tangentsPerSubMesh", tangentsPerSubMesh,
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("binormalsPerSubMesh", binormalsPerSubMesh,
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("vertexColorsPerSubMesh", vertexColorsPerSubMesh,
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("indicesPerSubMesh", indicesPerSubMesh,
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("materialNamesPerSubMesh", materialNamesPerSubMesh,
-                           p_Document.GetAllocator());
   }
 
   // <-
