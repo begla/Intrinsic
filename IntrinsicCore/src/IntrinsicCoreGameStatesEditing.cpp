@@ -982,7 +982,8 @@ void Editing::update(float p_DeltaT)
             _currentlySelectedEntity);
 
     physx::PxRaycastHit hit;
-    const Math::Ray ray = {Components::NodeManager::_worldPosition(nodeRef),
+    const Math::Ray ray = {Components::NodeManager::_worldPosition(nodeRef) +
+                               glm::vec3(0.0f, 5.0f, 0.0f),
                            glm::vec3(0.0f, -1.0f, 0.0f)};
     if (PhysxHelper::raycast(ray, hit, 1000.0f))
     {
