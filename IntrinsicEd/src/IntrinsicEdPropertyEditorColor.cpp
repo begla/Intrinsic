@@ -44,7 +44,7 @@ IntrinsicEdPropertyEditorColor::~IntrinsicEdPropertyEditorColor() {}
 
 void IntrinsicEdPropertyEditorColor::onPickColor()
 {
-  QColor color = QColorDialog::getColor(_ui.color->palette().base().color());
+  QColor color = QColorDialog::getColor(_ui.color->palette().button().color());
   _ui.x->setValue(color.redF());
   _ui.y->setValue(color.greenF());
   _ui.z->setValue(color.blueF());
