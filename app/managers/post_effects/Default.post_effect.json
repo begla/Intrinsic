@@ -2,20 +2,20 @@
     "name": "Default",
     "properties": {
         "name": "Default",
-        "Scattering": 0.0,
-        "MainLightIntensity": 10.0,
-        "MainLightTemperature": 2200.0,
-        "MainLightOrientation": [
+        "scattering": 0.0,
+        "mainLightIntensity": 10.0,
+        "mainLightTemperature": 2200.0,
+        "mainLightOrientation": [
             -0.2032211720943451,
             0.6494189500808716,
             0.18621788918972016,
             0.7087164521217346
         ],
-        "MainLightColor": [
+        "mainLightColor": [
             1.0,
             1.0,
             1.0
         ],
-        "AmbientFactor": 1.0
+        "ambientFactor": 1.0
     }
 }

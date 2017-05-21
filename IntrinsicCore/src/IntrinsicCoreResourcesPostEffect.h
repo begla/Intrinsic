@@ -98,35 +98,35 @@ struct PostEffectManager
                                                          p_Document);
 
     p_Properties.AddMember(
-        "Scattering",
+        "scattering",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(VolumetricLighting),
                           _N(float), _descVolumetricLightingScattering(p_Ref),
                           false, false),
         p_Document.GetAllocator());
 
     p_Properties.AddMember(
-        "MainLightIntensity",
+        "mainLightIntensity",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
                           _descMainLightIntens(p_Ref), false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember(
-        "MainLightTemperature",
+        "mainLightTemperature",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
                           _descMainLightTemp(p_Ref), false, false),
         p_Document.GetAllocator());
-    p_Properties.AddMember("MainLightOrientation",
+    p_Properties.AddMember("mainLightOrientation",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
                                              _N(Lighting), _N(rotation),
                                              _descMainLightOrientation(p_Ref),
                                              false, false),
                            p_Document.GetAllocator());
     p_Properties.AddMember(
-        "MainLightColor",
+        "mainLightColor",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(vec3),
                           _descMainLightColor(p_Ref), false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember(
-        "AmbientFactor",
+        "ambientFactor",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
                           _descAmbientFactor(p_Ref), false, false),
         p_Document.GetAllocator());
@@ -141,25 +141,25 @@ struct PostEffectManager
         PostEffectData,
         _INTR_MAX_POST_EFFECT_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
 
-    if (p_Properties.HasMember("Scattering"))
+    if (p_Properties.HasMember("scattering"))
       _descVolumetricLightingScattering(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["Scattering"]);
+          JsonHelper::readPropertyFloat(p_Properties["scattering"]);
 
-    if (p_Properties.HasMember("MainLightIntensity"))
+    if (p_Properties.HasMember("mainLightIntensity"))
       _descMainLightIntens(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["MainLightIntensity"]);
-    if (p_Properties.HasMember("MainLightTemperature"))
+          JsonHelper::readPropertyFloat(p_Properties["mainLightIntensity"]);
+    if (p_Properties.HasMember("mainLightTemperature"))
       _descMainLightTemp(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["MainLightTemperature"]);
-    if (p_Properties.HasMember("MainLightOrientation"))
+          JsonHelper::readPropertyFloat(p_Properties["mainLightTemperature"]);
+    if (p_Properties.HasMember("mainLightOrientation"))
       _descMainLightOrientation(p_Ref) =
-          JsonHelper::readPropertyQuat(p_Properties["MainLightOrientation"]);
-    if (p_Properties.HasMember("MainLightColor"))
+          JsonHelper::readPropertyQuat(p_Properties["mainLightOrientation"]);
+    if (p_Properties.HasMember("mainLightColor"))
       _descMainLightColor(p_Ref) =
-          JsonHelper::readPropertyVec3(p_Properties["MainLightColor"]);
-    if (p_Properties.HasMember("AmbientFactor"))
+          JsonHelper::readPropertyVec3(p_Properties["mainLightColor"]);
+    if (p_Properties.HasMember("ambientFactor"))
       _descAmbientFactor(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["AmbientFactor"]);
+          JsonHelper::readPropertyFloat(p_Properties["ambientFactor"]);
   }
 
   // <-
