@@ -88,7 +88,7 @@ struct LightManager
                            p_Document.GetAllocator());
     p_Properties.AddMember("color",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(Light), _N(vec3),
+                                             _N(Light), _N(color),
                                              _descColor(p_Ref), false, false),
                            p_Document.GetAllocator());
     p_Properties.AddMember(

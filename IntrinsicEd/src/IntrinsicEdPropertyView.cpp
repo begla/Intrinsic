@@ -328,6 +328,12 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
               &_propertyDocument, &currentProperties, &it->value,
               it->name.GetString());
         }
+        else if (strcmp(editor, "color") == 0u)
+        {
+          propertyEditor = new IntrinsicEdPropertyEditorColor(
+              &_propertyDocument, &currentProperties, &it->value,
+              it->name.GetString());
+        }
 
         if (propertyEditor)
         {
