@@ -176,7 +176,7 @@ void DrawCallManager::bindBuffer(DrawCallRef p_DrawCallRef, const Name& p_Name,
 DrawCallRef DrawCallManager::createDrawCallForMesh(
     const Name& p_Name, Dod::Ref p_Mesh, Dod::Ref p_Material,
     uint8_t p_MaterialPass, uint32_t p_PerInstanceDataVertexSize,
-    uint32_t p_PerInstanceDataFragmentSize)
+    uint32_t p_PerInstanceDataFragmentSize, uint32_t p_SubMeshIdx)
 {
   if (!p_Mesh.isValid())
   {
@@ -196,16 +196,18 @@ DrawCallRef DrawCallManager::createDrawCallForMesh(
         _descPipeline(drawCallMesh)));
 
     _descVertexBuffers(drawCallMesh) =
-        Core::Resources::MeshManager::_vertexBuffersPerSubMesh(p_Mesh)[0];
+        Core::Resources::MeshManager::_vertexBuffersPerSubMesh(
+            p_Mesh)[p_SubMeshIdx];
     _descIndexBuffer(drawCallMesh) =
-        Core::Resources::MeshManager::_indexBufferPerSubMesh(p_Mesh)[0];
+        Core::Resources::MeshManager::_indexBufferPerSubMesh(
+            p_Mesh)[p_SubMeshIdx];
     _descVertexCount(drawCallMesh) =
         (uint32_t)Core::Resources::MeshManager::_descPositionsPerSubMesh(
-            p_Mesh)[0]
+            p_Mesh)[p_SubMeshIdx]
             .size();
     _descIndexCount(drawCallMesh) =
         (uint32_t)Core::Resources::MeshManager::_descIndicesPerSubMesh(
-            p_Mesh)[0]
+            p_Mesh)[p_SubMeshIdx]
             .size();
     _descMaterial(drawCallMesh) = p_Material;
     _descMaterialPass(drawCallMesh) = p_MaterialPass;

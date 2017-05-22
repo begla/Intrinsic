@@ -342,7 +342,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             Renderer::Vulkan::Resources::DrawCallManager::createDrawCallForMesh(
                 _N(_MeshComponent), meshRef, matToUse, matPassIdx,
                 sizeof(MeshPerInstanceDataVertex),
-                sizeof(MeshPerInstanceDataFragment));
+                sizeof(MeshPerInstanceDataFragment), subMeshIdx);
 
         Renderer::Vulkan::Resources::DrawCallManager::_descMeshComponent(
             drawCallMesh) = meshCompRef;
