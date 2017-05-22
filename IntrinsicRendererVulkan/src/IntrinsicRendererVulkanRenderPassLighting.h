@@ -30,6 +30,8 @@ struct Lighting
   static void destroy();
 
   static void render(float p_DeltaT, Components::CameraRef p_CameraRef);
+
+  static float _globalAmbientFactor;
 };
 }
 }

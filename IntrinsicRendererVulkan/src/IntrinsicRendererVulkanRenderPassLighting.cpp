@@ -348,7 +348,7 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
   }
 }
 
-// <--
+// <-
 
 void renderLighting(Resources::FramebufferRef p_FramebufferRef,
                     Resources::DrawCallRef p_DrawCall,
@@ -388,7 +388,8 @@ void renderLighting(Resources::FramebufferRef p_FramebufferRef,
     _perInstanceData.data0.x = TaskManager::_totalTimePassed;
     _perInstanceData.data0.y =
         Core::Resources::PostEffectManager::_descAmbientFactor(
-            Core::Resources::PostEffectManager::_blendTargetRef);
+            Core::Resources::PostEffectManager::_blendTargetRef) *
+        Lighting::_globalAmbientFactor;
 
     const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
         RenderProcess::Default::_shadowFrustums[p_CameraRef];
@@ -427,6 +428,12 @@ void renderLighting(Resources::FramebufferRef p_FramebufferRef,
       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 }
+
+// <-
+
+float Lighting::_globalAmbientFactor = 1.0f;
+
+// <-
 
 void Lighting::init()
 {
