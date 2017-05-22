@@ -220,7 +220,7 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
                   clusterAABB))
           {
             const uint32_t irradProbeIdx = clusterIndex + irradProbeCount + 1u;
-            _lightIndexBufferGpuMemory[irradProbeIdx] = lidx;
+            _irradProbeIndexBufferGpuMemory[irradProbeIdx] = lidx;
             ++irradProbeCount;
           }
         }

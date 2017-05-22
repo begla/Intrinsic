@@ -75,6 +75,7 @@ const float translDistortion = 0.2;
 const float translPower = 12.0;
 const float translScale = 1.0;
 const vec3 translAmbient = vec3(0.0);
+const float probeFadeRange = 2.0;
 
 void main()
 {
@@ -131,15 +132,21 @@ void main()
     {
       IrradProbe probe = irradProbes[irradProbeIndices[clusterIdx + pi + 1]];
 
-      if (distance(posVS, probe.posAndRadius.xyz) < probe.posAndRadius.w)
+      const float distToProbe = distance(posVS, probe.posAndRadius.xyz);
+      if (distToProbe < probe.posAndRadius.w)
       {
-        irrad += d.diffuseColor * sampleSH(probe.data, R);
-        irradWeight += 1.0;
+        const float fadeStart = probe.posAndRadius.w - probeFadeRange;
+        const float fade = 1.0 - max(distToProbe - fadeStart, 0.0) / probeFadeRange;
+        
+        irrad += d.diffuseColor * sampleSH(probe.data, R) / MATH_PI;
+        irradWeight += fade;
       }
     }
   }
 
-  irrad /= irradWeight;
+  if (irradWeight > 1.0) irrad /= irradWeight;
+  irradWeight = clamp(irradWeight, 0.0, 1.0);
+
   irrad = mix(d.diffuseColor * texture(irradianceTex, R).rgb, irrad, irradWeight);
 
   outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, parameter0Sample.z) * irrad; 
@@ -208,7 +215,7 @@ void main()
       const vec3 lightColor = light.colorAndIntensity.rgb 
         * kelvinToRGB(light.temp.r, kelvinLutTex);
 
-      //outColor.rgb += calcLighting(d) * att * lightColor;
+      outColor.rgb += calcLighting(d) * att * lightColor;
 
       const float localTranslThickness = matParams.translucencyThickness;
 
