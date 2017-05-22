@@ -80,6 +80,14 @@ struct Light
 };
 
 // <-
+
+struct IrradProbe
+{
+  vec4 posAndRadius;
+  vec4 data[7];
+};
+
+// <-
 struct LightingData
 {
   // Source
@@ -169,6 +177,54 @@ float burleyToMipApprox(float perceptualRoughness)
 {
   const float scale = perceptualRoughness * (1.7 - 0.7 * perceptualRoughness);
   return scale * (IBL_MIP_COUNT - 1 - IBL_MIP_OFFSET);
+}
+
+float coeffsSH(int l, int m, vec3 v)
+{
+   float res = (1.0 / 2.0) * sqrt(1.0 / MATH_PI);
+   float x = v.x, y = v.y, z = v.z;
+ 
+   switch(l)
+   {
+      case 1:
+      { res = (1.0/2.0) * sqrt(3.0 / MATH_PI) * (m==-1 ? y : (m==0 ? z : x)); } break;
+      case 2:
+      {
+         const float s = (m==0 || m==2 ? 0.25 : 0.5) * sqrt((m==0 ? 5.0 : 15.0) / MATH_PI);
+ 
+         if(m==-2) res = s * x*y;
+         else if(m==-1) res = s * y*z;
+         else if(m==0) res = s * (2*z*z - x*x - y*y);
+         else if(m==1) res = s * z*x;
+         else res = s * (x*x-y*y);
+      }
+      break;
+   }
+ 
+   return res;
+}
+
+vec3 sampleSH(vec4 shCoeffs[7], vec3 v)
+{
+  vec3 coeffL0 = shCoeffs[0].xyz;
+
+  vec3 coeffL1[3] = vec3[3](vec3(shCoeffs[0].w, shCoeffs[1].xy),
+                vec3(shCoeffs[1].zw, shCoeffs[2].x),
+                shCoeffs[2].yzw);
+
+  vec3 coeffL2[5] = vec3[5](vec3(shCoeffs[3].xyz),
+                vec3(shCoeffs[3].w, shCoeffs[4].xy),
+                vec3(shCoeffs[4].zw, shCoeffs[5].x),
+                vec3(shCoeffs[5].yzw),
+                vec3(shCoeffs[6].xyz));
+
+  vec3 res = coeffsSH(0, 0, v) * coeffL0 + 
+    coeffsSH(1, -1, v) * coeffL1[0] + coeffsSH(1, 0, v) * coeffL1[1] + coeffsSH(1, 1, v) * coeffL1[2] +
+    coeffsSH(2, -2, v) * coeffL2[0] + coeffsSH(2, -1, v) * coeffL2[1] + coeffsSH(2, 0, v) * coeffL2[2] +
+    coeffsSH(2, 1, v) * coeffL2[3] + coeffsSH(2, 2, v) * coeffL2[4];
+
+  res = max(res, vec3(0.0));
+  return res;
 }
 
 // <-
