@@ -619,8 +619,9 @@ void Bloom::onReinitRendering()
 
       Vulkan::Resources::ComputeCallManager::_descDimensions(
           computeCallBlurXRef) =
-          glm::vec3(calculateThreadGroups(dim.x >> i, BLUR_THREADS), dim.y >> i,
-                    1);
+          glm::vec3(calculateThreadGroups(
+                        dim.x >> i, BLUR_THREADS - 2u * BLUR_HALF_BLUR_WIDTH),
+                    dim.y >> i, 1);
 
       ComputeCallManager::bindBuffer(
           computeCallBlurXRef, _N(PerInstance), GpuProgramType::kCompute,
@@ -650,7 +651,8 @@ void Bloom::onReinitRendering()
 
         Vulkan::Resources::ComputeCallManager::_descDimensions(
             computeCallBlurYRef) =
-            glm::vec3(calculateThreadGroups(dim.y >> i, BLUR_THREADS),
+            glm::vec3(calculateThreadGroups(
+                          dim.y >> i, BLUR_THREADS - 2u * BLUR_HALF_BLUR_WIDTH),
                       dim.x >> i, 1);
 
         ComputeCallManager::bindBuffer(
