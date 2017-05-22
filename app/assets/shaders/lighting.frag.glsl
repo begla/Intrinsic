@@ -57,8 +57,16 @@ layout (binding = 11) buffer LightIndexBuffer
 {
   uint lightIndices[];
 };
-layout (binding = 12) uniform sampler2D kelvinLutTex;
-layout (binding = 13) uniform sampler2D noiseTex;
+layout (binding = 12) buffer IrradProbeBuffer
+{
+  IrradProbe irradProbes[];
+};
+layout (binding = 13) buffer IrradProbeIndexBuffer
+{
+  uint irradProbeIndices[];
+};
+layout (binding = 14) uniform sampler2D kelvinLutTex;
+layout (binding = 15) uniform sampler2D noiseTex;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
@@ -102,6 +110,9 @@ void main()
   d.energy = vec3(uboPerInstance.mainLightColorAndIntens.w);
   calculateLightingData(d);
 
+  const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
+  const uint clusterIdx = calcClusterIndex(gridPos);
+
   // Ambient lighting
   const vec3 normalWS = (uboPerInstance.invViewMatrix * vec4(d.N, 0.0)).xyz;
   const vec3 vWS = (uboPerInstance.invViewMatrix * vec4(d.V, 0.0)).xyz;
@@ -109,7 +120,28 @@ void main()
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
-  const vec3 irrad = d.diffuseColor * texture(irradianceTex, R).rgb;
+  vec3 irrad = vec3(0.0);
+  float irradWeight = EPSILON;
+
+  if (isGridPosValid(gridPos))
+  {
+    const uint irradProbeCount = irradProbeIndices[clusterIdx];
+
+    for (uint pi=0; pi<irradProbeCount; ++pi)
+    {
+      IrradProbe probe = irradProbes[irradProbeIndices[clusterIdx + pi + 1]];
+
+      if (distance(posVS, probe.posAndRadius.xyz) < probe.posAndRadius.w)
+      {
+        irrad += d.diffuseColor * sampleSH(probe.data, R);
+        irradWeight += 1.0;
+      }
+    }
+  }
+
+  irrad /= irradWeight;
+  irrad = mix(d.diffuseColor * texture(irradianceTex, R).rgb, irrad, irradWeight);
+
   outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, parameter0Sample.z) * irrad; 
 
   // Specular
@@ -148,12 +180,8 @@ void main()
     outColor.rgb += translColor;    
   }
 
-  const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
-
   if (isGridPosValid(gridPos))
   {
-    const uint clusterIdx = calcClusterIndex(gridPos);
-
     // Point lights
     const uint lightCount = lightIndices[clusterIdx];
 
@@ -180,7 +208,7 @@ void main()
       const vec3 lightColor = light.colorAndIntensity.rgb 
         * kelvinToRGB(light.temp.r, kelvinLutTex);
 
-      outColor.rgb += calcLighting(d) * att * lightColor;
+      //outColor.rgb += calcLighting(d) * att * lightColor;
 
       const float localTranslThickness = matParams.translucencyThickness;
 

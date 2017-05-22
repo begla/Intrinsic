@@ -17,6 +17,7 @@
 #include "stdafx.h"
 
 #define MAX_LIGHT_COUNT_PER_CLUSTER 128u
+#define MAX_IRRAD_PROBES_PER_CLUSTER 4u
 #define GRID_DEPTH_SLICE_COUNT 24u
 
 namespace Intrinsic
@@ -39,6 +40,8 @@ Resources::DrawCallRef _drawCallRef;
 Resources::DrawCallRef _drawCallTransparentsRef;
 Resources::BufferRef _lightBuffer;
 Resources::BufferRef _lightIndexBuffer;
+Resources::BufferRef _irradProbeBuffer;
+Resources::BufferRef _irradProbeIndexBuffer;
 
 struct Light
 {
@@ -47,9 +50,18 @@ struct Light
   glm::vec4 temp;
 };
 
+struct IrradProbe
+{
+  glm::vec4 posAndRadius;
+  glm::vec4 data[7]; // Packed SH coefficients
+};
+
 uint32_t* _lightIndexBufferGpuMemory = nullptr;
 Light* _lightBufferGpuMemory = nullptr;
 Light* _lightBufferMemory = nullptr;
+uint32_t* _irradProbeIndexBufferGpuMemory = nullptr;
+IrradProbe* _irradProbeBufferGpuMemory = nullptr;
+IrradProbe* _irradProbeBufferMemory = nullptr;
 
 // <-
 
@@ -194,12 +206,31 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
             ++lightCount;
           }
         }
+
+        uint32_t& irradProbeCount =
+            _irradProbeIndexBufferGpuMemory[clusterIndex];
+        irradProbeCount = 0u;
+
+        for (uint32_t i = 0u; i < _availableIrradProbes.size(); ++i)
+        {
+          uint32_t lidx = _availableIrradProbes[i];
+          const IrradProbe& probe = _irradProbeBufferMemory[lidx];
+          if (Math::calcIntersectSphereAABB(
+                  {glm::vec3(probe.posAndRadius), probe.posAndRadius.w},
+                  clusterAABB))
+          {
+            const uint32_t irradProbeIdx = clusterIndex + irradProbeCount + 1u;
+            _lightIndexBufferGpuMemory[irradProbeIdx] = lidx;
+            ++irradProbeCount;
+          }
+        }
       }
     }
   }
 
   uint32_t _z;
   _INTR_ARRAY(uint32_t) _availableLights;
+  _INTR_ARRAY(uint32_t) _availableIrradProbes;
 } _cullingTaskSets[GRID_DEPTH_SLICE_COUNT];
 
 _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
@@ -208,7 +239,7 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
 
   // TODO: Coarse frustum culling pre-pass
   {
-    _INTR_PROFILE_CPU("Lighting", "Write Light Buffer");
+    _INTR_PROFILE_CPU("Lighting", "Write Light And Irrad Buffer");
 
     for (uint32_t i = 0u; i < Components::LightManager::_activeRefs.size(); ++i)
     {
@@ -227,6 +258,26 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
                     Components::LightManager::_descIntensity(lightRef)),
           glm::vec4(Components::LightManager::_descTemperature(lightRef))};
     }
+
+    for (uint32_t i = 0u;
+         i < Components::IrradianceProbeManager::_activeRefs.size(); ++i)
+    {
+      Components::IrradianceProbeRef irradProbeRef =
+          Components::IrradianceProbeManager::_activeRefs[i];
+      Components::NodeRef irradNodeRef =
+          Components::NodeManager::getComponentForEntity(
+              Components::IrradianceProbeManager::_entity(irradProbeRef));
+
+      const glm::vec3 irradProbePosVS =
+          Components::CameraManager::_viewMatrix(p_CameraRef) *
+          glm::vec4(Components::NodeManager::_worldPosition(irradNodeRef), 1.0);
+      _irradProbeBufferMemory[i].posAndRadius = glm::vec4(
+          irradProbePosVS,
+          Components::IrradianceProbeManager::_descRadius(irradProbeRef));
+      memcpy(_irradProbeBufferMemory[i].data,
+             &Components::IrradianceProbeManager::_descSHCoeffs(irradProbeRef),
+             sizeof(Components::SHCoeffs));
+    }
   }
 
   // Find lights intersecting the depth slices and kick jobs for populated
@@ -241,6 +292,7 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
       LightCullingParallelTaskSet& taskSet = _cullingTaskSets[z];
       taskSet._z = z;
       taskSet._availableLights.clear();
+      taskSet._availableIrradProbes.clear();
 
       const Math::AABB2 depthSliceAABB = calcAABBForDepthSlice(
           z, _perInstanceData.nearFarWidthHeight, _perInstanceData.nearFar);
@@ -257,7 +309,20 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
         }
       }
 
-      if (!taskSet._availableLights.empty())
+      for (uint32_t i = 0u;
+           i < Components::IrradianceProbeManager::_activeRefs.size(); ++i)
+      {
+        const IrradProbe& irradProbe = _irradProbeBufferMemory[i];
+        if (Math::calcIntersectSphereAABB(
+                {glm::vec3(irradProbe.posAndRadius), irradProbe.posAndRadius.w},
+                depthSliceAABB))
+        {
+          taskSet._availableIrradProbes.push_back(i);
+        }
+      }
+
+      if (!taskSet._availableLights.empty() ||
+          !taskSet._availableIrradProbes.empty())
       {
         Application::_scheduler.AddTaskSetToPipe(&taskSet);
         _activeTaskSets.push_back(z);
@@ -267,6 +332,9 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
 
   memcpy(_lightBufferGpuMemory, _lightBufferMemory,
          Components::LightManager::_activeRefs.size() * sizeof(Light));
+  memcpy(_irradProbeBufferGpuMemory, _irradProbeBufferMemory,
+         Components::IrradianceProbeManager::_activeRefs.size() *
+             sizeof(IrradProbe));
 
   {
     _INTR_PROFILE_CPU("Lighting", "Wait For Jobs");
@@ -445,17 +513,60 @@ void Lighting::init()
           _totalGridSize * sizeof(uint32_t);
       buffersToCreate.push_back(_lightIndexBuffer);
     }
+
+    _irradProbeBuffer = BufferManager::createBuffer(_N(IrradProbeBuffer));
+    {
+      BufferManager::resetToDefault(_irradProbeBuffer);
+      BufferManager::addResourceFlags(
+          _irradProbeBuffer, Dod::Resources::ResourceFlags::kResourceVolatile);
+
+      BufferManager::_descBufferType(_irradProbeBuffer) = BufferType::kStorage;
+      BufferManager::_descMemoryPoolType(_irradProbeBuffer) =
+          MemoryPoolType::kStaticStagingBuffers;
+      BufferManager::_descSizeInBytes(_irradProbeBuffer) =
+          MAX_IRRAD_PROBES_PER_CLUSTER * _gridRes.x * _gridRes.y * _gridRes.z *
+          sizeof(Light);
+      buffersToCreate.push_back(_irradProbeBuffer);
+    }
+
+    _irradProbeIndexBuffer =
+        BufferManager::createBuffer(_N(IrradProbeIndexBuffer));
+    {
+      BufferManager::resetToDefault(_irradProbeIndexBuffer);
+      BufferManager::addResourceFlags(
+          _irradProbeIndexBuffer,
+          Dod::Resources::ResourceFlags::kResourceVolatile);
+
+      BufferManager::_descBufferType(_irradProbeIndexBuffer) =
+          BufferType::kStorage;
+      BufferManager::_descMemoryPoolType(_irradProbeIndexBuffer) =
+          MemoryPoolType::kStaticStagingBuffers;
+      BufferManager::_descSizeInBytes(_irradProbeIndexBuffer) =
+          _totalGridSize * sizeof(uint32_t);
+      buffersToCreate.push_back(_irradProbeIndexBuffer);
+    }
+
+    Resources::BufferManager::createResources(buffersToCreate);
+
+    _lightBufferGpuMemory =
+        (Light*)Resources::BufferManager::getGpuMemory(_lightBuffer);
+    _lightIndexBufferGpuMemory =
+        (uint32_t*)Resources::BufferManager::getGpuMemory(_lightIndexBuffer);
+
+    _lightBufferMemory =
+        (Light*)malloc(MAX_LIGHT_COUNT_PER_CLUSTER * _gridRes.x * _gridRes.y *
+                       _gridRes.z * sizeof(Light));
+
+    _irradProbeBufferGpuMemory =
+        (IrradProbe*)Resources::BufferManager::getGpuMemory(_irradProbeBuffer);
+    _irradProbeIndexBufferGpuMemory =
+        (uint32_t*)Resources::BufferManager::getGpuMemory(
+            _irradProbeIndexBuffer);
+
+    _irradProbeBufferMemory =
+        (IrradProbe*)malloc(MAX_IRRAD_PROBES_PER_CLUSTER * _gridRes.x *
+                            _gridRes.y * _gridRes.z * sizeof(Light));
   }
-
-  Resources::BufferManager::createResources(buffersToCreate);
-
-  _lightBufferGpuMemory =
-      (Light*)Resources::BufferManager::getGpuMemory(_lightBuffer);
-  _lightIndexBufferGpuMemory =
-      (uint32_t*)Resources::BufferManager::getGpuMemory(_lightIndexBuffer);
-
-  _lightBufferMemory = (Light*)malloc(MAX_LIGHT_COUNT_PER_CLUSTER * _gridRes.x *
-                                      _gridRes.y * _gridRes.z * sizeof(Light));
 }
 
 // <-
@@ -633,6 +744,14 @@ void Lighting::onReinitRendering()
         _drawCallRef, _N(LightIndexBuffer), GpuProgramType::kFragment,
         _lightIndexBuffer, UboType::kInvalidUbo,
         BufferManager::_descSizeInBytes(_lightIndexBuffer));
+    DrawCallManager::bindBuffer(
+        _drawCallRef, _N(IrradProbeBuffer), GpuProgramType::kFragment,
+        _irradProbeBuffer, UboType::kInvalidUbo,
+        BufferManager::_descSizeInBytes(_irradProbeBuffer));
+    DrawCallManager::bindBuffer(
+        _drawCallRef, _N(IrradProbeIndexBuffer), GpuProgramType::kFragment,
+        _irradProbeIndexBuffer, UboType::kInvalidUbo,
+        BufferManager::_descSizeInBytes(_irradProbeIndexBuffer));
   }
 
   drawcallsToCreate.push_back(_drawCallRef);
@@ -702,6 +821,14 @@ void Lighting::onReinitRendering()
         _drawCallTransparentsRef, _N(LightIndexBuffer),
         GpuProgramType::kFragment, _lightIndexBuffer, UboType::kInvalidUbo,
         BufferManager::_descSizeInBytes(_lightIndexBuffer));
+    DrawCallManager::bindBuffer(
+        _drawCallTransparentsRef, _N(IrradProbeBuffer),
+        GpuProgramType::kFragment, _irradProbeBuffer, UboType::kInvalidUbo,
+        BufferManager::_descSizeInBytes(_irradProbeBuffer));
+    DrawCallManager::bindBuffer(
+        _drawCallTransparentsRef, _N(IrradProbeIndexBuffer),
+        GpuProgramType::kFragment, _irradProbeIndexBuffer, UboType::kInvalidUbo,
+        BufferManager::_descSizeInBytes(_irradProbeIndexBuffer));
   }
   drawcallsToCreate.push_back(_drawCallTransparentsRef);
 
