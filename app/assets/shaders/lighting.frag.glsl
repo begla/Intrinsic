@@ -75,7 +75,7 @@ const float translDistortion = 0.2;
 const float translPower = 12.0;
 const float translScale = 1.0;
 const vec3 translAmbient = vec3(0.0);
-const float probeFadeRange = 2.0;
+const float probeFadeRange = 0.2;
 
 void main()
 {
@@ -121,7 +121,7 @@ void main()
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
-  vec3 irrad = vec3(0.0);
+  vec3 irrad = d.diffuseColor * texture(irradianceTex, R).rgb;
   float irradWeight = EPSILON;
 
   if (isGridPosValid(gridPos))
@@ -135,19 +135,15 @@ void main()
       const float distToProbe = distance(posVS, probe.posAndRadius.xyz);
       if (distToProbe < probe.posAndRadius.w)
       {
-        const float fadeStart = probe.posAndRadius.w - probeFadeRange;
-        const float fade = 1.0 - max(distToProbe - fadeStart, 0.0) / probeFadeRange;
+        const float fadeRange = probe.posAndRadius.w * probeFadeRange;
+        const float fadeStart = probe.posAndRadius.w - fadeRange;
+        const float fade = max(distToProbe - fadeStart, 0.0) / fadeRange;
         
-        irrad += d.diffuseColor * sampleSH(probe.data, R) / MATH_PI;
-        irradWeight += fade;
+        irrad = mix(d.diffuseColor * sampleSH(probe.data, R) / MATH_PI, irrad, fade);
+        irradWeight += 1.0;
       }
     }
   }
-
-  if (irradWeight > 1.0) irrad /= irradWeight;
-  irradWeight = clamp(irradWeight, 0.0, 1.0);
-
-  irrad = mix(d.diffuseColor * texture(irradianceTex, R).rgb, irrad, irradWeight);
 
   outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, parameter0Sample.z) * irrad; 
 
