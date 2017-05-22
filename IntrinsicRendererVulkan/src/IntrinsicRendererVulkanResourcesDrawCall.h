@@ -227,11 +227,10 @@ struct DrawCallManager
 
   // <-
 
-  static DrawCallRef
-  createDrawCallForMesh(const Name& p_Name, Dod::Ref p_Mesh,
-                        Dod::Ref p_Material, uint8_t p_MaterialPass,
-                        uint32_t p_PerInstanceDataVertexSize,
-                        uint32_t p_PerInstanceDataFragmentSize);
+  static DrawCallRef createDrawCallForMesh(
+      const Name& p_Name, Dod::Ref p_Mesh, Dod::Ref p_Material,
+      uint8_t p_MaterialPass, uint32_t p_PerInstanceDataVertexSize,
+      uint32_t p_PerInstanceDataFragmentSize, uint32_t p_SubMeshIdx = 0u);
 
   // <-
 
