@@ -45,8 +45,10 @@ void GenericBlur::init(const rapidjson::Value& p_RenderPassDesc)
     Resources::ComputeCallManager::_descPipeline(_computeCallX) =
         PipelineManager::getResourceByName(_N(BloomBlurX));
 
-    Resources::ComputeCallManager::_descDimensions(_computeCallX) = glm::uvec3(
-        Bloom::calculateThreadGroups(dim.x, BLUR_THREADS), dim.y, 1u);
+    Resources::ComputeCallManager::_descDimensions(_computeCallX) =
+        glm::uvec3(Bloom::calculateThreadGroups(
+                       dim.x, BLUR_THREADS - 2u * BLUR_HALF_BLUR_WIDTH),
+                   dim.y, 1u);
 
     ComputeCallManager::bindBuffer(
         _computeCallX, _N(PerInstance), GpuProgramType::kCompute,
@@ -74,8 +76,10 @@ void GenericBlur::init(const rapidjson::Value& p_RenderPassDesc)
     Resources::ComputeCallManager::_descPipeline(_computeCallY) =
         PipelineManager::getResourceByName(_N(BloomBlurY));
 
-    Resources::ComputeCallManager::_descDimensions(_computeCallY) = glm::uvec3(
-        Bloom::calculateThreadGroups(dim.y, BLUR_THREADS), dim.x, 1u);
+    Resources::ComputeCallManager::_descDimensions(_computeCallY) =
+        glm::uvec3(Bloom::calculateThreadGroups(
+                       dim.y, BLUR_THREADS - 2u * BLUR_HALF_BLUR_WIDTH),
+                   dim.x, 1u);
 
     ComputeCallManager::bindBuffer(
         _computeCallY, _N(PerInstance), GpuProgramType::kCompute,

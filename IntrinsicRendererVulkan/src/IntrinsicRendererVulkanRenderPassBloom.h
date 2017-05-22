@@ -14,7 +14,9 @@
 
 #pragma once
 
+// Needs to be synced with the shader
 #define BLUR_THREADS 128
+#define BLUR_HALF_BLUR_WIDTH 4
 
 namespace Intrinsic
 {
