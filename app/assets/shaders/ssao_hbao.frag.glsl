@@ -35,12 +35,12 @@ layout (location = 0) out vec4 outColor;
 
 const uint numDirections = 6;
 const uint numSamples = 4;
-const float strength = 1.8;
+const float strength = 1.5;
 const float minAo = 0.0;
-const float R = 12.0;
+const float R = 4.0;
 const float R2 = R*R;
 const float negInvR2 = -1.0 / R2;
-const float maxRadiusPixels = 10.0;
+const float maxRadiusPixels = 5.0;
 const float tanBias = tan(5.0 * MATH_PI / 180.0);
 
 // TODO
