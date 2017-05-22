@@ -270,6 +270,17 @@ struct ImageManager
       VkPipelineStageFlags p_SrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
       VkPipelineStageFlags p_DstStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT)
   {
+    insertImageMemoryBarrier(RenderSystem::getPrimaryCommandBuffer(),
+                             p_ImageRef, p_SrcImageLayout, p_DstImageLayout,
+                             p_SrcStages, p_DstStages);
+  }
+
+  static _INTR_INLINE void insertImageMemoryBarrier(
+      VkCommandBuffer p_CommandBuffer, ImageRef p_ImageRef,
+      VkImageLayout p_SrcImageLayout, VkImageLayout p_DstImageLayout,
+      VkPipelineStageFlags p_SrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+      VkPipelineStageFlags p_DstStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT)
+  {
     VkImageSubresourceRange range;
     range.aspectMask =
         _descImageFormat(p_ImageRef) != RenderSystem::_depthStencilFormatToUse
@@ -280,9 +291,9 @@ struct ImageManager
     range.baseArrayLayer = 0u;
     range.layerCount = _descArrayLayerCount(p_ImageRef);
 
-    Helper::insertImageMemoryBarrier(
-        RenderSystem::getPrimaryCommandBuffer(), _vkImage(p_ImageRef),
-        p_SrcImageLayout, p_DstImageLayout, range, p_SrcStages, p_DstStages);
+    Helper::insertImageMemoryBarrier(p_CommandBuffer, _vkImage(p_ImageRef),
+                                     p_SrcImageLayout, p_DstImageLayout, range,
+                                     p_SrcStages, p_DstStages);
   }
 
   // <-
