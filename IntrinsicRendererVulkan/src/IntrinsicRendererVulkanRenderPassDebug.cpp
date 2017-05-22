@@ -159,6 +159,18 @@ void displayDebugLineGeometryForSelectedObject()
           Components::LightManager::_descRadius(lightRef),
           glm::vec3(Components::LightManager::_descColor(lightRef)));
     }
+
+    Components::IrradianceProbeRef irradProbeRef =
+        Components::IrradianceProbeManager::getComponentForEntity(
+            GameStates::Editing::_currentlySelectedEntity);
+
+    if (irradProbeRef.isValid())
+    {
+      Debug::renderSphere(
+          Components::NodeManager::_worldPosition(nodeRef),
+          Components::IrradianceProbeManager::_descRadius(irradProbeRef),
+          glm::vec3(1.0f, 0.0f, 0.0f));
+    }
   }
 }
 }

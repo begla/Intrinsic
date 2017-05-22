@@ -132,6 +132,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     _categoryToIconMapping["RigidBody"] = ":Icons/cube";
     _categoryToIconMapping["PostEffectVolume"] = ":Icons/picture";
     _categoryToIconMapping["Light"] = ":Icons/lightbulb";
+    _categoryToIconMapping["IrradianceProbe"] = ":Icons/lightbulb";
   }
 
   {
@@ -146,6 +147,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     _componentToIconMapping["RigidBody"] = ":Icons/cube";
     _componentToIconMapping["PostEffectVolume"] = ":Icons/picture";
     _componentToIconMapping["Light"] = ":Icons/lightbulb";
+    _componentToIconMapping["IrradianceProbe"] = ":Icons/lightbulb";
   }
 
   QObject::connect(_ui.actionExit, SIGNAL(triggered()), this, SLOT(onExit()));
@@ -200,11 +202,6 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    this, SLOT(onDebugGeometryChanged()));
   QObject::connect(_ui.actionShow_Benchmark_Paths, SIGNAL(triggered()), this,
                    SLOT(onDebugGeometryChanged()));
-
-  QObject::connect(_ui.actionSpawn_Vegetation, SIGNAL(triggered()), this,
-                   SLOT(onSpawnVegetation()));
-  QObject::connect(_ui.actionSpawn_Grass, SIGNAL(triggered()), this,
-                   SLOT(onSpawnGrass()));
 
   QObject::connect(_ui.actionShow_Create_Context_Menu, SIGNAL(triggered()),
                    this, SLOT(onShowCreateContextMenu()));
@@ -344,9 +341,6 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     _createContextMenu.addSeparator();
     _createContextMenu.addAction(_ui.actionCreateRigidBody);
     _createContextMenu.addAction(_ui.actionCreateRigidBody_Sphere);
-
-    _debugContextMenu.addAction(_ui.actionSpawn_Vegetation);
-    _debugContextMenu.addAction(_ui.actionSpawn_Grass);
 
     _debugGeometryContextMenu.addAction(_ui.actionShow_World_Bounding_Spheres);
     _debugGeometryContextMenu.addAction(_ui.actionShow_Benchmark_Paths);
@@ -752,238 +746,6 @@ void IntrinsicEd::closeEvent(QCloseEvent*)
   _viewport = nullptr;
 
   Application::shutdown();
-}
-
-struct SpawnVegetationDesc
-{
-  _INTR_ARRAY(Name) meshNames;
-  Name terrainName;
-  Name nodeName;
-
-  float minDist = 0.25f;
-  float density = 0.25f;
-  float slopeThreshold = 0.8f;
-  float seaLevel = 300.0f;
-  float mountainLevel = 1000.0f;
-  float noiseScale = 1.0f / 8000.0f;
-  float noiseOffset = 0.0f;
-  float noiseThreshold = -1.0f;
-  float minScale = 6.0f;
-  float maxScale = 8.0f;
-  float normalWeight = 0.4f;
-};
-
-void spawnVegetation(const SpawnVegetationDesc& p_Desc)
-{
-  Entity::EntityRef terrainEntityRef =
-      Entity::EntityManager::getEntityByName(p_Desc.terrainName);
-
-  if (!terrainEntityRef.isValid())
-    return;
-
-  Components::MeshRef terrainMeshRef =
-      Components::MeshManager::getComponentForEntity(terrainEntityRef);
-
-  if (!terrainMeshRef.isValid())
-    return;
-
-  Components::NodeRef terrainNodeRef =
-      Components::NodeManager::getComponentForEntity(terrainEntityRef);
-
-  if (!terrainNodeRef.isValid())
-    return;
-
-  const Name meshName = Components::MeshManager::_descMeshName(terrainMeshRef);
-  Resources::MeshRef meshResRef =
-      Resources::MeshManager::_getResourceByName(meshName);
-
-  if (!meshResRef.isValid() ||
-      Resources::MeshManager::_descIndicesPerSubMesh(meshResRef).empty())
-    return;
-
-  _INTR_ARRAY(uint32_t)& indices =
-      Resources::MeshManager::_descIndicesPerSubMesh(meshResRef)[0u];
-  _INTR_ARRAY(glm::vec3)& positions =
-      Resources::MeshManager::_descPositionsPerSubMesh(meshResRef)[0u];
-  _INTR_ARRAY(glm::vec3)& normals =
-      Resources::MeshManager::_descNormalsPerSubMesh(meshResRef)[0u];
-
-  Components::MeshRefArray meshComponentsToCreate;
-  Components::RigidBodyRefArray rigidBodyComponentsToCreate;
-
-  uint32_t spawnedTreeCount = 0u;
-
-  Components::NodeRef spawnedTreesNode;
-  Entity::EntityRef spawnedTreesEntity =
-      Entity::EntityManager::getEntityByName(p_Desc.nodeName);
-
-  if (!spawnedTreesEntity.isValid())
-  {
-    spawnedTreesEntity = Entity::EntityManager::createEntity(p_Desc.nodeName);
-    spawnedTreesNode = Components::NodeManager::createNode(spawnedTreesEntity);
-    Components::NodeManager::attachChild(World::getRootNode(),
-                                         spawnedTreesNode);
-    Components::NodeManager::updateTransforms({spawnedTreesNode});
-  }
-  else
-  {
-    spawnedTreesNode =
-        Components::NodeManager::getComponentForEntity(spawnedTreesEntity);
-  }
-
-  const glm::mat4& worldMatrix =
-      Components::NodeManager::_worldMatrix(terrainNodeRef);
-
-  for (uint32_t i = 0u; i < indices.size(); i += 3)
-  {
-    const uint32_t i0 = indices[i];
-    const uint32_t i1 = indices[i + 1u];
-    const uint32_t i2 = indices[i + 2u];
-
-    const glm::vec3 pos0 = glm::vec4(positions[i0], 1.0f);
-    const glm::vec3 pos1 = glm::vec4(positions[i1], 1.0f);
-    const glm::vec3 pos2 = glm::vec4(positions[i2], 1.0f);
-
-    const glm::vec3 n0 = glm::vec4(normals[i0], 1.0f);
-    const glm::vec3 n1 = glm::vec4(normals[i1], 1.0f);
-    const glm::vec3 n2 = glm::vec4(normals[i2], 1.0f);
-
-    const glm::vec3 b = Math::calcRandomBaryCoords();
-    const glm::vec3 pos =
-        worldMatrix *
-        glm::vec4(Math::baryInterpolate(b, pos0, pos1, pos2), 1.0f);
-    const glm::vec3 norm = glm::normalize(glm::vec3(
-        worldMatrix * glm::vec4(Math::baryInterpolate(b, n0, n1, n2), 1.0f)));
-    const glm::vec3 normWeighted = glm::mix(
-        norm, glm::vec3(0.0f, 1.0f, 0.0f),
-        (1.0f - p_Desc.normalWeight) * Math::calcRandomFloatMinMax(0.0f, 1.0f));
-
-    if (pos.y < p_Desc.seaLevel || pos.y > p_Desc.mountainLevel)
-      continue;
-
-    const float slope = glm::dot(norm, glm::vec3(0.0f, 1.0f, 0.0f));
-    const float dens = Math::calcRandomFloatMinMax(0.0f, 1.0f);
-    const float noise =
-        Math::noise(pos * p_Desc.noiseScale) + p_Desc.noiseOffset;
-
-    if (dens > p_Desc.density && slope > p_Desc.slopeThreshold &&
-        noise > p_Desc.noiseThreshold)
-    {
-      const glm::vec3 finalPos = pos;
-      const glm::quat finalOrient =
-          glm::rotation(glm::vec3(0.0f, 1.0f, 0.0f), normWeighted) *
-          glm::quat(glm::vec3(
-              0.0f, Math::calcRandomFloatMinMax(0.0f, glm::pi<float>() * 2.0f),
-              0.0f));
-      const glm::vec3 finalSize = glm::vec3(
-          Math::calcRandomFloatMinMax(p_Desc.minScale, p_Desc.maxScale));
-      const Name newVegMeshName =
-          p_Desc.meshNames[Math::calcRandomNumber() % p_Desc.meshNames.size()];
-      const glm::vec3 newTreeHalfExtent =
-          Math::calcAABBHalfExtent(Resources::MeshManager::_aabbPerSubMesh(
-              Resources::MeshManager::_getResourceByName(newVegMeshName))[0]);
-      const float newTreeRadius =
-          finalSize.x *
-          glm::length(glm::vec2(newTreeHalfExtent.x, newTreeHalfExtent.z));
-
-      bool invalid = false;
-
-      const glm::vec2 finalPosXz = glm::vec2(finalPos.x, finalPos.z);
-      for (uint32_t vegNodeIdx = 0u;
-           vegNodeIdx < Components::NodeManager::getActiveResourceCount();
-           ++vegNodeIdx)
-      {
-        Components::NodeRef vegNodeRef =
-            Components::NodeManager::getActiveResourceAtIndex(vegNodeIdx);
-
-        if (Components::NodeManager::_parent(vegNodeRef) != spawnedTreesNode)
-          continue;
-
-        const glm::vec2 worldPosXz =
-            glm::vec2(Components::NodeManager::_worldPosition(vegNodeRef).x,
-                      Components::NodeManager::_worldPosition(vegNodeRef).z);
-        const glm::vec3 halfExtents = Math::calcAABBHalfExtent(
-            Components::NodeManager::_worldAABB(vegNodeRef));
-        const float nodeRadius =
-            glm::length(glm::vec2(halfExtents.x, halfExtents.z));
-
-        if (glm::distance(worldPosXz, finalPosXz) <
-            (nodeRadius + newTreeRadius) * p_Desc.minDist)
-        {
-          invalid = true;
-          break;
-        }
-      }
-
-      if (invalid)
-        continue;
-
-      // Create random veg.
-      {
-        Entity::EntityRef entityRef = Entity::EntityManager::createEntity(
-            p_Desc.nodeName._string +
-            StringUtil::toString<uint32_t>(spawnedTreeCount));
-        Components::NodeRef nodeRef =
-            Components::NodeManager::createNode(entityRef);
-        Components::NodeManager::attachChild(spawnedTreesNode, nodeRef);
-
-        Components::MeshRef meshRef =
-            Components::MeshManager::createMesh(entityRef);
-        meshComponentsToCreate.push_back(meshRef);
-        Components::MeshManager::_descMeshName(meshRef) = newVegMeshName;
-
-        // Components::RigidBodyRef rigidBodyRef =
-        // Components::RigidBodyManager::createRigidBody(entityRef);
-        // rigidBodyComponentsToCreate.push_back(rigidBodyRef);
-        // Components::RigidBodyManager::_descRigidBodyType(rigidBodyRef) =
-        // Components::RigidBodyType::kBoxKinematic;
-
-        Components::NodeManager::_position(nodeRef) = finalPos;
-        Components::NodeManager::_orientation(nodeRef) = finalOrient;
-        Components::NodeManager::_size(nodeRef) = finalSize;
-
-        Components::NodeManager::updateTransforms({nodeRef});
-      }
-
-      ++spawnedTreeCount;
-    }
-  }
-
-  Components::NodeManager::rebuildTree();
-  Components::MeshManager::createResources(meshComponentsToCreate);
-  Components::RigidBodyManager::createResources(rigidBodyComponentsToCreate);
-}
-
-void IntrinsicEd::onSpawnVegetation()
-{
-  SpawnVegetationDesc desc;
-  desc.meshNames = {"Birch_01_24",      "Birch_02_26",     "Tree_Tall_01_8",
-                    "Tree_Tall_02_10",  "Tree_Tall_04_12", "Tree_Tall_05_14",
-                    "Tree_Trunk_01_70", "Spruce_01_52",    "Spruce_Tall_01_55",
-                    "Fir_01_49"};
-  desc.terrainName = _N(Terrain);
-  desc.nodeName = _N(SpawnedTrees);
-
-  spawnVegetation(desc);
-}
-
-void IntrinsicEd::onSpawnGrass()
-{
-  SpawnVegetationDesc desc;
-  desc.minDist = 0.0f;
-  desc.density = 0.0f;
-  desc.noiseThreshold = 0.0f;
-
-  desc.meshNames = {
-      "Bush_01_115",        "Bush_02_118",        "Fern_01_58",
-      "Fern_02_61",         "Fern_03_121",        "Fern_04_124",
-      "Grass_01_64",        "Grass_02_23",        "Grass_Tall_112",
-      "Ground_Plant_01_31", "Ground_Plant_02_33", "Ground_Plant_03_35",
-      "Ground_Plant_04_37", "Ground_Plant_05_39"};
-  desc.terrainName = _N(Terrain);
-  desc.nodeName = _N(SpawnedGrass);
-
-  spawnVegetation(desc);
 }
 
 void IntrinsicEd::onShowDebugContextMenu()

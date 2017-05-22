@@ -281,6 +281,24 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
   if (currIt)
   {
     Components::NodeRef currentNode = _itemToNodeMap[currIt];
+    Entity::EntityRef currentEntity =
+        Components::NodeManager::_entity(currentNode);
+
+    Components::IrradianceProbeRef irradProbeRef =
+        Components::IrradianceProbeManager::getComponentForEntity(
+            currentEntity);
+    if (irradProbeRef.isValid())
+    {
+      contextMenu->addSeparator();
+
+      QAction* loadSHCoeffs = new QAction(
+          QIcon(":/Icons/lightbulb"), "Load SH Coefficients From File", this);
+      contextMenu->addAction(loadSHCoeffs);
+      QObject::connect(loadSHCoeffs, SIGNAL(triggered()), this,
+                       SLOT(onLoadSHCoeffsFromFile()));
+
+      contextMenu->addSeparator();
+    }
 
     // Don't allow deleting the main node
     if (World::getRootNode() != currentNode)
@@ -619,6 +637,54 @@ void IntrinsicEdNodeViewTreeWidget::onCurrentlySelectedEntityChanged(
         if (item->parent())
         {
           expandAllParents(item->parent());
+        }
+      }
+    }
+  }
+}
+
+void IntrinsicEdNodeViewTreeWidget::onLoadSHCoeffsFromFile()
+{
+  QTreeWidgetItem* currIt = currentItem();
+  if (currIt)
+  {
+    Components::NodeRef currentNode = _itemToNodeMap[currIt];
+    Entity::EntityRef currentEntity =
+        Components::NodeManager::_entity(currentNode);
+
+    Components::IrradianceProbeRef irradProbeRef =
+        Components::IrradianceProbeManager::getComponentForEntity(
+            currentEntity);
+    if (irradProbeRef.isValid())
+    {
+      glm::vec3* coeffs =
+          (glm::vec3*)&Components::IrradianceProbeManager::_descSHCoeffs(
+              irradProbeRef);
+
+      const QString fileName = QFileDialog::getOpenFileName(
+          this, tr("Load SH Coefficients"), QString(), tr("LYS File (*.ash)"));
+
+      if (fileName.size() > 0u)
+      {
+        std::ifstream ifs(fileName.toStdString());
+        _INTR_STRING fileStr((std::istreambuf_iterator<char>(ifs)),
+                             std::istreambuf_iterator<char>());
+
+        _INTR_ARRAY(_INTR_STRING) lines;
+        StringUtil::split(fileStr, "\n", lines);
+
+        static const uint32_t shLineIndices[] = {3u,  5u,  6u,  7u, 9u,
+                                                 10u, 11u, 12u, 13u};
+
+        for (uint32_t i = 0u; i < 9; ++i)
+        {
+          const uint32_t lineIdx = shLineIndices[i];
+          _INTR_ARRAY(_INTR_STRING) rows;
+          StringUtil::split(lines[lineIdx], " ", rows);
+
+          coeffs[i] = glm::vec3(StringUtil::fromString<float>(rows[1]),
+                                StringUtil::fromString<float>(rows[2]),
+                                StringUtil::fromString<float>(rows[3]));
         }
       }
     }

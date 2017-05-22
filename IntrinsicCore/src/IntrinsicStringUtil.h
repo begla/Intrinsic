@@ -27,6 +27,15 @@ template <class T> _INTR_INLINE _INTR_STRING toString(T p_Value)
   return ss.str();
 }
 
+template <class T> _INTR_INLINE T fromString(const _INTR_STRING& p_String)
+{
+  T value;
+  _INTR_STRING_STREAM ss;
+  ss << p_String;
+  ss >> value;
+  return value;
+}
+
 _INTR_INLINE void split(const _INTR_STRING& p_String, const char* p_Delim,
                         _INTR_ARRAY(_INTR_STRING) & p_Tokens)
 {

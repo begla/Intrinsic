@@ -81,8 +81,6 @@ public slots:
   void onCreateRigidBodySphere();
   void onCreateLight();
   void onCreateSphere();
-  void onSpawnVegetation();
-  void onSpawnGrass();
   void onShowDebugContextMenu();
   void onShowDebugGeometryContextMenu();
   void onShowCreateContextMenu();

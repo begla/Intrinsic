@@ -61,6 +61,7 @@ public slots:
   void onItemDoubleClicked(QTreeWidgetItem* item, int column);
   void onItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
   void onItemChanged(QTreeWidgetItem* item, int column);
+  void onLoadSHCoeffsFromFile();
 
 signals:
   void nodeTreePopulated(uint32_t p_NodeCount);
