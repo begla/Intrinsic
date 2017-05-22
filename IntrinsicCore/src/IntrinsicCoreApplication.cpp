@@ -117,6 +117,7 @@ void Application::initManagers()
     Components::CameraControllerManager::init();
     Components::PlayerManager::init();
     Components::LightManager::init();
+    Components::IrradianceProbeManager::init();
   }
 
   // Init resource managers

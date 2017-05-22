@@ -156,6 +156,7 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreComponentsPlayer.h"
 #include "IntrinsicCoreComponentsPostEffectVolume.h"
 #include "IntrinsicCoreComponentsLight.h"
+#include "IntrinsicCoreComponentsIrradianceProbe.h"
 
 #include "IntrinsicCoreWorld.h"
 #include "IntrinsicCoreTaskManager.h"
