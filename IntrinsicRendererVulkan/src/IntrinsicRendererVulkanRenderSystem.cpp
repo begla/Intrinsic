@@ -46,6 +46,7 @@ VkSwapchainKHR RenderSystem::_vkSwapchain = VK_NULL_HANDLE;
 _INTR_ARRAY(VkImage) RenderSystem::_vkSwapchainImages;
 _INTR_ARRAY(VkImageView) RenderSystem::_vkSwapchainImageViews;
 glm::uvec2 RenderSystem::_backbufferDimensions = glm::uvec2(0u, 0u);
+glm::uvec2 RenderSystem::_customBackbufferDimensions = glm::uvec2(0u, 0u);
 
 VkQueue RenderSystem::_vkQueue = nullptr;
 
@@ -856,8 +857,17 @@ void RenderSystem::initOrUpdateVkSwapChain()
   }
 
   // Update backbuffer dimensions
-  _backbufferDimensions = glm::uvec2(swapchainCreationInfo.imageExtent.width,
-                                     swapchainCreationInfo.imageExtent.height);
+  if (_customBackbufferDimensions.x == 0u ||
+      _customBackbufferDimensions.y == 0u)
+  {
+    _backbufferDimensions =
+        glm::uvec2(swapchainCreationInfo.imageExtent.width,
+                   swapchainCreationInfo.imageExtent.height);
+  }
+  else
+  {
+    _backbufferDimensions = _customBackbufferDimensions;
+  }
 
   // Destroy previous swapchain
   if (swapchainCreationInfo.oldSwapchain != VK_NULL_HANDLE)

@@ -16,6 +16,9 @@
 #include "stdafx_editor.h"
 #include "stdafx.h"
 
+// Lib. includes
+#include "gli.hpp"
+
 // Helpers
 void expandAllParents(QTreeWidgetItem* p_Item)
 {
@@ -296,6 +299,11 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
       contextMenu->addAction(loadSHCoeffs);
       QObject::connect(loadSHCoeffs, SIGNAL(triggered()), this,
                        SLOT(onLoadSHCoeffsFromFile()));
+      QAction* captureProbe = new QAction(QIcon(":/Icons/lightbulb"),
+                                          "Capture Irradiance Probe", this);
+      contextMenu->addAction(captureProbe);
+      QObject::connect(captureProbe, SIGNAL(triggered()), this,
+                       SLOT(onCaptureIrradianceProbe()));
 
       contextMenu->addSeparator();
     }
@@ -687,6 +695,161 @@ void IntrinsicEdNodeViewTreeWidget::onLoadSHCoeffsFromFile()
                                 StringUtil::fromString<float>(rows[3]));
         }
       }
+    }
+  }
+}
+
+void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
+{
+  Components::IrradianceProbeRef irradProbeRef;
+  Components::NodeRef irradNodeRef;
+
+  static const glm::uvec2 cubeMapRes = glm::uvec2(320u, 320u);
+
+  QTreeWidgetItem* currIt = currentItem();
+  if (currIt)
+  {
+    irradNodeRef = _itemToNodeMap[currIt];
+    Entity::EntityRef currentEntity =
+        Components::NodeManager::_entity(irradNodeRef);
+
+    irradProbeRef = Components::IrradianceProbeManager::getComponentForEntity(
+        currentEntity);
+  }
+
+  if (irradProbeRef.isValid())
+  {
+    // Setup camera
+    Entity::EntityRef entityRef =
+        Entity::EntityManager::createEntity(_N(ProbeCamera));
+    Components::NodeRef camNodeRef =
+        Components::NodeManager::createNode(entityRef);
+    Components::NodeManager::attachChild(World::getRootNode(), camNodeRef);
+    Components::CameraRef camRef =
+        Components::CameraManager::createCamera(entityRef);
+    Components::CameraManager::resetToDefault(camRef);
+    Components::CameraManager::_descFov(camRef) = 90.0f;
+    Components::NodeManager::_position(camNodeRef) =
+        Components::NodeManager::_worldPosition(irradNodeRef);
+    Components::NodeManager::rebuildTreeAndUpdateTransforms();
+
+    Components::CameraRef prevCamera = World::getActiveCamera();
+    World::setActiveCamera(camRef);
+
+    // Setup buffer for readback
+    Intrinsic::Renderer::Vulkan::Resources::BufferRef readBackBufferRef =
+        Intrinsic::Renderer::Vulkan::Resources::BufferManager::createBuffer(
+            _N(PerPixelPickingReadBack));
+    {
+      Intrinsic::Renderer::Vulkan::Resources::BufferManager::resetToDefault(
+          readBackBufferRef);
+      Intrinsic::Renderer::Vulkan::Resources::BufferManager::addResourceFlags(
+          readBackBufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
+      Intrinsic::Renderer::Vulkan::Resources::BufferManager::
+          _descMemoryPoolType(readBackBufferRef) = Intrinsic::Renderer::Vulkan::
+              MemoryPoolType::kResolutionDependentStagingBuffers;
+
+      Intrinsic::Renderer::Vulkan::Resources::BufferManager::_descBufferType(
+          readBackBufferRef) =
+          Intrinsic::Renderer::Vulkan::BufferType::kStorage;
+      Intrinsic::Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
+          readBackBufferRef) =
+          cubeMapRes.x * cubeMapRes.y * 2u * sizeof(uint32_t); // FLT16
+
+      Intrinsic::Renderer::Vulkan::Resources::BufferManager::createResources(
+          {readBackBufferRef});
+    }
+
+    using namespace Intrinsic::Renderer::Vulkan;
+
+    static glm::quat rotationsPerFace[6] = {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, glm::half_pi<float>(), 0.0f),
+        glm::vec3(0.0f, glm::half_pi<float>() * 2.0f, 0.0f),
+        glm::vec3(0.0f, glm::half_pi<float>() * 3.0f, 0.0f),
+        glm::vec3(glm::half_pi<float>(), 0.0f, 0.0f),
+        glm::vec3(-glm::half_pi<float>(), 0.0f, 0.0f),
+    };
+
+    RenderSystem::_customBackbufferDimensions = cubeMapRes;
+    RenderSystem::resizeSwapChain(true);
+    {
+      for (uint32_t faceIdx = 0u; faceIdx < 6; ++faceIdx)
+      {
+        Components::NodeManager::_orientation(camNodeRef) =
+            rotationsPerFace[faceIdx];
+        Components::NodeManager::updateTransforms({camNodeRef});
+
+        for (uint32_t f = 0u; f < 60u; ++f)
+        {
+          RenderProcess::Default::renderFrame(0.0f);
+          qApp->processEvents();
+        }
+
+        // Wait for the rendering to finish
+        RenderSystem::waitForAllFrames();
+
+        // Copy image to host visible memory
+        VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
+
+        Intrinsic::Renderer::Vulkan::Resources::ImageRef sceneImageRef =
+            Intrinsic::Renderer::Vulkan::Resources::ImageManager::
+                getResourceByName(_N(Scene));
+
+        Intrinsic::Renderer::Vulkan::Resources::ImageManager::
+            insertImageMemoryBarrier(copyCmd, sceneImageRef,
+                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                     VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+        VkBufferImageCopy bufferImageCopy = {};
+        {
+          bufferImageCopy.bufferOffset = 0u;
+          bufferImageCopy.imageOffset = {};
+          bufferImageCopy.bufferRowLength = cubeMapRes.x;
+          bufferImageCopy.bufferImageHeight = cubeMapRes.y;
+          bufferImageCopy.imageExtent.width = cubeMapRes.x;
+          bufferImageCopy.imageExtent.height = cubeMapRes.y;
+          bufferImageCopy.imageExtent.depth = 1u;
+          bufferImageCopy.imageSubresource.aspectMask =
+              VK_IMAGE_ASPECT_COLOR_BIT;
+          bufferImageCopy.imageSubresource.baseArrayLayer = 0u;
+          bufferImageCopy.imageSubresource.layerCount = 1u;
+          bufferImageCopy.imageSubresource.mipLevel = 0u;
+        }
+
+        vkCmdCopyImageToBuffer(
+            copyCmd,
+            Intrinsic::Renderer::Vulkan::Resources::ImageManager::_vkImage(
+                sceneImageRef),
+            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+            Intrinsic::Renderer::Vulkan::Resources::BufferManager::_vkBuffer(
+                readBackBufferRef),
+            1u, &bufferImageCopy);
+
+        RenderSystem::flushTemporaryCommandBuffer();
+
+        const uint8_t* sceneMemory =
+            Intrinsic::Renderer::Vulkan::Resources::BufferManager::getGpuMemory(
+                readBackBufferRef);
+
+        gli::texture2d tex = gli::texture2d(
+            gli::FORMAT_RGBA16_SFLOAT_PACK16,
+            gli::texture2d::extent_type(cubeMapRes.x, cubeMapRes.y), 1u);
+        memcpy(tex.data(), sceneMemory, tex.size());
+
+        gli::save_dds(tex, "test.dds");
+      }
+
+      Intrinsic::Renderer::Vulkan::Resources::BufferManager::destroyResources(
+          {readBackBufferRef});
+      Intrinsic::Renderer::Vulkan::Resources::BufferManager::destroyBuffer(
+          readBackBufferRef);
+
+      RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
+      RenderSystem::resizeSwapChain(true);
+
+      World::setActiveCamera(prevCamera);
+      World::destroyNodeFull(camNodeRef);
     }
   }
 }

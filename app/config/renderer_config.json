@@ -126,7 +126,7 @@
 		{
 			"name" : "Scene",
 			"renderSize" : "Full",
-			"imageFormat" : "B10G11R11UFloat"
+			"imageFormat" : "R16G16B16A16Float"
 		},
 		{
 			"name" : "SceneDownSampled",

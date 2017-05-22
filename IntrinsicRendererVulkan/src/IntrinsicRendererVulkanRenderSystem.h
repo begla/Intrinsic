@@ -242,6 +242,44 @@ struct RenderSystem
 
   // <-
 
+  _INTR_INLINE static bool waitForFrame(uint32_t p_Idx)
+  {
+    if ((_activeBackbufferMask & (1u << p_Idx)) > 0u)
+    {
+      VkResult result = VkResult::VK_TIMEOUT;
+
+      do
+      {
+        result = vkWaitForFences(_vkDevice, 1u, &_vkDrawFences[p_Idx], VK_TRUE,
+                                 UINT64_MAX);
+      } while (result == VK_TIMEOUT);
+      _INTR_VK_CHECK_RESULT(result);
+
+      result = vkResetFences(_vkDevice, 1u, &_vkDrawFences[p_Idx]);
+      _INTR_VK_CHECK_RESULT(result);
+
+      _activeBackbufferMask &= ~(1u << p_Idx);
+      return true;
+    }
+
+    return false;
+  }
+
+  // <-
+
+  _INTR_INLINE static bool waitForAllFrames()
+  {
+    bool waited = false;
+    for (uint32_t idx = 0u; idx < (uint32_t)_vkSwapchainImages.size(); ++idx)
+    {
+      waited = waited || waitForFrame(idx);
+    }
+
+    return waited;
+  }
+
+  // <-
+
   static VkInstance _vkInstance;
 
   static VkPhysicalDevice _vkPhysicalDevice;
@@ -255,6 +293,7 @@ struct RenderSystem
   static _INTR_ARRAY(VkImage) _vkSwapchainImages;
   static _INTR_ARRAY(VkImageView) _vkSwapchainImageViews;
   static glm::uvec2 _backbufferDimensions;
+  static glm::uvec2 _customBackbufferDimensions;
 
   static VkQueue _vkQueue;
 
@@ -267,7 +306,6 @@ struct RenderSystem
 
   // <-
   static Format::Enum _depthStencilFormatToUse;
-  ;
 
 private:
   static void initManagers();
@@ -342,42 +380,6 @@ private:
       vkCmdPipelineBarrier(vkCmdBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
                            VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr,
                            0, nullptr, 1, &postPresentBarrier);
-    }
-  }
-
-  // <-
-
-  _INTR_INLINE static bool waitForFrame(uint32_t p_Idx)
-  {
-    if ((_activeBackbufferMask & (1u << p_Idx)) > 0u)
-    {
-      VkResult result = VkResult::VK_TIMEOUT;
-
-      do
-      {
-        result = vkWaitForFences(_vkDevice, 1u, &_vkDrawFences[p_Idx], VK_TRUE,
-                                 UINT64_MAX);
-      } while (result == VK_TIMEOUT);
-      _INTR_VK_CHECK_RESULT(result);
-
-      result = vkResetFences(_vkDevice, 1u, &_vkDrawFences[p_Idx]);
-      _INTR_VK_CHECK_RESULT(result);
-
-      _activeBackbufferMask &= ~(1u << p_Idx);
-      return true;
-    }
-
-    return false;
-  }
-
-  // <-
-
-  _INTR_INLINE static bool waitForAllFrames()
-  {
-    bool waited = false;
-    for (uint32_t idx = 0u; idx < (uint32_t)_vkSwapchainImages.size(); ++idx)
-    {
-      waited = waited || waitForFrame(idx);
     }
   }
 

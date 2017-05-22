@@ -62,6 +62,7 @@ public slots:
   void onItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
   void onItemChanged(QTreeWidgetItem* item, int column);
   void onLoadSHCoeffsFromFile();
+  void onCaptureIrradianceProbe();
 
 signals:
   void nodeTreePopulated(uint32_t p_NodeCount);
