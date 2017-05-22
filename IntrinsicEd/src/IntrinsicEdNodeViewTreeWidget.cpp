@@ -670,7 +670,8 @@ void IntrinsicEdNodeViewTreeWidget::onLoadSHCoeffsFromFile()
               irradProbeRef);
 
       const QString fileName = QFileDialog::getOpenFileName(
-          this, tr("Load SH Coefficients"), QString(), tr("LYS File (*.ash)"));
+          this, tr("Load SH Coefficients"), QString("media/irradiance_probes/"),
+          tr("LYS File (*.ash)"));
 
       if (fileName.size() > 0u)
       {
@@ -703,6 +704,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
 {
   Components::IrradianceProbeRef irradProbeRef;
   Components::NodeRef irradNodeRef;
+  Entity::EntityRef currentEntity;
 
   static const glm::uvec2 cubeMapRes = glm::uvec2(320u, 320u);
 
@@ -710,8 +712,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
   if (currIt)
   {
     irradNodeRef = _itemToNodeMap[currIt];
-    Entity::EntityRef currentEntity =
-        Components::NodeManager::_entity(irradNodeRef);
+    currentEntity = Components::NodeManager::_entity(irradNodeRef);
 
     irradProbeRef = Components::IrradianceProbeManager::getComponentForEntity(
         currentEntity);
@@ -719,6 +720,9 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
 
   if (irradProbeRef.isValid())
   {
+    const uint32_t faceSizeInBytes =
+        cubeMapRes.x * cubeMapRes.y * 2u * sizeof(uint32_t);
+
     // Setup camera
     Entity::EntityRef entityRef =
         Entity::EntityManager::createEntity(_N(ProbeCamera));
@@ -728,7 +732,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
     Components::CameraRef camRef =
         Components::CameraManager::createCamera(entityRef);
     Components::CameraManager::resetToDefault(camRef);
-    Components::CameraManager::_descFov(camRef) = 90.0f;
+    Components::CameraManager::_descFov(camRef) = glm::radians(90.0f);
     Components::NodeManager::_position(camNodeRef) =
         Components::NodeManager::_worldPosition(irradNodeRef);
     Components::NodeManager::rebuildTreeAndUpdateTransforms();
@@ -739,7 +743,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
     // Setup buffer for readback
     Intrinsic::Renderer::Vulkan::Resources::BufferRef readBackBufferRef =
         Intrinsic::Renderer::Vulkan::Resources::BufferManager::createBuffer(
-            _N(PerPixelPickingReadBack));
+            _N(IrradianceProbeReadBack));
     {
       Intrinsic::Renderer::Vulkan::Resources::BufferManager::resetToDefault(
           readBackBufferRef);
@@ -753,27 +757,34 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
           readBackBufferRef) =
           Intrinsic::Renderer::Vulkan::BufferType::kStorage;
       Intrinsic::Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-          readBackBufferRef) =
-          cubeMapRes.x * cubeMapRes.y * 2u * sizeof(uint32_t); // FLT16
+          readBackBufferRef) = faceSizeInBytes;
 
       Intrinsic::Renderer::Vulkan::Resources::BufferManager::createResources(
           {readBackBufferRef});
     }
 
     using namespace Intrinsic::Renderer::Vulkan;
+    RenderPass::Lighting::_globalAmbientFactor = 0.0f;
 
+    static glm::uvec2 atlasIndices[6]{glm::uvec2(0u, 1u), glm::uvec2(1u, 1u),
+                                      glm::uvec2(2u, 1u), glm::uvec2(3u, 1u),
+                                      glm::uvec2(1u, 0u), glm::uvec2(1u, 2u)};
     static glm::quat rotationsPerFace[6] = {
-        glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, glm::half_pi<float>(), 0.0f),
-        glm::vec3(0.0f, glm::half_pi<float>() * 2.0f, 0.0f),
-        glm::vec3(0.0f, glm::half_pi<float>() * 3.0f, 0.0f),
-        glm::vec3(glm::half_pi<float>(), 0.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, -glm::half_pi<float>(), 0.0f),
+        glm::vec3(0.0f, -glm::pi<float>(), 0.0f),
         glm::vec3(-glm::half_pi<float>(), 0.0f, 0.0f),
-    };
+        glm::vec3(glm::half_pi<float>(), 0.0f, 0.0f)};
 
     RenderSystem::_customBackbufferDimensions = cubeMapRes;
     RenderSystem::resizeSwapChain(true);
     {
+      gli::texture2d tex = gli::texture2d(
+          gli::FORMAT_RGBA16_SFLOAT_PACK16,
+          gli::texture2d::extent_type(cubeMapRes.x * 4u, cubeMapRes.y * 3u),
+          1u);
+
       for (uint32_t faceIdx = 0u; faceIdx < 6; ++faceIdx)
       {
         Components::NodeManager::_orientation(camNodeRef) =
@@ -832,13 +843,28 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
             Intrinsic::Renderer::Vulkan::Resources::BufferManager::getGpuMemory(
                 readBackBufferRef);
 
-        gli::texture2d tex = gli::texture2d(
-            gli::FORMAT_RGBA16_SFLOAT_PACK16,
-            gli::texture2d::extent_type(cubeMapRes.x, cubeMapRes.y), 1u);
-        memcpy(tex.data(), sceneMemory, tex.size());
+        const glm::uvec2 atlasIndex = atlasIndices[faceIdx];
+        for (uint32_t scanLineIdx = 0u; scanLineIdx < cubeMapRes.y;
+             ++scanLineIdx)
+        {
+          const uint32_t memOffsetInBytes =
+              ((atlasIndex.y * cubeMapRes.y * (cubeMapRes.x * 4u)) +
+               scanLineIdx * (cubeMapRes.x * 4u) +
+               atlasIndex.x * cubeMapRes.x) *
+              sizeof(uint32_t) * 2u;
 
-        gli::save_dds(tex, "test.dds");
+          const uint32_t scanLineSizeInBytes =
+              sizeof(uint32_t) * 2u * cubeMapRes.x;
+          memcpy((uint8_t*)tex.data() + memOffsetInBytes,
+                 sceneMemory + scanLineIdx * scanLineSizeInBytes,
+                 scanLineSizeInBytes);
+        }
       }
+
+      const _INTR_STRING filePath =
+          "media/irradiance_probes/" +
+          Entity::EntityManager::_name(currentEntity).getString() + ".dds";
+      gli::save_dds(tex, filePath.c_str());
 
       Intrinsic::Renderer::Vulkan::Resources::BufferManager::destroyResources(
           {readBackBufferRef});
@@ -848,6 +874,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
       RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
       RenderSystem::resizeSwapChain(true);
 
+      RenderPass::Lighting::_globalAmbientFactor = 1.0f;
       World::setActiveCamera(prevCamera);
       World::destroyNodeFull(camNodeRef);
     }

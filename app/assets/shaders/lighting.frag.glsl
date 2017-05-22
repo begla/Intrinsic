@@ -122,7 +122,7 @@ void main()
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
   vec3 irrad = d.diffuseColor * texture(irradianceTex, R).rgb;
-  float irradWeight = EPSILON;
+  float irradWeight = 0.0;
 
   if (isGridPosValid(gridPos))
   {
