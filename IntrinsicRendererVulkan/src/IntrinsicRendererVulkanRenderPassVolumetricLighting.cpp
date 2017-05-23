@@ -189,6 +189,8 @@ _INTR_INLINE Resources::ComputeCallRef
 createComputeCallAccumulation(glm::vec3 p_Dim,
                               Resources::BufferRef p_LightBuffer,
                               Resources::BufferRef p_LightIndexBuffer,
+                              Resources::BufferRef p_IrradProbeBuffer,
+                              Resources::BufferRef p_IrradProbeIndexBuffer,
                               Resources::BufferRef p_CurrentVolLightingBuffer,
                               Resources::BufferRef p_PrevVolLightingBuffer)
 {
@@ -239,6 +241,14 @@ createComputeCallAccumulation(glm::vec3 p_Dim,
         computeCallRef, _N(LightIndexBuffer), GpuProgramType::kCompute,
         p_LightIndexBuffer, UboType::kInvalidUbo,
         BufferManager::_descSizeInBytes(p_LightIndexBuffer));
+    ComputeCallManager::bindBuffer(
+        computeCallRef, _N(IrradProbeBuffer), GpuProgramType::kCompute,
+        p_IrradProbeBuffer, UboType::kInvalidUbo,
+        BufferManager::_descSizeInBytes(p_IrradProbeBuffer));
+    ComputeCallManager::bindBuffer(
+        computeCallRef, _N(IrradProbeIndexBuffer), GpuProgramType::kCompute,
+        p_IrradProbeIndexBuffer, UboType::kInvalidUbo,
+        BufferManager::_descSizeInBytes(p_IrradProbeIndexBuffer));
   }
 
   return computeCallRef;
@@ -709,15 +719,21 @@ void VolumetricLighting::init()
     BufferRef lightBuffer = BufferManager::getResourceByName(_N(LightBuffer));
     BufferRef lightIndexBuffer =
         BufferManager::getResourceByName(_N(LightIndexBuffer));
+    BufferRef irradProbeBuffer =
+        BufferManager::getResourceByName(_N(IrradProbeBuffer));
+    BufferRef irradProbeIndexBuffer =
+        BufferManager::getResourceByName(_N(IrradProbeIndexBuffer));
 
     // Accumulation
     _computeCallAccumRef = createComputeCallAccumulation(
-        computeDim, lightBuffer, lightIndexBuffer, _volLightingBufferImageRef,
+        computeDim, lightBuffer, lightIndexBuffer, irradProbeBuffer,
+        irradProbeIndexBuffer, _volLightingBufferImageRef,
         _volLightingBufferPrevFrameImageRef);
 
     _computeCallAccumPrevFrameRef = createComputeCallAccumulation(
-        computeDim, lightBuffer, lightIndexBuffer,
-        _volLightingBufferPrevFrameImageRef, _volLightingBufferImageRef);
+        computeDim, lightBuffer, lightIndexBuffer, irradProbeBuffer,
+        irradProbeIndexBuffer, _volLightingBufferPrevFrameImageRef,
+        _volLightingBufferImageRef);
 
     computeCallsToCreate.push_back(_computeCallAccumRef);
     computeCallsToCreate.push_back(_computeCallAccumPrevFrameRef);

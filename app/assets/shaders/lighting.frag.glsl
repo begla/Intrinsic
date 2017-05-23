@@ -71,12 +71,6 @@ layout (binding = 15) uniform sampler2D noiseTex;
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
-const float translDistortion = 0.2;
-const float translPower = 12.0;
-const float translScale = 1.0;
-const vec3 translAmbient = vec3(0.0);
-const float probeFadeRange = 0.2;
-
 void main()
 {
   const vec4 albedoSample = textureLod(albedoTex, inUV0, 0.0);
@@ -122,7 +116,6 @@ void main()
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
   vec3 irrad = d.diffuseColor * texture(irradianceTex, R).rgb;
-  float irradWeight = 0.0;
 
   if (isGridPosValid(gridPos))
   {
@@ -140,7 +133,6 @@ void main()
         const float fade = max(distToProbe - fadeStart, 0.0) / fadeRange;
         
         irrad = mix(d.diffuseColor * sampleSH(probe.data, R) / MATH_PI, irrad, fade);
-        irradWeight += 1.0;
       }
     }
   }
