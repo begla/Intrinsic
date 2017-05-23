@@ -63,8 +63,16 @@ layout (binding = 6) buffer LightIndexBuffer
 {
   uint lightIndices[];
 };
-layout (binding = 7) uniform sampler2DArray shadowBufferExpTex;
-layout (binding = 8) uniform sampler2D kelvinLutTex;
+layout (binding = 7) buffer IrradProbeBuffer
+{
+  IrradProbe irradProbes[];
+};
+layout (binding = 8) buffer IrradProbeIndexBuffer
+{
+  uint irradProbeIndices[];
+};
+layout (binding = 9) uniform sampler2DArray shadowBufferExpTex;
+layout (binding = 10) uniform sampler2D kelvinLutTex;
 
 // TODO
 const vec3 heightRefPosWS = vec3(0.0, 700.0, 0.0);
@@ -127,16 +135,40 @@ void main()
   vec3 lighting = vec3(0.0);
   lighting += shadowAttenuation * lightColor;
 
-  // Irradiance
+  // Global irradiance
   lighting += texture(irradianceTex, rayWS).rgb * uboPerInstance.data0.z;
 
-  // Local lights
   const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
+  const uint clusterIdx = calcClusterIndex(gridPos);
 
+  vec3 irrad = vec3(0.0);
+
+  // Local irradiance
   if (isGridPosValid(gridPos))
   {
-    const uint clusterIdx = calcClusterIndex(gridPos);
+    const uint irradProbeCount = irradProbeIndices[clusterIdx];
 
+    for (uint pi=0; pi<irradProbeCount; ++pi)
+    {
+      IrradProbe probe = irradProbes[irradProbeIndices[clusterIdx + pi + 1]];
+
+      const float distToProbe = distance(posVS, probe.posAndRadius.xyz);
+      if (distToProbe < probe.posAndRadius.w)
+      {
+        const float fadeRange = probe.posAndRadius.w * probeFadeRange;
+        const float fadeStart = probe.posAndRadius.w - fadeRange;
+        const float fade = max(distToProbe - fadeStart, 0.0) / fadeRange;
+        
+        irrad = mix(sampleSH(probe.data, rayWS) / MATH_PI, irrad, fade);
+      }
+    }
+  }
+
+  lighting += irrad ;
+
+  // Local lights
+  if (isGridPosValid(gridPos))
+  {
     uint lightCount = lightIndices[clusterIdx];
     for (uint li=0; li<lightCount; ++li)
     {

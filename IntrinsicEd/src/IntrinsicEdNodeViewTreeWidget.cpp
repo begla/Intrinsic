@@ -294,16 +294,17 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
     {
       contextMenu->addSeparator();
 
-      QAction* loadSHCoeffs = new QAction(
-          QIcon(":/Icons/lightbulb"), "Load SH Coefficients From File", this);
-      contextMenu->addAction(loadSHCoeffs);
-      QObject::connect(loadSHCoeffs, SIGNAL(triggered()), this,
-                       SLOT(onLoadSHCoeffsFromFile()));
       QAction* captureProbe = new QAction(QIcon(":/Icons/lightbulb"),
                                           "Capture Irradiance Probe", this);
       contextMenu->addAction(captureProbe);
       QObject::connect(captureProbe, SIGNAL(triggered()), this,
                        SLOT(onCaptureIrradianceProbe()));
+
+      QAction* loadSHCoeffs =
+          new QAction(QIcon(":/Icons/lightbulb"), "Load SH Coefficients", this);
+      contextMenu->addAction(loadSHCoeffs);
+      QObject::connect(loadSHCoeffs, SIGNAL(triggered()), this,
+                       SLOT(onLoadSHCoeffsFromFile()));
 
       contextMenu->addSeparator();
     }
