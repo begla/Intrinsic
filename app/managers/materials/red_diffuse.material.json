@@ -20,7 +20,7 @@
             0.0
         ],
         "translucencyThickness": 0.0,
-        "emissiveIntensity": 4.0,
+        "emissiveIntensity": 0.0,
         "normalTextureName": "default_NRM",
         "pbrTextureName": "default_PBR",
         "metalMaskBias": 0.0,
