@@ -1,0 +1,10 @@
+{
+    "name": "post_bloom_avg_lum.comp",
+    "properties": {
+        "name": "post_bloom_avg_lum.comp",
+        "gpuProgramName": "post_bloom_avg_lum.comp.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 3
+    }
+}

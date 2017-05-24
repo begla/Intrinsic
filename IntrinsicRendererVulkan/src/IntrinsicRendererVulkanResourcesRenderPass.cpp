@@ -114,6 +114,7 @@ void RenderPassManager::createResources(
     renderPassInfo.pSubpasses = &subpass;
     renderPassInfo.dependencyCount = 0;
     renderPassInfo.pDependencies = nullptr;
+    renderPassInfo.flags = 0u;
 
     VkResult result = vkCreateRenderPass(RenderSystem::_vkDevice,
                                          &renderPassInfo, nullptr, &renderPass);

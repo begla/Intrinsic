@@ -1,0 +1,21 @@
+{
+    "name": "IrradianceTest",
+    "properties": {
+        "name": "IrradianceTest",
+        "scattering": 0.0,
+        "mainLightIntensity": 0.0,
+        "mainLightTemperature": 3200.0,
+        "mainLightOrientation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        ],
+        "mainLightColor": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "ambientFactor": 1.0
+    }
+}

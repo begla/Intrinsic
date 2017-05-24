@@ -1,0 +1,10 @@
+{
+    "name": "gbuffer_terrain.vert",
+    "properties": {
+        "name": "gbuffer_terrain.vert",
+        "gpuProgramName": "gbuffer_terrain.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 0
+    }
+}

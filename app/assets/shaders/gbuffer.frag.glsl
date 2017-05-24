@@ -19,14 +19,15 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "lib_math.glsl"
-#include "surface_fragment.inc.glsl"
+#include "gbuffer.inc.glsl"
 
 // Ubos
-PER_MATERIAL_UBO();
-PER_INSTANCE_UBO();
+PER_MATERIAL_UBO;
+PER_INSTANCE_UBO;
 
 // Bindings
-BINDINGS();
+BINDINGS_GBUFFER;
+layout (binding = 6) uniform sampler2D emissiveTex;
 
 // Input
 layout (location = 0) in vec3 inNormal;
@@ -36,21 +37,24 @@ layout (location = 3) in vec3 inColor;
 layout (location = 4) in vec2 inUV0;
 
 // Output
-OUTPUT();
+OUTPUT
 
 void main()
 { 
   const mat3 TBN = mat3(inTangent, inBinormal, inNormal);
-
   const vec2 uv0 = UV0_TRANSFORMED_ANIMATED;
 
-  vec4 albedo = texture(albedoTex, uv0);
-  const vec4 normal = texture(normalTex, uv0);
-  const vec4 roughness = texture(roughnessTex, uv0);
-
-  outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, 1.0); // Albedo
-  outNormal.rg = encodeNormal(normalize(TBN * (normal.xyz * 2.0 - 1.0)));
-  outNormal.b = roughness.g + uboPerMaterial.pbrBias.g; // Specular
-  outNormal.a = max(roughness.b + uboPerMaterial.pbrBias.b, 0.01); // Roughness
-  outParameter0.rgba = vec4(roughness.r + uboPerMaterial.pbrBias.r, uboPerMaterial.data0.x, 0.0, 0.0); // Metal Mask / Material Buffer Idx
+  GBuffer gbuffer;
+  {
+    gbuffer.albedo = texture(albedoTex, uv0) * uboPerInstance.colorTint;
+    gbuffer.normal = normalize(TBN * (texture(normalTex, uv0).xyz * 2.0 - 1.0));
+    const vec4 pbr = texture(pbrTex, uv0);
+    gbuffer.metalMask = pbr.r + uboPerMaterial.pbrBias.r;
+    gbuffer.specular = pbr.g + uboPerMaterial.pbrBias.g;
+    gbuffer.roughness = pbr.b + uboPerMaterial.pbrBias.b;
+    gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
+    gbuffer.emissive = texture(emissiveTex, uv0).r;
+    gbuffer.occlusion = 1.0;
+  }
+  writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
 }

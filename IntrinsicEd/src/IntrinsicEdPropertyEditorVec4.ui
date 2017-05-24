@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>284</width>
-    <height>118</height>
+    <width>278</width>
+    <height>83</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -51,19 +51,19 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="leftMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>3</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>3</number>
       </property>
       <item>
        <widget class="QLabel" name="propertyTitle">
@@ -78,6 +78,12 @@
           <width>0</width>
           <height>0</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
         </property>
         <property name="text">
          <string>Property</string>
@@ -159,6 +165,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
             <number>6</number>
            </property>
@@ -166,7 +175,7 @@
             <double>-100000.000000000000000</double>
            </property>
            <property name="maximum">
-            <double>10000.000000000000000</double>
+            <double>1000000.0000000000000</double>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
@@ -200,14 +209,17 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
             <number>6</number>
            </property>
            <property name="minimum">
-            <double>-10000.000000000000000</double>
+            <double>-1000000.0000000000000</double>
            </property>
            <property name="maximum">
-            <double>10000.000000000000000</double>
+            <double>1000000.0000000000000</double>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
@@ -271,14 +283,17 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
             <number>6</number>
            </property>
            <property name="minimum">
-            <double>-10000.000000000000000</double>
+            <double>-1000000.0000000000000</double>
            </property>
            <property name="maximum">
-            <double>10000.000000000000000</double>
+            <double>1000000.0000000000000</double>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
@@ -315,14 +330,17 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
             <number>6</number>
            </property>
            <property name="minimum">
-            <double>-10000.000000000000000</double>
+            <double>-1000000.0000000000000</double>
            </property>
            <property name="maximum">
-            <double>10000.000000000000000</double>
+            <double>1000000.0000000000000</double>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>

@@ -14,11 +14,9 @@
 
 #pragma once
 
-#define BLUR_X_THREADS_X 4
-#define BLUR_X_THREADS_Y 64
-
-#define BLUR_Y_THREADS_X 64
-#define BLUR_Y_THREADS_Y 4
+// Needs to be synced with the shader
+#define BLUR_THREADS 128
+#define BLUR_HALF_BLUR_WIDTH 4
 
 namespace Intrinsic
 {
@@ -36,11 +34,11 @@ struct PerInstanceDataBlur
 struct Bloom
 {
   static void init();
-  static void updateResolutionDependentResources();
+  static void onReinitRendering();
 
   static void destroy();
 
-  static void render(float p_DeltaT);
+  static void render(float p_DeltaT, Components::CameraRef p_CameraRef);
 
   // <-
 

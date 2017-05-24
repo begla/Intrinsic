@@ -22,6 +22,17 @@ namespace TimingHelper
 {
 void timerStart();
 uint32_t timerEnd();
+void sleep(uint32_t p_Ms);
+uint64_t getMicroseconds();
+uint64_t getMilliseconds();
+
+struct AutoTimer
+{
+  AutoTimer(const char* p_Name) : _name(p_Name) { _INTR_PROFILE_START(); }
+  ~AutoTimer() { _INTR_PROFILE_END(_name.c_str()); }
+
+  _INTR_STRING _name;
+};
 }
 }
 }

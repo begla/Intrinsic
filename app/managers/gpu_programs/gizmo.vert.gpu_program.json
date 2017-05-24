@@ -1,0 +1,10 @@
+{
+    "name": "gizmo.vert",
+    "properties": {
+        "name": "gizmo.vert",
+        "gpuProgramName": "gizmo.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 0
+    }
+}

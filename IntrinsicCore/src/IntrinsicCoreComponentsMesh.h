@@ -36,6 +36,8 @@ struct MeshPerInstanceDataVertex
 
 struct MeshPerInstanceDataFragment
 {
+  glm::vec4 colorTint;
+  glm::vec4 camParams;
   glm::vec4 data0;
 };
 
@@ -44,6 +46,7 @@ struct MeshData : Dod::Components::ComponentDataBase
   MeshData();
 
   _INTR_ARRAY(Name) descMeshName;
+  _INTR_ARRAY(glm::vec4) descColorTint;
 
   _INTR_ARRAY(MeshPerInstanceDataVertex) perInstanceDataVertex;
   _INTR_ARRAY(MeshPerInstanceDataFragment) perInstanceDataFragment;
@@ -81,13 +84,19 @@ struct MeshManager
 
   // <-
 
-  _INTR_INLINE static void compileDescriptor(MeshRef p_Ref,
+  _INTR_INLINE static void compileDescriptor(MeshRef p_Ref, bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember(
-        "meshName", _INTR_CREATE_PROP(p_Document, _N(Mesh), _N(string),
-                                      _descMeshName(p_Ref), false, false),
+        "meshName",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Mesh),
+                          _N(meshSelector), _descMeshName(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "colorTint",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Mesh), _N(color),
+                          _descColorTint(p_Ref), false, false),
         p_Document.GetAllocator());
   }
 
@@ -100,6 +109,11 @@ struct MeshManager
     {
       _descMeshName(p_Ref) =
           JsonHelper::readPropertyName(p_Properties["meshName"]);
+    }
+    if (p_Properties.HasMember("colorTint"))
+    {
+      _descColorTint(p_Ref) =
+          JsonHelper::readPropertyVec4(p_Properties["colorTint"]);
     }
   }
 
@@ -127,7 +141,8 @@ struct MeshManager
   // <-
 
   static void updateUniformData(Dod::RefArray& p_Meshes);
-  static void updatePerInstanceData(uint32_t p_FrustumIdx);
+  static void updatePerInstanceData(Dod::Ref p_CameraRef,
+                                    uint32_t p_FrustumIdx);
 
   static void collectDrawCallsAndMeshComponents();
 
@@ -152,6 +167,10 @@ struct MeshManager
   _INTR_INLINE static Name& _descMeshName(MeshRef p_Ref)
   {
     return _data.descMeshName[p_Ref._id];
+  }
+  _INTR_INLINE static glm::vec4& _descColorTint(MeshRef p_Ref)
+  {
+    return _data.descColorTint[p_Ref._id];
   }
 
   // Resources

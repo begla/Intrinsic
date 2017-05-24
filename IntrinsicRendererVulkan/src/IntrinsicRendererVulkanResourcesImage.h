@@ -59,7 +59,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(VkImage) vkImage;
   _INTR_ARRAY(VkImageView) vkImageView;
   _INTR_ARRAY(ImageViewArray) vkSubResourceImageViews;
-  _INTR_ARRAY(MemoryAllocationInfo) memoryAllocationInfo;
+  _INTR_ARRAY(GpuMemoryAllocationInfo) memoryAllocationInfo;
 };
 
 struct ImageManager
@@ -94,46 +94,49 @@ struct ImageManager
   }
 
   _INTR_INLINE static void compileDescriptor(ImageRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         ImageData, _INTR_MAX_IMAGE_COUNT>::_compileDescriptor(p_Ref,
+                                                              p_GenerateDesc,
                                                               p_Properties,
                                                               p_Document);
 
-    p_Properties.AddMember("imageType",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             (uint32_t)_descImageType(p_Ref),
-                                             false, true),
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("imageFormat",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             (uint32_t)_descImageFormat(p_Ref),
-                                             false, true),
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("flags",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             (uint32_t)_descImageFlags(p_Ref),
-                                             false, true),
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("dimensions",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             glm::vec3(_descDimensions(p_Ref)),
-                                             false, true),
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("arrayLayerCount",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             _descArrayLayerCount(p_Ref), false,
-                                             true),
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("mipLevelCount",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "",
-                                             _descMipLevelCount(p_Ref), false,
-                                             true),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "imageType",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          (uint32_t)_descImageType(p_Ref), false, true),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "imageFormat",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          (uint32_t)_descImageFormat(p_Ref), false, true),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "flags",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          (uint32_t)_descImageFlags(p_Ref), false, true),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "dimensions",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          glm::vec3(_descDimensions(p_Ref)), false, true),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "arrayLayerCount",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          _descArrayLayerCount(p_Ref), false, true),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "mipLevelCount",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
+                          _descMipLevelCount(p_Ref), false, true),
+        p_Document.GetAllocator());
     p_Properties.AddMember("fileName",
-                           _INTR_CREATE_PROP(p_Document, _N(Image), "string",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(Image), "string",
                                              _descFileName(p_Ref), true, false),
                            p_Document.GetAllocator());
   }
@@ -168,17 +171,25 @@ struct ImageManager
           JsonHelper::readPropertyString(p_Properties["fileName"]);
   }
 
-  _INTR_INLINE static void saveToSingleFile(const char* p_FileName)
-  {
-    Dod::Resources::ResourceManagerBase<
-        ImageData, _INTR_MAX_IMAGE_COUNT>::_saveToSingleFile(p_FileName,
-                                                             compileDescriptor);
-  }
+  // <-
 
-  _INTR_INLINE static void loadFromSingleFile(const char* p_FileName)
+  _INTR_INLINE static void saveToMultipleFiles(const char* p_Path,
+                                               const char* p_Extension)
   {
     Dod::Resources::ResourceManagerBase<ImageData, _INTR_MAX_IMAGE_COUNT>::
-        _loadFromSingleFile(p_FileName, initFromDescriptor, resetToDefault);
+        _saveToMultipleFiles<
+            rapidjson::PrettyWriter<rapidjson::FileWriteStream>>(
+            p_Path, p_Extension, compileDescriptor);
+  }
+
+  // <-
+
+  _INTR_INLINE static void loadFromMultipleFiles(const char* p_Path,
+                                                 const char* p_Extension)
+  {
+    Dod::Resources::ResourceManagerBase<ImageData, _INTR_MAX_IMAGE_COUNT>::
+        _loadFromMultipleFiles(p_Path, p_Extension, initFromDescriptor,
+                               resetToDefault);
   }
 
   // <-
@@ -241,7 +252,7 @@ struct ImageManager
   // <-
 
   _INTR_INLINE static void
-  destroyImagesAndResources(const FramebufferRefArray& p_Images)
+  destroyImagesAndResources(const ImageRefArray& p_Images)
   {
     destroyResources(p_Images);
 
@@ -259,10 +270,27 @@ struct ImageManager
       VkPipelineStageFlags p_SrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
       VkPipelineStageFlags p_DstStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT)
   {
+<<<<<<< HEAD
 
     VkImageSubresourceRange range;
     range.aspectMask =
         _descImageFormat(p_ImageRef) != Vulkan::RenderSystem::_depthBufferFormat//Format::kD24UnormS8UInt
+=======
+    insertImageMemoryBarrier(RenderSystem::getPrimaryCommandBuffer(),
+                             p_ImageRef, p_SrcImageLayout, p_DstImageLayout,
+                             p_SrcStages, p_DstStages);
+  }
+
+  static _INTR_INLINE void insertImageMemoryBarrier(
+      VkCommandBuffer p_CommandBuffer, ImageRef p_ImageRef,
+      VkImageLayout p_SrcImageLayout, VkImageLayout p_DstImageLayout,
+      VkPipelineStageFlags p_SrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+      VkPipelineStageFlags p_DstStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT)
+  {
+    VkImageSubresourceRange range;
+    range.aspectMask =
+        _descImageFormat(p_ImageRef) != RenderSystem::_depthStencilFormatToUse
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
             ? VK_IMAGE_ASPECT_COLOR_BIT
             : (VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
     range.baseMipLevel = 0u;
@@ -270,9 +298,9 @@ struct ImageManager
     range.baseArrayLayer = 0u;
     range.layerCount = _descArrayLayerCount(p_ImageRef);
 
-    Helper::insertImageMemoryBarrier(
-        RenderSystem::getPrimaryCommandBuffer(), _vkImage(p_ImageRef),
-        p_SrcImageLayout, p_DstImageLayout, range, p_SrcStages, p_DstStages);
+    Helper::insertImageMemoryBarrier(p_CommandBuffer, _vkImage(p_ImageRef),
+                                     p_SrcImageLayout, p_DstImageLayout, range,
+                                     p_SrcStages, p_DstStages);
   }
 
   // <-
@@ -286,7 +314,11 @@ struct ImageManager
   {
     VkImageSubresourceRange range;
     range.aspectMask =
+<<<<<<< HEAD
         _descImageFormat(p_ImageRef) != Vulkan::RenderSystem::_depthBufferFormat //Format::kD24UnormS8UInt
+=======
+        _descImageFormat(p_ImageRef) != RenderSystem::_depthStencilFormatToUse
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
             ? VK_IMAGE_ASPECT_COLOR_BIT
             : (VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
     range.baseMipLevel = p_MipLevel;
@@ -351,7 +383,7 @@ struct ImageManager
     return _data.descFileName[p_Ref._id];
   }
 
-  // Resources
+  // GPU resources
   _INTR_INLINE static VkImage& _vkImage(ImageRef p_Ref)
   {
     return _data.vkImage[p_Ref._id];
@@ -371,7 +403,7 @@ struct ImageManager
   {
     return _data.vkSubResourceImageViews[p_Ref._id];
   }
-  _INTR_INLINE static MemoryAllocationInfo&
+  _INTR_INLINE static GpuMemoryAllocationInfo&
   _memoryAllocationInfo(ImageRef p_Ref)
   {
     return _data.memoryAllocationInfo[p_Ref._id];

@@ -1,0 +1,8 @@
+{
+    "name": "kelvin_rgb_LUT",
+    "properties": {
+        "name": "kelvin_rgb_LUT",
+        "assetFileName": "kelvin_rgb_LUT.tga",
+        "assetType": 4
+    }
+}

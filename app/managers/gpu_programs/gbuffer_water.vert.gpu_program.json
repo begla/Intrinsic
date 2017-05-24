@@ -1,0 +1,10 @@
+{
+    "name": "gbuffer_water.vert",
+    "properties": {
+        "name": "gbuffer_water.vert",
+        "gpuProgramName": "gbuffer_water.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 0
+    }
+}

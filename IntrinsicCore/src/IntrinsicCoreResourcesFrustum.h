@@ -40,6 +40,7 @@ struct FrustumData : Dod::Resources::ResourceDataBase
     descNearFarPlaneDistances.resize(_INTR_MAX_FRUSTUM_COUNT);
 
     descViewMatrix.resize(_INTR_MAX_FRUSTUM_COUNT);
+    descPrevViewMatrix.resize(_INTR_MAX_FRUSTUM_COUNT);
     invViewMatrix.resize(_INTR_MAX_FRUSTUM_COUNT);
 
     descProjectionMatrix.resize(_INTR_MAX_FRUSTUM_COUNT);
@@ -60,6 +61,7 @@ struct FrustumData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(glm::vec2) descNearFarPlaneDistances;
 
   _INTR_ARRAY(glm::mat4) descViewMatrix;
+  _INTR_ARRAY(glm::mat4) descPrevViewMatrix;
   _INTR_ARRAY(glm::mat4) invViewMatrix;
 
   _INTR_ARRAY(glm::mat4) descProjectionMatrix;
@@ -100,7 +102,7 @@ struct FrustumManager
 
   _INTR_INLINE static void prepareForRendering(FrustumRefArray p_Refs)
   {
-    _INTR_PROFILE_CPU("Resources", "Prepare Frustums For Rendering");
+    _INTR_PROFILE_CPU("General", "Prepare Frustums For Rendering");
 
     for (uint32_t i = 0u; i < p_Refs.size(); ++i)
     {
@@ -145,6 +147,10 @@ struct FrustumManager
   _INTR_INLINE static glm::mat4& _descViewMatrix(FrustumRef p_Ref)
   {
     return _data.descViewMatrix[p_Ref._id];
+  }
+  _INTR_INLINE static glm::mat4& _descPrevViewMatrix(FrustumRef p_Ref)
+  {
+    return _data.descPrevViewMatrix[p_Ref._id];
   }
   _INTR_INLINE static glm::mat4& _descProjectionMatrix(FrustumRef p_Ref)
   {

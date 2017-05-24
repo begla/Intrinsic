@@ -56,6 +56,10 @@ Resources::RenderPassRef _renderPassRef;
 DebugLineVertex* _mappedLineMemory = nullptr;
 uint32_t _currentLineVertexCount = 0u;
 
+rapidjson::Document _benchmarkDesc;
+_INTR_ARRAY(GameStates::Benchmark::Path) _benchmarkPaths;
+bool _parseBenchmark = true;
+
 void displayWorldBoundingSpheres()
 {
   for (uint32_t i = 0u; i < Components::NodeManager::_activeRefs.size(); ++i)
@@ -67,7 +71,46 @@ void displayWorldBoundingSpheres()
       Math::Sphere& worldBoundingSphere =
           Components::NodeManager::_worldBoundingSphere(nodeRef);
       Debug::renderSphere(worldBoundingSphere.p, worldBoundingSphere.r,
-                          glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+                          glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+  }
+}
+
+// <-
+
+void displayBenchmarkPaths()
+{
+  if (_parseBenchmark)
+  {
+    GameStates::Benchmark::parseBenchmark(_benchmarkDesc);
+    _parseBenchmark = false;
+  }
+
+  _benchmarkPaths.clear();
+  GameStates::Benchmark::assembleBenchmarkPaths(_benchmarkDesc,
+                                                _benchmarkPaths);
+
+  for (uint32_t i = 0u; i < _benchmarkPaths.size(); ++i)
+  {
+    static const float stepSize = 0.01f;
+
+    _INTR_ARRAY(glm::vec3) curvePositions;
+    curvePositions.reserve((uint32_t)(1.0f / 0.01f));
+
+    for (float perc = 0.0f; perc < 1.0f; perc += stepSize)
+    {
+      curvePositions.push_back(
+          Math::bezierQuadratic(_benchmarkPaths[i].nodePositions, perc));
+    }
+
+    if (curvePositions.size() > 1u)
+    {
+      for (uint32_t j = 0u; j < curvePositions.size() - 1u; ++j)
+      {
+        Debug::renderLine(curvePositions[j], curvePositions[j + 1],
+                          glm::vec3(0.0f, 1.0f, 1.0f),
+                          glm::vec3(0.0f, 1.0f, 1.0f));
+      }
     }
   }
 }
@@ -96,13 +139,37 @@ void displayDebugLineGeometryForSelectedObject()
       Debug::renderSphere(
           Components::NodeManager::_worldPosition(nodeRef),
           Components::PostEffectVolumeManager::_descRadius(postVolumeRef),
-          glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+          glm::vec3(0.0f, 0.0f, 1.0f));
       Debug::renderSphere(
           Components::NodeManager::_worldPosition(nodeRef),
           Components::PostEffectVolumeManager::_descRadius(postVolumeRef) -
               Components::PostEffectVolumeManager::_descBlendRange(
                   postVolumeRef),
-          glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
+          glm::vec3(0.0f, 1.0f, 1.0f));
+    }
+
+    Components::LightRef lightRef =
+        Components::LightManager::getComponentForEntity(
+            GameStates::Editing::_currentlySelectedEntity);
+
+    if (lightRef.isValid())
+    {
+      Debug::renderSphere(
+          Components::NodeManager::_worldPosition(nodeRef),
+          Components::LightManager::_descRadius(lightRef),
+          glm::vec3(Components::LightManager::_descColor(lightRef)));
+    }
+
+    Components::IrradianceProbeRef irradProbeRef =
+        Components::IrradianceProbeManager::getComponentForEntity(
+            GameStates::Editing::_currentlySelectedEntity);
+
+    if (irradProbeRef.isValid())
+    {
+      Debug::renderSphere(
+          Components::NodeManager::_worldPosition(nodeRef),
+          Components::IrradianceProbeManager::_descRadius(irradProbeRef),
+          glm::vec3(1.0f, 0.0f, 0.0f));
     }
   }
 }
@@ -126,8 +193,9 @@ void Debug::init()
     PipelineLayoutManager::resetToDefault(_debugLinePipelineLayout);
 
     GpuProgramManager::reflectPipelineLayout(
-        8u, {Resources::GpuProgramManager::getResourceByName("debug_line.vert"),
-             GpuProgramManager::getResourceByName("debug_line.frag")},
+        8u,
+        {Resources::GpuProgramManager::getResourceByName("debug_line.vert"),
+         GpuProgramManager::getResourceByName("debug_line.frag")},
         _debugLinePipelineLayout);
 
     pipelineLayoutsToCreate.push_back(_debugLinePipelineLayout);
@@ -143,8 +211,13 @@ void Debug::init()
     AttachmentDescription normalAttachment = {Format::kR16G16B16A16Float, 0u};
     AttachmentDescription parameter0Attachment = {Format::kR16G16B16A16Float,
                                                   0u};
+<<<<<<< HEAD
     AttachmentDescription depthStencilAttachment = { Vulkan::RenderSystem::_depthBufferFormat, //Format::kD24UnormS8UInt,
                                                     0u};
+=======
+    AttachmentDescription depthStencilAttachment = {
+        (uint8_t)RenderSystem::_depthStencilFormatToUse, 0u};
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
 
     RenderPassManager::_descAttachments(_renderPassRef)
         .push_back(albedoAttachment);
@@ -185,7 +258,7 @@ void Debug::init()
 
 // <-
 
-void Debug::updateResolutionDependentResources()
+void Debug::onReinitRendering()
 {
   using namespace Resources;
 
@@ -343,7 +416,7 @@ void Debug::renderLine(const glm::vec3& p_Pos0, const glm::vec3& p_Pos1,
 // <-
 
 void Debug::renderSphere(const glm::vec3& p_Center, float p_Radius,
-                         const glm::vec4& p_Color)
+                         const glm::vec3& p_Color)
 {
   if (GameStates::Manager::getActiveGameState() !=
       GameStates::GameState::kEditing)
@@ -373,7 +446,7 @@ void Debug::renderSphere(const glm::vec3& p_Center, float p_Radius,
 
 // <-
 
-void Debug::render(float p_DeltaT)
+void Debug::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
@@ -397,6 +470,14 @@ void Debug::render(float p_DeltaT)
     {
       displayWorldBoundingSpheres();
     }
+    if ((_activeDebugStageFlags & DebugStageFlags::kBenchmarkPaths) > 0u)
+    {
+      displayBenchmarkPaths();
+    }
+    else
+    {
+      _parseBenchmark = true;
+    }
 
     displayDebugLineGeometryForSelectedObject();
   }
@@ -406,15 +487,12 @@ void Debug::render(float p_DeltaT)
   {
     // Update line per instance data
     {
-      Components::CameraRef camRef = World::getActiveCamera();
-      _INTR_ASSERT(camRef.isValid());
-
       PerInstanceDataDebugLineVertex perInstanceDataVertex;
       {
         perInstanceDataVertex.worldViewProjMatrix =
-            Components::CameraManager::_viewProjectionMatrix(camRef);
+            Components::CameraManager::_viewProjectionMatrix(p_CameraRef);
         perInstanceDataVertex.normalMatrix =
-            Components::CameraManager::_viewMatrix(camRef);
+            Components::CameraManager::_viewMatrix(p_CameraRef);
       }
 
       // Write to GPU memory
@@ -441,19 +519,6 @@ void Debug::render(float p_DeltaT)
                               DrawCallDispatcher::_dispatchedDrawCallCount);
   }
   RenderSystem::endRenderPass(_renderPassRef);
-
-  ImageManager::insertImageMemoryBarrier(
-      _albedoImageRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-  ImageManager::insertImageMemoryBarrier(
-      _normalImageRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-  ImageManager::insertImageMemoryBarrier(
-      _parameter0ImageRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-  ImageManager::insertImageMemoryBarrier(
-      _depthImageRef, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
   // Reset the current line count to zero
   _currentLineVertexCount = 0u;

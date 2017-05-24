@@ -29,11 +29,24 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
       : Dod::Resources::ResourceDataBase(_INTR_MAX_POST_EFFECT_COUNT)
   {
     descVolumetricLightingScattering.resize(_INTR_MAX_POST_EFFECT_COUNT);
+
+    descMainLightTemp.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descMainLightColor.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descMainLightOrientation.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descMainLightIntens.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descAmbientFactor.resize(_INTR_MAX_POST_EFFECT_COUNT);
   }
 
   // <-
 
   _INTR_ARRAY(float) descVolumetricLightingScattering;
+
+  _INTR_ARRAY(float) descMainLightTemp;
+  _INTR_ARRAY(glm::vec3) descMainLightColor;
+  _INTR_ARRAY(glm::quat) descMainLightOrientation;
+  _INTR_ARRAY(float) descMainLightIntens;
+
+  _INTR_ARRAY(float) descAmbientFactor;
 };
 
 struct PostEffectManager
@@ -56,6 +69,11 @@ struct PostEffectManager
   _INTR_INLINE static void resetToDefault(PostEffectRef p_Ref)
   {
     _descVolumetricLightingScattering(p_Ref) = 0.0f;
+    _descMainLightColor(p_Ref) = glm::vec3(1.0f);
+    _descMainLightIntens(p_Ref) = 10.0f;
+    _descMainLightOrientation(p_Ref) = glm::quat();
+    _descMainLightTemp(p_Ref) = 3200.0f;
+    _descAmbientFactor(p_Ref) = 1.0f;
   }
 
   // <-
@@ -69,19 +87,48 @@ struct PostEffectManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(PostEffectRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         PostEffectData,
-        _INTR_MAX_POST_EFFECT_COUNT>::_compileDescriptor(p_Ref, p_Properties,
+        _INTR_MAX_POST_EFFECT_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
+                                                         p_Properties,
                                                          p_Document);
 
     p_Properties.AddMember(
-        "volumetricLightingScattering",
-        _INTR_CREATE_PROP(p_Document, _N(VolumetricLighting), _N(float),
-                          _descVolumetricLightingScattering(p_Ref), false,
-                          false),
+        "scattering",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(VolumetricLighting),
+                          _N(float), _descVolumetricLightingScattering(p_Ref),
+                          false, false),
+        p_Document.GetAllocator());
+
+    p_Properties.AddMember(
+        "mainLightIntensity",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descMainLightIntens(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "mainLightTemperature",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descMainLightTemp(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember("mainLightOrientation",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(Lighting), _N(rotation),
+                                             _descMainLightOrientation(p_Ref),
+                                             false, false),
+                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "mainLightColor",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(vec3),
+                          _descMainLightColor(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "ambientFactor",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descAmbientFactor(p_Ref), false, false),
         p_Document.GetAllocator());
   }
 
@@ -94,30 +141,50 @@ struct PostEffectManager
         PostEffectData,
         _INTR_MAX_POST_EFFECT_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
 
-    if (p_Properties.HasMember("volumetricLightingScattering"))
-      _descVolumetricLightingScattering(p_Ref) = JsonHelper::readPropertyFloat(
-          p_Properties["volumetricLightingScattering"]);
+    if (p_Properties.HasMember("scattering"))
+      _descVolumetricLightingScattering(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["scattering"]);
+
+    if (p_Properties.HasMember("mainLightIntensity"))
+      _descMainLightIntens(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["mainLightIntensity"]);
+    if (p_Properties.HasMember("mainLightTemperature"))
+      _descMainLightTemp(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["mainLightTemperature"]);
+    if (p_Properties.HasMember("mainLightOrientation"))
+      _descMainLightOrientation(p_Ref) =
+          JsonHelper::readPropertyQuat(p_Properties["mainLightOrientation"]);
+    if (p_Properties.HasMember("mainLightColor"))
+      _descMainLightColor(p_Ref) =
+          JsonHelper::readPropertyVec3(p_Properties["mainLightColor"]);
+    if (p_Properties.HasMember("ambientFactor"))
+      _descAmbientFactor(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["ambientFactor"]);
   }
 
   // <-
 
-  _INTR_INLINE static void saveToSingleFile(const char* p_FileName)
+  _INTR_INLINE static void saveToMultipleFiles(const char* p_Path,
+                                               const char* p_Extension)
   {
-    Dod::Resources::ResourceManagerBase<
-        PostEffectData,
-        _INTR_MAX_POST_EFFECT_COUNT>::_saveToSingleFile(p_FileName,
-                                                        compileDescriptor);
+    Dod::Resources::ResourceManagerBase<PostEffectData,
+                                        _INTR_MAX_POST_EFFECT_COUNT>::
+        _saveToMultipleFiles<
+            rapidjson::PrettyWriter<rapidjson::FileWriteStream>>(
+            p_Path, p_Extension, compileDescriptor);
   }
 
   // <-
 
-  _INTR_INLINE static void loadFromSingleFile(const char* p_FileName)
+  _INTR_INLINE static void loadFromMultipleFiles(const char* p_Path,
+                                                 const char* p_Extension)
   {
     Dod::Resources::ResourceManagerBase<
         PostEffectData,
-        _INTR_MAX_POST_EFFECT_COUNT>::_loadFromSingleFile(p_FileName,
-                                                          initFromDescriptor,
-                                                          resetToDefault);
+        _INTR_MAX_POST_EFFECT_COUNT>::_loadFromMultipleFiles(p_Path,
+                                                             p_Extension,
+                                                             initFromDescriptor,
+                                                             resetToDefault);
   }
 
   // <-
@@ -129,6 +196,20 @@ struct PostEffectManager
     _descVolumetricLightingScattering(p_Target) =
         glm::mix(_descVolumetricLightingScattering(p_Left),
                  _descVolumetricLightingScattering(p_Right), p_BlendFactor);
+
+    _descMainLightColor(p_Target) =
+        glm::mix(_descMainLightColor(p_Left), _descMainLightColor(p_Right),
+                 p_BlendFactor);
+    _descMainLightIntens(p_Target) =
+        glm::mix(_descMainLightIntens(p_Left), _descMainLightIntens(p_Right),
+                 p_BlendFactor);
+    _descMainLightTemp(p_Target) = glm::mix(
+        _descMainLightTemp(p_Left), _descMainLightTemp(p_Right), p_BlendFactor);
+    _descMainLightOrientation(p_Target) =
+        glm::slerp(_descMainLightOrientation(p_Left),
+                   _descMainLightOrientation(p_Right), p_BlendFactor);
+    _descAmbientFactor(p_Target) = glm::mix(
+        _descAmbientFactor(p_Left), _descAmbientFactor(p_Right), p_BlendFactor);
   }
 
   // <-
@@ -141,6 +222,27 @@ struct PostEffectManager
   _descVolumetricLightingScattering(PostEffectRef p_Ref)
   {
     return _data.descVolumetricLightingScattering[p_Ref._id];
+  }
+
+  _INTR_INLINE static float& _descMainLightIntens(PostEffectRef p_Ref)
+  {
+    return _data.descMainLightIntens[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descMainLightTemp(PostEffectRef p_Ref)
+  {
+    return _data.descMainLightTemp[p_Ref._id];
+  }
+  _INTR_INLINE static glm::vec3& _descMainLightColor(PostEffectRef p_Ref)
+  {
+    return _data.descMainLightColor[p_Ref._id];
+  }
+  _INTR_INLINE static glm::quat& _descMainLightOrientation(PostEffectRef p_Ref)
+  {
+    return _data.descMainLightOrientation[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descAmbientFactor(PostEffectRef p_Ref)
+  {
+    return _data.descAmbientFactor[p_Ref._id];
   }
 
   // Static members

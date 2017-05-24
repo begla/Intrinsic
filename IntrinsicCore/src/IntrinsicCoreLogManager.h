@@ -32,7 +32,7 @@ enum Enum
 };
 }
 
-typedef void (*LogCallbackFunction)(const _INTR_STRING&, LogLevel::Enum);
+typedef void (*LogCallbackFunction)(const char*, LogLevel::Enum);
 
 struct LogListenerEntry
 {
@@ -42,29 +42,11 @@ struct LogListenerEntry
 struct Manager
 {
   static void log(LogLevel::Enum p_LogLevel, const char* p_Message, ...);
+  static void addLogListener(const LogListenerEntry& p_Entry);
+  static void removeLogListener(const LogListenerEntry& p_Entry);
 
-  _INTR_INLINE static void addLogListener(const LogListenerEntry& p_Entry)
-  {
-    _logListeners.push_back(p_Entry);
-  }
-
-  _INTR_INLINE static void removeLogListener(const LogListenerEntry& p_Entry)
-  {
-    for (auto it = _logListeners.begin(); it != _logListeners.end();)
-    {
-      if (it->callbackFunction == p_Entry.callbackFunction)
-      {
-        it = _logListeners.erase(it);
-      }
-      else
-      {
-        ++it;
-      }
-    }
-  }
-
-  static uint32_t _currentIndent;
-  static _INTR_ARRAY(LogListenerEntry) _logListeners;
+  static void indent();
+  static void unindent();
 };
 }
 }

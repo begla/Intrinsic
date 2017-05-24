@@ -48,7 +48,7 @@ struct BufferData : Dod::Resources::ResourceDataBase
 
   _INTR_ARRAY(VkDescriptorBufferInfo) vkDescriptorBufferInfo;
   _INTR_ARRAY(VkBuffer) vkBuffer;
-  _INTR_ARRAY(MemoryAllocationInfo) memoryAllocationInfo;
+  _INTR_ARRAY(GpuMemoryAllocationInfo) memoryAllocationInfo;
 };
 
 struct BufferManager
@@ -92,11 +92,13 @@ struct BufferManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(BufferRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         BufferData, _INTR_MAX_BUFFER_COUNT>::_compileDescriptor(p_Ref,
+                                                                p_GenerateDesc,
                                                                 p_Properties,
                                                                 p_Document);
   }
@@ -173,11 +175,9 @@ struct BufferManager
 
   _INTR_INLINE static uint8_t* getGpuMemory(BufferRef p_Ref)
   {
-    _INTR_ASSERT(GpuMemoryManager::getMemoryUsage(
-                     (MemoryPoolType::Enum)_memoryAllocationInfo(p_Ref)
-                         .memoryPoolType) == MemoryLocation::kHostVisible);
-    return GpuMemoryManager::getHostVisibleMemoryForOffset(
-        _memoryAllocationInfo(p_Ref).offsetInBytes);
+    _INTR_ASSERT(_memoryAllocationInfo(p_Ref)._mappedMemory != nullptr &&
+                 "Memory is not mappable");
+    return _memoryAllocationInfo(p_Ref)._mappedMemory;
   }
 
   // <-
@@ -219,7 +219,7 @@ struct BufferManager
   {
     return _data.vkBuffer[p_Ref._id];
   }
-  _INTR_INLINE static MemoryAllocationInfo&
+  _INTR_INLINE static GpuMemoryAllocationInfo&
   _memoryAllocationInfo(BufferRef p_Ref)
   {
     return _data.memoryAllocationInfo[p_Ref._id];

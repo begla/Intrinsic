@@ -122,13 +122,14 @@ struct PipelineManager
   }
 
   _INTR_INLINE static void compileDescriptor(PipelineRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         PipelineData,
-        _INTR_MAX_PIPELINE_COUNT>::_compileDescriptor(p_Ref, p_Properties,
-                                                      p_Document);
+        _INTR_MAX_PIPELINE_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
+                                                      p_Properties, p_Document);
   }
 
   _INTR_INLINE static void initFromDescriptor(PipelineRef p_Ref,
@@ -188,7 +189,7 @@ struct PipelineManager
   // <-
 
   _INTR_INLINE static void
-  destroyPipelinesAndResources(const FramebufferRefArray& p_Pipelines)
+  destroyPipelinesAndResources(const PipelineRefArray& p_Pipelines)
   {
     destroyResources(p_Pipelines);
 

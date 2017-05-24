@@ -45,12 +45,12 @@ void main()
   const vec2 uv0 = -inUV0 + vec2(1.0);
   const vec2 texelSize = 1.0 / vec2(textureSize(brightnessTex, 0));
 
-  const float ghostDisp = 0.1;
-  const uint numGhosts = 8;
-  const float haloWidth = 0.25;
-  const float distortionFactor = 2.0;
-  const float brightnessBias = 8.0;
-  const float brightnessMax = 2.0;
+  const float ghostDisp = 0.25;
+  const uint numGhosts = 4;
+  const float haloWidth = 0.5;
+  const float distortionFactor = 5.0;
+  const float brightnessBias = 6.0;
+  const float brightnessMax = 10.0;
 
   const vec2 ghostDir = (vec2(0.5) - uv0) * ghostDisp;
   const vec3 distortion = vec3(-texelSize.x * distortionFactor, 0.0, texelSize.x * distortionFactor);

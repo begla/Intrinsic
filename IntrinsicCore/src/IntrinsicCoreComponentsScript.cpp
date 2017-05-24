@@ -28,9 +28,13 @@ void ScriptManager::createResources(const ScriptRefArray& p_Scripts)
     ScriptRef scriptRef = p_Scripts[scriptIdx];
     Resources::ScriptRef& scriptResRef = _script(scriptRef);
 
-    scriptResRef =
-        Resources::ScriptManager::getResourceByName(_descScriptName(scriptRef));
-    Resources::ScriptManager::callOnCreate(scriptResRef, scriptRef._id);
+    scriptResRef = Resources::ScriptManager::_getResourceByName(
+        _descScriptName(scriptRef));
+
+    if (scriptResRef.isValid())
+    {
+      Resources::ScriptManager::callOnCreate(scriptResRef, scriptRef);
+    }
   }
 }
 
@@ -41,14 +45,14 @@ void ScriptManager::destroyResources(const ScriptRefArray& p_Scripts)
     ScriptRef scriptRef = p_Scripts[scriptIdx];
     Resources::ScriptRef scriptResRef = _script(scriptRef);
 
-    Resources::ScriptManager::callOnDestroy(scriptResRef, scriptRef._id);
+    Resources::ScriptManager::callOnDestroy(scriptResRef, scriptRef);
     _script(scriptRef) = Resources::ScriptRef();
   }
 }
 
 void ScriptManager::tickScripts(ScriptRefArray& p_Scripts, float p_DeltaT)
 {
-  _INTR_PROFILE_CPU("Components", "Tick scripts");
+  _INTR_PROFILE_CPU("Scripts", "Tick Scripts");
 
   for (uint32_t scriptIdx = 0u;
        scriptIdx < static_cast<uint32_t>(p_Scripts.size()); ++scriptIdx)
@@ -58,7 +62,7 @@ void ScriptManager::tickScripts(ScriptRefArray& p_Scripts, float p_DeltaT)
 
     if (scriptResRef.isValid())
     {
-      Resources::ScriptManager::callTickScript(scriptResRef, scriptRef._id,
+      Resources::ScriptManager::callTickScript(scriptResRef, scriptRef,
                                                p_DeltaT);
     }
   }

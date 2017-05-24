@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /** \file
-* Contains the Camera Controller Component Manager.
-*/
+ * Contains the Camera Controller Component Manager.
+ */
 
 #pragma once
 
@@ -56,11 +56,18 @@ struct CameraControllerData : Dod::Components::ComponentDataBase
     descCameraControllerType.resize(
         _INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT);
     descTargetEulerAngles.resize(_INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT);
+
+    lastTargetEulerAngles.resize(_INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT);
+    timeSinceLastOrientationChange.resize(
+        _INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT);
   }
 
   _INTR_ARRAY(Name) descTargetObjectName;
   _INTR_ARRAY(CameraControllerType::Enum) descCameraControllerType;
   _INTR_ARRAY(glm::vec3) descTargetEulerAngles;
+
+  _INTR_ARRAY(glm::vec3) lastTargetEulerAngles;
+  _INTR_ARRAY(float) timeSinceLastOrientationChange;
 };
 
 ///
@@ -121,25 +128,28 @@ struct CameraControllerManager
   /// Compiles all exposed properties to a JSON descriptor.
   ///
   _INTR_INLINE static void compileDescriptor(CameraControllerRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember(
         "cameraControllerType",
-        _INTR_CREATE_PROP_ENUM(p_Document, _N(CameraController), _N(enum),
-                               _descCameraControllerType(p_Ref),
+        _INTR_CREATE_PROP_ENUM(p_Document, p_GenerateDesc, _N(CameraController),
+                               _N(enum), _descCameraControllerType(p_Ref),
                                "ThirdPerson,FirstPerson", false, false),
         p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "targetObjectName",
-        _INTR_CREATE_PROP(p_Document, _N(CameraController), _N(string),
-                          _descTargetObjectName(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "targetEulerAngles",
-        _INTR_CREATE_PROP(p_Document, _N(CameraController), _N(vec3),
-                          _descTargetEulerAngles(p_Ref), false, false),
-        p_Document.GetAllocator());
+    p_Properties.AddMember("targetObjectName",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(CameraController), _N(string),
+                                             _descTargetObjectName(p_Ref),
+                                             false, false),
+                           p_Document.GetAllocator());
+    p_Properties.AddMember("targetEulerAngles",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(CameraController), _N(vec3),
+                                             _descTargetEulerAngles(p_Ref),
+                                             false, false),
+                           p_Document.GetAllocator());
   }
 
   // <-
@@ -152,7 +162,7 @@ struct CameraControllerManager
   {
     if (p_Properties.HasMember("cameraControllerType"))
       _descCameraControllerType(p_Ref) =
-          (CameraControllerType::Enum)JsonHelper::readPropertyEnum(
+          (CameraControllerType::Enum)JsonHelper::readPropertyEnumUint(
               p_Properties["cameraControllerType"]);
     if (p_Properties.HasMember("targetObjectName"))
       _descTargetObjectName(p_Ref) =
@@ -195,6 +205,20 @@ struct CameraControllerManager
   _descCameraControllerType(CameraControllerRef p_Ref)
   {
     return _data.descCameraControllerType[p_Ref._id];
+  }
+
+  // Resources
+  /// The euler angles seen during the last update call.
+  _INTR_INLINE static glm::vec3&
+  _lastTargetEulerAngles(CameraControllerRef p_Ref)
+  {
+    return _data.lastTargetEulerAngles[p_Ref._id];
+  }
+  /// The time passed since the last change in orientation.
+  _INTR_INLINE static float&
+  _timeSinceLastOrientationChange(CameraControllerRef p_Ref)
+  {
+    return _data.timeSinceLastOrientationChange[p_Ref._id];
   }
 };
 }

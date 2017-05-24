@@ -1,13 +1,21 @@
 {
   "initialWorld": "Default.world.json",
 
+  "rendererConfig" : "renderer_config.json",
+  "materialPassConfig" : "material_pass_config.json",
   "rendererValidationEnabled": false,
 
   "targetFrameRate": 0.016,
-  
   "windowMode": 0,
+  "presentMode": 2,
+  "initialGameState": 2,
+
   "screenResolutionWidth": 1280,
   "screenResolutionHeight": 720,
+
+  "controllerDeadZone" : 0.3,
+  "invertHorizontalCameraAxis": true,
+  "invertVerticalCameraAxis": false,
 
   "assetMeshPath": "../../Intrinsic_Assets/app/assets/meshes",
   "assetTexturePath": "../../Intrinsic_Assets/app/assets/textures"

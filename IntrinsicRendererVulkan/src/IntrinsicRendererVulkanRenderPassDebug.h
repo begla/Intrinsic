@@ -26,14 +26,15 @@ struct DebugStageFlags
 {
   enum Flags
   {
-    kWorldBoundingSpheres = 0x01
+    kWorldBoundingSpheres = 0x01,
+    kBenchmarkPaths = 0x02
   };
 };
 
 struct Debug
 {
   static void init();
-  static void updateResolutionDependentResources();
+  static void onReinitRendering();
   static void destroy();
 
   static void renderLine(const glm::vec3& p_Pos0, const glm::vec3& p_Pos1,
@@ -41,9 +42,9 @@ struct Debug
   static void renderLine(const glm::vec3& p_Pos0, const glm::vec3& p_Pos1,
                          uint32_t p_Color0, uint32_t p_Color1);
   static void renderSphere(const glm::vec3& p_Center, float p_Radius,
-                           const glm::vec4& p_Color);
+                           const glm::vec3& p_Color);
 
-  static void render(float p_DeltaT);
+  static void render(float p_DeltaT, Components::CameraRef p_CameraRef);
 
   static uint32_t _activeDebugStageFlags;
 };

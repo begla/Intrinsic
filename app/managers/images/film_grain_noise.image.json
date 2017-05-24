@@ -1,0 +1,17 @@
+{
+    "name": "film_grain_noise",
+    "properties": {
+        "name": "film_grain_noise",
+        "imageType": 1,
+        "imageFormat": 7,
+        "flags": 16,
+        "dimensions": [
+            256.0,
+            256.0,
+            1.0
+        ],
+        "arrayLayerCount": 1,
+        "mipLevelCount": 9,
+        "fileName": "film_grain_noise.dds"
+    }
+}

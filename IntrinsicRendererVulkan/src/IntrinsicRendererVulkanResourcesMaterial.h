@@ -24,6 +24,7 @@ namespace Resources
 {
 typedef Dod::Ref MaterialRef;
 typedef Dod::RefArray MaterialRefArray;
+typedef Name& (*MaterialResourceFunction)(Dod::Ref);
 
 struct PerMaterialDataVertex
 {
@@ -35,15 +36,51 @@ struct PerMaterialDataFragment
   glm::vec4 uvOffsetScale;
   glm::vec4 uvAnimation;
   glm::vec4 pbrBias;
+  glm::vec4 waterParams;
 
   uint32_t data0[4];
 };
+
+namespace MaterialPass
+{
+namespace BoundResourceType
+{
+enum Enum
+{
+  kImage,
+  kBuffer
+};
+}
+
+struct MaterialPass
+{
+  Name name;
+  uint8_t pipelineIdx;
+  uint8_t pipelineLayoutIdx;
+  uint8_t boundResoucesIdx;
+};
+
+struct BoundResourceEntry
+{
+  uint8_t type;
+  uint8_t shaderStage;
+  Name resourceName;
+  Name slotName;
+};
+
+struct BoundResources
+{
+  Name name;
+  _INTR_ARRAY(BoundResourceEntry) boundResourceEntries;
+};
+}
 
 struct MaterialData : Dod::Resources::ResourceDataBase
 {
   MaterialData() : Dod::Resources::ResourceDataBase(_INTR_MAX_MATERIAL_COUNT)
   {
     descAlbedoTextureName.resize(_INTR_MAX_MATERIAL_COUNT);
+    descEmissiveTextureName.resize(_INTR_MAX_MATERIAL_COUNT);
     descAlbedo1TextureName.resize(_INTR_MAX_MATERIAL_COUNT);
     descAlbedo2TextureName.resize(_INTR_MAX_MATERIAL_COUNT);
     descNormalTextureName.resize(_INTR_MAX_MATERIAL_COUNT);
@@ -55,20 +92,22 @@ struct MaterialData : Dod::Resources::ResourceDataBase
 
     descBlendMaskTextureName.resize(_INTR_MAX_MATERIAL_COUNT);
     descFoamTextureName.resize(_INTR_MAX_MATERIAL_COUNT);
-    descFoamFadeDistance.resize(_INTR_MAX_MATERIAL_COUNT);
     descRefractionFactor.resize(_INTR_MAX_MATERIAL_COUNT);
 
     descTranslucencyThickness.resize(_INTR_MAX_MATERIAL_COUNT);
+    descEmissiveIntensity.resize(_INTR_MAX_MATERIAL_COUNT);
 
     descUvOffsetScale.resize(_INTR_MAX_MATERIAL_COUNT);
     descUvAnimation.resize(_INTR_MAX_MATERIAL_COUNT);
     descPbrBias.resize(_INTR_MAX_MATERIAL_COUNT);
+    descWaterParams.resize(_INTR_MAX_MATERIAL_COUNT);
 
     descMaterialPassMask.resize(_INTR_MAX_MATERIAL_COUNT);
 
     perMaterialDataVertexOffset.resize(_INTR_MAX_MATERIAL_COUNT);
     perMaterialDataFragmentOffset.resize(_INTR_MAX_MATERIAL_COUNT);
     materialBufferEntryIndex.resize(_INTR_MAX_MATERIAL_COUNT);
+    materialPassMask.resize(_INTR_MAX_MATERIAL_COUNT);
 
     memset(perMaterialDataFragmentOffset.data(), 0xFF,
            perMaterialDataFragmentOffset.size() * sizeof(uint32_t));
@@ -80,6 +119,7 @@ struct MaterialData : Dod::Resources::ResourceDataBase
 
   // Description
   _INTR_ARRAY(Name) descAlbedoTextureName;
+  _INTR_ARRAY(Name) descEmissiveTextureName;
   _INTR_ARRAY(Name) descAlbedo1TextureName;
   _INTR_ARRAY(Name) descAlbedo2TextureName;
   _INTR_ARRAY(Name) descNormalTextureName;
@@ -91,21 +131,23 @@ struct MaterialData : Dod::Resources::ResourceDataBase
 
   _INTR_ARRAY(Name) descBlendMaskTextureName;
   _INTR_ARRAY(Name) descFoamTextureName;
-  _INTR_ARRAY(float) descFoamFadeDistance;
   _INTR_ARRAY(float) descRefractionFactor;
 
   _INTR_ARRAY(float) descTranslucencyThickness;
+  _INTR_ARRAY(float) descEmissiveIntensity;
 
   _INTR_ARRAY(glm::vec4) descUvOffsetScale;
   _INTR_ARRAY(glm::vec2) descUvAnimation;
   _INTR_ARRAY(glm::vec3) descPbrBias;
+  _INTR_ARRAY(glm::vec4) descWaterParams;
 
-  _INTR_ARRAY(uint32_t) descMaterialPassMask;
+  _INTR_ARRAY(_INTR_ARRAY(Name)) descMaterialPassMask;
 
   // Resources
   _INTR_ARRAY(uint32_t) perMaterialDataVertexOffset;
   _INTR_ARRAY(uint32_t) perMaterialDataFragmentOffset;
   _INTR_ARRAY(uint32_t) materialBufferEntryIndex;
+  _INTR_ARRAY(uint32_t) materialPassMask;
 };
 
 struct MaterialManager
@@ -113,7 +155,6 @@ struct MaterialManager
                                           _INTR_MAX_MATERIAL_COUNT>
 {
   static void init();
-  static void initMaterialPasses();
 
   _INTR_INLINE static MaterialRef createMaterial(const Name& p_Name)
   {
@@ -125,6 +166,7 @@ struct MaterialManager
   _INTR_INLINE static void resetToDefault(MaterialRef p_Ref)
   {
     _descAlbedoTextureName(p_Ref) = _N(checkerboard);
+    _descEmissiveTextureName(p_Ref) = _N(white);
     _descAlbedo1TextureName(p_Ref) = _N(checkerboard);
     _descAlbedo2TextureName(p_Ref) = _N(checkerboard);
     _descNormalTextureName(p_Ref) = _N(default_NRM);
@@ -134,17 +176,20 @@ struct MaterialManager
     _descPbr1TextureName(p_Ref) = _N(default_PBR);
     _descPbr2TextureName(p_Ref) = _N(default_PBR);
 
-    _descBlendMaskTextureName(p_Ref) = _N(checkerboard);
+    _descBlendMaskTextureName(p_Ref) = _N(white);
     _descFoamTextureName(p_Ref) = _N(checkerboard);
-    _descFoamFadeDistance(p_Ref) = 1.0f;
     _descRefractionFactor(p_Ref) = 0.0f;
+
     _descTranslucencyThickness(p_Ref) = 0.0f;
+    _descEmissiveIntensity(p_Ref) = 0.0f;
 
     _descUvOffsetScale(p_Ref) = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
     _descPbrBias(p_Ref) = glm::vec3(0.0f);
     _descUvAnimation(p_Ref) = glm::vec2(0.0f);
+    _descWaterParams(p_Ref) = glm::vec4(0.0f);
 
-    _descMaterialPassMask(p_Ref) = MaterialPassFlags::kShadowedSurface;
+    _descMaterialPassMask(p_Ref) = {"GBufferDefault", "Shadow",
+                                    "PerPixelPicking"};
   }
 
   _INTR_INLINE static void destroyMaterial(MaterialRef p_Ref)
@@ -153,131 +198,179 @@ struct MaterialManager
         MaterialData, _INTR_MAX_MATERIAL_COUNT>::_destroyResource(p_Ref);
   }
 
+  _INTR_INLINE static void updateMaterialPassFlags(MaterialRef p_Ref) {}
+
   _INTR_INLINE static void compileDescriptor(MaterialRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         MaterialData,
-        _INTR_MAX_MATERIAL_COUNT>::_compileDescriptor(p_Ref, p_Properties,
-                                                      p_Document);
+        _INTR_MAX_MATERIAL_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
+                                                      p_Properties, p_Document);
 
-    p_Properties.AddMember("materialPassMask",
-                           _INTR_CREATE_PROP(p_Document, _N(Material), "",
-                                             _descMaterialPassMask(p_Ref),
-                                             false, true),
-                           p_Document.GetAllocator());
+    _INTR_STRING materialPassNames;
+    for (auto& matPass : _materialPasses)
+      materialPassNames += "," + matPass.name.getString();
+
+    p_Properties.AddMember(
+        "materialPassMask",
+        _INTR_CREATE_PROP_FLAGS(p_Document, p_GenerateDesc, _N(Material),
+                                "flags", _descMaterialPassMask(p_Ref),
+                                materialPassNames, false, false),
+        p_Document.GetAllocator());
 
     // General
     {
       p_Properties.AddMember(
           "albedoTextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures), "string",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
                             _descAlbedoTextureName(p_Ref), false, false),
           p_Document.GetAllocator());
       p_Properties.AddMember(
+          "emissiveTextureName",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
+                            _descEmissiveTextureName(p_Ref), false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
           "uvOffsetScale",
-          _INTR_CREATE_PROP(p_Document, _N(Properties_UV), "vec4",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(UV), "vec4",
                             _descUvOffsetScale(p_Ref), false, false),
           p_Document.GetAllocator());
-      p_Properties.AddMember("uvAnimation",
-                             _INTR_CREATE_PROP(p_Document, _N(Properties_UV),
-                                               "vec2", _descUvAnimation(p_Ref),
-                                               false, false),
-                             p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "uvAnimation",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(UV), "vec2",
+                            _descUvAnimation(p_Ref), false, false),
+          p_Document.GetAllocator());
       p_Properties.AddMember(
           "translucencyThickness",
-          _INTR_CREATE_PROP(p_Document, _N(Properties_Translucency), "float",
-                            _descTranslucencyThickness(p_Ref), false, false),
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Translucency),
+                            "float", _descTranslucencyThickness(p_Ref), false,
+                            false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "emissiveIntensity",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Emissive), "float",
+                            _descEmissiveIntensity(p_Ref), false, false),
           p_Document.GetAllocator());
     }
 
-    // Surface / Foliage properties
-    if ((_descMaterialPassMask(p_Ref) &
-         (MaterialPassFlags::kSurface | MaterialPassFlags::kFoliage |
-          MaterialPassFlags::kSurfaceWater |
-          MaterialPassFlags::kSurfaceLayered)) != 0u)
+    // General GBuffer
+    if ((_materialPassMask(p_Ref) &
+         (getMaterialPassFlag(_N(GBufferDefault)) |
+          getMaterialPassFlag(_N(GBufferFoliage)) |
+          getMaterialPassFlag(_N(GBufferWater)) |
+          getMaterialPassFlag(_N(GBufferTerrain)))) != 0u)
     {
       p_Properties.AddMember(
           "normalTextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures), "string",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
                             _descNormalTextureName(p_Ref), false, false),
           p_Document.GetAllocator());
       p_Properties.AddMember(
           "pbrTextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures), "string",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
                             _descPbrTextureName(p_Ref), false, false),
           p_Document.GetAllocator());
 
       p_Properties.AddMember(
-          "pbrBias",
-          _INTR_CREATE_PROP(p_Document, _N(Properties_Surface), "vec3",
-                            _descPbrBias(p_Ref), false, false),
+          "metalMaskBias",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(PBR), "float",
+                            _descPbrBias(p_Ref).x, false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "roughnessBias",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(PBR), "float",
+                            _descPbrBias(p_Ref).z, false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "specularBias",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(PBR), "float",
+                            _descPbrBias(p_Ref).y, false, false),
           p_Document.GetAllocator());
     }
 
-    // Surface (Layered)
-    if ((_descMaterialPassMask(p_Ref) & (MaterialPassFlags::kSurfaceLayered)) !=
+    if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferFoliage))) !=
         0u)
     {
       p_Properties.AddMember(
-          "albedo1TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descAlbedo1TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "normal1TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descNormal1TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "pbr1TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descPbr1TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "albedo2TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descAlbedo2TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "normal2TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descNormal2TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "pbr2TextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
-                            _descPbr2TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
           "blendMaskTextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Layered), "string",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
                             _descBlendMaskTextureName(p_Ref), false, false),
           p_Document.GetAllocator());
     }
 
-    // Surface (Water)
-    if ((_descMaterialPassMask(p_Ref) & (MaterialPassFlags::kSurfaceWater)) !=
+    // Terrain
+    if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferTerrain))) !=
+        0u)
+    {
+      p_Properties.AddMember(
+          "albedo1TextureName",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
+                            _descAlbedo1TextureName(p_Ref), false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "normal1TextureName",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
+                            _descNormal1TextureName(p_Ref), false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "pbr1TextureName",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
+                            _descPbr1TextureName(p_Ref), false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "albedo2TextureName",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
+                            _descAlbedo2TextureName(p_Ref), false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "normal2TextureName",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
+                            _descNormal2TextureName(p_Ref), false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "pbr2TextureName",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
+                            _descPbr2TextureName(p_Ref), false, false),
+          p_Document.GetAllocator());
+      p_Properties.AddMember(
+          "blendMaskTextureName",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
+                            _descBlendMaskTextureName(p_Ref), false, false),
+          p_Document.GetAllocator());
+    }
+
+    // Water
+    if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferWater))) !=
         0u)
     {
       p_Properties.AddMember(
           "foamTextureName",
-          _INTR_CREATE_PROP(p_Document, _N(Textures_Water), "string",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
                             _descFoamTextureName(p_Ref), false, false),
           p_Document.GetAllocator());
       p_Properties.AddMember(
           "foamFadeDistance",
-          _INTR_CREATE_PROP(p_Document, _N(Properties_Water), "float",
-                            _descFoamFadeDistance(p_Ref), false, false),
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Water), "float",
+                            _descWaterParams(p_Ref).x, false, false),
           p_Document.GetAllocator());
       p_Properties.AddMember(
-          "refractionFactor",
-          _INTR_CREATE_PROP(p_Document, _N(Properties_Water), "float",
-                            _descRefractionFactor(p_Ref), false, false),
+          "waterFadeDistance",
+          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Water), "float",
+                            _descWaterParams(p_Ref).y, false, false),
           p_Document.GetAllocator());
+      p_Properties.AddMember("refractionFactor",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(Transparency), "float",
+                                               _descRefractionFactor(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
     }
   }
+
+  // <-
 
   _INTR_INLINE static void initFromDescriptor(MaterialRef p_Ref,
                                               rapidjson::Value& p_Properties)
@@ -289,6 +382,9 @@ struct MaterialManager
     if (p_Properties.HasMember("albedoTextureName"))
       _descAlbedoTextureName(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["albedoTextureName"]);
+    if (p_Properties.HasMember("emissiveTextureName"))
+      _descEmissiveTextureName(p_Ref) =
+          JsonHelper::readPropertyString(p_Properties["emissiveTextureName"]);
     if (p_Properties.HasMember("normalTextureName"))
       _descNormalTextureName(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["normalTextureName"]);
@@ -321,8 +417,11 @@ struct MaterialManager
       _descFoamTextureName(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["foamTextureName"]);
     if (p_Properties.HasMember("foamFadeDistance"))
-      _descFoamFadeDistance(p_Ref) =
+      _descWaterParams(p_Ref).x =
           JsonHelper::readPropertyFloat(p_Properties["foamFadeDistance"]);
+    if (p_Properties.HasMember("waterFadeDistance"))
+      _descWaterParams(p_Ref).y =
+          JsonHelper::readPropertyFloat(p_Properties["waterFadeDistance"]);
     if (p_Properties.HasMember("refractionFactor"))
       _descRefractionFactor(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["refractionFactor"]);
@@ -330,6 +429,9 @@ struct MaterialManager
     if (p_Properties.HasMember("translucencyThickness"))
       _descTranslucencyThickness(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["translucencyThickness"]);
+    if (p_Properties.HasMember("emissiveIntensity"))
+      _descEmissiveIntensity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["emissiveIntensity"]);
 
     if (p_Properties.HasMember("uvOffsetScale"))
       _descUvOffsetScale(p_Ref) =
@@ -337,30 +439,47 @@ struct MaterialManager
     if (p_Properties.HasMember("uvAnimation"))
       _descUvAnimation(p_Ref) =
           JsonHelper::readPropertyVec2(p_Properties["uvAnimation"]);
-    if (p_Properties.HasMember("pbrBias"))
-      _descPbrBias(p_Ref) =
-          JsonHelper::readPropertyVec3(p_Properties["pbrBias"]);
+
+    if (p_Properties.HasMember("metalMaskBias"))
+      _descPbrBias(p_Ref).x =
+          JsonHelper::readPropertyFloat(p_Properties["metalMaskBias"]);
+    if (p_Properties.HasMember("specularBias"))
+      _descPbrBias(p_Ref).y =
+          JsonHelper::readPropertyFloat(p_Properties["specularBias"]);
+    if (p_Properties.HasMember("roughnessBias"))
+      _descPbrBias(p_Ref).z =
+          JsonHelper::readPropertyFloat(p_Properties["roughnessBias"]);
 
     if (p_Properties.HasMember("materialPassMask"))
-      _descMaterialPassMask(p_Ref) =
-          JsonHelper::readPropertyUint(p_Properties["materialPassMask"]);
+    {
+      _descMaterialPassMask(p_Ref).clear();
+      JsonHelper::readPropertyFlagsNameArray(p_Properties["materialPassMask"],
+                                             _descMaterialPassMask(p_Ref));
+    }
   }
 
-  _INTR_INLINE static void saveToSingleFile(const char* p_FileName)
+  // <-
+
+  _INTR_INLINE static void saveToMultipleFiles(const char* p_Path,
+                                               const char* p_Extension)
+  {
+    Dod::Resources::ResourceManagerBase<MaterialData,
+                                        _INTR_MAX_MATERIAL_COUNT>::
+        _saveToMultipleFiles<
+            rapidjson::PrettyWriter<rapidjson::FileWriteStream>>(
+            p_Path, p_Extension, compileDescriptor);
+  }
+
+  // <-
+
+  _INTR_INLINE static void loadFromMultipleFiles(const char* p_Path,
+                                                 const char* p_Extension)
   {
     Dod::Resources::ResourceManagerBase<
         MaterialData,
-        _INTR_MAX_MATERIAL_COUNT>::_saveToSingleFile(p_FileName,
-                                                     compileDescriptor);
-  }
-
-  _INTR_INLINE static void loadFromSingleFile(const char* p_FileName)
-  {
-    Dod::Resources::ResourceManagerBase<
-        MaterialData,
-        _INTR_MAX_MATERIAL_COUNT>::_loadFromSingleFile(p_FileName,
-                                                       initFromDescriptor,
-                                                       resetToDefault);
+        _INTR_MAX_MATERIAL_COUNT>::_loadFromMultipleFiles(p_Path, p_Extension,
+                                                          initFromDescriptor,
+                                                          resetToDefault);
   }
 
   // <-
@@ -374,6 +493,17 @@ struct MaterialManager
   static void createResources(const MaterialRefArray& p_Materials);
   static void destroyResources(const MaterialRefArray& p_Materials);
 
+  _INTR_INLINE static uint8_t getMaterialPassId(const Name& p_Name)
+  {
+    return _materialPassMapping[p_Name];
+  }
+  _INTR_INLINE static uint32_t getMaterialPassFlag(const Name& p_Name)
+  {
+    return (1u << getMaterialPassId(p_Name));
+  }
+
+  static void loadMaterialPassConfig();
+
   // Getter/Setter
   // ->
 
@@ -381,6 +511,10 @@ struct MaterialManager
   _INTR_INLINE static Name& _descAlbedoTextureName(MaterialRef p_Ref)
   {
     return _data.descAlbedoTextureName[p_Ref._id];
+  }
+  _INTR_INLINE static Name& _descEmissiveTextureName(MaterialRef p_Ref)
+  {
+    return _data.descEmissiveTextureName[p_Ref._id];
   }
   _INTR_INLINE static Name& _descNormalTextureName(MaterialRef p_Ref)
   {
@@ -423,10 +557,6 @@ struct MaterialManager
   {
     return _data.descFoamTextureName[p_Ref._id];
   }
-  _INTR_INLINE static float& _descFoamFadeDistance(MaterialRef p_Ref)
-  {
-    return _data.descFoamFadeDistance[p_Ref._id];
-  }
   _INTR_INLINE static float& _descRefractionFactor(MaterialRef p_Ref)
   {
     return _data.descRefractionFactor[p_Ref._id];
@@ -444,13 +574,22 @@ struct MaterialManager
   {
     return _data.descPbrBias[p_Ref._id];
   }
+  _INTR_INLINE static glm::vec4& _descWaterParams(MaterialRef p_Ref)
+  {
+    return _data.descWaterParams[p_Ref._id];
+  }
 
   _INTR_INLINE static float& _descTranslucencyThickness(MaterialRef p_Ref)
   {
     return _data.descTranslucencyThickness[p_Ref._id];
   }
+  _INTR_INLINE static float& _descEmissiveIntensity(MaterialRef p_Ref)
+  {
+    return _data.descEmissiveIntensity[p_Ref._id];
+  }
 
-  _INTR_INLINE static uint32_t& _descMaterialPassMask(MaterialRef p_Ref)
+  _INTR_INLINE static _INTR_ARRAY(Name) &
+      _descMaterialPassMask(MaterialRef p_Ref)
   {
     return _data.descMaterialPassMask[p_Ref._id];
   }
@@ -469,11 +608,21 @@ struct MaterialManager
   {
     return _data.materialBufferEntryIndex[p_Ref._id];
   }
+  _INTR_INLINE static uint32_t& _materialPassMask(MaterialRef p_Ref)
+  {
+    return _data.materialPassMask[p_Ref._id];
+  }
 
   // <-
 
-  static PipelineRef _pipelines[MaterialPass::kCount];
-  static PipelineRef _pipelineLayouts[MaterialPass::kCount];
+  static _INTR_ARRAY(MaterialPass::MaterialPass) _materialPasses;
+  static _INTR_ARRAY(Dod::Ref) _materialPassPipelines;
+  static _INTR_ARRAY(Dod::Ref) _materialPassPipelineLayouts;
+  static _INTR_HASH_MAP(Name, uint8_t) _materialPassMapping;
+
+  static _INTR_ARRAY(MaterialPass::BoundResources) _materialPassBoundResources;
+  static _INTR_HASH_MAP(Name, MaterialResourceFunction)
+      _materialResourceFunctionMapping;
 };
 }
 }

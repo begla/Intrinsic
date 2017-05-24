@@ -18,8 +18,8 @@
 
 #define LUM_AND_BRIGHT_THREADS 8u
 
-#define ADD_THREADS_X 64
-#define ADD_THREADS_Y 2
+#define ADD_THREADS_X 64u
+#define ADD_THREADS_Y 2u
 
 namespace Intrinsic
 {
@@ -96,9 +96,9 @@ _INTR_INLINE void dispatchLum(VkCommandBuffer p_CommandBuffer)
   RenderSystem::dispatchComputeCall(_lumComputeCallRef, p_CommandBuffer);
 
   ImageManager::insertImageMemoryBarrier(
-      _brightImageRef, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_GENERAL,
-      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+      _brightImageRef, VK_IMAGE_LAYOUT_GENERAL,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+      VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
 }
 
 // <-
@@ -156,24 +156,38 @@ _INTR_INLINE void dispatchBlur(VkCommandBuffer p_CommandBuffer,
                                           &blurData,
                                           sizeof(PerInstanceDataBlur));
 
+  ImageManager::insertImageMemoryBarrierSubResource(
+      _blurPingPongImageRef, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+      VK_IMAGE_LAYOUT_GENERAL, p_MipLevel0, 0u,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+
   RenderSystem::dispatchComputeCall(_blurXComputeCallRefs[p_MipLevel0],
                                     p_CommandBuffer);
 
   ImageManager::insertImageMemoryBarrierSubResource(
-      _blurPingPongImageRef, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_GENERAL,
-      p_MipLevel0, 0u, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+      _blurPingPongImageRef, VK_IMAGE_LAYOUT_GENERAL,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, p_MipLevel0, 0u,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
       VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
 
   ComputeCallManager::updateUniformMemory({_blurYComputeCallRefs[p_MipLevel0]},
                                           &blurData,
                                           sizeof(PerInstanceDataBlur));
 
+  ImageManager::insertImageMemoryBarrierSubResource(
+      _blurImageRef, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+      VK_IMAGE_LAYOUT_GENERAL, p_MipLevel0, 0u,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+
   RenderSystem::dispatchComputeCall(_blurYComputeCallRefs[p_MipLevel0],
                                     p_CommandBuffer);
 
   ImageManager::insertImageMemoryBarrierSubResource(
-      _blurImageRef, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_GENERAL,
-      p_MipLevel0, 0u, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+      _blurImageRef, VK_IMAGE_LAYOUT_GENERAL,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, p_MipLevel0, 0u,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
       VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
 }
 
@@ -200,11 +214,6 @@ _INTR_INLINE void dispatchAdd(VkCommandBuffer p_CommandBuffer,
 
   RenderSystem::dispatchComputeCall(_addComputeCallRefs[p_MipLevel0],
                                     p_CommandBuffer);
-
-  ImageManager::insertImageMemoryBarrierSubResource(
-      _summedImageRef, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_GENERAL,
-      p_MipLevel0, 0u, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
 }
 }
 
@@ -242,8 +251,9 @@ void Bloom::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutLumBright);
 
     GpuProgramManager::reflectPipelineLayout(
-        32u, {Resources::GpuProgramManager::getResourceByName(
-                 "post_bloom_bright_lum.comp")},
+        32u,
+        {Resources::GpuProgramManager::getResourceByName(
+            "post_bloom_bright_lum.comp")},
         pipelineLayoutLumBright);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayoutLumBright);
@@ -255,8 +265,9 @@ void Bloom::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutAvgLum);
 
     GpuProgramManager::reflectPipelineLayout(
-        32u, {Resources::GpuProgramManager::getResourceByName(
-                 "post_bloom_avg_lum.comp")},
+        32u,
+        {Resources::GpuProgramManager::getResourceByName(
+            "post_bloom_avg_lum.comp")},
         pipelineLayoutAvgLum);
   }
 
@@ -269,8 +280,9 @@ void Bloom::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutAdd);
 
     GpuProgramManager::reflectPipelineLayout(
-        32u, {Resources::GpuProgramManager::getResourceByName(
-                 "post_bloom_add.comp")},
+        32u,
+        {Resources::GpuProgramManager::getResourceByName(
+            "post_bloom_add.comp")},
         pipelineLayoutAdd);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayoutAdd);
@@ -282,8 +294,9 @@ void Bloom::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutBlur);
 
     GpuProgramManager::reflectPipelineLayout(
-        32u, {Resources::GpuProgramManager::getResourceByName(
-                 "post_bloom_blur_x.comp")},
+        128u,
+        {Resources::GpuProgramManager::getResourceByName(
+            "post_bloom_blur_x.comp")},
         pipelineLayoutBlur);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayoutBlur);
@@ -350,7 +363,7 @@ void Bloom::init()
 
 // <-
 
-void Bloom::updateResolutionDependentResources()
+void Bloom::onReinitRendering()
 {
   using namespace Resources;
 
@@ -606,10 +619,9 @@ void Bloom::updateResolutionDependentResources()
 
       Vulkan::Resources::ComputeCallManager::_descDimensions(
           computeCallBlurXRef) =
-          glm::vec3(
-              calculateThreadGroups((dim.x * 2u) >> (i + 1), BLUR_X_THREADS_X),
-              calculateThreadGroups((dim.y * 2u) >> (i + 1), BLUR_X_THREADS_Y),
-              1);
+          glm::vec3(calculateThreadGroups(
+                        dim.x >> i, BLUR_THREADS - 2u * BLUR_HALF_BLUR_WIDTH),
+                    dim.y >> i, 1);
 
       ComputeCallManager::bindBuffer(
           computeCallBlurXRef, _N(PerInstance), GpuProgramType::kCompute,
@@ -639,11 +651,9 @@ void Bloom::updateResolutionDependentResources()
 
         Vulkan::Resources::ComputeCallManager::_descDimensions(
             computeCallBlurYRef) =
-            glm::vec3(calculateThreadGroups((dim.x * 2u) >> (i + 1),
-                                            BLUR_Y_THREADS_X),
-                      calculateThreadGroups((dim.y * 2u) >> (i + 1),
-                                            BLUR_Y_THREADS_Y),
-                      1);
+            glm::vec3(calculateThreadGroups(
+                          dim.y >> i, BLUR_THREADS - 2u * BLUR_HALF_BLUR_WIDTH),
+                      dim.x >> i, 1);
 
         ComputeCallManager::bindBuffer(
             computeCallBlurYRef, _N(PerInstance), GpuProgramType::kCompute,
@@ -676,10 +686,8 @@ void Bloom::updateResolutionDependentResources()
 
           Vulkan::Resources::ComputeCallManager::_descDimensions(
               computeCallAddRef) =
-              glm::uvec3(
-                  calculateThreadGroups((dim.x * 2u) >> (i + 1), ADD_THREADS_X),
-                  calculateThreadGroups((dim.y * 2u) >> (i + 1), ADD_THREADS_Y),
-                  1u);
+              glm::uvec3(calculateThreadGroups(dim.x >> i, ADD_THREADS_X),
+                         calculateThreadGroups(dim.y >> i, ADD_THREADS_Y), 1u);
 
           ComputeCallManager::bindBuffer(
               computeCallAddRef, _N(PerInstance), GpuProgramType::kCompute,
@@ -712,7 +720,7 @@ void Bloom::destroy() {}
 
 // <-
 
-void Bloom::render(float p_DeltaT)
+void Bloom::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
@@ -731,14 +739,15 @@ void Bloom::render(float p_DeltaT)
       _summedImageRef, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL,
       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   ImageManager::insertImageMemoryBarrier(
-      _blurImageRef, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL,
+      _blurImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   ImageManager::insertImageMemoryBarrier(
-      _blurPingPongImageRef, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL,
+      _blurPingPongImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
 
   dispatchLum(primaryCmdBuffer);
-
   dispatchAvgLum(primaryCmdBuffer);
 
   dispatchBlur(primaryCmdBuffer, 3u);

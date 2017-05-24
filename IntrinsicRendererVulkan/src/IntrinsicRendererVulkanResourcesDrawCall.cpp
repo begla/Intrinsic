@@ -24,222 +24,9 @@ namespace Vulkan
 {
 namespace Resources
 {
-namespace
-{
-_INTR_INLINE void initBindInfosGBuffer(DrawCallRef p_DrawCallRef,
-                                       MaterialRef p_Material,
-                                       uint32_t p_PerInstanceDataVertexSize,
-                                       uint32_t p_PerInstanceDataFragmentSize)
-{
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerInstance), GpuProgramType::kVertex,
-      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceVertex,
-      p_PerInstanceDataVertexSize);
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerInstance), GpuProgramType::kFragment,
-      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceFragment,
-      p_PerInstanceDataFragmentSize);
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerMaterial), GpuProgramType::kFragment,
-      UniformManager::_perMaterialUniformBuffer, UboType::kPerMaterialFragment,
-      sizeof(PerMaterialDataFragment));
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(albedoTex), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descAlbedoTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(normalTex), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descNormalTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(roughnessTex), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descPbrTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-}
-
-// <-
-
-_INTR_INLINE void
-initBindInfosPerPixelPicking(DrawCallRef p_DrawCallRef, MaterialRef p_Material,
-                             uint32_t p_PerInstanceDataVertexSize,
-                             uint32_t p_PerInstanceDataFragmentSize)
-{
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerInstance), GpuProgramType::kVertex,
-      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceVertex,
-      p_PerInstanceDataVertexSize);
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerInstance), GpuProgramType::kFragment,
-      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceFragment,
-      p_PerInstanceDataFragmentSize);
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerMaterial), GpuProgramType::kFragment,
-      UniformManager::_perMaterialUniformBuffer, UboType::kPerMaterialFragment,
-      sizeof(PerMaterialDataFragment));
-}
-
-// <-
-
-_INTR_INLINE void
-initBindInfosGBufferLayered(DrawCallRef p_DrawCallRef, MaterialRef p_Material,
-                            uint32_t p_PerInstanceDataVertexSize,
-                            uint32_t p_PerInstanceDataFragmentSize)
-{
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerInstance), GpuProgramType::kVertex,
-      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceVertex,
-      p_PerInstanceDataVertexSize);
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerInstance), GpuProgramType::kFragment,
-      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceFragment,
-      p_PerInstanceDataFragmentSize);
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerMaterial), GpuProgramType::kFragment,
-      UniformManager::_perMaterialUniformBuffer, UboType::kPerMaterialFragment,
-      sizeof(PerMaterialDataFragment));
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(albedoTex0), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descAlbedoTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(normalTex0), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descNormalTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(roughnessTex0), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descPbrTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(albedoTex1), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descAlbedo1TextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(normalTex1), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descNormal1TextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(roughnessTex1), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descPbr1TextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(albedoTex2), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descAlbedo2TextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(normalTex2), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descNormal2TextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(roughnessTex2), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descPbr2TextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(blendMaskTex), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descBlendMaskTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-}
-
-// <-
-
-_INTR_INLINE void
-initBindInfosGBufferWater(DrawCallRef p_DrawCallRef, MaterialRef p_Material,
-                          uint32_t p_PerInstanceDataVertexSize,
-                          uint32_t p_PerInstanceDataFragmentSize)
-{
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerInstance), GpuProgramType::kVertex,
-      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceVertex,
-      p_PerInstanceDataVertexSize);
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerInstance), GpuProgramType::kFragment,
-      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceFragment,
-      p_PerInstanceDataFragmentSize);
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerMaterial), GpuProgramType::kFragment,
-      UniformManager::_perMaterialUniformBuffer, UboType::kPerMaterialFragment,
-      sizeof(PerMaterialDataFragment));
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(albedoTex), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descAlbedoTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(normalTex), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descNormalTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(roughnessTex), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descPbrTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(gbufferDepthTex), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(_N(GBufferDepth)),
-      Samplers::kNearestClamp);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(foamTex), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descFoamTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-}
-
-// <-
-
-_INTR_INLINE void
-initBindInfosShadowFoliage(DrawCallRef p_DrawCallRef, MaterialRef p_Material,
-                           uint32_t p_PerInstanceDataVertexSize,
-                           uint32_t p_PerInstanceDataFragmentSize)
-{
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerInstance), GpuProgramType::kVertex,
-      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceVertex,
-      p_PerInstanceDataVertexSize);
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerInstance), GpuProgramType::kFragment,
-      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceFragment,
-      p_PerInstanceDataFragmentSize);
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerMaterial), GpuProgramType::kFragment,
-      UniformManager::_perMaterialUniformBuffer, UboType::kPerMaterialFragment,
-      sizeof(PerMaterialDataFragment));
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(albedoTex), GpuProgramType::kFragment,
-      Resources::ImageManager::getResourceByName(
-          MaterialManager::_descAlbedoTextureName(p_Material)),
-      Samplers::kLinearRepeat);
-}
-
-// <-
-
-_INTR_INLINE void initBindInfosShadow(DrawCallRef p_DrawCallRef,
-                                      MaterialRef p_Material,
-                                      uint32_t p_PerInstanceDataVertexSize,
-                                      uint32_t p_PerInstanceDataFragmentSize)
-{
-  DrawCallManager::bindBuffer(
-      p_DrawCallRef, _N(PerInstance), GpuProgramType::kVertex,
-      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceVertex,
-      p_PerInstanceDataVertexSize);
-}
-}
-
 // Static members
-_INTR_ARRAY(DrawCallRef)
-DrawCallManager::_drawCallsPerMaterialPass[MaterialPass::kCount];
+_INTR_ARRAY(_INTR_ARRAY(DrawCallRef))
+DrawCallManager::_drawCallsPerMaterialPass;
 
 // <-
 
@@ -249,7 +36,7 @@ void DrawCallManager::createResources(const DrawCallRefArray& p_DrawCalls)
   {
     DrawCallRef drawCallRef = p_DrawCalls[dcIdx];
 
-    _INTR_ARRAY(BindingInfo)& bindInfs = _descBindInfos(drawCallRef);
+    _INTR_ARRAY(BindingInfo)& bindInfos = _descBindInfos(drawCallRef);
     PipelineRef pipelineRef = _descPipeline(drawCallRef);
     PipelineLayoutRef pipelineLayout =
         Resources::PipelineManager::_descPipelineLayout(pipelineRef);
@@ -260,7 +47,7 @@ void DrawCallManager::createResources(const DrawCallRefArray& p_DrawCalls)
     _INTR_ASSERT(descSet == VK_NULL_HANDLE);
 
     descSet = Resources::PipelineLayoutManager::allocateAndWriteDescriptorSet(
-        pipelineLayout, bindInfs);
+        pipelineLayout, bindInfos);
 
     // Defaults for now
     _indexBufferOffset(drawCallRef) = 0ull;
@@ -271,8 +58,6 @@ void DrawCallManager::createResources(const DrawCallRefArray& p_DrawCalls)
     {
       vtxBuffers[i] = BufferManager::_vkBuffer(descVtxBuffers[i]);
     }
-
-    _INTR_ARRAY(BindingInfo)& bindInfos = _descBindInfos(drawCallRef);
 
     uint32_t dynamicOffsetCount = 0u;
     for (uint32_t bindIdx = 0u; bindIdx < (uint32_t)bindInfos.size(); ++bindIdx)
@@ -289,10 +74,11 @@ void DrawCallManager::createResources(const DrawCallRefArray& p_DrawCalls)
 
     // "Sort" to per material pass array
     uint8_t materialPass = _descMaterialPass(drawCallRef);
-    if (materialPass != MaterialPass::kNone)
+    if (materialPass + 1u > _drawCallsPerMaterialPass.size())
     {
-      _drawCallsPerMaterialPass[materialPass].push_back(drawCallRef);
+      _drawCallsPerMaterialPass.resize(materialPass + 1u);
     }
+    _drawCallsPerMaterialPass[materialPass].push_back(drawCallRef);
   }
 }
 
@@ -390,7 +176,7 @@ void DrawCallManager::bindBuffer(DrawCallRef p_DrawCallRef, const Name& p_Name,
 DrawCallRef DrawCallManager::createDrawCallForMesh(
     const Name& p_Name, Dod::Ref p_Mesh, Dod::Ref p_Material,
     uint8_t p_MaterialPass, uint32_t p_PerInstanceDataVertexSize,
-    uint32_t p_PerInstanceDataFragmentSize)
+    uint32_t p_PerInstanceDataFragmentSize, uint32_t p_SubMeshIdx)
 {
   if (!p_Mesh.isValid())
   {
@@ -403,60 +189,89 @@ DrawCallRef DrawCallManager::createDrawCallForMesh(
                    Dod::Resources::ResourceFlags::kResourceVolatile);
 
   {
-    _descPipeline(drawCallMesh) = MaterialManager::_pipelines[p_MaterialPass];
+    _descPipeline(drawCallMesh) = MaterialManager::_materialPassPipelines
+        [MaterialManager::_materialPasses[p_MaterialPass].pipelineIdx];
+
+    _INTR_ASSERT(Renderer::Vulkan::Resources::PipelineManager::_vkPipeline(
+        _descPipeline(drawCallMesh)));
+
     _descVertexBuffers(drawCallMesh) =
-        Core::Resources::MeshManager::_vertexBuffersPerSubMesh(p_Mesh)[0];
+        Core::Resources::MeshManager::_vertexBuffersPerSubMesh(
+            p_Mesh)[p_SubMeshIdx];
     _descIndexBuffer(drawCallMesh) =
-        Core::Resources::MeshManager::_indexBufferPerSubMesh(p_Mesh)[0];
+        Core::Resources::MeshManager::_indexBufferPerSubMesh(
+            p_Mesh)[p_SubMeshIdx];
     _descVertexCount(drawCallMesh) =
         (uint32_t)Core::Resources::MeshManager::_descPositionsPerSubMesh(
-            p_Mesh)[0]
+            p_Mesh)[p_SubMeshIdx]
             .size();
     _descIndexCount(drawCallMesh) =
         (uint32_t)Core::Resources::MeshManager::_descIndicesPerSubMesh(
-            p_Mesh)[0]
+            p_Mesh)[p_SubMeshIdx]
             .size();
     _descMaterial(drawCallMesh) = p_Material;
     _descMaterialPass(drawCallMesh) = p_MaterialPass;
 
-    if (p_MaterialPass == MaterialPass::kSurface ||
-        p_MaterialPass == MaterialPass::kSky ||
-        p_MaterialPass == MaterialPass::kFoliage ||
-        p_MaterialPass == MaterialPass::kDebugGizmo ||
-        p_MaterialPass == MaterialPass::kDebugGrid)
+    MaterialPass::BoundResources& boundResources =
+        MaterialManager::_materialPassBoundResources
+            [MaterialManager::_materialPasses[p_MaterialPass].boundResoucesIdx];
+
+    for (uint32_t i = 0u; i < boundResources.boundResourceEntries.size(); ++i)
     {
-      initBindInfosGBuffer(drawCallMesh, p_Material,
-                           p_PerInstanceDataVertexSize,
-                           p_PerInstanceDataFragmentSize);
-    }
-    else if (p_MaterialPass == MaterialPass::kSurfaceLayered)
-    {
-      initBindInfosGBufferLayered(drawCallMesh, p_Material,
-                                  p_PerInstanceDataVertexSize,
-                                  p_PerInstanceDataFragmentSize);
-    }
-    else if (p_MaterialPass == MaterialPass::kSurfaceWater)
-    {
-      initBindInfosGBufferWater(drawCallMesh, p_Material,
-                                p_PerInstanceDataVertexSize,
-                                p_PerInstanceDataFragmentSize);
-    }
-    else if (p_MaterialPass == MaterialPass::kShadow)
-    {
-      initBindInfosShadow(drawCallMesh, p_Material, p_PerInstanceDataVertexSize,
-                          p_PerInstanceDataFragmentSize);
-    }
-    else if (p_MaterialPass == MaterialPass::kShadowFoliage)
-    {
-      initBindInfosShadowFoliage(drawCallMesh, p_Material,
-                                 p_PerInstanceDataVertexSize,
-                                 p_PerInstanceDataFragmentSize);
-    }
-    else if (p_MaterialPass == MaterialPass::kPerPixelPicking)
-    {
-      initBindInfosPerPixelPicking(drawCallMesh, p_Material,
-                                   p_PerInstanceDataVertexSize,
-                                   p_PerInstanceDataFragmentSize);
+      MaterialPass::BoundResourceEntry& entry =
+          boundResources.boundResourceEntries[i];
+
+      if (entry.type == MaterialPass::BoundResourceType::kImage)
+      {
+        Name resourceName = entry.resourceName;
+        auto functionMapping =
+            MaterialManager::_materialResourceFunctionMapping.find(
+                entry.resourceName);
+        if (functionMapping !=
+            MaterialManager::_materialResourceFunctionMapping.end())
+        {
+          resourceName = functionMapping->second(p_Material);
+        }
+        ImageRef imageRef = ImageManager::getResourceByName(resourceName);
+        DrawCallManager::bindImage(drawCallMesh, entry.slotName,
+                                   entry.shaderStage, imageRef,
+                                   Samplers::kLinearRepeat);
+      }
+      else if (entry.type == MaterialPass::BoundResourceType::kBuffer)
+      {
+        if (entry.resourceName == _N(PerMaterial))
+        {
+          DrawCallManager::bindBuffer(
+              drawCallMesh, entry.slotName, entry.shaderStage,
+              UniformManager::_perMaterialUniformBuffer,
+              entry.shaderStage == GpuProgramType::kFragment
+                  ? UboType::kPerMaterialFragment
+                  : UboType::kPerMaterialVertex,
+              entry.shaderStage == GpuProgramType::kFragment
+                  ? sizeof(PerMaterialDataFragment)
+                  : sizeof(PerMaterialDataVertex));
+        }
+        else if (entry.resourceName == _N(PerInstance))
+        {
+          DrawCallManager::bindBuffer(
+              drawCallMesh, entry.slotName, entry.shaderStage,
+              UniformManager::_perInstanceUniformBuffer,
+              entry.shaderStage == GpuProgramType::kFragment
+                  ? UboType::kPerInstanceFragment
+                  : UboType::kPerInstanceVertex,
+              entry.shaderStage == GpuProgramType::kFragment
+                  ? p_PerInstanceDataFragmentSize
+                  : p_PerInstanceDataVertexSize);
+        }
+        else
+        {
+          _INTR_ASSERT(false && "Buffer type type not supported");
+        }
+      }
+      else
+      {
+        _INTR_ASSERT(false && "Resource type not found");
+      }
     }
   }
 

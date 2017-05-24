@@ -80,11 +80,13 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
     Resources::MeshManager::loadFromMultipleFiles("managers/meshes/",
                                                   ".mesh.json");
     Resources::MeshManager::createAllResources();
-    Resources::ScriptManager::loadFromSingleFile(
-        "managers/Script.manager.json");
+
+    Resources::ScriptManager::loadFromMultipleFiles("managers/scripts/",
+                                                    ".script.json");
     Resources::ScriptManager::createAllResources();
-    Resources::PostEffectManager::loadFromSingleFile(
-        "managers/PostEffect.manager.json");
+
+    Resources::PostEffectManager::loadFromMultipleFiles(
+        "managers/post_effects/", ".post_effect.json");
   }
 
   // Init. world
@@ -111,8 +113,11 @@ void Application::initManagers()
     Components::PostEffectVolumeManager::init();
     Components::RigidBodyManager::init();
     Components::CharacterControllerManager::init();
+    Components::SwarmManager::init();
     Components::CameraControllerManager::init();
     Components::PlayerManager::init();
+    Components::LightManager::init();
+    Components::IrradianceProbeManager::init();
   }
 
   // Init resource managers

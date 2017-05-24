@@ -26,7 +26,8 @@ enum Enum
 {
   kNone,
   kEditing,
-  kMain
+  kMain,
+  kBenchmark
 };
 }
 

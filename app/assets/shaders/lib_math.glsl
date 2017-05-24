@@ -13,6 +13,28 @@
 // limitations under the License.
 
 #define MATH_PI 3.14159
+#define LUM_WEIGHTS vec3(0.27, 0.67, 0.06)
+
+// https://github.com/playdeadgames/temporal/blob/master/Assets/Shaders/IncNoise.cginc
+// Normalized random: [0,1[
+float PDnrand(vec2 n) 
+{
+  return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* 43758.5453);
+}
+vec2 PDnrand2(vec2 n) 
+{
+  return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* vec2(43758.5453, 28001.8384));
+}
+vec3 PDnrand3(vec2 n) 
+{
+  return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* vec3(43758.5453, 28001.8384, 50849.4141));
+}
+vec4 PDnrand4(vec2 n) 
+{
+  return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* vec4(43758.5453, 28001.8384, 50849.4141, 12996.89));
+}
+
+// <-
 
 float calcScreenSpaceScale(vec3 worldPosition, mat4 viewProjMatrix, float height)
 {
@@ -33,6 +55,8 @@ float calcScreenSpaceScale(vec3 worldPosition, mat4 viewProjMatrix, float height
   return length(p1 - p0);
 }
 
+// <-
+
 vec2 encodeNormal(vec3 n)
 {
   float p = sqrt(n.z * 8.0 + 8.0);
@@ -50,12 +74,15 @@ vec3 decodeNormal(vec2 enc)
   return n;
 }
 
+// <-
+
 vec3 unproject(vec2 uv0, float depth, mat4 invProjMatrix)
 {
   vec4 unprojPos = invProjMatrix * vec4(uv0.xy * 2.0 - 1.0, depth, 1.0);
-  unprojPos /= unprojPos.w;
-  return unprojPos.xyz;
+  return unprojPos.xyz / unprojPos.www;
 }
+
+// <-
 
 float linearizeDepth(float depth, float n, float f)
 {

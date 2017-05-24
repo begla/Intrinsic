@@ -21,9 +21,11 @@ namespace Core
 {
 namespace Log
 {
-// Static members
-uint32_t Manager::_currentIndent = 0u;
-_INTR_ARRAY(LogListenerEntry) Manager::_logListeners;
+namespace
+{
+_INTR_ARRAY(LogListenerEntry) _logListeners;
+uint32_t _currentIndent = 0u;
+}
 
 // <-
 
@@ -96,8 +98,44 @@ void Manager::log(LogLevel::Enum p_LogLevel, const char* p_Message, ...)
   // Call listeners
   for (uint32_t i = 0u; i < _logListeners.size(); ++i)
   {
-    _logListeners[i].callbackFunction(_INTR_STRING(messageBuffer), p_LogLevel);
+    _logListeners[i].callbackFunction(messageBuffer, p_LogLevel);
   }
+}
+
+// <-
+
+void Manager::addLogListener(const LogListenerEntry& p_Entry)
+{
+  _logListeners.push_back(p_Entry);
+}
+
+// <-
+
+void Manager::removeLogListener(const LogListenerEntry& p_Entry)
+{
+  for (auto it = _logListeners.begin(); it != _logListeners.end();)
+  {
+    if (it->callbackFunction == p_Entry.callbackFunction)
+    {
+      it = _logListeners.erase(it);
+    }
+    else
+    {
+      ++it;
+    }
+  }
+}
+
+// <-
+
+void Manager::indent() { ++_currentIndent; }
+
+// <-
+
+void Manager::unindent()
+{
+  _INTR_ASSERT(_currentIndent > 0u);
+  --_currentIndent;
 }
 }
 }

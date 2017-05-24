@@ -1,0 +1,10 @@
+{
+    "name": "per_pixel_picking.frag",
+    "properties": {
+        "name": "per_pixel_picking.frag",
+        "gpuProgramName": "per_pixel_picking.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

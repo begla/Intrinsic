@@ -1,0 +1,10 @@
+{
+    "name": "sky.vert",
+    "properties": {
+        "name": "sky.vert",
+        "gpuProgramName": "sky.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 0
+    }
+}

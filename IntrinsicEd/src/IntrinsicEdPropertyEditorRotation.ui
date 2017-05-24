@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>325</width>
-    <height>165</height>
+    <width>185</width>
+    <height>114</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -19,13 +19,16 @@
   <property name="minimumSize">
    <size>
     <width>0</width>
-    <height>165</height>
+    <height>114</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>6</number>
+   </property>
    <property name="leftMargin">
     <number>9</number>
    </property>
@@ -54,16 +57,16 @@
        <number>0</number>
       </property>
       <property name="leftMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>3</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>3</number>
       </property>
       <item>
        <widget class="QLabel" name="propertyTitle">
@@ -78,6 +81,12 @@
           <width>0</width>
           <height>0</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
         </property>
         <property name="text">
          <string>Property</string>
@@ -96,6 +105,9 @@
       </size>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>6</number>
+      </property>
       <property name="topMargin">
        <number>3</number>
       </property>
@@ -105,6 +117,18 @@
       <item>
        <widget class="QWidget" name="widget" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QLabel" name="lYaw">
            <property name="sizePolicy">
@@ -126,20 +150,23 @@
             </font>
            </property>
            <property name="text">
-            <string>Yaw</string>
+            <string>X</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QDoubleSpinBox" name="yaw">
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
-            <number>4</number>
+            <number>6</number>
            </property>
            <property name="minimum">
-            <double>-360.000000000000000</double>
+            <double>-180.000000000000000</double>
            </property>
            <property name="maximum">
-            <double>360.000000000000000</double>
+            <double>180.000000000000000</double>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
@@ -152,10 +179,10 @@
          <item>
           <widget class="QSlider" name="sYaw">
            <property name="minimum">
-            <number>-360</number>
+            <number>-180</number>
            </property>
            <property name="maximum">
-            <number>360</number>
+            <number>180</number>
            </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -168,6 +195,18 @@
       <item>
        <widget class="QWidget" name="widget_2" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QLabel" name="lPitch">
            <property name="sizePolicy">
@@ -183,20 +222,23 @@
             </size>
            </property>
            <property name="text">
-            <string>Pitch</string>
+            <string>Y</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QDoubleSpinBox" name="pitch">
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
-            <number>4</number>
+            <number>6</number>
            </property>
            <property name="minimum">
-            <double>-360.000000000000000</double>
+            <double>-180.000000000000000</double>
            </property>
            <property name="maximum">
-            <double>360.000000000000000</double>
+            <double>180.000000000000000</double>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
@@ -206,10 +248,10 @@
          <item>
           <widget class="QSlider" name="sPitch">
            <property name="minimum">
-            <number>-360</number>
+            <number>-180</number>
            </property>
            <property name="maximum">
-            <number>360</number>
+            <number>180</number>
            </property>
            <property name="value">
             <number>0</number>
@@ -225,6 +267,18 @@
       <item>
        <widget class="QWidget" name="widget_3" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QLabel" name="lRoll">
            <property name="sizePolicy">
@@ -240,7 +294,7 @@
             </size>
            </property>
            <property name="text">
-            <string>Roll</string>
+            <string>Z</string>
            </property>
           </widget>
          </item>
@@ -252,14 +306,17 @@
              <height>0</height>
             </size>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
-            <number>4</number>
+            <number>6</number>
            </property>
            <property name="minimum">
-            <double>-360.000000000000000</double>
+            <double>-180.000000000000000</double>
            </property>
            <property name="maximum">
-            <double>360.000000000000000</double>
+            <double>180.000000000000000</double>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
@@ -269,10 +326,10 @@
          <item>
           <widget class="QSlider" name="sRoll">
            <property name="minimum">
-            <number>-360</number>
+            <number>-180</number>
            </property>
            <property name="maximum">
-            <number>360</number>
+            <number>180</number>
            </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>

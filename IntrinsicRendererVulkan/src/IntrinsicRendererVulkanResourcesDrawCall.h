@@ -227,11 +227,10 @@ struct DrawCallManager
 
   // <-
 
-  static DrawCallRef
-  createDrawCallForMesh(const Name& p_Name, Dod::Ref p_Mesh,
-                        Dod::Ref p_Material, uint8_t p_MaterialPass,
-                        uint32_t p_PerInstanceDataVertexSize,
-                        uint32_t p_PerInstanceDataFragmentSize);
+  static DrawCallRef createDrawCallForMesh(
+      const Name& p_Name, Dod::Ref p_Mesh, Dod::Ref p_Material,
+      uint8_t p_MaterialPass, uint32_t p_PerInstanceDataVertexSize,
+      uint32_t p_PerInstanceDataFragmentSize, uint32_t p_SubMeshIdx = 0u);
 
   // <-
 
@@ -245,7 +244,7 @@ struct DrawCallManager
     _descVertexBuffers(p_Ref).clear();
     _descIndexBuffer(p_Ref) = BufferRef();
     _descMaterial(p_Ref) = Dod::Ref();
-    _descMaterialPass(p_Ref) = MaterialPass::kNone;
+    _descMaterialPass(p_Ref) = 0u;
     _descMeshComponent(p_Ref) = Dod::Ref();
   }
 
@@ -256,12 +255,14 @@ struct DrawCallManager
   }
 
   _INTR_INLINE static void compileDescriptor(DrawCallRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         DrawCallData,
-        _INTR_MAX_DRAW_CALL_COUNT>::_compileDescriptor(p_Ref, p_Properties,
+        _INTR_MAX_DRAW_CALL_COUNT>::_compileDescriptor(p_Ref, p_GenerateDesc,
+                                                       p_Properties,
                                                        p_Document);
   }
 
@@ -334,7 +335,6 @@ struct DrawCallManager
 
       // Remove from per material pass array
       uint8_t materialPass = _descMaterialPass(drawCallRef);
-      if (materialPass != MaterialPass::kNone)
       {
         uint32_t dcCount =
             (uint32_t)_drawCallsPerMaterialPass[materialPass].size();
@@ -371,7 +371,7 @@ struct DrawCallManager
   _INTR_INLINE static void
   sortDrawCallsFrontToBack(DrawCallRefArray& p_RefArray)
   {
-    _INTR_PROFILE_CPU("Resources", "Sort Draw Calls");
+    _INTR_PROFILE_CPU("General", "Sort Draw Calls");
 
     struct Comparator
     {
@@ -389,7 +389,7 @@ struct DrawCallManager
   _INTR_INLINE static void
   sortDrawCallsBackToFront(DrawCallRefArray& p_RefArray)
   {
-    _INTR_PROFILE_CPU("Resources", "Sort Draw Calls");
+    _INTR_PROFILE_CPU("General", "Sort Draw Calls");
 
     struct Comparator
     {
@@ -498,8 +498,7 @@ struct DrawCallManager
   // <-
 
   // Static members
-  static _INTR_ARRAY(DrawCallRef)
-      _drawCallsPerMaterialPass[MaterialPass::kCount];
+  static _INTR_ARRAY(_INTR_ARRAY(DrawCallRef)) _drawCallsPerMaterialPass;
 };
 }
 }

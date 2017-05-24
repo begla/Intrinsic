@@ -60,10 +60,8 @@ void BufferManager::createResources(const BufferRefArray& p_Buffers)
     vkGetBufferMemoryRequirements(RenderSystem::_vkDevice, buffer, &memReqs);
 
     MemoryPoolType::Enum memoryPoolType = _descMemoryPoolType(bufferRef);
-    MemoryAllocationInfo& memoryAllocationInfo =
+    GpuMemoryAllocationInfo& memoryAllocationInfo =
         _memoryAllocationInfo(bufferRef);
-    VkDeviceMemory deviceMemory =
-        GpuMemoryManager::getDeviceMemory(memoryPoolType);
 
     bool needsAlloc = true;
 
@@ -71,10 +69,9 @@ void BufferManager::createResources(const BufferRefArray& p_Buffers)
     if (memoryPoolType >= MemoryPoolType::kRangeStartStatic &&
         memoryPoolType <= MemoryPoolType::kRangeEndStatic)
     {
-      if (memoryAllocationInfo.memoryPoolType == memoryPoolType &&
-          memReqs.size <= memoryAllocationInfo.sizeInBytes &&
-          memReqs.alignment == memoryAllocationInfo.alignmentInBytes &&
-          deviceMemory == memoryAllocationInfo.vkDeviceMemory)
+      if (memoryAllocationInfo._memoryPoolType == memoryPoolType &&
+          memReqs.size <= memoryAllocationInfo._sizeInBytes &&
+          memReqs.alignment == memoryAllocationInfo._alignmentInBytes)
       {
         needsAlloc = false;
       }
@@ -82,17 +79,14 @@ void BufferManager::createResources(const BufferRefArray& p_Buffers)
 
     if (needsAlloc)
     {
-      memoryAllocationInfo.sizeInBytes = (uint32_t)memReqs.size;
-      memoryAllocationInfo.alignmentInBytes = (uint32_t)memReqs.alignment;
-      memoryAllocationInfo.memoryPoolType = memoryPoolType;
-      memoryAllocationInfo.vkDeviceMemory = deviceMemory;
-      memoryAllocationInfo.offsetInBytes = GpuMemoryManager::allocateOffset(
-          memoryPoolType, (uint32_t)memReqs.size, (uint32_t)memReqs.alignment);
+      memoryAllocationInfo = GpuMemoryManager::allocateOffset(
+          memoryPoolType, (uint32_t)memReqs.size, (uint32_t)memReqs.alignment,
+          memReqs.memoryTypeBits);
     }
 
     result = vkBindBufferMemory(RenderSystem::_vkDevice, buffer,
-                                memoryAllocationInfo.vkDeviceMemory,
-                                memoryAllocationInfo.offsetInBytes);
+                                memoryAllocationInfo._vkDeviceMemory,
+                                memoryAllocationInfo._offset);
     _INTR_VK_CHECK_RESULT(result);
 
     void* initialData = _descInitialData(bufferRef);
@@ -108,32 +102,25 @@ void BufferManager::createResources(const BufferRefArray& p_Buffers)
                               nullptr, &stagingBuffer);
       _INTR_VK_CHECK_RESULT(result);
 
-      // We've run out of memory - flush the command buffer and reset the
-      // allocator
-      if (GpuMemoryManager::calcAvailableMemoryInBytes(
-              MemoryPoolType::kVolatileStagingBuffers) < memReqs.size)
-      {
-        RenderSystem::flushTemporaryCommandBuffer();
-        GpuMemoryManager::resetAllocator(
-            MemoryPoolType::kVolatileStagingBuffers);
-        copyCmd = RenderSystem::beginTemporaryCommandBuffer();
-      }
+      VkMemoryRequirements stagingMemReqs;
+      vkGetBufferMemoryRequirements(RenderSystem::_vkDevice, stagingBuffer,
+                                    &stagingMemReqs);
 
-      const uint32_t stagingMemOffset = GpuMemoryManager::allocateOffset(
-          MemoryPoolType::kVolatileStagingBuffers, (uint32_t)memReqs.size,
-          (uint32_t)memReqs.alignment);
+      const GpuMemoryAllocationInfo stagingGpuAllocInfo =
+          GpuMemoryManager::allocateOffset(
+              MemoryPoolType::kVolatileStagingBuffers,
+              (uint32_t)stagingMemReqs.size, (uint32_t)stagingMemReqs.alignment,
+              stagingMemReqs.memoryTypeBits);
 
       result = vkBindBufferMemory(RenderSystem::_vkDevice, stagingBuffer,
-                                  GpuMemoryManager::getDeviceMemory(
-                                      MemoryPoolType::kVolatileStagingBuffers),
-                                  stagingMemOffset);
+                                  stagingGpuAllocInfo._vkDeviceMemory,
+                                  stagingGpuAllocInfo._offset);
       _INTR_VK_CHECK_RESULT(result);
 
       // Copy initial data to staging memory
       {
-        memcpy(
-            GpuMemoryManager::getHostVisibleMemoryForOffset(stagingMemOffset),
-            initialData, _descSizeInBytes(bufferRef));
+        memcpy(stagingGpuAllocInfo._mappedMemory, initialData,
+               _descSizeInBytes(bufferRef));
       }
 
       VkBufferCopy bufferCopy = {};
@@ -156,7 +143,7 @@ void BufferManager::createResources(const BufferRefArray& p_Buffers)
                     nullptr);
   }
 
-  GpuMemoryManager::resetAllocator(MemoryPoolType::kVolatileStagingBuffers);
+  GpuMemoryManager::resetPool(MemoryPoolType::kVolatileStagingBuffers);
 }
 }
 }

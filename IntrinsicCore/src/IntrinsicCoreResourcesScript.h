@@ -67,19 +67,21 @@ struct ScriptManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(ScriptRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         ScriptData, _INTR_MAX_SCRIPT_COUNT>::_compileDescriptor(p_Ref,
+                                                                p_GenerateDesc,
                                                                 p_Properties,
                                                                 p_Document);
 
-    p_Properties.AddMember("scriptFileName",
-                           _INTR_CREATE_PROP(p_Document, _N(Script), _N(string),
-                                             _descScriptFileName(p_Ref), false,
-                                             false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "scriptFileName",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Script), _N(string),
+                          _descScriptFileName(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   // <-
@@ -98,18 +100,23 @@ struct ScriptManager
 
   // <-
 
-  _INTR_INLINE static void saveToSingleFile(const char* p_FileName)
+  _INTR_INLINE static void saveToMultipleFiles(const char* p_Path,
+                                               const char* p_Extension)
   {
     Dod::Resources::ResourceManagerBase<ScriptData, _INTR_MAX_SCRIPT_COUNT>::
-        _saveToSingleFile(p_FileName, compileDescriptor);
+        _saveToMultipleFiles<
+            rapidjson::PrettyWriter<rapidjson::FileWriteStream>>(
+            p_Path, p_Extension, compileDescriptor);
   }
 
   // <-
 
-  _INTR_INLINE static void loadFromSingleFile(const char* p_FileName)
+  _INTR_INLINE static void loadFromMultipleFiles(const char* p_Path,
+                                                 const char* p_Extension)
   {
     Dod::Resources::ResourceManagerBase<ScriptData, _INTR_MAX_SCRIPT_COUNT>::
-        _loadFromSingleFile(p_FileName, initFromDescriptor, resetToDefault);
+        _loadFromMultipleFiles(p_Path, p_Extension, initFromDescriptor,
+                               resetToDefault);
   }
 
   // <-
@@ -148,10 +155,10 @@ struct ScriptManager
 
   // <-
 
-  static void callTickScript(ScriptRef p_Script, uint32_t p_InstanceId,
+  static void callTickScript(ScriptRef p_ScriptRef, Dod::Ref p_ScriptCompRef,
                              float p_DeltaT);
-  static void callOnCreate(ScriptRef p_Script, uint32_t p_InstanceId);
-  static void callOnDestroy(ScriptRef p_Script, uint32_t p_InstanceId);
+  static void callOnCreate(ScriptRef p_ScriptRef, Dod::Ref p_ScriptCompRef);
+  static void callOnDestroy(ScriptRef p_Script, Dod::Ref p_ScriptCompRef);
 
   // <-
 

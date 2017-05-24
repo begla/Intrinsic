@@ -1,0 +1,8 @@
+{
+    "name": "default_ibl_cube_irradiance",
+    "properties": {
+        "name": "default_ibl_cube_irradiance",
+        "assetFileName": "default_ibl_cube_irradiance.dds",
+        "assetType": 6
+    }
+}

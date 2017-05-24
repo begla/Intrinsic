@@ -31,5 +31,5 @@ void main()
 {
   outAlbedo = vec4(inColor, 1.0);
   outNormal = vec4(encodeNormal(inNormal), 0.5, 1.0);
-  outParameter0 = vec4(0.0, 0.5, 0.0, 0.0);
+  outParameter0 = vec4(0.0, 0.5, 1.0, 0.0);
 }

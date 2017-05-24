@@ -46,10 +46,10 @@ void ImageManager::init()
         Resources::ImageManager::getActiveResourceAtIndex;
     managerEntry.getActiveResourceCountFunction =
         Resources::ImageManager::getActiveResourceCount;
-    managerEntry.loadFromSingleFileFunction =
-        Resources::ImageManager::loadFromSingleFile;
-    managerEntry.saveToSingleFileFunction =
-        Resources::ImageManager::saveToSingleFile;
+    managerEntry.loadFromMultipleFilesFunction =
+        Resources::ImageManager::loadFromMultipleFiles;
+    managerEntry.saveToMultipleFilesFunction =
+        Resources::ImageManager::saveToMultipleFiles;
     managerEntry.getResourceFlagsFunction = ImageManager::_resourceFlags;
     Application::_resourceManagerMapping[_N(Image)] = managerEntry;
   }
@@ -69,7 +69,7 @@ void ImageManager::init()
 
 namespace
 {
-_INTR_INLINE void allocateMemory(MemoryAllocationInfo& p_MemAllocInfo,
+_INTR_INLINE void allocateMemory(GpuMemoryAllocationInfo& p_MemAllocInfo,
                                  MemoryPoolType::Enum p_PoolType,
                                  const VkMemoryRequirements& p_MemReqs)
 {
@@ -78,9 +78,9 @@ _INTR_INLINE void allocateMemory(MemoryAllocationInfo& p_MemAllocInfo,
   if (p_PoolType >= MemoryPoolType::kRangeStartStatic &&
       p_PoolType <= MemoryPoolType::kRangeEndStatic)
   {
-    if (p_MemAllocInfo.sizeInBytes <= p_MemReqs.size &&
-        p_MemAllocInfo.alignmentInBytes == p_MemReqs.alignment &&
-        p_MemAllocInfo.memoryPoolType == p_PoolType)
+    if (p_MemAllocInfo._sizeInBytes <= p_MemReqs.size &&
+        p_MemAllocInfo._alignmentInBytes == p_MemReqs.alignment &&
+        p_MemAllocInfo._memoryPoolType == p_PoolType)
     {
       needsAlloc = false;
     }
@@ -88,13 +88,9 @@ _INTR_INLINE void allocateMemory(MemoryAllocationInfo& p_MemAllocInfo,
 
   if (needsAlloc)
   {
-    p_MemAllocInfo.offsetInBytes = GpuMemoryManager::allocateOffset(
-        p_PoolType, (uint32_t)p_MemReqs.size, (uint32_t)p_MemReqs.alignment);
-    p_MemAllocInfo.sizeInBytes = (uint32_t)p_MemReqs.size;
-    p_MemAllocInfo.vkDeviceMemory =
-        GpuMemoryManager::getDeviceMemory(p_PoolType);
-    p_MemAllocInfo.alignmentInBytes = (uint32_t)p_MemReqs.alignment;
-    p_MemAllocInfo.memoryPoolType = p_PoolType;
+    p_MemAllocInfo = GpuMemoryManager::allocateOffset(
+        p_PoolType, (uint32_t)p_MemReqs.size, (uint32_t)p_MemReqs.alignment,
+        p_MemReqs.memoryTypeBits);
   }
 }
 void createTexture(ImageRef p_Ref)
@@ -102,7 +98,7 @@ void createTexture(ImageRef p_Ref)
   VkImage& vkImage = ImageManager::_vkImage(p_Ref);
   VkFormat vkFormat =
       Helper::mapFormatToVkFormat(ImageManager::_descImageFormat(p_Ref));
-  MemoryAllocationInfo& memoryAllocationInfo =
+  GpuMemoryAllocationInfo& memoryAllocationInfo =
       ImageManager::_memoryAllocationInfo(p_Ref);
   MemoryPoolType::Enum memoryPoolType =
       ImageManager::_descMemoryPoolType(p_Ref);
@@ -115,6 +111,7 @@ void createTexture(ImageRef p_Ref)
   _INTR_ASSERT(dimensions.x >= 1.0f && dimensions.y >= 1.0f &&
                dimensions.z >= 1.0f);
 
+<<<<<<< HEAD
   std::vector<VkFormat> depthFormats =
   {
 	  VK_FORMAT_D32_SFLOAT_S8_UINT,
@@ -135,6 +132,12 @@ void createTexture(ImageRef p_Ref)
 		  break;
 	  }
   }
+=======
+  bool isDepthTarget =
+      Helper::isFormatDepthFormat(ImageManager::_descImageFormat(p_Ref));
+  bool isStencilTarget =
+      Helper::isFormatDepthStencilFormat(ImageManager::_descImageFormat(p_Ref));
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
 
   VkImageType vkImageType = VK_IMAGE_TYPE_1D;
   VkImageViewType vkImageViewTypeSubResource = VK_IMAGE_VIEW_TYPE_1D;
@@ -181,7 +184,7 @@ void createTexture(ImageRef p_Ref)
       }
       else
       {
-        _INTR_ASSERT(false);
+        _INTR_ASSERT(false && "Depth/stencil format not supported");
       }
     }
     else
@@ -197,9 +200,22 @@ void createTexture(ImageRef p_Ref)
       }
       else
       {
-        _INTR_ASSERT(false);
+        _INTR_ASSERT(false && "Color format not supported");
       }
     }
+  }
+
+  if ((imageFlags & ImageFlags::kUsageSampled) > 0u)
+  {
+    _INTR_ASSERT((props.optimalTilingFeatures &
+                  VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) > 0u &&
+                 "Image format does not support sampling");
+  }
+  if ((imageFlags & ImageFlags::kUsageStorage) > 0u)
+  {
+    _INTR_ASSERT((props.optimalTilingFeatures &
+                  VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT) > 0u &&
+                 "Image format does not support storing");
   }
 
   imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -247,8 +263,8 @@ void createTexture(ImageRef p_Ref)
   allocateMemory(memoryAllocationInfo, memoryPoolType, memReqs);
 
   result = vkBindImageMemory(RenderSystem::_vkDevice, vkImage,
-                             memoryAllocationInfo.vkDeviceMemory,
-                             memoryAllocationInfo.offsetInBytes);
+                             memoryAllocationInfo._vkDeviceMemory,
+                             memoryAllocationInfo._offset);
   _INTR_VK_CHECK_RESULT(result);
 
   VkImageViewCreateInfo imageViewCreateInfo = {};
@@ -324,7 +340,7 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
   VkFormat vkFormat =
       Helper::mapFormatToVkFormat(ImageManager::_descImageFormat(p_Ref));
 
-  MemoryAllocationInfo& memoryAllocationInfo =
+  GpuMemoryAllocationInfo& memoryAllocationInfo =
       ImageManager::_memoryAllocationInfo(p_Ref);
   MemoryPoolType::Enum memoryPoolType =
       ImageManager::_descMemoryPoolType(p_Ref);
@@ -358,22 +374,22 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
   VkResult result = vkCreateBuffer(RenderSystem::_vkDevice, &bufferCreateInfo,
                                    nullptr, &stagingBuffer);
   _INTR_VK_CHECK_RESULT(result);
-  VkMemoryRequirements memReqs;
+  VkMemoryRequirements stagingMemReqs;
   vkGetBufferMemoryRequirements(RenderSystem::_vkDevice, stagingBuffer,
-                                &memReqs);
+                                &stagingMemReqs);
 
-  const uint32_t stagingMemOffset = GpuMemoryManager::allocateOffset(
-      MemoryPoolType::kVolatileStagingBuffers, (uint32_t)memReqs.size,
-      (uint32_t)memReqs.alignment);
+  GpuMemoryAllocationInfo stagingGpuAllocInfo =
+      GpuMemoryManager::allocateOffset(MemoryPoolType::kVolatileStagingBuffers,
+                                       (uint32_t)stagingMemReqs.size,
+                                       (uint32_t)stagingMemReqs.alignment,
+                                       stagingMemReqs.memoryTypeBits);
 
   result = vkBindBufferMemory(RenderSystem::_vkDevice, stagingBuffer,
-                              GpuMemoryManager::getDeviceMemory(
-                                  MemoryPoolType::kVolatileStagingBuffers),
-                              stagingMemOffset);
+                              stagingGpuAllocInfo._vkDeviceMemory,
+                              stagingGpuAllocInfo._offset);
   _INTR_VK_CHECK_RESULT(result);
 
-  uint8_t* data =
-      GpuMemoryManager::getHostVisibleMemoryForOffset(stagingMemOffset);
+  uint8_t* data = stagingGpuAllocInfo._mappedMemory;
   {
     memcpy(data, texCube.data(), texCube.size());
   }
@@ -425,13 +441,14 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
                          &vkImage);
   _INTR_VK_CHECK_RESULT(result);
 
+  VkMemoryRequirements memReqs;
   vkGetImageMemoryRequirements(RenderSystem::_vkDevice, vkImage, &memReqs);
 
   allocateMemory(memoryAllocationInfo, memoryPoolType, memReqs);
 
   result = vkBindImageMemory(RenderSystem::_vkDevice, vkImage,
-                             memoryAllocationInfo.vkDeviceMemory,
-                             memoryAllocationInfo.offsetInBytes);
+                             memoryAllocationInfo._vkDeviceMemory,
+                             memoryAllocationInfo._offset);
   _INTR_VK_CHECK_RESULT(result);
 
   VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
@@ -458,7 +475,7 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
   RenderSystem::flushTemporaryCommandBuffer();
 
   vkDestroyBuffer(RenderSystem::_vkDevice, stagingBuffer, nullptr);
-  GpuMemoryManager::resetAllocator(MemoryPoolType::kVolatileStagingBuffers);
+  GpuMemoryManager::resetPool(MemoryPoolType::kVolatileStagingBuffers);
 
   VkImageViewCreateInfo view = {};
   {
@@ -491,7 +508,7 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
   VkFormat vkFormat =
       Helper::mapFormatToVkFormat(ImageManager::_descImageFormat(p_Ref));
 
-  MemoryAllocationInfo& memoryAllocationInfo =
+  GpuMemoryAllocationInfo& memoryAllocationInfo =
       ImageManager::_memoryAllocationInfo(p_Ref);
   MemoryPoolType::Enum memoryPoolType =
       ImageManager::_descMemoryPoolType(p_Ref);
@@ -523,22 +540,22 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
                                    nullptr, &stagingBuffer);
   _INTR_VK_CHECK_RESULT(result);
 
-  VkMemoryRequirements memReqs;
+  VkMemoryRequirements stagingMemReqs;
   vkGetBufferMemoryRequirements(RenderSystem::_vkDevice, stagingBuffer,
-                                &memReqs);
+                                &stagingMemReqs);
 
-  const uint32_t stagingMemOffset = GpuMemoryManager::allocateOffset(
-      MemoryPoolType::kVolatileStagingBuffers, (uint32_t)memReqs.size,
-      (uint32_t)memReqs.alignment);
+  GpuMemoryAllocationInfo stagingGpuAllocInfo =
+      GpuMemoryManager::allocateOffset(MemoryPoolType::kVolatileStagingBuffers,
+                                       (uint32_t)stagingMemReqs.size,
+                                       (uint32_t)stagingMemReqs.alignment,
+                                       stagingMemReqs.memoryTypeBits);
 
   result = vkBindBufferMemory(RenderSystem::_vkDevice, stagingBuffer,
-                              GpuMemoryManager::getDeviceMemory(
-                                  MemoryPoolType::kVolatileStagingBuffers),
-                              stagingMemOffset);
+                              stagingGpuAllocInfo._vkDeviceMemory,
+                              stagingGpuAllocInfo._offset);
   _INTR_VK_CHECK_RESULT(result);
 
-  uint8_t* data =
-      GpuMemoryManager::getHostVisibleMemoryForOffset(stagingMemOffset);
+  uint8_t* data = stagingGpuAllocInfo._mappedMemory;
   {
     memcpy(data, tex2D.data(), tex2D.size());
   }
@@ -587,13 +604,14 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
                          &vkImage);
   _INTR_VK_CHECK_RESULT(result);
 
+  VkMemoryRequirements memReqs;
   vkGetImageMemoryRequirements(RenderSystem::_vkDevice, vkImage, &memReqs);
 
   allocateMemory(memoryAllocationInfo, memoryPoolType, memReqs);
 
   result = vkBindImageMemory(RenderSystem::_vkDevice, vkImage,
-                             memoryAllocationInfo.vkDeviceMemory,
-                             memoryAllocationInfo.offsetInBytes);
+                             memoryAllocationInfo._vkDeviceMemory,
+                             memoryAllocationInfo._offset);
   _INTR_VK_CHECK_RESULT(result);
 
   VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
@@ -620,7 +638,7 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
   RenderSystem::flushTemporaryCommandBuffer();
 
   vkDestroyBuffer(RenderSystem::_vkDevice, stagingBuffer, nullptr);
-  GpuMemoryManager::resetAllocator(MemoryPoolType::kVolatileStagingBuffers);
+  GpuMemoryManager::resetPool(MemoryPoolType::kVolatileStagingBuffers);
 
   VkImageViewCreateInfo view = {};
   {
@@ -650,10 +668,26 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
 
 void createTextureFromFile(ImageRef p_Ref)
 {
+<<<<<<< HEAD
   gli::texture tex = gli::load(
 	  ("media/textures/" + ImageManager::_descFileName(p_Ref)).c_str());
 
+=======
+  _INTR_STRING texturePath =
+      "media/textures/" + ImageManager::_descFileName(p_Ref);
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
 
+  // Check if the texture exists - if not, use the checkerboard texture as a
+  // fallback instead
+  if (!Util::fileExists(texturePath.c_str()))
+  {
+    _INTR_LOG_WARNING(
+        "Texture '%s' not found, using checkerboard texture instead...",
+        texturePath.c_str());
+    texturePath = "media/textures/checkerboard.dds";
+  }
+
+  gli::texture tex = gli::load(texturePath.c_str());
   if (tex.target() == gli::target::TARGET_2D)
   {
     createTextureFromFile2D(p_Ref, tex);
@@ -664,7 +698,7 @@ void createTextureFromFile(ImageRef p_Ref)
   }
   else
   {
-    _INTR_ASSERT(false);
+    _INTR_ASSERT(false && "Unsupported texture type");
   }
 }
 }

@@ -53,8 +53,12 @@ void PerPixelPicking::init()
 
 
     AttachmentDescription depthStencilAttachment = {
+<<<<<<< HEAD
        // Format::kD24UnormS8UInt,
 		Vulkan::RenderSystem::_depthBufferFormat,
+=======
+        (uint8_t)RenderSystem::_depthStencilFormatToUse,
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
         AttachmentFlags::kClearOnLoad | AttachmentFlags::kClearStencilOnLoad};
 
     RenderPassManager::_descAttachments(_renderPassRef)
@@ -69,7 +73,7 @@ void PerPixelPicking::init()
 
 // <-
 
-void PerPixelPicking::updateResolutionDependentResources()
+void PerPixelPicking::onReinitRendering()
 {
   using namespace Resources;
 
@@ -129,8 +133,13 @@ void PerPixelPicking::updateResolutionDependentResources()
 
     ImageManager::_descDimensions(_pickingDepthImageRef) =
         glm::uvec3(_perPixelPickingSize, 1u);
+<<<<<<< HEAD
 	ImageManager::_descImageFormat(_pickingDepthImageRef) = Vulkan::RenderSystem::_depthBufferFormat;
        // Format::kD24UnormS8UInt;
+=======
+    ImageManager::_descImageFormat(_pickingDepthImageRef) =
+        RenderSystem::_depthStencilFormatToUse;
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
     ImageManager::_descImageType(_pickingDepthImageRef) = ImageType::kTexture;
   }
   imgsToCreate.push_back(_pickingDepthImageRef);
@@ -186,7 +195,7 @@ void PerPixelPicking::destroy() {}
 
 // <-
 
-void PerPixelPicking::render(float p_DeltaT)
+void PerPixelPicking::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   using namespace Resources;
 
@@ -200,9 +209,10 @@ void PerPixelPicking::render(float p_DeltaT)
 
   static DrawCallRefArray visibleDrawCalls;
   visibleDrawCalls.clear();
-  RenderSystem::_visibleDrawCallsPerMaterialPass[0u]
-                                                [MaterialPass::kPerPixelPicking]
-                                                    .copy(visibleDrawCalls);
+
+  RenderProcess::Default::getVisibleDrawCalls(
+      p_CameraRef, 0u, MaterialManager::getMaterialPassId(_N(PerPixelPicking)))
+      .copy(visibleDrawCalls);
 
   if (visibleDrawCalls.empty())
   {

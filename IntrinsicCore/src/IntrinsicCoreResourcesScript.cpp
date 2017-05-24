@@ -111,65 +111,65 @@ void setupLuaState(sol::state* p_State)
     p_State->new_usertype<Dod::Ref>("Ref", "isValid", &Dod::Ref::isValid);
   }
 
-  {// Entity API
-   {entityTable["getEntityByName"] = &Entity::EntityManager::getEntityByName;
-  entityTable["createEntity"] = &Entity::EntityManager::createEntity;
-  entityTable["isAlive"] = &Entity::EntityManager::isAlive;
-}
-
-// World API
-{
-  worldTable["getRootNode"] = &World::getRootNode;
-  worldTable["setRootNode"] = &World::setRootNode;
-  worldTable["getActiveCamera"] = &World::getActiveCamera;
-  worldTable["setActiveCamera"] = &World::setActiveCamera;
-
-  worldTable["destroyNodeFull"] = &World::destroyNodeFull;
-  worldTable["cloneNodeFull"] = &World::cloneNodeFull;
-}
-}
-
-{
-  // Mesh component API
+  // Entity API
   {
-    meshComponentTable["getComponentForEntity"] =
-        &Components::MeshManager::getComponentForEntity;
-    meshComponentTable["destroyResources"] =
-        (void (*)(Components::MeshRef)) &
-        Components::MeshManager::destroyResources;
-    meshComponentTable["createResources"] =
-        (void (*)(Components::MeshRef)) &
-        Components::MeshManager::createResources;
-    meshComponentTable["createMesh"] = &Components::MeshManager::createMesh;
-
-    meshComponentTable["getMeshName"] = &Components::MeshManager::getMeshName;
-    meshComponentTable["setMeshName"] = &Components::MeshManager::setMeshName;
+    entityTable["getEntityByName"] = &Entity::EntityManager::getEntityByName;
+    entityTable["createEntity"] = &Entity::EntityManager::createEntity;
+    entityTable["isAlive"] = &Entity::EntityManager::isAlive;
   }
 
-  // Node API
+  // World API
   {
-    nodeComponentTable["getComponentForEntity"] =
-        &Components::NodeManager::getComponentForEntity;
-    nodeComponentTable["createNode"] = &Components::NodeManager::createNode;
-    nodeComponentTable["attachChild"] = &Components::NodeManager::attachChild;
+    worldTable["getRootNode"] = &World::getRootNode;
+    worldTable["setRootNode"] = &World::setRootNode;
+    worldTable["getActiveCamera"] = &World::getActiveCamera;
+    worldTable["setActiveCamera"] = &World::setActiveCamera;
 
-    nodeComponentTable["rebuildTree"] = &Components::NodeManager::rebuildTree;
-    nodeComponentTable["rebuildTreeAndUpdateTransforms"] =
-        &Components::NodeManager::rebuildTreeAndUpdateTransforms;
-    nodeComponentTable["updateTransforms"] =
-        (void (*)(Components::NodeRef)) &
-        Components::NodeManager::updateTransforms;
-
-    nodeComponentTable["getPosition"] = &Components::NodeManager::getPosition;
-    nodeComponentTable["setPosition"] = &Components::NodeManager::setPosition;
-    nodeComponentTable["getOrientation"] =
-        &Components::NodeManager::getOrientation;
-    nodeComponentTable["setOrientation"] =
-        &Components::NodeManager::setOrientation;
-    nodeComponentTable["getSize"] = &Components::NodeManager::getSize;
-    nodeComponentTable["setSize"] = &Components::NodeManager::setSize;
+    worldTable["destroyNodeFull"] = &World::destroyNodeFull;
+    worldTable["cloneNodeFull"] = &World::cloneNodeFull;
   }
-}
+
+  {
+    // Mesh component API
+    {
+      meshComponentTable["getComponentForEntity"] =
+          &Components::MeshManager::getComponentForEntity;
+      meshComponentTable["destroyResources"] =
+          (void (*)(Components::MeshRef)) &
+          Components::MeshManager::destroyResources;
+      meshComponentTable["createResources"] =
+          (void (*)(Components::MeshRef)) &
+          Components::MeshManager::createResources;
+      meshComponentTable["createMesh"] = &Components::MeshManager::createMesh;
+
+      meshComponentTable["getMeshName"] = &Components::MeshManager::getMeshName;
+      meshComponentTable["setMeshName"] = &Components::MeshManager::setMeshName;
+    }
+
+    // Node API
+    {
+      nodeComponentTable["getComponentForEntity"] =
+          &Components::NodeManager::getComponentForEntity;
+      nodeComponentTable["createNode"] = &Components::NodeManager::createNode;
+      nodeComponentTable["attachChild"] = &Components::NodeManager::attachChild;
+
+      nodeComponentTable["rebuildTree"] = &Components::NodeManager::rebuildTree;
+      nodeComponentTable["rebuildTreeAndUpdateTransforms"] =
+          &Components::NodeManager::rebuildTreeAndUpdateTransforms;
+      nodeComponentTable["updateTransforms"] =
+          (void (*)(Components::NodeRef)) &
+          Components::NodeManager::updateTransforms;
+
+      nodeComponentTable["getPosition"] = &Components::NodeManager::getPosition;
+      nodeComponentTable["setPosition"] = &Components::NodeManager::setPosition;
+      nodeComponentTable["getOrientation"] =
+          &Components::NodeManager::getOrientation;
+      nodeComponentTable["setOrientation"] =
+          &Components::NodeManager::setOrientation;
+      nodeComponentTable["getSize"] = &Components::NodeManager::getSize;
+      nodeComponentTable["setSize"] = &Components::NodeManager::setSize;
+    }
+  }
 }
 
 void ScriptManager::init()
@@ -188,8 +188,10 @@ void ScriptManager::init()
         ScriptManager::getActiveResourceAtIndex;
     managerEntry.getActiveResourceCountFunction =
         ScriptManager::getActiveResourceCount;
-    managerEntry.loadFromSingleFileFunction = ScriptManager::loadFromSingleFile;
-    managerEntry.saveToSingleFileFunction = ScriptManager::saveToSingleFile;
+    managerEntry.loadFromMultipleFilesFunction =
+        ScriptManager::loadFromMultipleFiles;
+    managerEntry.saveToMultipleFilesFunction =
+        ScriptManager::saveToMultipleFiles;
     managerEntry.resetToDefaultFunction = ScriptManager::resetToDefault;
     managerEntry.getResourceFlagsFunction = ScriptManager::_resourceFlags;
 
@@ -255,51 +257,57 @@ void ScriptManager::destroyResources(const ScriptRefArray& p_Scripts)
   }
 }
 
-void ScriptManager::callTickScript(ScriptRef p_Script, uint32_t p_InstanceId,
-                                   float p_DeltaT)
+void ScriptManager::callTickScript(ScriptRef p_ScriptRef,
+                                   Dod::Ref p_ScriptCompRef, float p_DeltaT)
 {
   sol::optional<sol::function> func =
-      _luaState["methods"]["tick"][(uint32_t)p_Script._id];
+      _luaState["methods"]["tick"][(uint32_t)p_ScriptRef._id];
   if (func)
   {
     bool success = false;
-    SOL_PROTECTED_EXEC((*func)(p_InstanceId, p_DeltaT), success);
+    SOL_PROTECTED_EXEC(
+        (*func)(Components::ScriptManager::_entity(p_ScriptCompRef), p_DeltaT),
+        success);
 
     if (!success)
     {
-      destroyResources(p_Script);
+      destroyResources(p_ScriptRef);
     }
   }
 }
 
-void ScriptManager::callOnCreate(ScriptRef p_Script, uint32_t p_InstanceId)
+void ScriptManager::callOnCreate(ScriptRef p_ScriptRef,
+                                 Dod::Ref p_ScriptCompRef)
 {
   sol::optional<sol::function> func =
-      _luaState["methods"]["onCreate"][(uint32_t)p_Script._id];
+      _luaState["methods"]["onCreate"][(uint32_t)p_ScriptRef._id];
   if (func)
   {
     bool success = false;
-    SOL_PROTECTED_EXEC((*func)(p_InstanceId), success);
+    SOL_PROTECTED_EXEC(
+        (*func)(Components::ScriptManager::_entity(p_ScriptCompRef)), success);
 
     if (!success)
     {
-      destroyResources(p_Script);
+      destroyResources(p_ScriptRef);
     }
   }
 }
 
-void ScriptManager::callOnDestroy(ScriptRef p_Script, uint32_t p_InstanceId)
+void ScriptManager::callOnDestroy(ScriptRef p_ScriptRef,
+                                  Dod::Ref p_ScriptCompRef)
 {
   sol::optional<sol::function> func =
-      _luaState["methods"]["onDestroy"][(uint32_t)p_Script._id];
+      _luaState["methods"]["onDestroy"][(uint32_t)p_ScriptRef._id];
   if (func)
   {
     bool success = false;
-    SOL_PROTECTED_EXEC((*func)(p_InstanceId), success);
+    SOL_PROTECTED_EXEC(
+        (*func)(Components::ScriptManager::_entity(p_ScriptCompRef)), success);
 
     if (!success)
     {
-      destroyResources(p_Script);
+      destroyResources(p_ScriptRef);
     }
   }
 }

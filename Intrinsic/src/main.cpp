@@ -19,7 +19,16 @@
 #pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif // _MSC_VER
 
-int main(int argc, char* argv[])
+#if defined(_WIN32)
+//#define GENERATE_CRASH_DUMPS
+#include "BugSplat.h"
+#endif //_WIN32
+
+#if defined(GENERATE_CRASH_DUMPS)
+#include "IntrinsicCoreCrashDumpGeneratorWin32.h"
+#endif // _WIN32
+
+int _main(int argc, char* argv[])
 {
   // Loading settings file
   Settings::Manager::loadSettings();
@@ -32,8 +41,7 @@ int main(int argc, char* argv[])
   SDL_DisplayMode displayMode;
   SDL_GetCurrentDisplayMode(0, &displayMode);
 
-  uint32_t windowFlags =
-      SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_GRABBED;
+  uint32_t windowFlags = SDL_WINDOW_RESIZABLE;
   if (Settings::Manager::_windowMode == Settings::WindowMode::kFullscreen)
   {
     windowFlags |= SDL_WINDOW_FULLSCREEN;
@@ -56,7 +64,8 @@ int main(int argc, char* argv[])
   }
 
   SDL_Window* sdlWindow = SDL_CreateWindow(
-      "Intrinsic", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      (_INTR_STRING("Intrinsic - ") + _INTR_VERSION_STRING).c_str(),
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
       Settings::Manager::_screenResolutionWidth,
       Settings::Manager::_screenResolutionHeight, windowFlags);
   _INTR_ASSERT(sdlWindow);
@@ -77,10 +86,13 @@ int main(int argc, char* argv[])
 #endif // _WIN32
 
   // Activate main game state
-  GameStates::Manager::activateGameState(GameStates::GameState::kMain);
+  GameStates::Manager::activateGameState(
+      (GameStates::GameState::Enum)Settings::Manager::_initialGameState);
 
   SDL_ShowWindow(sdlWindow);
-  SDL_SetRelativeMouseMode(SDL_TRUE);
+
+  int result = SDL_SetRelativeMouseMode(SDL_TRUE);
+  _INTR_ASSERT(result == 0 && "Failed to set relative mouse mode");
 
   while (Application::_running)
   {
@@ -89,3 +101,41 @@ int main(int argc, char* argv[])
 
   return 0;
 }
+
+#if defined(GENERATE_CRASH_DUMPS)
+int main(int argc, char* argv[])
+{
+  __try
+  {
+    return _main(argc, argv);
+  }
+  __except (Intrinsic::Core::CrashDumpGeneratorWin32::GenerateDump(
+      GetExceptionInformation()))
+  {
+    return -1;
+  }
+}
+#else
+
+#if defined(BUGSPLAT_H)
+MiniDmpSender* miniDmpSender = nullptr;
+
+bool ExceptionCallback(UINT nCode, LPVOID lpVal1, LPVOID lpVal2)
+{
+  wchar_t full[_MAX_PATH];
+  miniDmpSender->sendAdditionalFile(
+      _wfullpath(full, L"Intrinsic.log", _MAX_PATH));
+  return false;
+}
+#endif // BUGSPLAT_H
+
+int main(int argc, char* argv[])
+{
+#if defined(BUGSPLAT_H)
+  miniDmpSender =
+      new MiniDmpSender(L"Intrinsic", L"Intrinsic", _INTR_VERSION_STRING_L);
+  miniDmpSender->setCallback(ExceptionCallback);
+#endif // BUGSPLAT_H
+  return _main(argc, argv);
+}
+#endif // GENERATE_CRASH_DUMPS

@@ -87,7 +87,8 @@ void CharacterControllerManager::updateControllers(
 
     NodeRef nodeRef = NodeManager::getComponentForEntity(_entity(charCtrlRef));
     const glm::vec3 currentControllerPosition =
-        PhysxHelper::convertExt(pxController->getPosition());
+        PhysxHelper::convertExt(pxController->getPosition()) -
+        glm::vec3(0.0f, 1.5f, 0.0f);
     const glm::vec3& currentWorldPos = NodeManager::_worldPosition(nodeRef);
 
     if (currentControllerPosition != currentWorldPos)
@@ -112,14 +113,14 @@ void CharacterControllerManager::updateControllers(
 
     if (xzVelocity < xzMoveVelocity)
     {
-      internalMoveVector.x += p_DeltaT * _currentMoveVector(charCtrlRef).x;
-      internalMoveVector.z += p_DeltaT * _currentMoveVector(charCtrlRef).z;
+      internalMoveVector.x = p_DeltaT * _currentMoveVector(charCtrlRef).x;
+      internalMoveVector.z = p_DeltaT * _currentMoveVector(charCtrlRef).z;
     }
     else
     {
       glm::vec2 dampedXzMovement =
           glm::vec2(internalMoveVector.x, internalMoveVector.z);
-      Math::dampSimple(dampedXzMovement, 0.01f, p_DeltaT);
+      Math::dampSimple(dampedXzMovement, 0.005f, p_DeltaT);
       internalMoveVector.x = dampedXzMovement.x;
       internalMoveVector.z = dampedXzMovement.y;
     }
@@ -162,7 +163,8 @@ void CharacterControllerManager::updateControllers(
     }
 
     const glm::vec3 nodeWorldPosAfterSim =
-        PhysxHelper::convertExt(pxController->getPosition());
+        PhysxHelper::convertExt(pxController->getPosition()) -
+        glm::vec3(0.0f, 1.5f, 0.0f);
 
     // Update node position (and remove parent transform beforehand)
     NodeRef parentNodeRef = NodeManager::_parent(nodeRef);
@@ -175,6 +177,20 @@ void CharacterControllerManager::updateControllers(
           (nodeWorldPosAfterSim - NodeManager::_worldPosition(parentNodeRef));
     }
 
+    // Rotate the CCT into the direction of the move vector
+    glm::vec3 rotationDirection = internalMoveVector;
+    rotationDirection.y = 0.0f;
+    const float movVecLen = glm::length(rotationDirection);
+
+    if (movVecLen > _INTR_EPSILON)
+    {
+      const glm::vec3 playerOrientation = rotationDirection / movVecLen;
+      Components::NodeManager::_orientation(nodeRef) =
+          glm::slerp(Components::NodeManager::_orientation(nodeRef),
+                     glm::rotation(glm::vec3(0.0, 0.0, 1.0), playerOrientation),
+                     glm::clamp(p_DeltaT / 0.1f, 0.0f, 1.0f));
+    }
+
     NodeManager::updateTransforms(nodeRef);
   }
 }
@@ -182,10 +198,9 @@ void CharacterControllerManager::updateControllers(
 void CharacterControllerManager::createResources(
     const CharacterControllerRefArray& p_CharacterControllers)
 {
-  for (uint32_t meshIdx = 0u; meshIdx < p_CharacterControllers.size();
-       ++meshIdx)
+  for (uint32_t cctIdx = 0u; cctIdx < p_CharacterControllers.size(); ++cctIdx)
   {
-    CharacterControllerRef charCtrlRef = p_CharacterControllers[meshIdx];
+    CharacterControllerRef charCtrlRef = p_CharacterControllers[cctIdx];
 
     physx::PxController*& pxController = _pxController(charCtrlRef);
     _INTR_ASSERT(pxController == nullptr);
@@ -216,10 +231,9 @@ void CharacterControllerManager::createResources(
 void CharacterControllerManager::destroyResources(
     const CharacterControllerRefArray& p_CharacterControllers)
 {
-  for (uint32_t meshIdx = 0u; meshIdx < p_CharacterControllers.size();
-       ++meshIdx)
+  for (uint32_t cctIdx = 0u; cctIdx < p_CharacterControllers.size(); ++cctIdx)
   {
-    CharacterControllerRef charCtrlRef = p_CharacterControllers[meshIdx];
+    CharacterControllerRef charCtrlRef = p_CharacterControllers[cctIdx];
     physx::PxController*& pxController = _pxController(charCtrlRef);
     _INTR_ASSERT(pxController);
 

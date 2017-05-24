@@ -40,6 +40,9 @@ void Manager::activateGameState(GameState::Enum p_GameState)
     case GameState::kMain:
       Main::activate();
       break;
+    case GameState::kBenchmark:
+      Benchmark::activate();
+      break;
     }
 
     _activeGameState = p_GameState;
@@ -58,6 +61,9 @@ void Manager::deactivateGameState()
   case GameState::kMain:
     Main::deativate();
     break;
+  case GameState::kBenchmark:
+    Benchmark::deativate();
+    break;
   }
 
   _activeGameState = GameState::kNone;
@@ -75,6 +81,10 @@ void Manager::update(float p_DeltaT)
   case GameState::kMain:
     Main::update(p_DeltaT);
     break;
+  case GameState::kBenchmark:
+    Benchmark::update(p_DeltaT);
+    break;
+    ;
   }
 }
 

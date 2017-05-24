@@ -27,6 +27,10 @@ copy %VK_SDK_PATH%\\Source\\lib\\vulkan-1.dll app\\vulkan-1.dll
 copy dependencies\\lua\\lua51.dll app\\lua51.dll
 copy dependencies\\sdl\\lib\\x64\\SDL2.dll app\\SDL2.dll
 
+copy dependencies\\bugsplat\\bin\\BsSndRpt64.exe app\\BsSndRpt64.exe
+copy dependencies\\bugsplat\\bin\\BugSplat64.dll app\\BugSplat64.dll
+copy dependencies\\bugsplat\\bin\\BugSplatRc64.dll app\\BugSplatRc64.dll
+
 cd scripts_win32
 
 timeout 2

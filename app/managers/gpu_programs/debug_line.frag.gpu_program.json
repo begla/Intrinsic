@@ -1,0 +1,10 @@
+{
+    "name": "debug_line.frag",
+    "properties": {
+        "name": "debug_line.frag",
+        "gpuProgramName": "debug_line.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

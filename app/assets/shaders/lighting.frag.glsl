@@ -29,27 +29,56 @@ layout (binding = 0) uniform PerInstance
   mat4 invProjMatrix;
   mat4 invViewMatrix;
 
-  mat4 shadowViewProjMatrix[PSSM_SPLIT_COUNT];
+  mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT];
+
+  vec4 nearFarWidthHeight;
+  vec4 nearFar;
+
+  vec4 mainLightColorAndIntens;
+  vec4 mainLightDirAndTemp;
+
+  vec4 data0;
 } uboPerInstance; 
 
 layout (binding = 1) uniform sampler2D albedoTex;
 layout (binding = 2) uniform sampler2D normalTex;
 layout (binding = 3) uniform sampler2D parameter0Tex;
 layout (binding = 4) uniform sampler2D depthTex;
-layout (binding = 5) uniform samplerCube irradianceTex;
+layout (binding = 5) uniform sampler2D ssaoTex;
 layout (binding = 6) uniform samplerCube specularTex;
 layout (binding = 7) uniform sampler2DArrayShadow shadowBufferTex;
 layout (binding = 8) MATERIAL_BUFFER;
+layout (binding = 9) buffer LightBuffer
+{
+  Light lights[];
+};
+layout (binding = 10) buffer LightIndexBuffer
+{
+  uint lightIndices[];
+};
+layout (binding = 11) buffer IrradProbeBuffer
+{
+  IrradProbe irradProbes[];
+};
+layout (binding = 12) buffer IrradProbeIndexBuffer
+{
+  uint irradProbeIndices[];
+};
+layout (binding = 13) uniform sampler2D kelvinLutTex;
+layout (binding = 14) uniform sampler2D noiseTex;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
 void main()
 {
+  const vec4 albedoSample = textureLod(albedoTex, inUV0, 0.0);
   const float depth = textureLod(depthTex, inUV0, 0.0).x;
+
+  // Pass through sky
   if (depth == 1.0)
   { 
-    outColor.rgba = vec4(1.0, 1.0, 1.0, 1.0);
+    outColor.rgba = albedoSample;
     return;
   }
 
@@ -57,8 +86,8 @@ void main()
 
   const vec3 posVS = unproject(inUV0, depth, uboPerInstance.invProjMatrix);
 
+  const vec4 ssaoSample = textureLod(ssaoTex, inUV0, 0.0);
   const vec4 normalSample = textureLod(normalTex, inUV0, 0.0);
-  const vec4 albedoSample = textureLod(albedoTex, inUV0, 0.0);
   const vec4 parameter0Sample = textureLod(parameter0Tex, inUV0, 0.0);
   const MaterialParameters matParams = materialParameters[uint(parameter0Sample.y)];
 
@@ -67,12 +96,16 @@ void main()
   d.metalMask = parameter0Sample.r;
   d.specular = normalSample.b;
   d.roughness = normalSample.a;
+  initLightingDataFromGBuffer(d);
 
   d.N = normalize(decodeNormal(normalSample.rg));  
-  d.L = normalize(uboPerInstance.viewMatrix * vec4(1.0, 0.45, -0.15, 0.0)).xyz;
+  d.L = uboPerInstance.mainLightDirAndTemp.xyz;
   d.V = -normalize(posVS); 
-  d.energy = 30.0 * vec3(1.0, 1.0, 1.0);
-  initLightingData(d);
+  d.energy = vec3(uboPerInstance.mainLightColorAndIntens.w);
+  calculateLightingData(d);
+
+  const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
+  const uint clusterIdx = calcClusterIndex(gridPos);
 
   // Ambient lighting
   const vec3 normalWS = (uboPerInstance.invViewMatrix * vec4(d.N, 0.0)).xyz;
@@ -81,47 +114,116 @@ void main()
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
-  const vec3 irrad = d.diffuseColor * textureLod(irradianceTex, R, 0.0).rgb;
-  outColor.rgb += irrad; 
+  vec3 irrad = vec3(0.0);
 
-  const float maxSpecPower = 999999.0;
-  const float k0 = 0.00098; const float k1 = 0.9921;
-  const float maxT = (exp2(-10.0/sqrt(maxSpecPower)) - k0)/k1;
+  if (isGridPosValid(gridPos))
+  {
+    float irradWeight = 0.0;
+    const uint irradProbeCount = irradProbeIndices[clusterIdx];
 
-  float specPower = (2.0 / d.roughness2) - 2.0;
-  specPower /= (4.0 * max(dot(normalWS, R), 1.0e-6)); 
+    for (uint pi=0; pi<irradProbeCount; ++pi)
+    {
+      IrradProbe probe = irradProbes[irradProbeIndices[clusterIdx + pi + 1]];
 
-  const float smulMaxT = (exp2(-10.0 / sqrt(specPower)) - k0) / k1;
+      const float distToProbe = distance(posVS, probe.posAndRadius.xyz);
+      if (distToProbe < probe.posAndRadius.w)
+      {
+        const float fadeRange = probe.posAndRadius.w * probeFadeRange;
+        const float fadeStart = probe.posAndRadius.w - fadeRange;
+        const float fade = 1.0 - max(distToProbe - fadeStart, 0.0) / fadeRange;
+        
+        irrad += d.diffuseColor * sampleSH(probe.data, R) / MATH_PI * fade;
+        irradWeight += fade;
+      }
+    }
+    if (irradWeight > 1.0)
+      irrad /= irradWeight;
+  }
 
-  const int mipOffset = 3;
-  const int numMips = 9;
+  outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, parameter0Sample.z) * irrad; 
 
-  const float specLod = float(numMips-1-mipOffset) * (1.0 - clamp(smulMaxT/maxT, 0.0, 1.0));
+  // Specular
+  //const float specLod = burleyToMip(d.roughness, dot(normalWS, R0));
+  const float specLod = burleyToMipApprox(d.roughness);
   const vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
 
-  outColor.rgb += spec;
+  outColor.rgb += uboPerInstance.data0.y * parameter0Sample.z * spec;
 
-  // Directional main light shadows
-  float shadowAttenuation = calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
+  // Emissive
+  outColor.rgb += parameter0Sample.w * matParams.emissiveIntensity * d.baseColor;
+
+  const vec3 mainLightColor = uboPerInstance.mainLightColorAndIntens.rgb 
+    * kelvinToRGB(uboPerInstance.mainLightDirAndTemp.w, kelvinLutTex);
+
+  // Cloud shadows
+  const vec4 posWS = uboPerInstance.invViewMatrix * vec4(posVS, 1.0);
+  const float cloudShadows = clamp(texture(noiseTex, 
+    clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0 + uboPerInstance.data0.x * 0.01).r * 3.0 - 0.5, 0.0, 1.0);
 
   // Direct lighting
-  const vec3 lightColor = vec3(1.0, 0.7, 0.75);
-  outColor.rgb += shadowAttenuation * calcLighting(d) * lightColor;
+  float shadowAttenuation = cloudShadows * calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
+  outColor.rgb += shadowAttenuation * mainLightColor * calcLighting(d);
 
   // Translucency
-  const float translDistortion = 1.0;
-  const float translPower = 3.0;
-  const float translScale = 5.0;
-  const vec3 translAmbient = vec3(0.0);
+  // TODO: Move this to a library
+
   const float translThickness = matParams.translucencyThickness;
+  if (translThickness > EPSILON)
+  {
+    const vec3 translLightVector = d.L + d.N * translDistortion;
+    const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
+    const vec3 transl = (translDot + translAmbient) * translThickness;
+    const vec3 translColor = uboPerInstance.mainLightColorAndIntens.w * d.diffuseColor * mainLightColor * transl;
 
-  vec3 translLightVector = d.L + d.N * translDistortion;
-  float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
-  vec3 transl = (translDot + translAmbient) * translThickness;
-  vec3 translColor = d.diffuseColor * lightColor * transl;
+    outColor.rgb += translColor;    
+  }
 
-  outColor.rgb += shadowAttenuation * translColor;
+  if (isGridPosValid(gridPos))
+  {
+    // Point lights
+    const uint lightCount = lightIndices[clusterIdx];
 
-  outColor.a = 1.0; 
+    // DEBUG: Visualize clusters
+    /*if (lightCount > 0)
+    {
+      outColor = vec4(gridPos / vec3(gridRes), 0.0);
+      return;
+    }*/
+
+    for (uint li=0; li<lightCount; ++li)
+    {
+      Light light = lights[lightIndices[clusterIdx + li + 1]];
+
+      const vec3 lightDistVec = light.posAndRadius.xyz - posVS;
+      const float dist = length(lightDistVec);
+      const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
+      if (att * light.colorAndIntensity.w < MIN_FALLOFF) continue;
+
+      d.L = lightDistVec / dist;
+      d.energy = vec3(light.colorAndIntensity.a);
+      calculateLightingData(d);
+
+      const vec3 lightColor = light.colorAndIntensity.rgb 
+        * kelvinToRGB(light.temp.r, kelvinLutTex);
+
+      outColor.rgb += calcLighting(d) * att * lightColor;
+
+      const float localTranslThickness = matParams.translucencyThickness;
+
+      if (localTranslThickness > EPSILON)
+      {
+        // Translucency
+        // TODO: Move this to a library
+        const vec3 translLightVector = d.L + d.N * translDistortion;
+        const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
+        const vec3 transl = (translDot + translAmbient) * localTranslThickness;
+        const vec3 translColor = att * light.colorAndIntensity.w * lightColor * transl * d.diffuseColor;
+
+        outColor.rgb += translColor;
+      }
+    }
+  }
+  
+  outColor.a = 1.0;
 }
   

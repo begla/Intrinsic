@@ -236,9 +236,19 @@ _INTR_INLINE VkFormat mapFormatToVkFormat(Format::Enum p_Format)
     return VK_FORMAT_R32_SFLOAT;
   case Format::kR32UInt:
     return VK_FORMAT_R32_UINT;
+  case Format::kB10G11R11UFloat:
+    return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
 
   case Format::kD24UnormS8UInt:
     return VK_FORMAT_D24_UNORM_S8_UINT;
+  case Format::kD32SFloatS8UInt:
+    return VK_FORMAT_D32_SFLOAT_S8_UINT;
+  case Format::kD32SFloat:
+    return VK_FORMAT_D32_SFLOAT;
+  case Format::kD16UNorm:
+    return VK_FORMAT_D16_UNORM;
+  case Format::kD16UnormS8UInt:
+    return VK_FORMAT_D16_UNORM_S8_UINT;
 
   case Format::kB8G8R8A8UNorm:
     return VK_FORMAT_B8G8R8A8_UNORM;
@@ -285,6 +295,7 @@ _INTR_INLINE bool isFormatDepthStencilFormat(Format::Enum p_Format)
   {
   case Format::kD24UnormS8UInt:
     return true;
+<<<<<<< HEAD
   case Format::kD16UnormS8UInt:
 	  return true;
   case Format::kD32sFLOATs8UINT:
@@ -293,10 +304,35 @@ _INTR_INLINE bool isFormatDepthStencilFormat(Format::Enum p_Format)
 	  return true;
   case Format::kD16UNORM:
 	  return true;
+=======
+  case Format::kD32SFloatS8UInt:
+    return true;
+  case Format::kD16UnormS8UInt:
+    return true;
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
   }
 
   return false;
 };
+
+_INTR_INLINE bool isFormatDepthFormat(Format::Enum p_Format)
+{
+  switch (p_Format)
+  {
+  case Format::kD24UnormS8UInt:
+    return true;
+  case Format::kD32SFloatS8UInt:
+    return true;
+  case Format::kD16UnormS8UInt:
+    return true;
+  case Format::kD32SFloat:
+    return true;
+  case Format::kD16UNorm:
+    return true;
+  }
+
+  return false;
+}
 
 // <-
 
@@ -312,7 +348,7 @@ _INTR_INLINE void createDefaultMeshVertexLayout(Dod::Ref& p_VertexLayoutToInit)
   VertexAttribute attrPos = {};
   {
     attrPos.binding = 0u;
-    attrPos.format = Format::kR16G16B16Float;
+    attrPos.format = Format::kR16G16B16A16Float;
     attrPos.location = 0u;
     attrPos.offset = 0u;
   }
@@ -342,7 +378,7 @@ _INTR_INLINE void createDefaultMeshVertexLayout(Dod::Ref& p_VertexLayoutToInit)
   VertexAttribute attrNormal = {};
   {
     attrNormal.binding = 2u;
-    attrNormal.format = Format::kR16G16B16Float;
+    attrNormal.format = Format::kR16G16B16A16Float;
     attrNormal.location = 2u;
     attrNormal.offset = 0u;
   }
@@ -357,7 +393,7 @@ _INTR_INLINE void createDefaultMeshVertexLayout(Dod::Ref& p_VertexLayoutToInit)
   VertexAttribute attrTangent = {};
   {
     attrTangent.binding = 3u;
-    attrTangent.format = Format::kR16G16B16Float;
+    attrTangent.format = Format::kR16G16B16A16Float;
     attrTangent.location = 3u;
     attrTangent.offset = 0u;
   }
@@ -372,7 +408,7 @@ _INTR_INLINE void createDefaultMeshVertexLayout(Dod::Ref& p_VertexLayoutToInit)
   VertexAttribute attrBinormal = {};
   {
     attrBinormal.binding = 4u;
-    attrBinormal.format = Format::kR16G16B16Float;
+    attrBinormal.format = Format::kR16G16B16A16Float;
     attrBinormal.location = 4u;
     attrBinormal.offset = 0u;
   }
@@ -392,31 +428,25 @@ _INTR_INLINE void createDefaultMeshVertexLayout(Dod::Ref& p_VertexLayoutToInit)
     attrVtxColor.offset = 0u;
   }
 
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindPos);
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindUv0);
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindNormal);
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindTangent);
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindBinormal);
-  Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit)
-      .push_back(bindVtxColor);
+  _INTR_ARRAY(VertexBinding)& vertexBindings =
+      Resources::VertexLayoutManager::_descVertexBindings(p_VertexLayoutToInit);
+  _INTR_ARRAY(VertexAttribute)& vertexAttributes =
+      Resources::VertexLayoutManager::_descVertexAttributes(
+          p_VertexLayoutToInit);
 
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrPos);
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrUv0);
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrNormal);
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrBinormal);
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrTangent);
-  Resources::VertexLayoutManager::_descVertexAttributes(p_VertexLayoutToInit)
-      .push_back(attrVtxColor);
+  vertexBindings.push_back(bindPos);
+  vertexBindings.push_back(bindUv0);
+  vertexBindings.push_back(bindNormal);
+  vertexBindings.push_back(bindTangent);
+  vertexBindings.push_back(bindBinormal);
+  vertexBindings.push_back(bindVtxColor);
+
+  vertexAttributes.push_back(attrPos);
+  vertexAttributes.push_back(attrUv0);
+  vertexAttributes.push_back(attrNormal);
+  vertexAttributes.push_back(attrBinormal);
+  vertexAttributes.push_back(attrTangent);
+  vertexAttributes.push_back(attrVtxColor);
 }
 
 // <-
@@ -588,7 +618,177 @@ _INTR_INLINE static uint32_t computeGpuMemoryTypeIdx(uint32_t p_TypeBits,
   _INTR_ASSERT(false);
   return (uint32_t)-1;
 }
-};
+
+// <-
+
+_INTR_INLINE static Format::Enum mapFormat(const _INTR_STRING& p_Format)
+{
+  static _INTR_HASH_MAP(Name, Format::Enum)
+      formats = {{"R32G32B32SFloat", Format::kR32G32B32SFloat},
+                 {"R32G32B32A32SFloat", Format::kR32G32B32A32SFloat},
+                 {"R32G32SFloat", Format::kR32G32SFloat},
+                 {"R16G16B16Float", Format::kR16G16B16Float},
+                 {"R16G16Float", Format::kR16G16Float},
+                 {"B8G8R8A8UNorm", Format::kB8G8R8A8UNorm},
+                 {"BC1RGBUNorm", Format::kBC1RGBUNorm},
+                 {"BC1RGBSrgb", Format::kBC1RGBSrgb},
+                 {"BC2UNorm", Format::kBC2UNorm},
+                 {"BC2Srgb", Format::kBC2Srgb},
+                 {"BC5UNorm", Format::kBC5UNorm},
+                 {"BC5SNorm", Format::kBC5SNorm},
+                 {"D24UnormS8UInt", Format::kD24UnormS8UInt},
+                 {"B8G8R8A8Srgb", Format::kB8G8R8A8Srgb},
+                 {"BC6UFloat", Format::kBC6UFloat},
+                 {"BC3UNorm", Format::kBC3UNorm},
+                 {"BC3Srgb", Format::kBC3Srgb},
+                 {"R32SFloat", Format::kR32SFloat},
+                 {"R32UInt", Format::kR32UInt},
+                 {"D16UnormS8UInt", Format::kD16UnormS8UInt},
+                 {"D32SFloatS8UInt", Format::kD32SFloatS8UInt},
+                 {"D32SFloat", Format::kD32SFloat},
+                 {"D16UNorm", Format::kD16UNorm},
+                 {"R16G16B16A16Float", Format::kR16G16B16A16Float},
+                 {"B10G11R11UFloat", Format::kB10G11R11UFloat}};
+
+  auto format = formats.find(p_Format);
+  if (format != formats.end())
+  {
+    return format->second;
+  }
+
+  _INTR_ASSERT(false && "Format not supported/found");
+  return Format::kB8G8R8A8UNorm;
+}
+
+// <-
+
+_INTR_INLINE static RenderSize::Enum
+mapRenderSize(const _INTR_STRING& p_RenderSize)
+{
+  static _INTR_HASH_MAP(Name, RenderSize::Enum)
+      renderSizes = {{"Full", RenderSize::kFull},
+                     {"Half", RenderSize::kHalf},
+                     {"Quarter", RenderSize::kQuarter}};
+
+  auto renderSize = renderSizes.find(p_RenderSize);
+  if (renderSize != renderSizes.end())
+  {
+    return renderSize->second;
+  }
+
+  _INTR_ASSERT(false && "Render size not supported/found");
+  return RenderSize::kFull;
+}
+
+// <-
+
+_INTR_INLINE static GpuProgramType::Enum
+mapGpuProgramType(const _INTR_STRING& p_GpuProgramType)
+{
+  static _INTR_HASH_MAP(Name, GpuProgramType::Enum)
+      gpuProgramTypes = {{"Fragment", GpuProgramType::kFragment},
+                         {"Vertex", GpuProgramType::kVertex},
+                         {"Compute", GpuProgramType::kCompute}};
+
+  auto gpuProgramType = gpuProgramTypes.find(p_GpuProgramType);
+  if (gpuProgramType != gpuProgramTypes.end())
+  {
+    return gpuProgramType->second;
+  }
+
+  _INTR_ASSERT(false && "GPU program type not supported/found");
+  return GpuProgramType::kVertex;
+}
+
+// <-
+
+_INTR_INLINE static Samplers::Enum mapSampler(const _INTR_STRING& p_Sampler)
+{
+  static _INTR_HASH_MAP(Name, Samplers::Enum)
+      samplers = {{"LinearClamp", Samplers::kLinearClamp},
+                  {"LinearRepeat", Samplers::kLinearRepeat},
+                  {"NearestClamp", Samplers::kNearestClamp},
+                  {"NearestRepeat", Samplers::kNearestRepeat},
+                  {"Shadow", Samplers::kShadow}};
+
+  auto sampler = samplers.find(p_Sampler);
+  if (sampler != samplers.end())
+  {
+    return sampler->second;
+  }
+
+  _INTR_ASSERT(false && "GPU program type not supported/found");
+  return Samplers::kLinearClamp;
+}
+
+// <-
+
+_INTR_INLINE static VkImageLayout
+mapImageLayout(const _INTR_STRING& p_ImageLayout)
+{
+  static _INTR_HASH_MAP(Name, VkImageLayout) imageLayouts = {
+      {"Undefined", VK_IMAGE_LAYOUT_UNDEFINED},
+      {"General", VK_IMAGE_LAYOUT_GENERAL},
+      {"ColorAttachment", VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL},
+      {"DepthStencilAttachment",
+       VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL},
+      {"DepthStencilReadOnly", VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL},
+      {"ShaderReadOnly", VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
+      {"TransferSrc", VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL},
+      {"TransferDst", VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL},
+      {"Preinitialized", VK_IMAGE_LAYOUT_PREINITIALIZED}};
+
+  auto imageLayout = imageLayouts.find(p_ImageLayout);
+  if (imageLayout != imageLayouts.end())
+  {
+    return imageLayout->second;
+  }
+
+  _INTR_ASSERT(false && "Image layout not supported/found");
+  return VK_IMAGE_LAYOUT_GENERAL;
+}
+
+// <-
+
+_INTR_INLINE static DepthStencilStates::Enum
+mapDepthStencilState(const _INTR_STRING& p_DepthStencilState)
+{
+  static _INTR_HASH_MAP(Name, DepthStencilStates::Enum) depthStencilStates = {
+      {"Default", DepthStencilStates::kDefault},
+      {"DefaultNoDepthTestAndWrite",
+       DepthStencilStates::kDefaultNoDepthTestAndWrite},
+      {"DefaultNoWrite", DepthStencilStates::kDefaultNoWrite},
+      {"DefaultNoDepthTest", DepthStencilStates::kDefaultNoDepthTest}};
+
+  auto depthStencilState = depthStencilStates.find(p_DepthStencilState);
+  if (depthStencilState != depthStencilStates.end())
+  {
+    return depthStencilState->second;
+  }
+
+  _INTR_ASSERT(false && "Depth stencil state not supported/found");
+  return DepthStencilStates::kDefault;
+}
+
+// <-
+
+_INTR_INLINE static BlendStates::Enum
+mapBlendState(const _INTR_STRING& p_BlendSate)
+{
+  static _INTR_HASH_MAP(Name, BlendStates::Enum)
+      blendStates = {{"Default", BlendStates::kDefault},
+                     {"AlphaBlend", BlendStates::kAlphaBlend}};
+
+  auto blendState = blendStates.find(p_BlendSate);
+  if (blendState != blendStates.end())
+  {
+    return blendState->second;
+  }
+
+  _INTR_ASSERT(false && "Blend state not supported/found");
+  return BlendStates::kDefault;
+}
+}
 }
 }
 }

@@ -13,7 +13,25 @@
   <property name="windowTitle">
    <string>IntrinsicEd</string>
   </property>
-  <widget class="IntrinsicEdViewport" name="centralWidget"/>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="IntrinsicEdViewport" name="viewPort" native="true"/>
+    </item>
+   </layout>
+  </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -58,9 +76,17 @@
     <addaction name="separator"/>
     <addaction name="actionAssets"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionCompile_Shaders"/>
+    <addaction name="actionRecompile_Shaders"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuManagers"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="windowTitle">
@@ -82,6 +108,8 @@
    <addaction name="separator"/>
    <addaction name="actionLoad_World"/>
    <addaction name="actionSave_World"/>
+   <addaction name="separator"/>
+   <addaction name="actionReload_Settings_And_Renderer_Config"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="editingToolBar">
@@ -137,8 +165,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionShow_Debug_Context_Menu"/>
-   <addaction name="separator"/>
    <addaction name="actionShow_Debug_Geometry_Context_Menu"/>
+   <addaction name="actionOpen_Microprofile"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -152,6 +180,7 @@
    </attribute>
    <addaction name="actionEditingGameState"/>
    <addaction name="actionMainGameState"/>
+   <addaction name="actionBenchmarkGameState"/>
   </widget>
   <action name="actionExit">
    <property name="icon">
@@ -507,7 +536,7 @@
    </property>
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/tacho</normaloff>:/Icons/tacho</iconset>
+     <normaloff>:/Icons/icons/cc/white/png/lighting_icon&amp;16.png</normaloff>:/Icons/icons/cc/white/png/lighting_icon&amp;16.png</iconset>
    </property>
    <property name="text">
     <string>Show Debug Geometry Context Menu</string>
@@ -548,6 +577,92 @@
    </property>
    <property name="toolTip">
     <string>Post Effects</string>
+   </property>
+  </action>
+  <action name="actionReload_Settings_And_Renderer_Config">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/refresh</normaloff>:/Icons/refresh</iconset>
+   </property>
+   <property name="text">
+    <string>Reload Settings and Renderer Config</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload Settings and Renderer Config</string>
+   </property>
+  </action>
+  <action name="actionOpen_Microprofile">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/tacho</normaloff>:/Icons/tacho</iconset>
+   </property>
+   <property name="text">
+    <string>Open Microprofile</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Microprofile</string>
+   </property>
+  </action>
+  <action name="actionCompile_Shaders">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Compile Shaders</string>
+   </property>
+  </action>
+  <action name="actionRecompile_Shaders">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Recompile Shaders</string>
+   </property>
+  </action>
+  <action name="actionBenchmarkGameState">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/cc/white/png/chart_bar_icon&amp;16.png</normaloff>:/Icons/icons/cc/white/png/chart_bar_icon&amp;16.png</iconset>
+   </property>
+   <property name="text">
+    <string>Benchmark Game State</string>
+   </property>
+   <property name="toolTip">
+    <string>Benchmark Game State</string>
+   </property>
+  </action>
+  <action name="actionShow_Benchmark_Paths">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Benchmark Paths</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Benchmark Paths</string>
+   </property>
+  </action>
+  <action name="actionCreateLight">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/lightbulb</normaloff>:/Icons/lightbulb</iconset>
+   </property>
+   <property name="text">
+    <string>Create Light</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Light</string>
    </property>
   </action>
  </widget>

@@ -1,0 +1,30 @@
+{
+    "name": "barrel",
+    "properties": {
+        "name": "barrel",
+        "materialPassMask": [
+            "GBufferDefault",
+            "Shadow",
+            "PerPixelPicking"
+        ],
+        "albedoTextureName": "barrel_01",
+        "emissiveTextureName": "white",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 0.0,
+        "emissiveIntensity": 0.0,
+        "normalTextureName": "barrel_01_NRM",
+        "pbrTextureName": "barrel_01_PBR",
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": 0.0
+    }
+}

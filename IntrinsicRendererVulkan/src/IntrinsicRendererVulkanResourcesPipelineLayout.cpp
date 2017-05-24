@@ -25,12 +25,12 @@ namespace Vulkan
 namespace Resources
 {
 void PipelineLayoutManager::createResources(
-    const PipelineLayoutRefArray& p_Pipelinelayouts)
+    const PipelineLayoutRefArray& p_PipelineLayouts)
 {
-  for (uint32_t pplLayoutIdx = 0u; pplLayoutIdx < p_Pipelinelayouts.size();
+  for (uint32_t pplLayoutIdx = 0u; pplLayoutIdx < p_PipelineLayouts.size();
        ++pplLayoutIdx)
   {
-    PipelineLayoutRef ref = p_Pipelinelayouts[pplLayoutIdx];
+    PipelineLayoutRef ref = p_PipelineLayouts[pplLayoutIdx];
 
     VkDescriptorSetLayout& descriptorSetLayout = _vkDescriptorSetLayout(ref);
     VkPipelineLayout& pipelineLayout = _vkPipelineLayout(ref);
@@ -110,6 +110,57 @@ void PipelineLayoutManager::createResources(
       VkResult result = vkCreateDescriptorPool(RenderSystem::_vkDevice,
                                                &descriptorPool, nullptr, &pool);
       _INTR_VK_CHECK_RESULT(result);
+    }
+  }
+}
+
+// <-
+
+void PipelineLayoutManager::destroyResources(
+    const PipelineLayoutRefArray& p_PipelineLayouts)
+{
+  for (uint32_t i = 0u; i < p_PipelineLayouts.size(); ++i)
+  {
+    PipelineLayoutRef ref = p_PipelineLayouts[i];
+
+    VkPipelineLayout& pipelineLayout = _vkPipelineLayout(ref);
+    if (pipelineLayout != VK_NULL_HANDLE)
+    {
+      vkDestroyPipelineLayout(RenderSystem::_vkDevice, pipelineLayout, nullptr);
+      pipelineLayout = VK_NULL_HANDLE;
+    }
+
+    VkDescriptorSetLayout& descSetLayout = _vkDescriptorSetLayout(ref);
+    if (descSetLayout != VK_NULL_HANDLE)
+    {
+      vkDestroyDescriptorSetLayout(RenderSystem::_vkDevice, descSetLayout,
+                                   nullptr);
+      descSetLayout = VK_NULL_HANDLE;
+    }
+
+    VkDescriptorPool& descPool = _vkDescriptorPool(ref);
+    if (descPool != VK_NULL_HANDLE)
+    {
+      vkDestroyDescriptorPool(RenderSystem::_vkDevice, descPool, nullptr);
+      descPool = VK_NULL_HANDLE;
+
+      // Invalidate descriptor sets allocated from this pool
+      for (uint32_t dcIdx = 0u; dcIdx < DrawCallManager::_activeRefs.size();
+           ++dcIdx)
+      {
+        DrawCallRef dcRef = DrawCallManager::_activeRefs[dcIdx];
+        PipelineRef pRef = DrawCallManager::_descPipeline(dcRef);
+
+        if (pRef.isValid())
+        {
+          PipelineLayoutRef plRef = PipelineManager::_descPipelineLayout(pRef);
+
+          if (plRef == ref)
+          {
+            DrawCallManager::_vkDescriptorSet(dcRef) = nullptr;
+          }
+        }
+      }
     }
   }
 }

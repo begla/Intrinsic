@@ -20,7 +20,9 @@
 #define _INTR_MAX_MESH_COMPONENT_COUNT 32768
 #define _INTR_MAX_CAMERA_COMPONENT_COUNT 1024
 #define _INTR_MAX_SCRIPT_COMPONENT_COUNT 1024
+#define _INTR_MAX_LIGHT_COMPONENT_COUNT 32768
 #define _INTR_MAX_RIGID_BODY_COMPONENT_COUNT 32768
+#define _INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT 1024u
 #define _INTR_MAX_FRUSTUM_COUNT 1024
 #define _INTR_MAX_GPU_PROGRAM_COUNT 1024
 #define _INTR_MAX_PIPELINE_COUNT 1024
@@ -29,7 +31,7 @@
 #define _INTR_MAX_VERTEX_LAYOUT_COUNT 8
 #define _INTR_MAX_PIPELINE_LAYOUT_COUNT 1024
 #define _INTR_MAX_BUFFER_COUNT 1024
-#define _INTR_MAX_DRAW_CALL_COUNT (32768 * 3)
+#define _INTR_MAX_DRAW_CALL_COUNT (1024 * 10)
 #define _INTR_MAX_COMPUTE_CALL_COUNT 1024
 #define _INTR_MAX_FRAMEBUFFER_COUNT 1024
 #define _INTR_MAX_IMAGE_COUNT 1024
@@ -40,8 +42,14 @@
 #define _INTR_MAX_EVENT_LISTENER_COUNT 1024
 #define _INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT 1024
 #define _INTR_MAX_CHARACTER_CONTROLLER_COMPONENT_COUNT 1024
+#define _INTR_MAX_SWARM_COMPONENT_COUNT 1024
 #define _INTR_MAX_PLAYER_COMPONENT_COUNT 8
 #define _INTR_MAX_POST_EFFECT_CONTROLLER_COMPONENT_COUNT 1024
+#define _INTR_MAX_MATERIAL_PASS_COUNT 256
+
+// Various
+#define _INTR_CONCAT_(x, y) x##y
+#define _INTR_CONCAT(x, y) _INTR_CONCAT_(x, y)
 
 // Logging
 #if defined(_INTR_LOGGING_ENABLED)
@@ -54,10 +62,8 @@
 #define _INTR_LOG_ERROR(x, ...)                                                \
   Intrinsic::Core::Log::Manager::log(Intrinsic::Core::Log::LogLevel::kError,   \
                                      x, ##__VA_ARGS__)
-#define _INTR_LOG_PUSH() ++Intrinsic::Core::Log::Manager::_currentIndent
-#define _INTR_LOG_POP()                                                        \
-  _INTR_ASSERT(Intrinsic::Core::Log::Manager::_currentIndent > 0u);            \
-  --Intrinsic::Core::Log::Manager::_currentIndent
+#define _INTR_LOG_PUSH() Intrinsic::Core::Log::Manager::indent()
+#define _INTR_LOG_POP() Intrinsic::Core::Log::Manager::unindent()
 #else
 #define _INTR_LOG_INFO(x, ...)
 #define _INTR_LOG_WARNING(x, ...)
@@ -65,19 +71,6 @@
 #define _INTR_LOG_PUSH()
 #define _INTR_LOG_POP()
 #endif // _INTR_LOGGING_ENABLED
-
-// Timing macros
-#if defined(_INTR_PROFILING_ENABLED)
-#define _INTR_PROFILE_START() TimingHelper::timerStart()
-#define _INTR_PROFILE_END(x)                                                   \
-  {                                                                            \
-    const float timePassed = Intrinsic::Core::TimingHelper::timerEnd();        \
-    _INTR_LOG_INFO("%s finished in %.4f ms", x, timePassed);                   \
-  }
-#else
-#define _INTR_PROFILE_START()
-#define _INTR_PROFILE_END(x)
-#endif // _INTR_PROFILING_ENABLED
 
 // Names
 #define _N(x) Name(#x)
@@ -119,6 +112,24 @@
   std::basic_ostringstream<char, std::char_traits<char>,                       \
                            Intrinsic::Core::StlAllocator<char>>
 
+// Timing macros
+#if defined(_INTR_PROFILING_ENABLED)
+#define _INTR_PROFILE_START() TimingHelper::timerStart()
+#define _INTR_PROFILE_END(x)                                                   \
+  {                                                                            \
+    const uint32_t msPassed = Intrinsic::Core::TimingHelper::timerEnd();       \
+    _INTR_LOG_INFO("%s finished in %ums", x, msPassed);                        \
+  }
+
+#define _INTR_PROFILE_AUTO(x)                                                  \
+  TimingHelper::AutoTimer _INTR_CONCAT(timer, __COUNTER__) =                   \
+      TimingHelper::AutoTimer(x)
+#else
+#define _INTR_PROFILE_START()
+#define _INTR_PROFILE_END(x)
+#define _INTR_PROFILE_AUTO(x)
+#endif // _INTR_PROFILING_ENABLED
+
 // Sorting
 #define _INTR_SORT(a, b, c) std::sort(a, b, c)
 
@@ -149,17 +160,23 @@ case IDCONTINUE : break;                                                       \
     \
 }                                                                       \
   }
+#define _INTR_ERROR_DIALOG_SIMPLE(_msg)                                        \
+  {                                                                            \
+    MessageBox(NULL, _msg, "Error", MB_ICONERROR | MB_OK);                     \
+  }
 #define _INTR_DBG_BREAK() __debugbreak()
 #define _INTR_ASSERT(_expr)                                                    \
   if (!(_expr))                                                                \
-  _INTR_ERROR_DIALOG(#_expr)
+    _INTR_LOG_ERROR("Assert: " #_expr);
 #else
 #define _INTR_ERROR_DIALOG(_msg)
+#define _INTR_ERROR_DIALOG_SIMPLE(_msg)
 #define _INTR_ASSERT(_expr) assert(_expr)
 #define _INTR_DBG_BREAK()
 #endif // _WIN32
 #else
 #define _INTR_ERROR_DIALOG(_msg)
+#define _INTR_ERROR_DIALOG_SIMPLE(_msg)
 #define _INTR_IS_DEBUGGER_ATTACHED()
 #define _INTR_ASSERT(_expr)
 #define _INTR_DBG_BREAK()
@@ -173,11 +190,15 @@ case IDCONTINUE : break;                                                       \
   a = nullptr
 
 // Properties
-#define _INTR_CREATE_PROP(_doc, _cat, _ed, _val, _ro, _int)                    \
-  Intrinsic::Core::JsonHelper::createProperty(_doc, _cat, _ed, _val, _ro, _int)
-#define _INTR_CREATE_PROP_ENUM(_doc, _cat, _ed, _val, _enum, _ro, _int)        \
-  Intrinsic::Core::JsonHelper::createProperty(_doc, _cat, _ed, _val, _enum,    \
-                                              _ro, _int)
+#define _INTR_CREATE_PROP(_doc, _gd, _cat, _ed, _val, _ro, _int)               \
+  Intrinsic::Core::JsonHelper::createProperty(_doc, _gd, _cat, _ed, _val, _ro, \
+                                              _int)
+#define _INTR_CREATE_PROP_ENUM(_doc, _gd, _cat, _ed, _val, _enum, _ro, _int)   \
+  Intrinsic::Core::JsonHelper::createPropertyEnum(_doc, _gd, _cat, _ed, _val,  \
+                                                  _enum, _ro, _int)
+#define _INTR_CREATE_PROP_FLAGS(_doc, _gd, _cat, _ed, _val, _flags, _ro, _int) \
+  Intrinsic::Core::JsonHelper::createPropertyFlags(_doc, _gd, _cat, _ed, _val, \
+                                                   _flags, _ro, _int)
 
 // Math
 #define _INTR_EPSILON 1.0e-6f
@@ -191,7 +212,17 @@ case IDCONTINUE : break;                                                       \
 #if defined(_INTR_PROFILING_ENABLED)
 #define _INTR_PROFILE_CPU(_group, _name)                                       \
   MICROPROFILE_SCOPEI(_group, _name, 0xff00ff)
-#define _INTR_PROFILE_GPU(_name) MICROPROFILE_SCOPEGPUI(_name, 0xff00ff)
+#define _INTR_PROFILE_CPU_CUSTOM(_var) MICROPROFILE_SCOPE(_var)
+#define _INTR_PROFILE_CPU_DEFINE(_var, _group, _name)                          \
+  MICROPROFILE_DEFINE(_var, _group, _name, 0xff00ff)
+#define _INTR_PROFILE_GPU(_name)                                               \
+  MICROPROFILE_SCOPEGPUI(_name, 0xff00ff);                                     \
+  _INTR_PROFILE_GPU_MARKER_REGION(_name)
+#define _INTR_PROFILE_GPU_CUSTOM(_var, _name)                                  \
+  MICROPROFILE_SCOPEGPU(_var);                                                 \
+  _INTR_PROFILE_GPU_MARKER_REGION(_name)
+#define _INTR_PROFILE_GPU_DEFINE(_var, _name)                                  \
+  MICROPROFILE_DEFINE_GPU(_var, _name, 0xff00ff);
 #define _INTR_PROFILE_COUNTER_ADD(_name, _count)                               \
   MICROPROFILE_COUNTER_ADD(_name, _count)
 #define _INTR_PROFILE_COUNTER_SET(_name, _count)                               \
@@ -209,7 +240,11 @@ case IDCONTINUE : break;                                                       \
   MICROPROFILE_COUNTER_LOCAL_SUB(_var, _count)
 #else
 #define _INTR_PROFILE_CPU(_group, _name)
+#define _INTR_PROFILE_CPU_CUSTOM(_var)
+#define _INTR_PROFILE_CPU_DEFINE(_var, _group, _name)
 #define _INTR_PROFILE_GPU(_name)
+#define _INTR_PROFILE_GPU_CUSTOM(_var, _name)
+#define _INTR_PROFILE_GPU_DEFINE(_var, _name)
 #define _INTR_PROFILE_COUNTER_ADD(_name, _count)
 #define _INTR_PROFILE_COUNTER_SET(_name, _count)
 #define _INTR_PROFILE_COUNTER_SUB(_name, _count)

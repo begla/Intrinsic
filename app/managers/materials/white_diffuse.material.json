@@ -1,0 +1,30 @@
+{
+    "name": "white_diffuse",
+    "properties": {
+        "name": "white_diffuse",
+        "materialPassMask": [
+            "GBufferDefault",
+            "Shadow",
+            "PerPixelPicking"
+        ],
+        "albedoTextureName": "white",
+        "emissiveTextureName": "white",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 0.0,
+        "emissiveIntensity": 0.0,
+        "normalTextureName": "default_NRM",
+        "pbrTextureName": "default_PBR",
+        "metalMaskBias": 0.0,
+        "roughnessBias": 1.0,
+        "specularBias": -1.0
+    }
+}

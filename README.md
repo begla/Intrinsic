@@ -2,9 +2,10 @@
 
 [![Contribute!](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/begla/Intrinsic/issues) [![Join the Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Intrinsic-Engine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Intrinsic is a Vulkan based cross-platform game and rendering engine. The project is currently in an early stage of development but evolves rapidly from day to day.
+Intrinsic is a Vulkan based cross-platform game and rendering engine. The project is currently in an early stage of development.
 
-![Intrinsic](media/screenshot3.jpg)
+![Intrinsic](media/screenshot_0.jpg)
+![IntrinsicEd](media/screenshot_1.jpg)
 
 # Getting Started
 
@@ -15,71 +16,81 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 * Visual Studio 2015
 * CMake >= 3.2
 * Qt 5.7
-* Vulkan SDK 1.0.30.0
+* Vulkan SDK >= 1.0.49.0
 * PhysX 3.3
 * FBX SDK 2015.1
 
 ### Setup Instructions
 
 1. Download and install the Qt (open-source) distribution
-2. Create a new environment variable "INTR_QTDIR" pointing to "[...]\Qtx.x\x.x\msvc2015_64"
-
+2. Create a new environment variable `INTR_QTDIR` pointing to `...\Qtx.x\x.x\msvc2015_64`
 3. Download an install the Vulkan SDK
-
 4. Get access to the latest PhysX SDK from NVIDIA: https://developer.nvidia.com/physx-sdk
-5. Follow the instructions from NVIDIA and compile the PhysX libraries for the configurations "Release", "Profile" and "Debug"
-   NOTE: Make sure that PhysX links the Runtime Library dynamically as Intrinsic does!
-   
+5. Follow the instructions from NVIDIA and compile the PhysX libraries for the configurations *Release*, *Profile* and *Debug*
+
+   **NOTE:** Make sure that PhysX links the Runtime Library dynamically as Intrinsic does! 
+
 6. Download and install the Autodesk FBX SDK
+7. Create a new directory called `Intrinsic_Dependencies` on the _same level_ as the Intrinsic repository folder
+8. Inside, create a new folder `dependencies` containing two folders `physx` and `fbx`
+9. Copy the static/dynamic libraries and header files of both SDKs to folders named `bin` (DLLs), `lib` (LIBs) and `include` respectively
+10. Go to the `scripts_win32` folder in the Intrinsic repository dir
+11. Execute `ConfigAndBuildDependencies.bat` to build some of the remaining dependencies automatically
+12. Execute `CopyDllsToAppDir_Debug.bat` and `CopyDllsToAppDir_Release.bat`
+13. Execute `Config.bat` to create a Visual Studio 2015 solution file and all project configurations
+14. If everything went well, you'll find the solution in the newly created `build` folder
 
-7. Create a new directory called "Intrinsic_Dependencies" on the _same level_ as the Intrinsic repository folder
-8. Inside, create a new folder "dependencies" containing two folders "physx" and "fbx"
-9. Copy the static/dynamic libraries and header files of both SDKs to folders named "bin" (DLLs), "lib" (LIBs) and "include" respectively
+    **NOTE:** You can also use one of the many build scripts: `Build_Release.bat`, ... to get started
 
-10. Go to the "scripts_win32" folder in the Intrinsic repository dir
-11. Execute "ConfigAndBuildDependencies.bat" to build some of the remaining dependencies automatically
-12. Execute "CopyDllsToAppDir_Debug.bat" and "CopyDllsToAppDir_Release.bat"
-13. Execute "Config.bat" to create a Visual Studio 2015 solution file and all project configurations
+15. Execute `Intrinsic.exe` or `IntrinsicEd.exe` in the `app` directory
+16. You're all set - yey!
 
-14. If everything went well, you'll find the solution in the newly created "build" folder. You can also use one of the many build scripts: "Build_Release.bat", ... to get started
-15. Execute "Intrinsic.exe" or "IntrinsicEd.exe" in the "app" directory - yey!
-
-## Linux (Fresh Ubuntu 16.10 Install)
+## Linux (Ubuntu 16.10)
 
 ### Prerequisites
 
+```
 sudo apt install git cmake ninja-build libsdl2-dev
+```
 
 ### Setup Instructions
-1. Download and install the Qt (open-source) distribution  
-    Add environment variables to your .zshrc or .bashrc:  
-       # Intrinsic  
-       export INTR_QTDIR="[...]/Qt/x.x/gcc_64"  
+
+1. Download and install the Qt (open-source) distribution
+
+   Add environment variables to your .zshrc or .bashrc:
+   ```
+   # Intrinsic  
+   export INTR_QTDIR="[...]/Qt/x.x/gcc_64"
+   ```
 
 2. Download and install the Vulkan SDK
-    Add environment variables to your .zshrc or .bashrc:  
-       # vulkan sdk  
-       VULKAN_SDK=~/[...]/VulkanSDK/1.0.30.0/x86_64  
-       VK_LAYER_PATH=$VULKAN_SDK/etc/explicit_layer.d  
-  
-       export VK_LAYER_PATH  
-       export PATH=$VULKAN_SDK/bin:$PATH  
+
+    Add environment variables to your .zshrc or .bashrc:
+    ```
+    # Vulkan SDK  
+    VULKAN_SDK=~/[...]/VulkanSDK/1.0.30.0/x86_64  
+    VK_LAYER_PATH=$VULKAN_SDK/etc/explicit_layer.d  
+
+    export VK_LAYER_PATH  
+    export PATH=$VULKAN_SDK/bin:$PATH
+    ```
 
 3. Get access to the latest PhysX SDK  
-   After cloning of the git repository apply patches from https://github.com/NVIDIAGameWorks/PhysX-3.3/pull/57  
-   cd [...]/PhysX-3.3/PhysXSDK/Source/compiler/linux64  
-   make release profile debug  
-  
-   Add environment variables to your .zshrc or .bashrc:  
-      export PHYSX_HOME="$HOME/[...]/PhysX-3.3/PhysXSDK/"  
-  
-4. Download and install Autodesk FBX SDK  
 
-5. Go to the "scripts_linux" folder in the Intrinsic repository dir
-6. Execute "ConfigAndBuildDependencies"
-7. Execute "Config_Release"
-8. Execute "Build"
-9. Execute "Run_Release"
+   After cloning of the git repository apply patches from https://github.com/NVIDIAGameWorks/PhysX-3.3/pull/57
+   ```
+   cd .../PhysX-3.3/PhysXSDK/Source/compiler/linux64  
+   make release profile debug  
+   ```
+   Add environment variables to your .zshrc or .bashrc:
+   ```
+   export PHYSX_HOME="$HOME/[...]/PhysX-3.3/PhysXSDK/"
+   ```
+
+4. Download and install Autodesk FBX SDK  
+5. Go to the `scripts_linux` folder in the Intrinsic repository dir
+6. Execute following scripts: `ConfigAndBuildDependencies`, `Config_Release`, `Build` and last but not least `Run_Release`
+7. You're all set - yey!
 
 # Build Status
 
@@ -87,7 +98,6 @@ sudo apt install git cmake ninja-build libsdl2-dev
 |:--------:|:------------:|
 | Windows  | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/eevcf6gfm77309ud?svg=true)](https://ci.appveyor.com/project/begla/intrinsic) |
 | Linux    |  [![Linux Build Status](https://travis-ci.org/begla/Intrinsic.svg?branch=master)](https://travis-ci.org/begla/Intrinsic) |
-| Android  | Coming soon... |
 
 # License
 
@@ -132,9 +142,16 @@ Intrinsic uses the following proprietary libraries:
 
 * PhysX 3 (see https://developer.nvidia.com/physx-sdk)
 * FBX SDK (IntrinsicEd only, see http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775847)
+* BugSplat (see http://www.bugsplat.com/)
 
-Intrinsic also uses the following tools in binary format:
+... and the following tools in binary format:
 
 * NVTT (see https://developer.nvidia.com/gpu-accelerated-texture-compression)
 * Cloc (see http://cloc.sourceforge.net)
 * 7za (see http://www.7-zip.org/download.html)
+
+Assets (amongst other things) sourced from:
+
+* https://cloud.blender.org/
+* http://www.hdrlabs.com/sibl/archive.html
+

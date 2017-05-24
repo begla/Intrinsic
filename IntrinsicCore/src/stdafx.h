@@ -71,8 +71,12 @@
 #include "glm/gtx/quaternion.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 
-// ->::Core related includes
+// Core related includes
+#include "IntrinsicCoreVersion.h"
 #include "IntrinsicCorePrerequisites.h"
+
+// Logging
+#include "IntrinsicCoreLogManager.h"
 
 // STL allocator include
 #include "IntrinsicCoreTlsfAllocator.h"
@@ -121,11 +125,11 @@ using namespace Intrinsic::Core;
 // Core related includes
 #include "IntrinsicCoreTriangleOptimizer.h"
 #include "IntrinsicCoreSettingsManager.h"
-#include "IntrinsicCoreLogManager.h"
 #include "IntrinsicCoreLockFreeStack.h"
 #include "IntrinsicCoreLinearOffsetAllocator.h"
 #include "IntrinsicCoreLockFreeFixedBlockAllocator.h"
 #include "IntrinsicStringUtil.h"
+#include "IntrinsicUtil.h"
 #include "IntrinsicCoreSimd.h"
 #include "IntrinsicCoreMath.h"
 #include "IntrinsicCoreName.h"
@@ -144,12 +148,15 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreResourcesPostEffect.h"
 #include "IntrinsicCoreComponentsNode.h"
 #include "IntrinsicCoreComponentsMesh.h"
+#include "IntrinsicCoreComponentsSwarm.h"
 #include "IntrinsicCoreComponentsRigidBody.h"
 #include "IntrinsicCoreComponentsCamera.h"
 #include "IntrinsicCoreComponentsCameraController.h"
 #include "IntrinsicCoreComponentsCharacterController.h"
 #include "IntrinsicCoreComponentsPlayer.h"
 #include "IntrinsicCoreComponentsPostEffectVolume.h"
+#include "IntrinsicCoreComponentsLight.h"
+#include "IntrinsicCoreComponentsIrradianceProbe.h"
 
 #include "IntrinsicCoreWorld.h"
 #include "IntrinsicCoreTaskManager.h"
@@ -158,6 +165,7 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreSystemEventProviderSDL.h"
 #include "IntrinsicCoreGameStatesEditing.h"
 #include "IntrinsicCoreGameStatesMain.h"
+#include "IntrinsicCoreGameStatesBenchmark.h"
 #include "IntrinsicCoreGameStatesManager.h"
 #include "IntrinsicCoreResourcesScript.h"
 #include "IntrinsicCoreComponentsScript.h"

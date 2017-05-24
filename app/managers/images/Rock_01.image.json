@@ -1,0 +1,17 @@
+{
+    "name": "Rock_01",
+    "properties": {
+        "name": "Rock_01",
+        "imageType": 1,
+        "imageFormat": 10,
+        "flags": 16,
+        "dimensions": [
+            2048.0,
+            2048.0,
+            1.0
+        ],
+        "arrayLayerCount": 1,
+        "mipLevelCount": 12,
+        "fileName": "Rock_01.dds"
+    }
+}

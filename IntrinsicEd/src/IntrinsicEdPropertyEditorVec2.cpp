@@ -23,9 +23,8 @@ IntrinsicEdPropertyEditorVec2::IntrinsicEdPropertyEditorVec2(
     rapidjson::Document* p_Document, rapidjson::Value* p_CurrentProperties,
     rapidjson::Value* p_CurrentProperty, const char* p_PropertyName,
     QWidget* parent)
-    : QWidget(parent), _properties(p_CurrentProperties),
-      _property(p_CurrentProperty), _propertyName(p_PropertyName),
-      _document(p_Document)
+    : IntrinsicEdPropertyEditorBase(p_Document, p_CurrentProperties,
+                                    p_CurrentProperty, p_PropertyName, parent)
 {
   _ui.setupUi(this);
   updateFromProperty();
@@ -49,8 +48,19 @@ void IntrinsicEdPropertyEditorVec2::updateFromProperty()
     _ui.y->setReadOnly(true);
   }
 
-  _ui.x->setValue(prop["valueX"].GetFloat());
-  _ui.y->setValue(prop["valueY"].GetFloat());
+  const bool hasFocus = _ui.x->hasFocus() || _ui.y->hasFocus();
+  const bool changed = prop["values"][0].GetFloat() != _ui.x->value() ||
+                       prop["values"][1].GetFloat() != _ui.y->value();
+
+  if (changed && !hasFocus)
+  {
+    _ui.x->blockSignals(true);
+    _ui.y->blockSignals(true);
+    _ui.x->setValue(prop["values"][0].GetFloat());
+    _ui.y->setValue(prop["values"][1].GetFloat());
+    _ui.x->blockSignals(false);
+    _ui.y->blockSignals(false);
+  }
 
   _ui.propertyTitle->setText(_propertyName.c_str());
 }
@@ -60,8 +70,14 @@ void IntrinsicEdPropertyEditorVec2::onValueChanged()
   _INTR_ASSERT(_property);
   rapidjson::Value& prop = *_property;
 
-  prop["valueX"].SetFloat((float)_ui.x->value());
-  prop["valueY"].SetFloat((float)_ui.y->value());
+  bool changed = prop["values"][0].GetFloat() != _ui.x->value() ||
+                 prop["values"][1].GetFloat() != _ui.y->value();
 
-  emit valueChanged(*_properties);
+  if (changed)
+  {
+    prop["values"][0].SetFloat((float)_ui.x->value());
+    prop["values"][1].SetFloat((float)_ui.y->value());
+
+    emit valueChanged(*_properties);
+  }
 }

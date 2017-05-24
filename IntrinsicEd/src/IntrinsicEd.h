@@ -60,6 +60,7 @@ public slots:
   void onLoadEditorSettings();
   void onExit();
   void onLoadWorld();
+  void onReloadSettingsAndRendererConfig();
   void onSaveWorld();
   void onFullscreen();
   void onEndFullscreen();
@@ -70,27 +71,34 @@ public slots:
   void onEditingModeScale();
   void onEditingGameState();
   void onMainGameState();
+  void onBenchmarkGameState();
   void onGridSizeChanged(double p_Value);
   void onGizmoSizeChanged(double p_Value);
   void onCameraSpeedChanged(double p_Value);
+  void onTimeModChanged(double p_Value);
   void onCreateCube();
   void onCreateRigidBody();
   void onCreateRigidBodySphere();
+  void onCreateLight();
   void onCreateSphere();
-  void onSpawnVegetation();
-  void onSpawnGrass();
   void onShowDebugContextMenu();
   void onShowDebugGeometryContextMenu();
   void onShowCreateContextMenu();
   void onDebugGeometryChanged();
+  void onOpenMicroprofile();
+  void onCompileShaders();
+  void onRecompileShaders();
+  void onSettingsFileChanged(const QString&);
 
 private:
-  QByteArray _tempStoredGeometry;
-  QByteArray _tempStoredState;
+  void updateSettingsChangeWatch();
 
   QMenu _createContextMenu;
   QMenu _debugContextMenu;
   QMenu _debugGeometryContextMenu;
+
+  QFileSystemWatcher* _settingsChangeWatch;
+  bool _settingsUpdatePending;
 
   Ui::IntrinsicEdClass _ui;
 };

@@ -46,6 +46,7 @@ VkSwapchainKHR RenderSystem::_vkSwapchain = VK_NULL_HANDLE;
 _INTR_ARRAY(VkImage) RenderSystem::_vkSwapchainImages;
 _INTR_ARRAY(VkImageView) RenderSystem::_vkSwapchainImageViews;
 glm::uvec2 RenderSystem::_backbufferDimensions = glm::uvec2(0u, 0u);
+glm::uvec2 RenderSystem::_customBackbufferDimensions = glm::uvec2(0u, 0u);
 
 VkQueue RenderSystem::_vkQueue = nullptr;
 
@@ -55,6 +56,7 @@ uint32_t RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex = (uint32_t)-1;
 
 uint32_t RenderSystem::_backbufferIndex = 0u;
 uint32_t RenderSystem::_activeBackbufferMask = 0u;
+<<<<<<< HEAD
 Format::Enum RenderSystem::_depthBufferFormat = Format::kD24UnormS8UInt;
 
 // <-
@@ -64,6 +66,9 @@ LockFreeStack<Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT> RenderSystem::
                                     [MaterialPass::kCount];
 LockFreeStack<Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT>
     RenderSystem::_visibleMeshComponents[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT];
+=======
+Format::Enum RenderSystem::_depthStencilFormatToUse = Format::kD32SFloat;
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
 
 // Private static members
 VkCommandPool RenderSystem::_vkPrimaryCommandPool;
@@ -85,7 +90,10 @@ _INTR_ARRAY(ResourceReleaseEntry) RenderSystem::_resourcesToFree;
 
 void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 {
-  _INTR_LOG_INFO("Inititializing Vulkan Renderer...");
+  _INTR_PROFILE_AUTO("Init. Vulkan Render System");
+
+  _INTR_LOG_INFO("Inititializing Vulkan Render System...");
+  _INTR_LOG_PUSH();
 
   // Init render states
   {
@@ -94,9 +102,11 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
   // Init. Vulkan
   {
+    _INTR_LOG_INFO("Using Vulkan SDK version 1.0.%u.x...", VK_HEADER_VERSION);
+    _INTR_PROFILE_AUTO("Init. Vulkan");
+
     initVkInstance();
     initVkDevice();
-    Debugging::init(_vkInstance);
     initVkSurface(p_PlatformHandle, p_PlatformWindow);
     initVkPipelineCache();
     initVkCommandPools();
@@ -110,10 +120,25 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
   }
 
   {
-    GpuProgramManager::compileAllShaders();
-    GpuProgramManager::createAllResources();
+    _INTR_PROFILE_AUTO("Create Resources");
+
+    {
+      _INTR_PROFILE_AUTO("Compile Shaders");
+      GpuProgramManager::compileAllShaders();
+    }
+
+    {
+      _INTR_PROFILE_AUTO("Create GPU Program Resources");
+      GpuProgramManager::createAllResources();
+    }
+
     RenderPassManager::createAllResources();
-    ImageManager::createAllResources();
+
+    {
+      _INTR_PROFILE_AUTO("Create Image Resources");
+      ImageManager::createAllResources();
+    }
+
     VertexLayoutManager::createAllResources();
     PipelineLayoutManager::createAllResources();
     PipelineManager::createAllResources();
@@ -127,6 +152,11 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 	initVkSupportedDepthBufferFormat();
   }
 
+  // Format setup
+  {
+    setupPlatformDependentFormats();
+  }
+
   // Init. separate manager
   {
     UniformManager::init();
@@ -135,37 +165,31 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
   // Init. render passes
   {
-    RenderPass::GBuffer::init();
-    RenderPass::GBufferTransparents::init();
-    RenderPass::Sky::init();
-    RenderPass::Foliage::init();
+    _INTR_PROFILE_AUTO("Init. Render Passes");
+
     RenderPass::Shadow::init();
 
     RenderPass::Lighting::init();
     RenderPass::VolumetricLighting::init();
 
-    RenderPass::PreCombine::init();
     RenderPass::Bloom::init();
-    RenderPass::PostCombine::init();
-    RenderPass::LensFlare::init();
 
     RenderPass::Debug::init();
     RenderPass::PerPixelPicking::init();
   }
 
-  {
-    MaterialManager::initMaterialPasses();
-    MaterialManager::createAllResources();
-  }
+  RenderProcess::Default::loadRendererConfig();
+  MaterialManager::loadMaterialPassConfig();
+  MaterialManager::createAllResources();
 
-  updateResolutionDependentResources();
+  _INTR_LOG_POP();
 }
 
 // <-
 
 void RenderSystem::onViewportChanged() { _swapChainUpdatePending = true; }
 
-// <-
+//<-
 
 void RenderSystem::releaseQueuedResources()
 {
@@ -225,34 +249,29 @@ void RenderSystem::releaseQueuedResources()
   }
 }
 
-void RenderSystem::updateResolutionDependentResources()
+void RenderSystem::reinitRendering()
 {
-  // Recreate all pipelines (to update the view port size)
-  PipelineManager::createAllResources();
+  _INTR_PROFILE_AUTO("Reinit. Rendering");
 
   // Reset allocators
-  GpuMemoryManager::resetAllocator(MemoryPoolType::kResolutionDependentBuffers);
-  GpuMemoryManager::resetAllocator(MemoryPoolType::kResolutionDependentImages);
+  GpuMemoryManager::resetPool(MemoryPoolType::kResolutionDependentBuffers);
+  GpuMemoryManager::resetPool(MemoryPoolType::kResolutionDependentImages);
 
-  RenderPass::GBufferTransparents::updateResolutionDependentResources();
-  RenderPass::GBuffer::updateResolutionDependentResources();
-  RenderPass::Debug::updateResolutionDependentResources();
-  RenderPass::PerPixelPicking::updateResolutionDependentResources();
-  RenderPass::Foliage::updateResolutionDependentResources();
-  RenderPass::Sky::updateResolutionDependentResources();
-  RenderPass::Shadow::updateResolutionDependentResources();
-  RenderPass::Lighting::updateResolutionDependentResources();
-  RenderPass::VolumetricLighting::updateResolutionDependentResources();
-  RenderPass::PreCombine::updateResolutionDependentResources();
-  RenderPass::Bloom::updateResolutionDependentResources();
-  RenderPass::LensFlare::updateResolutionDependentResources();
-  RenderPass::PostCombine::updateResolutionDependentResources();
+  // Update from config files
+  RenderProcess::Default::loadRendererConfig();
+  MaterialManager::loadMaterialPassConfig();
+  MaterialManager::createAllResources();
 
-  // Recreate all mesh draw calls (might use resources of the render passes)
+  // Recreate draw calls
+  GameStates::Editing::onReinitRendering();
+
   Components::MeshManager::destroyResources(
       Components::MeshManager::_activeRefs);
   Components::MeshManager::createResources(
       Components::MeshManager::_activeRefs);
+
+  // Recreate all pipelines (to update the view port size)
+  PipelineManager::createAllResources();
 }
 
 // <-
@@ -398,9 +417,11 @@ void RenderSystem::initManagers()
 
   // Load managers
   {
-    GpuProgramManager::loadFromSingleFile("managers/GpuProgram.manager.json");
-    ImageManager::loadFromSingleFile("managers/Image.manager.json");
-    MaterialManager::loadFromSingleFile("managers/Material.manager.json");
+    GpuProgramManager::loadFromMultipleFiles("managers/gpu_programs/",
+                                             ".gpu_program.json");
+    ImageManager::loadFromMultipleFiles("managers/images/", ".image.json");
+    MaterialManager::loadFromMultipleFiles("managers/materials/",
+                                           ".material.json");
   }
 
   // Setup default vertex layouts
@@ -432,24 +453,83 @@ void RenderSystem::initVkInstance()
   appInfo.pEngineName = "Intrinsic";
   appInfo.apiVersion = VK_API_VERSION_1_0;
 
-  _INTR_ARRAY(const char*) enabledExtensions;
+  _INTR_ARRAY(const char*) extensionsToEnable;
   {
-    enabledExtensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+    extensionsToEnable.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
-    enabledExtensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+    extensionsToEnable.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #elif defined(VK_USE_PLATFORM_XLIB_KHR)
-    enabledExtensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+    extensionsToEnable.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
 #endif // VK_USE_PLATFORM_WIN32_KHR
   }
 
-  _INTR_ARRAY(const char*) enabledLayers;
+  _INTR_ARRAY(const char*) layersToEnable;
+  if ((Settings::Manager::_rendererFlags &
+       Settings::RendererFlags::kValidationEnabled) > 0u)
   {
-    if ((Settings::Manager::_rendererFlags &
-         Settings::RendererFlags::kValidationEnabled) > 0u)
+    layersToEnable.push_back("VK_LAYER_LUNARG_standard_validation");
+    extensionsToEnable.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+  }
+
+  uint32_t availableLayerCount = 0u;
+  vkEnumerateInstanceLayerProperties(&availableLayerCount, nullptr);
+  _INTR_ARRAY(VkLayerProperties) availableLayers;
+  availableLayers.resize(availableLayerCount);
+  vkEnumerateInstanceLayerProperties(&availableLayerCount,
+                                     availableLayers.data());
+
+  _INTR_ARRAY(const char*) enabledLayers;
+  for (uint32_t i = 0u; i < availableLayerCount; ++i)
+  {
+    VkLayerProperties& layerProperty = availableLayers[i];
+    _INTR_LOG_INFO("Found available Vulkan layer '%s'...",
+                   layerProperty.layerName);
+
+    for (uint32_t i = 0u; i < layersToEnable.size(); ++i)
     {
-      enabledLayers.push_back("VK_LAYER_LUNARG_standard_validation");
-      enabledExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+      if (strcmp(layerProperty.layerName, layersToEnable[i]) == 0u)
+      {
+        _INTR_LOG_INFO("Enabaling Vulkan layer '%s'...",
+                       layerProperty.layerName);
+        enabledLayers.push_back(layersToEnable[i]);
+      }
     }
+  }
+
+  if (enabledLayers.size() != layersToEnable.size())
+  {
+    _INTR_LOG_WARNING("Failed to enable some Vulkan layers...");
+  }
+
+  uint32_t availableExtensionCount = 0u;
+  vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount,
+                                         nullptr);
+  _INTR_ARRAY(VkExtensionProperties) availableExtensions;
+  availableExtensions.resize(availableExtensionCount);
+  vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount,
+                                         availableExtensions.data());
+
+  _INTR_ARRAY(const char*) enabledExtensions;
+  for (uint32_t i = 0u; i < availableExtensionCount; ++i)
+  {
+    VkExtensionProperties& extensionProperty = availableExtensions[i];
+    _INTR_LOG_INFO("Found available Vulkan extension '%s'...",
+                   extensionProperty.extensionName);
+
+    for (uint32_t i = 0u; i < extensionsToEnable.size(); ++i)
+    {
+      if (strcmp(extensionProperty.extensionName, extensionsToEnable[i]) == 0u)
+      {
+        _INTR_LOG_INFO("Enabaling Vulkan extension '%s'...",
+                       extensionProperty.extensionName);
+        enabledExtensions.push_back(extensionsToEnable[i]);
+      }
+    }
+  }
+
+  if (enabledExtensions.size() != extensionsToEnable.size())
+  {
+    _INTR_LOG_WARNING("Failed to enable some Vulkan extensions...");
   }
 
   VkInstanceCreateInfo instanceCreateInfo = {};
@@ -473,6 +553,14 @@ void RenderSystem::initVkInstance()
   VkResult result =
       vkCreateInstance(&instanceCreateInfo, nullptr, &_vkInstance);
   _INTR_VK_CHECK_RESULT(result);
+
+  for (uint32_t i = 0u; i < enabledExtensions.size(); ++i)
+  {
+    if (strcmp(enabledExtensions[i], VK_EXT_DEBUG_REPORT_EXTENSION_NAME) == 0u)
+    {
+      Debugging::initDebugReportCallback();
+    }
+  }
 }
 
 // <-
@@ -511,8 +599,11 @@ void RenderSystem::initVkDevice()
     vkGetPhysicalDeviceMemoryProperties(_vkPhysicalDevice,
                                         &_vkPhysicalDeviceMemoryProperties);
 
-    _INTR_LOG_INFO("Using physical device %s (Driver %u)...",
-                   physDeviceProps.deviceName, physDeviceProps.driverVersion);
+    _INTR_LOG_INFO("Using physical device %s (Driver Ver. %u, API Ver. %u, "
+                   "Vendor ID %u, Device ID %u, Device Type %u)...",
+                   physDeviceProps.deviceName, physDeviceProps.driverVersion,
+                   physDeviceProps.apiVersion, physDeviceProps.vendorID,
+                   physDeviceProps.deviceID, physDeviceProps.deviceType);
   }
 
   // Find graphics _AND_ compute queue
@@ -531,24 +622,19 @@ void RenderSystem::initVkDevice()
     vkGetPhysicalDeviceQueueFamilyProperties(_vkPhysicalDevice, &queueCount,
                                              queueProps.data());
 
-    uint32_t graphicsComputeQueue;
-    for (graphicsComputeQueue = 0; graphicsComputeQueue < queueCount;
-         graphicsComputeQueue++)
+    for (uint32_t queueIdx = 0; queueIdx < queueCount; queueIdx++)
     {
-      if ((queueProps[graphicsComputeQueue].queueFlags &
-           VK_QUEUE_GRAPHICS_BIT) > 0u &&
-          (queueProps[graphicsComputeQueue].queueFlags & VK_QUEUE_COMPUTE_BIT) >
-              0u)
+      if ((queueProps[queueIdx].queueFlags & VK_QUEUE_GRAPHICS_BIT) > 0u &&
+          (queueProps[queueIdx].queueFlags & VK_QUEUE_COMPUTE_BIT) > 0u)
       {
-        _INTR_LOG_INFO("Using queue #%u for graphics and compute...",
-                       graphicsComputeQueue);
+        _INTR_LOG_INFO("Using queue #%u for graphics and compute...", queueIdx);
+        _vkGraphicsAndComputeQueueFamilyIndex = queueIdx;
         break;
       }
     }
-    _INTR_ASSERT(graphicsComputeQueue < queueCount &&
-                 "Unable to locate a matching queue");
 
-    _vkGraphicsAndComputeQueueFamilyIndex = graphicsComputeQueue;
+    _INTR_ASSERT(_vkGraphicsAndComputeQueueFamilyIndex != (uint32_t)-1 &&
+                 "Unable to locate a matching queue");
   }
 
   // Setup device queue
@@ -576,8 +662,9 @@ void RenderSystem::initVkDevice()
 
     for (auto& ext : extensions)
     {
-      if (!strcmp(ext.extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+      if (strcmp(ext.extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME) == 0u)
       {
+        _INTR_LOG_INFO("Enabling debug markers...");
         debugMarkerExtPresent = true;
       }
     }
@@ -625,6 +712,10 @@ void RenderSystem::initVkDevice()
   // Retrieve device queue
   vkGetDeviceQueue(_vkDevice, _vkGraphicsAndComputeQueueFamilyIndex, 0u,
                    &_vkQueue);
+
+  // Enable debug markers (if available)
+  if (debugMarkerExtPresent)
+    Debugging::initDebugMarkers();
 
   _INTR_LOG_POP();
 }
@@ -677,9 +768,12 @@ void RenderSystem::initOrUpdateVkSwapChain()
   static VkFormat surfaceFormatToUse = VK_FORMAT_B8G8R8A8_SRGB;
   static VkColorSpaceKHR surfaceColorSpaceToUse =
       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-  static VkPresentModeKHR presentModeToUse = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
+  VkPresentModeKHR presentModeToUse =
+      (VkPresentModeKHR)Settings::Manager::_presentMode;
 
   // Check if present mode is supported
+  _INTR_LOG_INFO("Checking present mode to use...");
+  _INTR_LOG_PUSH();
   {
     uint32_t presentModeCount = 0u;
     result = vkGetPhysicalDeviceSurfacePresentModesKHR(
@@ -697,6 +791,7 @@ void RenderSystem::initOrUpdateVkSwapChain()
     bool found = false;
     for (uint32_t i = 0u; i < presentModeCount; ++i)
     {
+<<<<<<< HEAD
 		if (presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
 		{
 			presentModeToUse = VK_PRESENT_MODE_MAILBOX_KHR;
@@ -708,9 +803,25 @@ void RenderSystem::initOrUpdateVkSwapChain()
 			presentModeToUse = VK_PRESENT_MODE_IMMEDIATE_KHR;
 			found = true;
 		}
+=======
+      _INTR_LOG_INFO("Present mode '%u' available...", presentModes[i]);
+
+      if (presentModes[i] == presentModeToUse)
+      {
+        _INTR_LOG_INFO("Using present mode '%u'...", presentModes[i]);
+        found = true;
+      }
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
     }
-    _INTR_ASSERT(found && "Present mode not supported");
+
+    if (!found)
+    {
+      _INTR_LOG_WARNING("Selected present mode is not supported, falling back "
+                        "to fifo mode...");
+      presentModeToUse = VK_PRESENT_MODE_FIFO_KHR;
+    }
   }
+  _INTR_LOG_POP();
 
   // Check if surface format is supported
   {
@@ -773,8 +884,17 @@ void RenderSystem::initOrUpdateVkSwapChain()
   }
 
   // Update backbuffer dimensions
-  _backbufferDimensions = glm::uvec2(swapchainCreationInfo.imageExtent.width,
-                                     swapchainCreationInfo.imageExtent.height);
+  if (_customBackbufferDimensions.x == 0u ||
+      _customBackbufferDimensions.y == 0u)
+  {
+    _backbufferDimensions =
+        glm::uvec2(swapchainCreationInfo.imageExtent.width,
+                   swapchainCreationInfo.imageExtent.height);
+  }
+  else
+  {
+    _backbufferDimensions = _customBackbufferDimensions;
+  }
 
   // Destroy previous swapchain
   if (swapchainCreationInfo.oldSwapchain != VK_NULL_HANDLE)
@@ -816,7 +936,7 @@ void RenderSystem::initOrUpdateVkSwapChain()
       {
         colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         colorAttachmentView.pNext = nullptr;
-        colorAttachmentView.format = VK_FORMAT_B8G8R8A8_SRGB;
+        colorAttachmentView.format = surfaceFormatToUse;
         colorAttachmentView.components.r = VK_COMPONENT_SWIZZLE_R;
         colorAttachmentView.components.g = VK_COMPONENT_SWIZZLE_G;
         colorAttachmentView.components.b = VK_COMPONENT_SWIZZLE_B;
@@ -1120,15 +1240,18 @@ void RenderSystem::initVkSynchronization()
   _INTR_VK_CHECK_RESULT(result);
 }
 
-void RenderSystem::resizeSwapChain()
+// <-
+
+void RenderSystem::resizeSwapChain(bool p_Force)
 {
   if (_swapChainUpdatePending &&
-      _timePassedSinceLastSwapChainUpdate >= _timeBetweenSwapChainUpdates)
+          _timePassedSinceLastSwapChainUpdate >= _timeBetweenSwapChainUpdates ||
+      p_Force)
   {
     vkDeviceWaitIdle(_vkDevice);
 
     initOrUpdateVkSwapChain();
-    updateResolutionDependentResources();
+    reinitRendering();
 
     _swapChainUpdatePending = false;
     _timePassedSinceLastSwapChainUpdate = 0.0f;
@@ -1137,6 +1260,35 @@ void RenderSystem::resizeSwapChain()
   {
     _timePassedSinceLastSwapChainUpdate += TaskManager::_lastDeltaT;
   }
+}
+
+// <-
+
+void RenderSystem::setupPlatformDependentFormats()
+{
+  static _INTR_ARRAY(Format::Enum)
+      depthFormats = {Format::kD24UnormS8UInt, Format::kD32SFloatS8UInt,
+                      Format::kD16UnormS8UInt};
+
+  for (uint32_t i = 0u; i < depthFormats.size(); ++i)
+  {
+    const Format::Enum format = depthFormats[i];
+    const VkFormat vkFormat = Helper::mapFormatToVkFormat(format);
+
+    VkFormatProperties formatProps;
+    vkGetPhysicalDeviceFormatProperties(_vkPhysicalDevice, vkFormat,
+                                        &formatProps);
+
+    if ((formatProps.optimalTilingFeatures &
+         VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) > 0u)
+    {
+      _depthStencilFormatToUse = format;
+      return;
+    }
+  }
+
+  _INTR_ASSERT(false &&
+               "Failed to find a working depth format for this platform");
 }
 
 // <-
@@ -1160,6 +1312,7 @@ void RenderSystem::beginFrame()
 
   {
     _INTR_PROFILE_CPU("Render System", "Wait For Previous Frame");
+
     waitForFrame(_backbufferIndex);
   }
 
@@ -1218,7 +1371,7 @@ void RenderSystem::endFrame()
   }
 
   {
-    _INTR_PROFILE_CPU("Renderer", "Queue Present");
+    _INTR_PROFILE_CPU("Render System", "Queue Present");
 
     VkPresentInfoKHR present = {};
     {

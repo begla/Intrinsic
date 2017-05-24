@@ -1,0 +1,10 @@
+{
+    "name": "simple.comp",
+    "properties": {
+        "name": "simple.comp",
+        "gpuProgramName": "simple.comp.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 3
+    }
+}

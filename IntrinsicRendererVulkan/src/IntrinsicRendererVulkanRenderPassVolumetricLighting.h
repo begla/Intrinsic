@@ -25,11 +25,11 @@ namespace RenderPass
 struct VolumetricLighting
 {
   static void init();
-  static void updateResolutionDependentResources();
+  static void onReinitRendering();
 
   static void destroy();
 
-  static void render(float p_DeltaT);
+  static void render(float p_DeltaT, Components::CameraRef p_CameraRef);
 };
 }
 }

@@ -19,13 +19,12 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "lib_math.glsl"
+#include "gbuffer.inc.glsl"
 
 layout (location = 0) in vec3 inNormal;
 layout (location = 1) in vec3 inColor;
 
-layout (location = 0) out vec4 outAlbedo;
-layout (location = 1) out vec4 outNormal;
-layout (location = 2) out vec4 outParameter0;
+OUTPUT
 
 layout (binding = 1) uniform PerInstance
 {
@@ -34,7 +33,16 @@ layout (binding = 1) uniform PerInstance
 
 void main()
 {
-  outAlbedo = vec4(inColor, 1.0);
-  outNormal = vec4(encodeNormal(inNormal), 0.5, 1.0);
-  outParameter0 = vec4(0.0, 0.5, 0.0, 0.0);
+  GBuffer gbuffer;
+  {
+    gbuffer.albedo = vec4(inColor, 1.0);
+    gbuffer.normal = normalize(inNormal);
+    gbuffer.metalMask = 0.0;
+    gbuffer.specular = 0.5;
+    gbuffer.roughness = 0.5;
+    gbuffer.materialBufferIdx = 0;
+    gbuffer.occlusion = 1.0;
+    gbuffer.emissive = 0.0; 
+  }
+  writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
 }

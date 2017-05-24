@@ -19,16 +19,17 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "lib_math.glsl"
-#include "surface_fragment.inc.glsl"
+#include "gbuffer.inc.glsl"
 
 // Ubos
-PER_MATERIAL_UBO();
-PER_INSTANCE_UBO();
+PER_MATERIAL_UBO;
+PER_INSTANCE_UBO;
 
 // Bindings
-BINDINGS();
+BINDINGS_GBUFFER;
 layout (binding = 6) uniform sampler2D gbufferDepthTex;
 layout (binding = 7) uniform sampler2D foamTex;
+layout (binding = 8) uniform sampler2D noiseTex;
 
 // Input
 layout (location = 0) in vec3 inNormal;
@@ -39,17 +40,19 @@ layout (location = 4) in vec2 inUV0;
 layout (location = 5) in vec4 inPosition;
 
 // Output
-OUTPUT();
+OUTPUT
+
+const float edgeFadeDistance = 15.0;
+const float waterBaseAlpha = 0.7;
 
 void main()
 { 
   vec3 screenPos = inPosition.xyz / inPosition.w;
   screenPos.xy = screenPos.xy * 0.5 + 0.5;
+  screenPos.z = linearizeDepth(screenPos.z, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
 
-  const vec4 camParams = vec4(1.0, 5000.0, 1.0, 1.0 / 5000.0);
-  screenPos.z = linearizeDepth(screenPos.z, camParams.x, camParams.y);
-
-  const float opaqueDepth = linearizeDepth(textureLod(gbufferDepthTex, screenPos.xy, 0.0).r, camParams.x, camParams.y);
+  const float opaqueDepth = linearizeDepth(textureLod(gbufferDepthTex, screenPos.xy, 0.0).r, 
+    uboPerInstance.camParams.x, uboPerInstance.camParams.y);
   if (opaqueDepth < screenPos.z)
   {
     discard;
@@ -58,39 +61,59 @@ void main()
   const mat3 TBN = mat3(inTangent, inBinormal, inNormal);
 
   const vec2 uv0 = UV0_TRANSFORMED_ANIMATED;
-  const vec2 uv0InverseAnim = UV0_TRANSFORMED_ANIMATED_FACTOR(vec2(0.4, 0.3));
+  const vec2 uv0InverseAnim = UV0_TRANSFORMED_ANIMATED_FACTOR(vec2(0.2, 0.9));
+  const vec2 uv0Raw = UV0;
 
-  const vec4 albedo0 = texture(albedoTex, uv0);
+  vec4 albedo = texture(albedoTex, uv0);
+  albedo.a = waterBaseAlpha;
+
   const vec4 normal0 = texture(normalTex, uv0);
-
-  const vec4 albedo1 = texture(albedoTex, uv0InverseAnim * 0.4);
-  const vec4 normal1 = texture(normalTex, uv0InverseAnim * 0.4);
+  const vec4 normal1 = texture(normalTex, uv0InverseAnim * 0.2);
+  const vec4 noise = texture(noiseTex, uv0 * 2.0);
+  const vec4 noise1 = texture(noiseTex, uv0);
+  const vec4 noise2 = texture(noiseTex, uv0 * 4.0);
 
   const float blend = 0.5;
-  vec4 albedo = mix(albedo0, albedo1, blend);
   const vec4 normal = mix(normal0, normal1, blend);
 
-  const vec4 foam = texture(foamTex, uv0);
-  vec4 roughness = texture(roughnessTex, uv0);
+  const vec4 foam = texture(foamTex, uv0 * 15.0);
 
-  const float baseAlpha = 0.5;
-  const float edgeFadeDistance = 0.0;
+  // Shore waves fakery
+  float waveFade = clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
+      * uboPerInstance.camParams.y / (uboPerMaterial.waterParams.x * 2.0), 0.0, 1.0);
+  float wave = sin(1.0 - length(uv0Raw.xy * 2.0 - 1.0) * 64.0 + uboPerInstance.data0.w);
+  wave = clamp(wave - noise2.r + 0.5, 0.0, 1.0);
+  albedo.a *= mix(wave, 1.0, waveFade);
 
-  const float foamFade = 1.0 
-    - clamp(max(opaqueDepth * camParams.x - screenPos.z, 0.0) * camParams.y / uboPerMaterial.pbrBias.w / foam.r, 0.0, 1.0);
+  // Foam
+  float foamFade = 1.0 
+    - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
+      * uboPerInstance.camParams.y / uboPerMaterial.waterParams.x, 0.0, 1.0);
+
+  foamFade += clamp(noise.r - 0.4, 0.0, 1.0);
+  foamFade *= clamp(noise1.r * 2.0 - 0.2, 0.0, 1.0);
+  foamFade = min(foamFade, albedo.a);
+
+  // Smooth edges
   const float edgeFade = 1.0 
-    - clamp(max(opaqueDepth * camParams.x - screenPos.z, 0.0) * camParams.y / edgeFadeDistance, 0.0, 1.0);
+    - clamp(max(opaqueDepth * uboPerInstance.camParams.x - screenPos.z, 0.0) 
+      * uboPerInstance.camParams.y / uboPerMaterial.waterParams.y, 0.0, 1.0);
 
-  float alpha = mix(baseAlpha, 0.0, foamFade);
-  alpha = mix(alpha, 1.0, edgeFade);
-
+  albedo.a = mix(albedo.a, 1.0, foamFade);    
+  albedo.a = mix(albedo.a, 0.0, edgeFade);
   albedo.rgb = mix(albedo.rgb, foam.rgb, foamFade);
+  vec2 metalRoughness = mix(vec2(1.0, 0.15), vec2(0.0, 1.0), foamFade);
 
-  roughness.xz = mix(roughness.xz, vec2(0.0, 1.0), foamFade);
-
-  outAlbedo = vec4(albedo.rgb * uboPerInstance.data0.x, alpha); // Albedo
-  outNormal.rg = encodeNormal(normalize(TBN * (normal.xyz * 2.0 - 1.0)));
-  outNormal.b = roughness.g + uboPerMaterial.pbrBias.g; // Specular
-  outNormal.a = max(roughness.b + uboPerMaterial.pbrBias.b, 0.01); // Roughness
-  outParameter0.rgba = vec4(1.0, uboPerMaterial.data0.x, 0.0, 0.0); // Metal Mask / Material Buffer Idx
+  GBuffer gbuffer;
+  {
+    gbuffer.albedo = albedo;
+    gbuffer.normal = normalize(TBN * (normal.xyz * 2.0 - 1.0));
+    gbuffer.metalMask = metalRoughness.x;
+    gbuffer.specular = 0.0;
+    gbuffer.roughness = metalRoughness.y;
+    gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
+    gbuffer.emissive = 0.0;
+    gbuffer.occlusion = 1.0; 
+  }
+  writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
 }

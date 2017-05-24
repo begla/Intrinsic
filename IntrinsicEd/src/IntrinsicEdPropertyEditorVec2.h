@@ -17,7 +17,7 @@
 // UI related includes
 #include "ui_IntrinsicEdPropertyEditorVec2.h"
 
-class IntrinsicEdPropertyEditorVec2 : public QWidget
+class IntrinsicEdPropertyEditorVec2 : public IntrinsicEdPropertyEditorBase
 {
   Q_OBJECT
 
@@ -39,8 +39,4 @@ private:
   void updateFromProperty();
 
   Ui::IntrinsicEdPropertyEditorVec2Class _ui;
-  rapidjson::Value* _property;
-  rapidjson::Value* _properties;
-  rapidjson::Document* _document;
-  _INTR_STRING _propertyName;
 };

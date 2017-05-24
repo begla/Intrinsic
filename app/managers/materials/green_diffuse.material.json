@@ -1,0 +1,30 @@
+{
+    "name": "green_diffuse",
+    "properties": {
+        "name": "green_diffuse",
+        "materialPassMask": [
+            "GBufferDefault",
+            "Shadow",
+            "PerPixelPicking"
+        ],
+        "albedoTextureName": "green",
+        "emissiveTextureName": "white",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 0.0,
+        "emissiveIntensity": 0.0,
+        "normalTextureName": "default_NRM",
+        "pbrTextureName": "default_PBR",
+        "metalMaskBias": 0.0,
+        "roughnessBias": 1.0,
+        "specularBias": -1.0
+    }
+}

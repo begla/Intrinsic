@@ -1,0 +1,22 @@
+[
+	{
+		"name" : "Forest",
+		"nodes" : ["PathA1", "PathA2", "PathA3", "PathA4", "PathA5", "PathA6", "PathA7", "PathA8"],
+		"camSpeed" : 0.01
+	},
+	{
+		"name" : "Sea",
+		"nodes" : ["PathB1", "PathB2", "PathB3"],
+		"camSpeed" : 0.1
+	},
+	{
+		"name" : "Top Down",
+		"nodes" : ["PathC1", "PathC2", "PathC3", "PathC4"],
+		"camSpeed" : 0.1
+	},
+	{
+		"name" : "Mountains",
+		"nodes" : ["PathD1", "PathD2", "PathD4", "PathD5", "PathD6", "PathD7"],
+		"camSpeed" : 0.05
+	}
+]

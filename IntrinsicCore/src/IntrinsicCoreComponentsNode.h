@@ -15,8 +15,8 @@
 #pragma once
 
 /** \file
-* Contains the Node Component Manager.
-*/
+ * Contains the Node Component Manager.
+ */
 
 namespace Intrinsic
 {
@@ -24,6 +24,14 @@ namespace Core
 {
 namespace Components
 {
+namespace NodeFlags
+{
+enum Flags
+{
+  kSpawned = 0x01u,
+};
+}
+
 typedef Dod::Ref NodeRef;
 typedef _INTR_ARRAY(NodeRef) NodeRefArray;
 
@@ -35,6 +43,8 @@ struct NodeData : Dod::Components::ComponentDataBase
   NodeData()
       : Dod::Components::ComponentDataBase(_INTR_MAX_NODE_COMPONENT_COUNT)
   {
+    flags.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
+
     position.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     orientation.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     size.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
@@ -57,6 +67,8 @@ struct NodeData : Dod::Components::ComponentDataBase
     prevSibling.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     nextSibling.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
   }
+
+  _INTR_ARRAY(uint32_t) flags;
 
   _INTR_ARRAY(glm::vec3) position;
   _INTR_ARRAY(glm::quat) orientation;
@@ -100,6 +112,7 @@ struct NodeManager
     _firstChild(p_Ref) = NodeRef();
     _prevSibling(p_Ref) = NodeRef();
     _nextSibling(p_Ref) = NodeRef();
+    _flags(p_Ref) = 0u;
 
     _position(p_Ref) = _worldPosition(p_Ref) = glm::vec3();
     _orientation(p_Ref) = _worldOrientation(p_Ref) =
@@ -367,39 +380,41 @@ struct NodeManager
   // <-
 
   /// Compiles all exposed properties to a JSON descriptor.
-  _INTR_INLINE static void compileDescriptor(NodeRef p_Ref,
+  _INTR_INLINE static void compileDescriptor(NodeRef p_Ref, bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember(
-        "localPos", _INTR_CREATE_PROP(p_Document, _N(NodeLocalTransform),
-                                      _N(vec3), _position(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember("localOrient",
-                           _INTR_CREATE_PROP(p_Document, _N(NodeLocalTransform),
-                                             _N(rotation), _orientation(p_Ref),
-                                             false, false),
+    p_Properties.AddMember("localPos",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(NodeLocalTransform), _N(vec3),
+                                             _position(p_Ref), false, false),
                            p_Document.GetAllocator());
     p_Properties.AddMember(
-        "localSize", _INTR_CREATE_PROP(p_Document, _N(NodeLocalTransform),
-                                       _N(vec3), _size(p_Ref), false, false),
+        "localOrient",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(NodeLocalTransform),
+                          _N(rotation), _orientation(p_Ref), false, false),
         p_Document.GetAllocator());
+    p_Properties.AddMember("localSize",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(NodeLocalTransform), _N(vec3),
+                                             _size(p_Ref), false, false),
+                           p_Document.GetAllocator());
 
     // Read only
-    p_Properties.AddMember("worldPos",
-                           _INTR_CREATE_PROP(p_Document, _N(NodeWorldTransform),
-                                             _N(vec3), _worldPosition(p_Ref),
-                                             true, false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "worldPos",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(NodeWorldTransform),
+                          _N(vec3), _worldPosition(p_Ref), true, false),
+        p_Document.GetAllocator());
     p_Properties.AddMember(
         "worldOrient",
-        _INTR_CREATE_PROP(p_Document, _N(NodeWorldTransform), _N(rotation),
-                          _worldOrientation(p_Ref), true, false),
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(NodeWorldTransform),
+                          _N(rotation), _worldOrientation(p_Ref), true, false),
         p_Document.GetAllocator());
     p_Properties.AddMember("worldSize",
-                           _INTR_CREATE_PROP(p_Document, _N(NodeWorldTransform),
-                                             _N(vec3), _worldSize(p_Ref), true,
-                                             false),
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(NodeWorldTransform), _N(vec3),
+                                             _worldSize(p_Ref), true, false),
                            p_Document.GetAllocator());
   }
 
@@ -419,6 +434,42 @@ struct NodeManager
     if (p_Properties.HasMember("localSize"))
     {
       _size(p_Ref) = JsonHelper::readPropertyVec3(p_Properties["localSize"]);
+    }
+  }
+
+  ///
+  _INTR_INLINE static void
+  updateFromWorldOrientation(NodeRef p_Ref, const glm::quat& p_WorldOrientation)
+  {
+    Components::NodeRef parentNode = _parent(p_Ref);
+    if (parentNode.isValid())
+    {
+      // Undo parent transform first
+      _orientation(p_Ref) =
+          p_WorldOrientation *
+          glm::normalize(glm::inverse(_worldOrientation(parentNode)));
+    }
+    else
+    {
+      _orientation(p_Ref) = p_WorldOrientation;
+    }
+  }
+
+  ///
+  _INTR_INLINE static void
+  updateFromWorldPosition(NodeRef p_Ref, const glm::vec3& p_WorldPosition)
+  {
+    Components::NodeRef parentNode = _parent(p_Ref);
+    if (parentNode.isValid())
+    {
+      // Undo parent transform first
+      _position(p_Ref) =
+          glm::normalize(glm::inverse(_worldOrientation(parentNode))) *
+          (p_WorldPosition - _worldPosition(parentNode));
+    }
+    else
+    {
+      _position(p_Ref) = p_WorldPosition;
     }
   }
 
@@ -498,6 +549,12 @@ struct NodeManager
   }
 
   // <-
+
+  /// The node flags
+  _INTR_INLINE static uint32_t& _flags(NodeRef p_Ref)
+  {
+    return _data.flags[p_Ref._id];
+  }
 
   /// The (local) position.
   _INTR_INLINE static glm::vec3& _position(NodeRef p_Ref)

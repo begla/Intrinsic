@@ -45,13 +45,15 @@ enum Enum
 };
 }
 
-struct MemoryAllocationInfo
+struct GpuMemoryAllocationInfo
 {
-  VkDeviceMemory vkDeviceMemory;
-  uint32_t sizeInBytes;
-  uint32_t alignmentInBytes;
-  uint32_t offsetInBytes;
-  uint8_t memoryPoolType;
+  MemoryPoolType::Enum _memoryPoolType;
+  uint32_t _pageIdx;
+  uint32_t _offset;
+  VkDeviceMemory _vkDeviceMemory;
+  uint32_t _sizeInBytes;
+  uint32_t _alignmentInBytes;
+  uint8_t* _mappedMemory;
 };
 
 namespace RenderSize
@@ -63,62 +65,6 @@ enum Enum
   kFull,
   kHalf,
   kQuarter
-};
-}
-
-namespace MaterialPass
-{
-enum Enum
-{
-  kSurface,
-  kShadow,
-
-  kSky,
-
-  kDebugGizmo,
-  kDebugGrid,
-
-  kFoliage,
-  kShadowFoliage,
-
-  kSurfaceWater,
-  kSurfaceLayered,
-
-  kPerPixelPicking,
-
-  kCount,
-  kNone
-};
-}
-
-namespace MaterialPassFlags
-{
-enum Flags
-{
-  kSurface = (1u << MaterialPass::kSurface),
-  kShadow = (1u << MaterialPass::kShadow),
-
-  kSky = (1u << MaterialPass::kSky),
-
-  kDebugGizmo = (1u << MaterialPass::kDebugGizmo),
-  kDebugGrid = (1u << MaterialPass::kDebugGrid),
-
-  kFoliage = (1u << MaterialPass::kFoliage),
-  kShadowFoliage = (1u << MaterialPass::kShadowFoliage),
-
-  kSurfaceWater = (1u << MaterialPass::kSurfaceWater),
-  kSurfaceLayered = (1u << MaterialPass::kSurfaceLayered),
-
-  kPerPixelPicking = (1u << MaterialPass::kPerPixelPicking),
-
-  kShadowedSurface = kSurface | kShadow,
-  kShadowedFoliage = kFoliage | kShadowFoliage,
-  kShadowedSurfaceLayered = kSurfaceLayered | kShadow,
-
-  kShadowedSurfaceWithPicking = kSurface | kShadow | kPerPixelPicking,
-  kShadowedFoliageWithPicking = kFoliage | kShadowFoliage | kPerPixelPicking,
-  kShadowedSurfaceLayeredWithPicking =
-      kSurfaceLayered | kShadow | kPerPixelPicking
 };
 }
 
@@ -172,7 +118,9 @@ namespace MemoryLocation
 enum Enum
 {
   kDeviceLocal,
-  kHostVisible
+  kHostVisible,
+
+  kCount
 };
 }
 
@@ -245,11 +193,21 @@ enum Enum
   kBC3Srgb,
   kR32SFloat,
   kR32UInt,
+<<<<<<< HEAD
 
   kD16UnormS8UInt,
 	kD32sFLOATs8UINT,
 	kD32sFLOAT,
 	kD16UNORM
+=======
+  kD16UnormS8UInt,
+  kD32SFloatS8UInt,
+  kD32SFloat,
+  kD16UNorm,
+  kB10G11R11UFloat,
+
+  kCount
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
 };
 }
 
@@ -272,6 +230,15 @@ enum Enum
   kRangeEndPerInstance = kPerInstanceCompute,
   kRangeStartPerMaterial = kPerMaterialFragment,
   kRangeEndPerMaterial = kPerMaterialVertex
+};
+}
+
+namespace RenderOrder
+{
+enum Enum
+{
+  kFrontToBack,
+  kBackToFront
 };
 }
 

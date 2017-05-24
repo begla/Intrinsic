@@ -32,6 +32,12 @@ struct AABB
   glm::vec3 max;
 };
 
+struct AABB2
+{
+  glm::vec3 center;
+  glm::vec3 halfExtent;
+};
+
 // <-
 
 struct Ray
@@ -264,6 +270,19 @@ _INTR_INLINE glm::vec3 calcAABBHalfExtent(const AABB& p_AABB)
 _INTR_INLINE glm::vec3 calcAABBCenter(const AABB& p_AABB)
 {
   return (p_AABB.min + p_AABB.max) * 0.5f;
+}
+
+// <-
+
+_INTR_INLINE bool calcIntersectSphereAABB(const Sphere& p_Sphere,
+                                          const AABB2& p_AABB)
+{
+  const glm::vec3 d0 =
+      glm::max(glm::vec3(0.0f),
+               glm::abs(p_AABB.center - p_Sphere.p) - p_AABB.halfExtent);
+  const float d1 = glm::dot(d0, d0);
+
+  return d1 <= p_Sphere.r * p_Sphere.r;
 }
 
 // <-
@@ -643,6 +662,41 @@ _INTR_INLINE float bytesToMegaBytes(uint32_t p_Bytes)
 _INTR_INLINE uint32_t megaBytesToBytes(float p_MegaBytes)
 {
   return (uint32_t)(p_MegaBytes * 1024.0f * 1024.0f);
+}
+
+// <-
+
+_INTR_INLINE glm::vec3 wrapEuler(const glm::vec3& p_Euler)
+{
+  return glm::mod(p_Euler * 0.5f + glm::half_pi<float>(),
+                  glm::pi<float>() + _INTR_EPSILON) *
+             2.0f -
+         glm::pi<float>();
+}
+
+// <-
+
+_INTR_INLINE glm::vec3 bezierQuadratic(const _INTR_ARRAY(glm::vec3) p_Points,
+                                       float p_Perc)
+{
+  _INTR_ASSERT(p_Points.size() >= 3u);
+
+  _INTR_ARRAY(glm::vec3) interpPoints;
+  interpPoints.resize(p_Points.size());
+  memcpy(interpPoints.data(), p_Points.data(),
+         sizeof(glm::vec3) * p_Points.size());
+  uint32_t numPoints = (uint32_t)p_Points.size() - 1u;
+
+  while (numPoints > 0u)
+  {
+    for (uint32_t i = 0u; i < numPoints; ++i)
+    {
+      interpPoints[i] = glm::mix(interpPoints[i], interpPoints[i + 1], p_Perc);
+    }
+    --numPoints;
+  }
+
+  return interpPoints[0];
 }
 }
 }

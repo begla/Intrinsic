@@ -69,10 +69,8 @@ Components::NodeRef World::cloneNodeFull(Components::NodeRef p_Ref)
     Entity::EntityRef referenceEntityRef =
         Components::NodeManager::_entity(referenceNodes[i]);
 
-    const Name uniqueName = Entity::EntityManager::makeNameUnique(
+    Entity::EntityRef clonedEntityRef = Entity::EntityManager::createEntity(
         Entity::EntityManager::_name(referenceEntityRef)._string.c_str());
-    Entity::EntityRef clonedEntityRef =
-        Entity::EntityManager::createEntity(uniqueName);
 
     for (auto propCompIt =
              Application::_componentPropertyCompilerMapping.begin();
@@ -100,7 +98,7 @@ Components::NodeRef World::cloneNodeFull(Components::NodeRef p_Ref)
           _INTR_ASSERT(propCompIt->second.compileFunction);
           propCompIt->second.compileFunction(
               managerEntry.getComponentForEntityFunction(referenceEntityRef),
-              properties, doc);
+              false, properties, doc);
 
           // Create new component and init from reference
           _INTR_ASSERT(managerEntry.createFunction);
@@ -192,8 +190,9 @@ void World::destroyNodeFull(Components::NodeRef p_Ref)
 
 void World::destroy()
 {
-  destroyNodeFull(_rootNode);
+  Components::NodeRef currentRootNode = _rootNode;
   _rootNode = Components::NodeRef();
+  destroyNodeFull(currentRootNode);
 }
 
 void World::save(const _INTR_STRING& p_FilePath)
@@ -236,6 +235,9 @@ void World::save(const _INTR_STRING& p_FilePath)
       ++nodeStackCount;
     }
 
+    // Don't serialize spawned objects
+    if ((Components::NodeManager::_flags(currentNodeRef) &
+         Components::NodeFlags::Flags::kSpawned) == 0u)
     {
       rapidjson::Value node = rapidjson::Value(rapidjson::kObjectType);
       rapidjson::Value name = rapidjson::Value(
@@ -243,15 +245,13 @@ void World::save(const _INTR_STRING& p_FilePath)
           worldDesc.GetAllocator());
 
       node.AddMember("name", name, worldDesc.GetAllocator());
-      node.AddMember("hasParent", parent.isValid(), worldDesc.GetAllocator());
 
-      if (parent.isValid())
-      {
-        const int32_t offsetToParent = calcOffsetToParent(
-            storedNodes, parent, (uint32_t)storedNodes.size());
-        node.AddMember("offsetToParent", offsetToParent,
-                       worldDesc.GetAllocator());
-      }
+      const int32_t offsetToParent =
+          parent.isValid() ? calcOffsetToParent(storedNodes, parent,
+                                                (uint32_t)storedNodes.size())
+                           : 0;
+      node.AddMember("offsetToParent", offsetToParent,
+                     worldDesc.GetAllocator());
 
       rapidjson::Value propertyEntries =
           rapidjson::Value(rapidjson::kArrayType);
@@ -278,7 +278,7 @@ void World::save(const _INTR_STRING& p_FilePath)
             rapidjson::Value properties =
                 rapidjson::Value(rapidjson::kObjectType);
             propCompIt->second.compileFunction(
-                managerEntry.getComponentForEntityFunction(entityRef),
+                managerEntry.getComponentForEntityFunction(entityRef), false,
                 properties, worldDesc);
 
             rapidjson::Value propertyEntry =
@@ -399,9 +399,10 @@ void World::load(const _INTR_STRING& p_FilePath)
       const Components::NodeRef nodeRef = worldNodes[i];
       rapidjson::Value& node = worldDesc[i];
 
-      if (node["hasParent"].GetBool())
+      const int32_t offsetToParent = node["offsetToParent"].GetInt();
+
+      if (offsetToParent != 0)
       {
-        const int32_t offsetToParent = node["offsetToParent"].GetInt();
         Components::NodeManager::attachChildIgnoreParent(
             worldNodes[i + offsetToParent], nodeRef);
       }

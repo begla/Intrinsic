@@ -14,12 +14,7 @@ copy ..\\Intrinsic_Dependencies\\dependencies\\physx\\bin\\PhysX3DEBUG_x64.dll a
 copy ..\\Intrinsic_Dependencies\\dependencies\\physx\\bin\\PhysX3CookingDEBUG_x64.dll app\\PhysX3CookingDEBUG_x64.dll
 copy ..\\Intrinsic_Dependencies\\dependencies\\physx\\bin\\PhysX3CommonDEBUG_x64.dll app\\PhysX3CommonDEBUG_x64.dll
 
-copy ..\\Intrinsic_Dependencies\\dependencies\\physx\\bin\\nvToolsExt64_1.dll app\\nvToolsExt64_1.dll
-
 copy ..\\Intrinsic_Dependencies\\dependencies\\fbx\\bin\\debug\\libfbxsdk.dll app\\libfbxsdk.dll
-
-copy dependencies\\lua\\lua51.dll app\\lua51.dll
-copy dependencies\\sdl\\lib\\x64\\SDL2.dll app\\SDL2.dll
 
 cd scripts_win32
 

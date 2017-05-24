@@ -25,15 +25,16 @@ namespace RenderPass
 struct Shadow
 {
   static void init();
-  static void updateResolutionDependentResources();
+  static void onReinitRendering();
 
   static void destroy();
 
-  static void prepareFrustums();
+  static void prepareFrustums(Components::CameraRef p_CameraRef,
+                              _INTR_ARRAY(Core::Resources::FrustumRef) &
+                                  p_ShadowFrustums);
 
-  static void render(float p_DeltaT);
+  static void render(float p_DeltaT, Components::CameraRef p_CameraRef);
 
-  static _INTR_ARRAY(Dod::Ref) _shadowFrustums;
   static glm::uvec2 _shadowMapSize;
 };
 }

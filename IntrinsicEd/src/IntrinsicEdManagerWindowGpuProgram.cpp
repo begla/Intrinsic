@@ -25,7 +25,8 @@ IntrinsicEdManagerWindowGpuProgram::IntrinsicEdManagerWindowGpuProgram(
       Application::_resourcePropertyCompilerMapping[_N(GpuProgram)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(GpuProgram)];
   _resourceIcon = QIcon(":/Icons/calendar");
-  _managerFilePath = "managers/GpuProgram.manager.json";
+  _managerPath = "managers/gpu_programs/";
+  _managerExtension = ".gpu_program.json";
   _resourceName = "GpuProgram";
   _shaderAssetPath = "assets/shaders/";
 

@@ -67,7 +67,14 @@ void PostEffectVolumeManager::blendPostEffects(
       NodeManager::getComponentForEntity(CameraManager::_entity(camRef));
   const glm::vec3& camWorldPosition = NodeManager::_worldPosition(camNodeRef);
 
-  bool volumeInRange = false;
+  const Resources::PostEffectRef defaultEffectRef =
+      Resources::PostEffectManager::getResourceByName(_N(Default));
+
+  // Always start with the default effect
+  Resources::PostEffectManager::blendPostEffect(
+      Resources::PostEffectManager::_blendTargetRef, defaultEffectRef,
+      defaultEffectRef, 0.0f);
+
   for (uint32_t i = 0u; i < p_PostEffectVolumes.size(); ++i)
   {
     PostEffectVolumeRef postVolRef = p_PostEffectVolumes[i];
@@ -89,7 +96,6 @@ void PostEffectVolumeManager::blendPostEffects(
 
       if (distanceToCamera < radius)
       {
-        volumeInRange = true;
         const float blendFactor =
             1.0f -
             glm::clamp((distanceToCamera - (radius - blendRange)) / blendRange,
@@ -97,22 +103,10 @@ void PostEffectVolumeManager::blendPostEffects(
 
         Resources::PostEffectManager::blendPostEffect(
             Resources::PostEffectManager::_blendTargetRef,
-            Resources::PostEffectManager::getResourceByName(_N(Default)),
-            postEffect, blendFactor);
-
-        // Only possible to blend to one scene setting at once
-        break;
+            Resources::PostEffectManager::_blendTargetRef, postEffect,
+            blendFactor);
       }
     }
-  }
-
-  if (!volumeInRange)
-  {
-    // No volume in range? Use the default post effect
-    Resources::PostEffectManager::blendPostEffect(
-        Resources::PostEffectManager::_blendTargetRef,
-        Resources::PostEffectManager::getResourceByName(_N(Default)),
-        Resources::PostEffectManager::_blendTargetRef, 0.0f);
   }
 }
 }

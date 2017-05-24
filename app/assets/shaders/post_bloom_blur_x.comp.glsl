@@ -21,8 +21,7 @@
 #define BLUR_WIDTH 9
 #define HALF_BLUR_WIDTH 4
 
-#define BLUR_THREADS_X 4
-#define BLUR_THREADS_Y 64
+#define BLUR_THREADS 128
 
 const float blurWeights[] = {
     0.004815026,
@@ -44,26 +43,25 @@ layout (binding = 0) uniform PerInstance
 layout (binding = 1, rgba16f) uniform image2D outTex;
 layout (binding = 2) uniform sampler2D inTex;
 
-layout (local_size_x = 1, local_size_y = BLUR_THREADS_Y) in;
+shared vec4 temp[BLUR_THREADS];
+
+layout (local_size_x = BLUR_THREADS, local_size_y = 1) in;
 void main()
 {
-  vec4 in0[BLUR_WIDTH + BLUR_THREADS_X];
-  ivec2 base = ivec2(gl_GlobalInvocationID.x * BLUR_THREADS_X, gl_GlobalInvocationID.y); 
+  ivec2 coord = ivec2(gl_LocalInvocationIndex - HALF_BLUR_WIDTH + (BLUR_THREADS - HALF_BLUR_WIDTH * 2) * gl_WorkGroupID.x, gl_WorkGroupID.y);
+  temp[gl_LocalInvocationIndex] = texelFetch(inTex, coord, uboPerInstance.mipLevel.x);
+
+  barrier();
   
-  for(int i = 0; i < BLUR_WIDTH + BLUR_THREADS_X; i++)
-  {
-    in0[i] = texelFetch(inTex, base + ivec2(i-HALF_BLUR_WIDTH, 0), uboPerInstance.mipLevel.x);
-  }
-  
-  for(int x = 0; x < BLUR_THREADS_X; x++)
+  if (gl_LocalInvocationIndex >= HALF_BLUR_WIDTH &&
+        gl_LocalInvocationIndex < (BLUR_THREADS - HALF_BLUR_WIDTH))
   {
     vec4 out0 = vec4(0.0);
 
-    for(int i = 0; i < BLUR_WIDTH; i++)
-    {
-      out0 += in0[x+i] * blurWeights[i];
-    }
+    for (int i = -HALF_BLUR_WIDTH; i <= HALF_BLUR_WIDTH; ++i)
+      out0 += temp[gl_LocalInvocationIndex + i] * blurWeights[i + HALF_BLUR_WIDTH];
 
-    imageStore(outTex, base.xy + ivec2(x, 0), out0);
-  } 
+    imageStore(outTex, ivec2(gl_LocalInvocationIndex - HALF_BLUR_WIDTH 
+      + (BLUR_THREADS - HALF_BLUR_WIDTH * 2) * gl_WorkGroupID.x, gl_GlobalInvocationID.y), out0);
+  }
 }

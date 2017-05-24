@@ -76,7 +76,12 @@ enum Enum
   k8,
   k9,
 
+  kF1,
+  kF2,
+  kF3,
+
   kF,
+  kT,
 
   kMouseLeft,
   kMouseRight,
@@ -172,6 +177,31 @@ struct System
   _INTR_INLINE static glm::vec2& getLastMousePosRel()
   {
     return _lastMousePosRel;
+  }
+
+  _INTR_INLINE static glm::vec4 getMovementFiltered()
+  {
+    glm::vec2 camMovement =
+        glm::vec2(Input::System::getVirtualKeyState(
+                      Input::VirtualKey::kMoveCameraVertical),
+                  Input::System::getVirtualKeyState(
+                      Input::VirtualKey::kMoveCameraHorizontal));
+    glm::vec2 movement = glm::vec2(
+        Input::System::getVirtualKeyState(Input::VirtualKey::kMoveVertical),
+        Input::System::getVirtualKeyState(Input::VirtualKey::kMoveHorizontal));
+
+    // Dead zone
+    if (glm::length(camMovement) < Settings::Manager::_controllerDeadZone)
+      camMovement = glm::vec2(0.0f);
+    if (glm::length(movement) < Settings::Manager::_controllerDeadZone)
+      movement = glm::vec2(0.0f);
+
+    // To invert or not to invert
+    camMovement *=
+        glm::vec2(Settings::Manager::_invertHorizontalCameraAxis ? -1.0f : 1.0f,
+                  Settings::Manager::_invertVerticalCameraAxis ? -1.0f : 1.0f);
+
+    return glm::vec4(movement, camMovement);
   }
 
 private:

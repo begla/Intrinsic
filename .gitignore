@@ -4,6 +4,7 @@ app/*.lib
 app/*.pdb
 app/*.dll
 app/*.ilk
+!app/BsSndRpt64.exe
 app/platforms
 app/assets/world_machine/*.tmd.session
 
@@ -25,7 +26,16 @@ Intrinsic.files
 Intrinsic.includes
 
 app/assets/*
+
 !app/assets/shaders
+app/media/shaders/*
+!app/media/shaders/KEEP_ME
+app/crash_dumps
+app/media/irradiance_probes/*
+!app/media/irradiance_probes/KEEP_ME
 
 app/Intrinsic.log
+<<<<<<< HEAD
 Intrinsic_Dependencies/
+=======
+>>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b

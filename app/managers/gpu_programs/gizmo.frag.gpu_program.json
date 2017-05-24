@@ -1,0 +1,10 @@
+{
+    "name": "gizmo.frag",
+    "properties": {
+        "name": "gizmo.frag",
+        "gpuProgramName": "gizmo.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

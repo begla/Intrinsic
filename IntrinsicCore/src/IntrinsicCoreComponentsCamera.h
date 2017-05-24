@@ -31,24 +31,20 @@ struct CameraData : Dod::Components::ComponentDataBase
     descFov.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
     descNearPlane.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
     descFarPlane.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
-    descEulerAngles.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
 
     frustum.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
 
     forward.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
     up.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
-    actualCameraOrientation.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
   }
 
   _INTR_ARRAY(float) descFov;
   _INTR_ARRAY(float) descNearPlane;
   _INTR_ARRAY(float) descFarPlane;
-  _INTR_ARRAY(glm::vec3) descEulerAngles;
 
   _INTR_ARRAY(Resources::FrustumRef) frustum;
   _INTR_ARRAY(glm::vec3) forward;
   _INTR_ARRAY(glm::vec3) up;
-  _INTR_ARRAY(glm::quat) actualCameraOrientation;
 };
 
 struct CameraManager
@@ -77,7 +73,6 @@ struct CameraManager
     _descFov(p_Ref) = glm::radians(75.0f);
     _descNearPlane(p_Ref) = 1.0f;
     _descFarPlane(p_Ref) = 10000.0f;
-    _descEulerAngles(p_Ref) = glm::vec3(0.0f);
   }
 
   // <-
@@ -95,25 +90,24 @@ struct CameraManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(CameraRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember(
-        "fov", _INTR_CREATE_PROP(p_Document, _N(Camera), _N(float),
-                                 glm::degrees(_descFov(p_Ref)), false, false),
+        "fov",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Camera), _N(float),
+                          glm::degrees(_descFov(p_Ref)), false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember(
-        "nearPlane", _INTR_CREATE_PROP(p_Document, _N(Camera), _N(float),
-                                       _descNearPlane(p_Ref), false, false),
+        "nearPlane",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Camera), _N(float),
+                          _descNearPlane(p_Ref), false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember(
-        "farPlane", _INTR_CREATE_PROP(p_Document, _N(Camera), _N(float),
-                                      _descFarPlane(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "eulerAngles",
-        _INTR_CREATE_PROP(p_Document, _N(Camera), _N(rotation),
-                          glm::degrees(_descEulerAngles(p_Ref)), false, false),
+        "farPlane",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Camera), _N(float),
+                          _descFarPlane(p_Ref), false, false),
         p_Document.GetAllocator());
   }
 
@@ -131,21 +125,6 @@ struct CameraManager
     if (p_Properties.HasMember("farPlane"))
       _descFarPlane(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["farPlane"]);
-    if (p_Properties.HasMember("eulerAngles"))
-      _descEulerAngles(p_Ref) = glm::radians(
-          JsonHelper::readPropertyVec3(p_Properties["eulerAngles"]));
-  }
-
-  // <-
-
-  _INTR_INLINE static glm::quat calcActualCameraOrientation(CameraRef p_Ref)
-  {
-    Entity::EntityRef entityRef = _entity(p_Ref);
-    Components::NodeRef nodeCompRef =
-        Components::NodeManager::getComponentForEntity(entityRef);
-
-    return Components::NodeManager::_worldOrientation(nodeCompRef) *
-           glm::quat(Components::CameraManager::_descEulerAngles(p_Ref));
   }
 
   // <-
@@ -173,10 +152,6 @@ struct CameraManager
   {
     return _data.descFov[p_Ref._id];
   }
-  _INTR_INLINE static glm::vec3& _descEulerAngles(CameraRef p_Ref)
-  {
-    return _data.descEulerAngles[p_Ref._id];
-  }
 
   // Resources
   _INTR_INLINE static Resources::FrustumRef& _frustum(CameraRef p_Ref)
@@ -187,6 +162,10 @@ struct CameraManager
   _INTR_INLINE static glm::mat4x4& _viewMatrix(CameraRef p_Ref)
   {
     return Resources::FrustumManager::_descViewMatrix(_frustum(p_Ref));
+  }
+  _INTR_INLINE static glm::mat4x4& _prevViewMatrix(CameraRef p_Ref)
+  {
+    return Resources::FrustumManager::_descPrevViewMatrix(_frustum(p_Ref));
   }
   _INTR_INLINE static glm::mat4x4& _inverseViewMatrix(CameraRef p_Ref)
   {
@@ -211,10 +190,6 @@ struct CameraManager
     return Resources::FrustumManager::_invViewProjectionMatrix(_frustum(p_Ref));
   }
 
-  _INTR_INLINE static glm::quat& _actualCameraOrientation(CameraRef p_Ref)
-  {
-    return _data.actualCameraOrientation[p_Ref._id];
-  }
   _INTR_INLINE static glm::vec3& _forward(CameraRef p_Ref)
   {
     return _data.forward[p_Ref._id];

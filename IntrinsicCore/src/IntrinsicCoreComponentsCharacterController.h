@@ -95,6 +95,7 @@ struct CharacterControllerManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(CharacterControllerRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
@@ -109,24 +110,24 @@ struct CharacterControllerManager
 
   // <-
 
-  _INTR_INLINE static void createResources(CharacterControllerRef p_Mesh)
+  _INTR_INLINE static void createResources(CharacterControllerRef p_CCT)
   {
-    CharacterControllerRefArray meshes = {p_Mesh};
-    createResources(meshes);
+    CharacterControllerRefArray ccts = {p_CCT};
+    createResources(ccts);
   }
 
   // <-
 
-  _INTR_INLINE static void destroyResources(CharacterControllerRef p_Mesh)
+  _INTR_INLINE static void destroyResources(CharacterControllerRef p_CCT)
   {
-    CharacterControllerRefArray meshes = {p_Mesh};
-    destroyResources(meshes);
+    CharacterControllerRefArray ccts = {p_CCT};
+    destroyResources(ccts);
   }
 
   // <-
 
-  static void createResources(const CharacterControllerRefArray& p_Meshes);
-  static void destroyResources(const CharacterControllerRefArray& p_Meshes);
+  static void createResources(const CharacterControllerRefArray& p_CCTs);
+  static void destroyResources(const CharacterControllerRefArray& p_CCTs);
 
   // <-
 

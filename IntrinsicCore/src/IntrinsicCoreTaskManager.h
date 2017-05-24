@@ -25,6 +25,10 @@ struct TaskManager
   static float _lastDeltaT;
   static float _totalTimePassed;
   static uint32_t _frameCounter;
+  static uint64_t _lastUpdate;
+
+  static float _lastActualFrameDuration;
+  static float _timeModulator;
 };
 }
 }

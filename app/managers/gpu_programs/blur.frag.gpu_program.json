@@ -1,0 +1,10 @@
+{
+    "name": "blur.frag",
+    "properties": {
+        "name": "blur.frag",
+        "gpuProgramName": "blur.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

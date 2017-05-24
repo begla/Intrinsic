@@ -32,7 +32,7 @@ struct RenderSystem
   // <-
 
   static void onViewportChanged();
-  static void resizeSwapChain();
+  static void resizeSwapChain(bool p_Force = false);
 
   // <-
 
@@ -242,6 +242,44 @@ struct RenderSystem
 
   // <-
 
+  _INTR_INLINE static bool waitForFrame(uint32_t p_Idx)
+  {
+    if ((_activeBackbufferMask & (1u << p_Idx)) > 0u)
+    {
+      VkResult result = VkResult::VK_TIMEOUT;
+
+      do
+      {
+        result = vkWaitForFences(_vkDevice, 1u, &_vkDrawFences[p_Idx], VK_TRUE,
+                                 UINT64_MAX);
+      } while (result == VK_TIMEOUT);
+      _INTR_VK_CHECK_RESULT(result);
+
+      result = vkResetFences(_vkDevice, 1u, &_vkDrawFences[p_Idx]);
+      _INTR_VK_CHECK_RESULT(result);
+
+      _activeBackbufferMask &= ~(1u << p_Idx);
+      return true;
+    }
+
+    return false;
+  }
+
+  // <-
+
+  _INTR_INLINE static bool waitForAllFrames()
+  {
+    bool waited = false;
+    for (uint32_t idx = 0u; idx < (uint32_t)_vkSwapchainImages.size(); ++idx)
+    {
+      waited = waited || waitForFrame(idx);
+    }
+
+    return waited;
+  }
+
+  // <-
+
   static VkInstance _vkInstance;
 
   static VkPhysicalDevice _vkPhysicalDevice;
@@ -255,6 +293,7 @@ struct RenderSystem
   static _INTR_ARRAY(VkImage) _vkSwapchainImages;
   static _INTR_ARRAY(VkImageView) _vkSwapchainImageViews;
   static glm::uvec2 _backbufferDimensions;
+  static glm::uvec2 _customBackbufferDimensions;
 
   static VkQueue _vkQueue;
 
@@ -267,12 +306,7 @@ struct RenderSystem
   static Format::Enum _depthBufferFormat;
 
   // <-
-
-  static LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>
-      _visibleDrawCallsPerMaterialPass[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT]
-                                      [MaterialPass::kCount];
-  static LockFreeStack<Core::Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT>
-      _visibleMeshComponents[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT];
+  static Format::Enum _depthStencilFormatToUse;
 
 private:
   static void initManagers();
@@ -290,6 +324,7 @@ private:
   static void initVkSupportedDepthBufferFormat();
   static void destroyVkCommandBuffers();
   static void initVkSynchronization();
+  static void setupPlatformDependentFormats();
 
   // <-
 
@@ -352,47 +387,8 @@ private:
 
   // <-
 
-  _INTR_INLINE static bool waitForFrame(uint32_t p_Idx)
-  {
-    if ((_activeBackbufferMask & (1u << p_Idx)) > 0u)
-    {
-      VkResult result = VkResult::VK_TIMEOUT;
-
-      do
-      {
-        result = vkWaitForFences(_vkDevice, 1u, &_vkDrawFences[p_Idx], VK_TRUE,
-                                 UINT64_MAX);
-      } while (result == VK_TIMEOUT);
-      _INTR_VK_CHECK_RESULT(result);
-
-      result = vkResetFences(_vkDevice, 1u, &_vkDrawFences[p_Idx]);
-      _INTR_VK_CHECK_RESULT(result);
-
-      _activeBackbufferMask &= ~(1u << p_Idx);
-      return true;
-    }
-
-    return false;
-  }
-
-  // <-
-
-  _INTR_INLINE static bool waitForAllFrames()
-  {
-    bool waited = false;
-    for (uint32_t idx = 0u; idx < (uint32_t)_vkSwapchainImages.size(); ++idx)
-    {
-      waited = waited || waitForFrame(idx);
-    }
-  }
-
-  // <-
-
   static void releaseQueuedResources();
-
-  // <-
-
-  static void updateResolutionDependentResources();
+  static void reinitRendering();
 
   // <-
 

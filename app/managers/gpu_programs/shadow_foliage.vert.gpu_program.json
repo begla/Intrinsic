@@ -1,0 +1,10 @@
+{
+    "name": "shadow_foliage.vert",
+    "properties": {
+        "name": "shadow_foliage.vert",
+        "gpuProgramName": "shadow_foliage.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 0
+    }
+}

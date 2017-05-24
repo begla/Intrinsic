@@ -29,6 +29,8 @@ public slots:
   void onAssetChanged(const QString& p_FileName);
   void onResourceTreePopulated();
   void onCompileAsset();
+  void onCompileAllTextures();
+  void onCompileAllMeshes();
   void onCompileQueuedAssets();
 
 private:

@@ -149,9 +149,10 @@ QFrame* IntrinsicEdPropertyView::createCategoryHeaderWidget(const char* p_Title,
   frame->layout()->addWidget(label);
   frame->layout()->addItem(
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-  frame->setStyleSheet(".QFrame { border: 1px solid black; border-radius: 0px;"
-                       "background-color: qlineargradient(x1: 0 y1: 0, x2: 0 "
-                       "y2: 1, stop: 0 #24323B, stop: 1 #1C272E); }");
+  frame->setStyleSheet(
+      ".QFrame { border: 1px solid #2d3339; border-radius: 6px;"
+      "background-color: qlineargradient(x1: 0 y1: 0, x2: 0 "
+      "y2: 1, stop: 0 #22262a, stop: 1 #202428); }");
 
   return frame;
 }
@@ -164,6 +165,7 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
   }
 
   clearPropertyView();
+  _propertyEntries.clear();
 
   const char* categories[16] = {};
   uint32_t categoryCount = 0u;
@@ -179,7 +181,7 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
 
     // Compile properties
     {
-      compilerEntry.compileFunction(compilerEntry.ref, currentProperties,
+      compilerEntry.compileFunction(compilerEntry.ref, true, currentProperties,
                                     _propertyDocument);
     }
 
@@ -265,7 +267,7 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
 
         const char* editor = prop["editor"].GetString();
 
-        QWidget* propertyEditor = nullptr;
+        IntrinsicEdPropertyEditorBase* propertyEditor = nullptr;
         if (strcmp(editor, "vec2") == 0u)
         {
           propertyEditor = new IntrinsicEdPropertyEditorVec2(
@@ -308,6 +310,30 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
               &_propertyDocument, &currentProperties, &it->value,
               it->name.GetString());
         }
+        else if (strcmp(editor, "meshSelector") == 0u)
+        {
+          propertyEditor = new IntrinsicEdPropertyEditorResourceSelector(
+              &_propertyDocument, &currentProperties, &it->value,
+              it->name.GetString(), "Mesh");
+        }
+        else if (strcmp(editor, "scriptSelector") == 0u)
+        {
+          propertyEditor = new IntrinsicEdPropertyEditorResourceSelector(
+              &_propertyDocument, &currentProperties, &it->value,
+              it->name.GetString(), "Script");
+        }
+        else if (strcmp(editor, "flags") == 0u)
+        {
+          propertyEditor = new IntrinsicEdPropertyEditorFlags(
+              &_propertyDocument, &currentProperties, &it->value,
+              it->name.GetString());
+        }
+        else if (strcmp(editor, "color") == 0u)
+        {
+          propertyEditor = new IntrinsicEdPropertyEditorColor(
+              &_propertyDocument, &currentProperties, &it->value,
+              it->name.GetString());
+        }
 
         if (propertyEditor)
         {
@@ -316,6 +342,8 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
                            SLOT(onValueChanged(rapidjson::Value&)));
 
           _ui.scrollAreaWidgetContents->layout()->addWidget(propertyEditor);
+          _propertyEntries.push_back(
+              {propertyEditor, pi, it->name.GetString()});
         }
       }
     }
@@ -324,6 +352,36 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
   QSpacerItem* spacer =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
   _ui.scrollAreaWidgetContents->layout()->addItem(spacer);
+}
+
+void IntrinsicEdPropertyView::updatePropertyView()
+{
+  for (uint32_t ci = 0u; ci < _currentPropertyCompilerEntries.size(); ++ci)
+  {
+    rapidjson::Value& currentProperties = _propertyDocument[ci];
+    currentProperties.RemoveAllMembers();
+
+    Dod::PropertyCompilerEntry& compilerEntry =
+        _currentPropertyCompilerEntries[ci];
+
+    // Compile properties
+    {
+      compilerEntry.compileFunction(compilerEntry.ref, true, currentProperties,
+                                    _propertyDocument);
+    }
+  }
+
+  for (uint32_t i = 0u; i < _propertyEntries.size(); ++i)
+  {
+    const PropertyEntry& entry = _propertyEntries[i];
+    rapidjson::Value& currentProperties =
+        _propertyDocument[entry.propertyCompilerEntryIdx];
+
+    entry.propertyEditor->init(&_propertyDocument, &currentProperties,
+                               &currentProperties[entry.propertyName.c_str()],
+                               entry.propertyName.c_str());
+    entry.propertyEditor->updateFromProperty();
+  }
 }
 
 void IntrinsicEdPropertyView::clearPropertySet()

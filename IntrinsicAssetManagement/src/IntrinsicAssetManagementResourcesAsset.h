@@ -29,10 +29,15 @@ enum Enum
 {
   kNone,
   kMesh,
-  kColorTexture,
-  kAlphaTexture,
+  kAlbedoTexture,
+  kAlbedoAlphaTexture,
+  kLinearColorTexture,
   kNormalTexture,
-  kHdrTexture
+  kHdrTexture,
+
+  kCount,
+  kTexturesBegin = kAlbedoTexture,
+  kTexturesEnd = kHdrTexture
 };
 }
 
@@ -83,25 +88,28 @@ struct AssetManager
   // <-
 
   _INTR_INLINE static void compileDescriptor(AssetRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         AssetData, _INTR_MAX_ASSET_COUNT>::_compileDescriptor(p_Ref,
+                                                              p_GenerateDesc,
                                                               p_Properties,
                                                               p_Document);
 
-    p_Properties.AddMember("assetFileName",
-                           _INTR_CREATE_PROP(p_Document, _N(Asset), _N(string),
-                                             _descAssetFileName(p_Ref), false,
-                                             false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "assetFileName",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Asset), _N(string),
+                          _descAssetFileName(p_Ref), false, false),
+        p_Document.GetAllocator());
     p_Properties.AddMember(
         "assetType",
-        _INTR_CREATE_PROP_ENUM(
-            p_Document, _N(Asset), _N(enum), _descAssetType(p_Ref),
-            "None,Mesh,ColorTexture,AlphaTexture,NormalTexture,HdrTexture",
-            false, false),
+        _INTR_CREATE_PROP_ENUM(p_Document, p_GenerateDesc, _N(Asset), _N(enum),
+                               _descAssetType(p_Ref),
+                               "None,Mesh,AlbedoTexture,AlbedoAlphaTexture,"
+                               "LinearColorTexture,NormalTexture,HDRTexture",
+                               false, false),
         p_Document.GetAllocator());
   }
 
@@ -118,25 +126,29 @@ struct AssetManager
       _descAssetFileName(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["assetFileName"]);
     if (p_Properties.HasMember("assetType"))
-      _descAssetType(p_Ref) = (AssetType::Enum)JsonHelper::readPropertyEnum(
+      _descAssetType(p_Ref) = (AssetType::Enum)JsonHelper::readPropertyEnumUint(
           p_Properties["assetType"]);
   }
 
   // <-
 
-  _INTR_INLINE static void saveToSingleFile(const char* p_FileName)
+  _INTR_INLINE static void saveToMultipleFiles(const char* p_Path,
+                                               const char* p_Extension)
   {
-    Dod::Resources::ResourceManagerBase<
-        AssetData, _INTR_MAX_ASSET_COUNT>::_saveToSingleFile(p_FileName,
-                                                             compileDescriptor);
+    Dod::Resources::ResourceManagerBase<AssetData, _INTR_MAX_ASSET_COUNT>::
+        _saveToMultipleFiles<
+            rapidjson::PrettyWriter<rapidjson::FileWriteStream>>(
+            p_Path, p_Extension, compileDescriptor);
   }
 
   // <-
 
-  _INTR_INLINE static void loadFromSingleFile(const char* p_FileName)
+  _INTR_INLINE static void loadFromMultipleFiles(const char* p_Path,
+                                                 const char* p_Extension)
   {
     Dod::Resources::ResourceManagerBase<AssetData, _INTR_MAX_ASSET_COUNT>::
-        _loadFromSingleFile(p_FileName, initFromDescriptor, resetToDefault);
+        _loadFromMultipleFiles(p_Path, p_Extension, initFromDescriptor,
+                               resetToDefault);
   }
 
   // <-

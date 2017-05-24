@@ -23,11 +23,22 @@ IntrinsicEdPropertyEditorEnum::IntrinsicEdPropertyEditorEnum(
     rapidjson::Document* p_Document, rapidjson::Value* p_CurrentProperties,
     rapidjson::Value* p_CurrentProperty, const char* p_PropertyName,
     QWidget* parent)
-    : QWidget(parent), _property(p_CurrentProperty),
-      _properties(p_CurrentProperties), _propertyName(p_PropertyName),
-      _document(p_Document)
+    : IntrinsicEdPropertyEditorBase(p_Document, p_CurrentProperties,
+                                    p_CurrentProperty, p_PropertyName, parent)
 {
   _ui.setupUi(this);
+
+  // Update enum items
+  {
+    const rapidjson::Value& prop = *_property;
+
+    _ui.comboBox->clear();
+    for (uint32_t i = 0u; i < prop["enumItems"].Size(); ++i)
+    {
+      _ui.comboBox->addItem(prop["enumItems"][i].GetString());
+    }
+  }
+
   updateFromProperty();
 
   QObject::connect(_ui.comboBox, SIGNAL(currentIndexChanged(int)), this,
@@ -46,13 +57,13 @@ void IntrinsicEdPropertyEditorEnum::updateFromProperty()
     _ui.comboBox->setEditable(false);
   }
 
-  _ui.comboBox->clear();
-  for (uint32_t i = 0u; i < prop["enumItems"].Size(); ++i)
+  if (_ui.comboBox->currentIndex() != prop["value"].GetUint())
   {
-    _ui.comboBox->addItem(prop["enumItems"][i].GetString());
+    _ui.comboBox->blockSignals(true);
+    _ui.comboBox->setCurrentIndex(prop["value"].GetUint());
+    _ui.comboBox->blockSignals(false);
   }
 
-  _ui.comboBox->setCurrentIndex(prop["value"].GetUint());
   _ui.propertyTitle->setText(_propertyName.c_str());
 }
 
@@ -61,7 +72,10 @@ void IntrinsicEdPropertyEditorEnum::onValueChanged()
   _INTR_ASSERT(_property);
   rapidjson::Value& prop = *_property;
 
-  prop["value"].SetUint((uint32_t)_ui.comboBox->currentIndex());
+  if (_ui.comboBox->currentIndex() != prop["value"].GetUint())
+  {
+    prop["value"].SetUint((uint32_t)_ui.comboBox->currentIndex());
 
-  emit valueChanged(*_properties);
+    emit valueChanged(*_properties);
+  }
 }

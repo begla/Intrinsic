@@ -1,0 +1,30 @@
+{
+    "name": "Prop_Atlas_01",
+    "properties": {
+        "name": "Prop_Atlas_01",
+        "materialPassMask": [
+            "GBufferDefault",
+            "Shadow",
+            "PerPixelPicking"
+        ],
+        "albedoTextureName": "Prop_Atlas_01",
+        "emissiveTextureName": "white",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 0.0,
+        "emissiveIntensity": 0.0,
+        "normalTextureName": "default_NRM",
+        "pbrTextureName": "default_PBR",
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": 0.0
+    }
+}

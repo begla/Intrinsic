@@ -148,7 +148,8 @@ void stripDuplicateVertices(Dod::Ref p_MeshRef)
   }
 }
 
-void importMesh(FbxMesh* p_Mesh)
+void importMesh(FbxMesh* p_Mesh,
+                _INTR_ARRAY(Core::Resources::MeshRef) & p_ImportedMeshes)
 {
   const char* meshName = p_Mesh->GetNode()->GetName();
   FbxAMatrix nodeTransform = p_Mesh->GetNode()->EvaluateGlobalTransform();
@@ -432,6 +433,8 @@ void importMesh(FbxMesh* p_Mesh)
   Core::Resources::MeshRefArray meshesToCreate;
   meshesToCreate.push_back(meshRef);
   Core::Resources::MeshManager::createResources(meshesToCreate);
+  p_ImportedMeshes.insert(p_ImportedMeshes.begin(), meshesToCreate.begin(),
+                          meshesToCreate.end());
 
   // Reload mesh components if necessary
   if (!newMesh)
@@ -458,7 +461,9 @@ void importMesh(FbxMesh* p_Mesh)
 
 // <-
 
-_INTR_INLINE void importMeshesFromNode(FbxNode* p_Node)
+_INTR_INLINE void importMeshesFromNode(FbxNode* p_Node,
+                                       _INTR_ARRAY(Core::Resources::MeshRef) &
+                                           p_ImportedMeshes)
 {
   _INTR_ASSERT(p_Node);
 
@@ -473,14 +478,14 @@ _INTR_INLINE void importMeshesFromNode(FbxNode* p_Node)
       const char* meshName = p_Node->GetName();
       _INTR_LOG_INFO("Found mesh in node '%s'", meshName);
 
-      importMesh((FbxMesh*)nodeAttribute);
+      importMesh((FbxMesh*)nodeAttribute, p_ImportedMeshes);
       triangleMeshFound = true;
     }
   }
 
   for (uint32_t i = 0u; i < (uint32_t)p_Node->GetChildCount(); ++i)
   {
-    importMeshesFromNode(p_Node->GetChild(i));
+    importMeshesFromNode(p_Node->GetChild(i), p_ImportedMeshes);
   }
 }
 }
@@ -505,7 +510,9 @@ void ImporterFbx::destroy()
 
 // <-
 
-bool ImporterFbx::importMeshesFromFile(const _INTR_STRING& p_FilePath)
+bool ImporterFbx::importMeshesFromFile(const _INTR_STRING& p_FilePath,
+                                       _INTR_ARRAY(Core::Resources::MeshRef) &
+                                           p_ImportedMeshes)
 {
   FbxImporter* importer = FbxImporter::Create(_fbxManager, "");
 
@@ -530,7 +537,7 @@ bool ImporterFbx::importMeshesFromFile(const _INTR_STRING& p_FilePath)
   _INTR_LOG_INFO("Importing meshes from nodes...");
   _INTR_LOG_PUSH();
 
-  importMeshesFromNode(rootNode);
+  importMeshesFromNode(rootNode, p_ImportedMeshes);
 
   _INTR_LOG_POP();
 

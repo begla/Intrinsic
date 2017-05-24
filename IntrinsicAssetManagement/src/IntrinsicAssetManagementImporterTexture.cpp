@@ -84,37 +84,9 @@ ImageRef createTexture(const _INTR_STRING& p_TextureName,
   return imageRef;
 }
 
-void updateDrawCalls(ImageRef p_ImageRef)
-{
-  _INTR_ARRAY(DrawCallRef) drawCallsToUpdate;
+// <-
 
-  const uint32_t activeResourceCount =
-      DrawCallManager::getActiveResourceCount();
-
-  for (uint32_t dcIdx = 0u; dcIdx < activeResourceCount; ++dcIdx)
-  {
-    DrawCallRef dcRef = DrawCallManager::getActiveResourceAtIndex(dcIdx);
-
-    _INTR_ARRAY(BindingInfo)& bindInfos =
-        DrawCallManager::_descBindInfos(dcRef);
-
-    for (uint32_t biIdx = 0u; biIdx < (uint32_t)bindInfos.size(); ++biIdx)
-    {
-      BindingInfo& bindInfo = bindInfos[biIdx];
-
-      if (bindInfo.resource == p_ImageRef)
-      {
-        drawCallsToUpdate.push_back(dcRef);
-        break;
-      }
-    }
-  }
-
-  DrawCallManager::destroyResources(drawCallsToUpdate);
-  DrawCallManager::createResources(drawCallsToUpdate);
-}
-
-void ImporterTexture::importTextureFromFile(const _INTR_STRING& p_FilePath)
+void ImporterTexture::importColorTextureFromFile(const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
@@ -123,21 +95,33 @@ void ImporterTexture::importTextureFromFile(const _INTR_STRING& p_FilePath)
                   ".dds");
   ImageRef imgRef =
       createTexture(fileName, Renderer::Vulkan::Format::kBC1RGBUNorm);
-  updateDrawCalls(imgRef);
 }
 
 // <-
 
-void ImporterTexture::importAlphaTextureFromFile(const _INTR_STRING& p_FilePath)
+void ImporterTexture::importAlebdoTextureFromFile(
+    const _INTR_STRING& p_FilePath)
+{
+  _INTR_STRING fileName, extension;
+  StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
+
+  compressTexture("-bc1 " + p_FilePath + " " + mediaPath + "/" + fileName +
+                  ".dds");
+  ImageRef imgRef =
+      createTexture(fileName, Renderer::Vulkan::Format::kBC1RGBSrgb);
+}
+
+// <-
+
+void ImporterTexture::importAlebdoAlphaTextureFromFile(
+    const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
   compressTexture("-bc2 " + p_FilePath + " " + mediaPath + "/" + fileName +
                   ".dds");
-  ImageRef imgRef =
-      createTexture(fileName, Renderer::Vulkan::Format::kBC2UNorm);
-  updateDrawCalls(imgRef);
+  ImageRef imgRef = createTexture(fileName, Renderer::Vulkan::Format::kBC2Srgb);
 }
 
 // <-
@@ -152,7 +136,6 @@ void ImporterTexture::importNormalMapTextureFromFile(
                   ".dds");
   ImageRef imgRef =
       createTexture(fileName, Renderer::Vulkan::Format::kBC1RGBUNorm);
-  updateDrawCalls(imgRef);
 }
 
 // <-
@@ -165,7 +148,6 @@ void ImporterTexture::importHdrCubemapFromFile(const _INTR_STRING& p_FilePath)
   copyFile(p_FilePath, mediaPath + "/" + fileName + ".dds");
   ImageRef imgRef =
       createTexture(fileName, Renderer::Vulkan::Format::kBC6UFloat);
-  updateDrawCalls(imgRef);
 }
 }
 }

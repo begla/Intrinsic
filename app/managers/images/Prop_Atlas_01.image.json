@@ -1,0 +1,17 @@
+{
+    "name": "Prop_Atlas_01",
+    "properties": {
+        "name": "Prop_Atlas_01",
+        "imageType": 1,
+        "imageFormat": 10,
+        "flags": 16,
+        "dimensions": [
+            4096.0,
+            4096.0,
+            1.0
+        ],
+        "arrayLayerCount": 1,
+        "mipLevelCount": 13,
+        "fileName": "Prop_Atlas_01.dds"
+    }
+}

@@ -1,0 +1,774 @@
+{
+	"name" : "Default",
+	"uniformBuffers" : [
+		{
+			"name" : "PerInstanceDataPreCombine",
+			"entries" : [
+				"InverseProjectionMatrix",
+				"InverseViewProjectionMatrix",
+				"CameraWorldPosition",
+				"CameraParameters",
+				"PostParams0"
+			]
+		},
+		{
+			"name" : "SSAOTemporalReproj",
+			"entries" : [
+				"InverseViewProjectionMatrix",
+				"InverseProjectionMatrix",
+				"ProjectionMatrix",
+				"PrevViewMatrix"
+			]
+		},
+		{
+			"name" : "PerInstanceDataPostCombine",
+			"entries" : [
+				"HaltonSamples",
+				"CameraParameters"
+			]
+		},
+		{
+			"name" : "BlurX",
+			"entries" : [
+				"BlurParamsXNormal",
+				"CameraParameters"
+			]
+		},
+		{
+			"name" : "BlurY",
+			"entries" : [
+				"BlurParamsYNormal",
+				"CameraParameters"
+			]
+		},
+		{
+			"name" : "BlurMediumX",
+			"entries" : [
+				"BlurParamsXMedium",
+				"CameraParameters"
+			]
+		},
+		{
+			"name" : "BlurMediumY",
+			"entries" : [
+				"BlurParamsYMedium",
+				"CameraParameters"
+			]
+		},
+		{
+			"name" : "BlurLowX",
+			"entries" : [
+				"BlurParamsXLow",
+				"CameraParameters"
+			]
+		},
+		{
+			"name" : "BlurLowY",
+			"entries" : [
+				"BlurParamsYLow",
+				"CameraParameters"
+			]
+		},
+		{
+			"name" : "PerInstanceDataSSAO",
+			"entries" : [
+				"InverseProjectionMatrix"
+			]
+		},
+		{
+			"name" : "Dummy",
+			"entries" : [
+				"CameraWorldPosition"
+			]
+		}
+	],
+	"images" : [
+		{
+			"name" : "GBufferDepth",
+			"renderSize" : "Full",
+			"imageFormat" : "Depth"
+		},
+		{
+			"name" : "GBufferAlbedo",
+			"renderSize" : "Full",
+			"imageFormat" : "R16G16B16A16Float"
+		},
+		{
+			"name" : "GBufferNormal",
+			"renderSize" : "Full",
+			"imageFormat" : "R16G16B16A16Float"
+		},
+		{
+			"name" : "GBufferParameter0",
+			"renderSize" : "Full",
+			"imageFormat" : "R16G16B16A16Float"
+		},
+		{
+			"name" : "GBufferTransparentsAlbedo",
+			"renderSize" : "Full",
+			"imageFormat" : "R16G16B16A16Float"
+		},
+		{
+			"name" : "GBufferTransparentsNormal",
+			"renderSize" : "Full",
+			"imageFormat" : "R16G16B16A16Float"
+		},
+		{
+			"name" : "GBufferTransparentsParameter0",
+			"renderSize" : "Full",
+			"imageFormat" : "R16G16B16A16Float"
+		},
+		{
+			"name" : "GBufferTransparentsDepth",
+			"renderSize" : "Full",
+			"imageFormat" : "Depth"
+		},
+		{
+			"name" : "Scene",
+			"renderSize" : "Full",
+			"imageFormat" : "R16G16B16A16Float"
+		},
+		{
+			"name" : "SceneDownSampled",
+			"renderSize" : "Half",
+			"imageFormat" : "B10G11R11UFloat"
+		},
+		{
+			"name" : "LensFlare",
+			"renderSize" : "Quarter",
+			"imageFormat" : "B10G11R11UFloat"
+		},
+		{
+			"name" : "LensFlarePingPong",
+			"renderSize" : "Quarter",
+			"imageFormat" : "B10G11R11UFloat"
+		},
+		{
+			"name" : "SceneBlurred",
+			"renderSize" : "Half",
+			"imageFormat" : "B10G11R11UFloat"
+		},
+		{
+			"name" : "SceneBlurredPingPong",
+			"renderSize" : "Half",
+			"imageFormat" : "B10G11R11UFloat"
+		},
+		{
+			"name" : "SSAO",
+			"renderSize" : "Half",
+			"imageFormat" : "B8G8R8A8UNorm"
+		},
+		{
+			"name" : "SSAOPingPong",
+			"renderSize" : "Half",
+			"imageFormat" : "B8G8R8A8UNorm"
+		},
+		{
+			"name" : "SSAOPrevFrame",
+			"renderSize" : "Half",
+			"imageFormat" : "B8G8R8A8UNorm"
+		}
+	],
+
+	"renderSteps" : [
+		// Offscreen test
+		{
+			"type" : "SwitchCamera",
+			"cameraName" : "GameCamera"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferAlbedo",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferNormal",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferParameter0",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferDepth",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "DepthStencilAttachment"
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"name" : "GBuffer",
+			"materialPasses" : ["GBufferDefault", "GBufferTerrain"],
+			"renderOrder" : "FrontToBack",
+			"outputs" : [
+				["GBufferAlbedo", [0.1, 0.5, 1.0, 1.0]],
+				["GBufferNormal", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferParameter0", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
+			]
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"name" : "GBufferFoliage",
+			"materialPasses" : ["GBufferFoliage"],
+			"renderOrder" : "FrontToBack",
+			"outputs" : [
+				["GBufferAlbedo"],
+				["GBufferNormal"],
+				["GBufferParameter0"],
+				["GBufferDepth"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferAlbedo",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "Scene",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "CopyOffscreenResult",
+			"fragmentGpuProgram" : "blit.frag",
+			"viewportRenderSize" : "Full",
+			"perInstanceDataBufferName" : "Dummy",
+			"inputs" : [
+				["Image", "GBufferAlbedo", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["Scene"]
+			]
+		},	
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "Scene",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferAlbedo",
+			"sourceImageLayout" : "ShaderReadOnly",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		// <-
+		// GBuffer passes
+		// ->
+		{
+			"type" : "SwitchCamera",
+			"cameraName" : "ActiveCamera"
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"name" : "GBufferPrePassFoliage",
+			"materialPasses" : ["GBufferFoliagePrePass"],
+			"renderOrder" : "FrontToBack",
+			"outputs" : [
+				["GBufferDepth", [1.0]]
+			]
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"name" : "GBuffer",
+			"materialPasses" : ["GBufferDefault", "GBufferTerrain", "GBufferFoliage"],
+			"renderOrder" : "FrontToBack",
+			"outputs" : [
+				["GBufferAlbedo", [0.1, 0.5, 1.0, 1.0]],
+				["GBufferNormal", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferParameter0", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferDepth"]
+			]
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"name" : "GBufferSky",
+			"materialPasses" : ["GBufferSky"],
+			"renderOrder" : "BackToFront",
+			"outputs" : [
+				["GBufferAlbedo"],
+				["GBufferDepth"]
+			]
+		},
+		{
+			"type" : "RenderPassDebug"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferAlbedo",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferNormal",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferParameter0",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferDepth",
+			"sourceImageLayout" : "DepthStencilAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsAlbedo",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsNormal",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsParameter0",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsDepth",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "DepthStencilAttachment"
+		},
+		{
+			"type" : "RenderPassGenericMesh",
+			"name" : "GBufferTransparents",
+			"materialPasses" : ["GBufferWater", "GBufferEffect"],
+			"renderOrder" : "BackToFront",
+			"outputs" : [
+				["GBufferTransparentsAlbedo", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferTransparentsNormal", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferTransparentsParameter0", [0.0, 0.0, 0.0, 0.0]],
+				["GBufferTransparentsDepth", [1.0]]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsAlbedo",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsNormal",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsParameter0",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "GBufferTransparentsDepth",
+			"sourceImageLayout" : "DepthStencilAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		// <-
+		{
+			"type" : "RenderPassPerPixelPicking"
+		},
+		// Lighting passes
+		// ->
+		{
+			"type" : "RenderPassShadow"
+		},
+		// Render and blur SSAO
+		// ->
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAOPingPong",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "SSAO",
+			"fragmentGpuProgram" : "ssao_hbao.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "PerInstanceDataSSAO",
+			"inputs" : [
+				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"],
+				["Image", "hbao_noise", "noiseTex", "Fragment", "NearestRepeat"]
+			],
+			"outputs" : [
+				["SSAOPingPong"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAOPingPong",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAO",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurSSAO_X",
+			"fragmentGpuProgram" : "blur_bilateral.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "BlurX",
+			"inputs" : [
+				["Image", "SSAOPingPong", "inputTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["SSAO"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAO",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAOPingPong",
+			"sourceImageLayout" : "ShaderReadOnly",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurSSAO_Y",
+			"fragmentGpuProgram" : "blur_bilateral.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "BlurY",
+			"inputs" : [
+				["Image", "SSAO", "inputTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["SSAOPingPong"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAOPingPong",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAOPrevFrame",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAO",
+			"sourceImageLayout" : "ShaderReadOnly",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "SSAOTemporalReproj",
+			"fragmentGpuProgram" : "ssao_temp.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "SSAOTemporalReproj",
+			"inputs" : [
+				["Image", "SSAOPingPong", "ssaoTex", "Fragment", "NearestClamp"],
+				["Image", "SSAOPrevFrame", "ssaoPrevTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["SSAO"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAO",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SSAOPrevFrame",
+			"sourceImageLayout" : "ShaderReadOnly",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "CopySSAO",
+			"fragmentGpuProgram" : "blit.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "Dummy",
+			"inputs" : [
+				["Image", "SSAO", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["SSAOPrevFrame"]
+			]
+		},
+		// <-
+		{
+			"type" : "RenderPassLighting"
+		},
+		{
+			"type" : "RenderPassVolumetricLighting"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "Scene",
+			"sourceImageLayout" : "ShaderReadOnly",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		// <-
+		// Post processing
+		// ->
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "PreCombine",
+			"fragmentGpuProgram" : "pre_combine.frag",
+			"viewportRenderSize" : "Full",
+			"perInstanceDataBufferName" : "PerInstanceDataPreCombine",
+			"inputs" : [
+				["Image", "GBufferAlbedo", "albedoTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferNormal", "normalTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferParameter0", "param0Tex", "Fragment", "NearestClamp"],
+				["Image", "GBufferTransparentsAlbedo", "albedoTranspTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferTransparentsNormal", "normTranspTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferTransparentsParameter0", "param0TranspTex", "Fragment", "NearestClamp"],
+				["Image", "LightBuffer", "lightBufferTex", "Fragment", "NearestClamp"],
+				["Image", "LightBufferTransparents", "lightBufferTranspTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"],
+				["Image", "GBufferTransparentsDepth", "depthBufferTranspTex", "Fragment", "NearestClamp"],
+				["Buffer", "MaterialBuffer", "MaterialBuffer", "Fragment"],
+				["Image", "VolumetricLightingScatteringBuffer", "volLightScatteringBufferTex", "Fragment", "LinearClamp"],
+				["Image", "default_ibl_cube_irradiance", "irradianceTex", "Fragment", "LinearClamp"]
+			],
+			"outputs" : [
+				["Scene"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "Scene",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		// Downsample scene
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneDownSampled",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "DownSampleScene",
+			"fragmentGpuProgram" : "blit.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "Dummy",
+			"inputs" : [
+				["Image", "Scene", "inputTex", "Fragment", "LinearClamp"]
+			],
+			"outputs" : [
+				["SceneDownSampled"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneDownSampled",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "RenderPassBloom"
+		},
+		// Render and blur lens flares
+		// ->
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlare",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "LensFlare",
+			"fragmentGpuProgram" : "lens_flare.frag",
+			"viewportRenderSize" : "Quarter",
+			"perInstanceDataBufferName" : "Dummy",
+			"inputs" : [
+				["Image", "BloomBright", "brightnessTex", "Fragment", "LinearClamp"],
+				["Image", "lens_flare", "lensFlareTex", "Fragment", "LinearClamp"]
+			],
+			"outputs" : [
+				["LensFlare"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlare",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlarePingPong",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurLensFlares_X",
+			"fragmentGpuProgram" : "blur.frag",
+			"viewportRenderSize" : "Quarter",
+			"perInstanceDataBufferName" : "BlurMediumX",
+			"inputs" : [
+				["Image", "LensFlare", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["LensFlarePingPong"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlarePingPong",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlare",
+			"sourceImageLayout" : "ShaderReadOnly",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurLensFlares_Y",
+			"fragmentGpuProgram" : "blur.frag",
+			"viewportRenderSize" : "Quarter",
+			"perInstanceDataBufferName" : "BlurMediumY",
+			"inputs" : [
+				["Image", "LensFlarePingPong", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["LensFlare"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "LensFlare",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		// <-
+		// Generate blurred half res. scene image
+		// ->
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneBlurredPingPong",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurScene_X",
+			"fragmentGpuProgram" : "blur.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "BlurLowX",
+			"inputs" : [
+				["Image", "SceneDownSampled", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["SceneBlurredPingPong"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneBlurredPingPong",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneBlurred",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlurScene_Y",
+			"fragmentGpuProgram" : "blur.frag",
+			"viewportRenderSize" : "Half",
+			"perInstanceDataBufferName" : "BlurLowY",
+			"inputs" : [
+				["Image", "SceneBlurredPingPong", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["SceneBlurred"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SceneBlurred",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		// <-
+		/*{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "CopyOffscreenResult",
+			"fragmentGpuProgram" : "blit.frag",
+			"viewportRenderSize" : "Full",
+			"perInstanceDataBufferName" : "Dummy",
+			"inputs" : [
+				["Image", "LightBuffer", "inputTex", "Fragment", "NearestClamp"]
+			],
+			"outputs" : [
+				["Backbuffer"]
+			]
+		},*/
+		// <-
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "PostCombine",
+			"fragmentGpuProgram" : "post_combine.frag",
+			"viewportRenderSize" : "Full",
+			"perInstanceDataBufferName" : "PerInstanceDataPostCombine",
+			"inputs" : [
+				["Image", "Scene", "sceneTex", "Fragment", "NearestClamp"],
+				["Image", "SceneBlurred", "sceneBlurredTex", "Fragment", "LinearClamp"],
+				["Image", "BloomSummed", "bloomTex", "Fragment", "LinearClamp"],
+				["Image", "lens_dirt", "lensDirtTex", "Fragment", "NearestClamp"],
+				["Image", "film_grain_noise", "filmGrainTex", "Fragment", "NearestClamp"],
+				["Image", "LensFlare", "lensFlareTex", "Fragment", "LinearClamp"],
+				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"],
+				["Buffer", "BloomLumBuffer", "AvgLum", "Fragment"]
+			],
+			"outputs" : [
+				["Backbuffer"]
+			]
+		}
+		// <-
+	]
+}

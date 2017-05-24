@@ -1,0 +1,23 @@
+{
+    "name": "sky",
+    "properties": {
+        "name": "sky",
+        "materialPassMask": [
+            "GBufferSky"
+        ],
+        "albedoTextureName": "default_ibl_cube_radiance",
+        "emissiveTextureName": "white",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 0.0,
+        "emissiveIntensity": 0.0
+    }
+}

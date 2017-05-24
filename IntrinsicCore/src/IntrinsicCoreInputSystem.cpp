@@ -57,12 +57,7 @@ void System::reset() { _lastMousePosRel = glm::vec2(0.0f); }
 
 void System::processAxisEvent(const AxisEvent& p_Event)
 {
-  static const float deadZone = 0.1f;
-  float axisValue = p_Event.value;
-  axisValue /= deadZone;
-  axisValue = std::trunc(axisValue);
-  axisValue *= deadZone;
-
+  const float axisValue = p_Event.value;
   if (_axisStates[p_Event.axis] != axisValue)
   {
     _axisStates[p_Event.axis] = axisValue;
@@ -124,7 +119,8 @@ void System::processKeyReleaseEvent(const KeyEvent& p_Event)
 
 void System::processMouseMoveEvent(const MouseMoveEvent& p_Event)
 {
-  if (_lastMousePos != p_Event.pos)
+  if (_lastMousePos != p_Event.pos || _lastMousePosRel != p_Event.posRel ||
+      _lastMousePosViewport != p_Event.posViewport)
   {
     Resources::QueuedEventData eventData;
     eventData.mouseEvent.pos[0] = p_Event.pos.x;

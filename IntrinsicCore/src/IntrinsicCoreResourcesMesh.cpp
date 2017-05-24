@@ -163,7 +163,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             posVertexBuffer) = Renderer::Vulkan::BufferType::kVertex;
         Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
             posVertexBuffer) =
-            (uint32_t)positions[subMeshIdx].size() * sizeof(uint16_t) * 3u;
+            (uint32_t)positions[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
         uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
@@ -238,7 +238,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             normalVertexBuffer) = Renderer::Vulkan::BufferType::kVertex;
         Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
             normalVertexBuffer) =
-            (uint32_t)normals[subMeshIdx].size() * sizeof(uint16_t) * 3u;
+            (uint32_t)normals[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
         uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
@@ -278,7 +278,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             tangentVertexBuffer) = Renderer::Vulkan::BufferType::kVertex;
         Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
             tangentVertexBuffer) =
-            (uint32_t)tangents[subMeshIdx].size() * sizeof(uint16_t) * 3u;
+            (uint32_t)tangents[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
         uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
@@ -318,7 +318,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             binormalVertexBuffer) = Renderer::Vulkan::BufferType::kVertex;
         Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
             binormalVertexBuffer) =
-            (uint32_t)binormals[subMeshIdx].size() * sizeof(uint16_t) * 3u;
+            (uint32_t)binormals[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
         uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(

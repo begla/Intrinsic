@@ -33,6 +33,8 @@ if(WIN32)
   set(INTR_GENERAL_COMPILE_FLAGS "/Zm256 /EHa /W3")
   add_definitions("-D_SCL_SECURE_NO_WARNINGS")
   add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+  set(INTR_GENERAL_COMPILE_FLAGS "${INTR_GENERAL_COMPILE_FLAGS} /Zi")
+  set(INTR_GENERAL_LINK_FLAGS "${INTR_GENERAL_LINK_FLAGS} /DEBUG")
 
   if(INTR_FINAL_BUILD)
     add_definitions("-D_HAS_EXCEPTIONS=0")
@@ -71,6 +73,9 @@ find_package(Vulkan REQUIRED)
 if (BUILD_INTRINSICED)
   find_package(Qt5 REQUIRED)
   find_package(FBX REQUIRED)
+endif()
+if (WIN32)
+  find_package(BugSplat REQUIRED)
 endif()
 
 file(GLOB INTR_RENDERER_VULKAN_SOURCE_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.cpp)
@@ -208,6 +213,7 @@ set(INTR_DEPENDENCIES
   "${SDL2_INCLUDE_DIR}"
   "dependencies/spirvcross/"
   "${Vulkan_INCLUDE_DIR}"
+  "${BUGSPLAT_INCLUDE_DIR}"
 )
 
 if(WIN32)
@@ -247,6 +253,9 @@ set(INTR_EXTERNAL_LIBS
 
   # PhysX
   ${PhysX_LIBRARIES}
+
+  # BugSplat
+  ${BUGSPLAT_LIBRARIES}
 )
 
 if(UNIX)
@@ -270,6 +279,7 @@ if (NOT COMPILE_ONLY)
   # Core
   if (WIN32)
     target_link_libraries(IntrinsicCore wsock32 ws2_32)
+    target_link_libraries(IntrinsicCore Dbghelp)
   endif()
   target_link_libraries(IntrinsicCore IntrinsicRendererVulkan)
   target_link_libraries(IntrinsicCore ${INTR_EXTERNAL_LIBS})

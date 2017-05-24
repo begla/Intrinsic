@@ -1,0 +1,10 @@
+{
+    "name": "gbuffer_foliage.frag",
+    "properties": {
+        "name": "gbuffer_foliage.frag",
+        "gpuProgramName": "gbuffer_foliage.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

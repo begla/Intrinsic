@@ -19,18 +19,18 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "lib_math.glsl"
+#include "ubos.inc.glsl"
 
-layout (binding = 0) uniform PerInstance
-{
-  ivec4 data0;
-} uboPerInstance;
+PER_INSTANCE_DATA_POST_COMBINE;
 
 layout (binding = 1) uniform sampler2D sceneTex;
-layout (binding = 2) uniform sampler2D bloomTex;
-layout (binding = 3) uniform sampler2D lensDirtTex;
-layout (binding = 4) uniform sampler2D filmGrainTex;
-layout (binding = 5) uniform sampler2D lensFlareTex;
-layout (binding = 6) buffer AvgLum
+layout (binding = 2) uniform sampler2D sceneBlurredTex;
+layout (binding = 3) uniform sampler2D bloomTex;
+layout (binding = 4) uniform sampler2D lensDirtTex;
+layout (binding = 5) uniform sampler2D filmGrainTex;
+layout (binding = 6) uniform sampler2D lensFlareTex;
+layout (binding = 7) uniform sampler2D depthBufferTex;
+layout (binding = 8) buffer AvgLum
 {
   float avgLum[];
 };
@@ -51,43 +51,79 @@ vec3 tonemap(vec3 x)
    return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
 }
 
+vec3 sampleColorOffsets(sampler2D scene, vec2 uv0, vec3 offsets, vec2 framebufferSize)
+{
+  const vec2 direction = uv0 * 2.0 - 1.0;
+  offsets *= clamp(length(direction) - 0.3, 0.0, 1.0);
+
+  const vec2 pixelSize = 1.0 / framebufferSize;
+
+  return vec3(textureLod(scene, uv0 - direction * offsets.x * pixelSize, 0.0).r, 
+    textureLod(scene, uv0 - direction * offsets.y * pixelSize, 0.0).g, 
+    textureLod(scene, uv0 - direction * offsets.z * pixelSize, 0.0).b);
+}
+
+const float lensDirtLumThreshold = 0.2;
+const float lensDirtIntens = 0.9;
+const float toneMappingLumTarget = 0.9;
+const float toneMappingMaxExposure = 3.0;
+const float bloomFactor = 1.0;
+const float filmGrainBias = 0.0;
+const float filmGrainMax = 1.0;
+const float lensFlareFactor = 1.0;
+
 void main()
 {
   const vec2 framebufferSize = vec2(textureSize(sceneTex, 0));
 
-  const vec4 scene = textureLod(sceneTex, inUV0, 0.0).rgba;
+  // Chromatic abberation
+  const vec3 colorOffsets = 3.0 * vec3(1, 2, 3);
+  vec3 scene = sampleColorOffsets(sceneTex, inUV0, colorOffsets, framebufferSize);
+
+  const vec3 sceneBlurred = textureLod(sceneBlurredTex, inUV0, 0.0).rgb;
+  const float depth = textureLod(depthBufferTex, inUV0, 0.0).r;
+  const float linDepth = linearizeDepth(depth, uboPerInstance.camParams.x, uboPerInstance.camParams.y) * uboPerInstance.camParams.y;
+
+  // DoF fake
+  const float blurFactor = clamp((linDepth - 500.0) / 50.0, 0.0, 1.0);
+  scene = mix(scene, sceneBlurred, blurFactor);
+
   const vec4 bloom = textureLod(bloomTex, inUV0, 0.0).rgba;
   const vec4 lensDirt = textureLod(lensDirtTex, inUV0, 0.0).rgba;
   const vec4 lensFlare = textureLod(lensFlareTex, inUV0, 0.0).rgba;
-
-  const float lensDirtLumThreshold = 0.3;
-  const float lensDirtIntens = 0.75;
-  const float toneMappingLumTarget = 0.4;
-  const float toneMappingMaxExposure = 3.0;
-  const float bloomFactor = 0.5;
-  const float filmGrainBias = 0.0;
-  const float filmGrainMax = 0.5;
-  const float lensFlareFactor = 0.5;
 
   const float exposure = min(toneMappingLumTarget / avgLum[0], toneMappingMaxExposure);
 
   // Bloom
   outColor = vec4(scene.rgb + bloomFactor * bloom.rgb, 1.0);
   // Lens flares
-  outColor.rgb += lensFlare.rgb * lensFlareFactor;
+  outColor.rgb += lensFlare.rgb * lensFlareFactor * lensDirt.rgb;
   // Lens dirt
   outColor.rgb += lensDirtIntens * lensDirt.rgb * clamp(max(bloom.a - lensDirtLumThreshold, 0.0), 0.0, 1.0);
+  // Vignette
+  outColor.rgb *= 1.0 - clamp(pow(length(inUV0 * 2.0 - 1.0), 1.5) * 0.5, 0.0, 1.0);
 
   // Film grain
   const vec4 grain = texelFetch(filmGrainTex, 
-    (ivec2(inUV0 * framebufferSize.xy) + uboPerInstance.data0.xy) & 255, 0).rgba;
+    (ivec2(inUV0 * framebufferSize.xy) + ivec2(uboPerInstance.haltonSamples.xy * 255.0)) & 255, 0).rgba;
   outColor.rgb = grain.rgb * min(outColor.rgb + filmGrainBias, filmGrainMax) + outColor.rgb;
 
   // Tonemapping
   outColor.rgb *= exposure;
   outColor.rgb = tonemap(outColor.rgb);
-
-  vec3 whiteScale = 1.0/tonemap(vec3(W, W, W));
+  vec3 whiteScale = 1.0/tonemap(vec3(W));
   outColor.rgb *= whiteScale;
+
+  // Bleach Bypass
+  {
+    vec3 lumCoeff = vec3(0.25, 0.65, 0.1);
+    float lum = dot(lumCoeff, outColor.rgb);
+    vec3 blend = vec3(lum);
+    float L = min(1.0, max(0.0, 10.0 * (lum - 0.45)));
+    vec3 result1 = 2.0 * outColor.rgb * blend;
+    vec3 result2 = 1.0 - 2.0 * (1.0 - blend) * (1.0 - outColor.rgb);
+
+    const float strength = 0.5;
+    outColor.rgb = mix(outColor.rgb, mix(result1, result2, L), strength);
+  }
 }
- 

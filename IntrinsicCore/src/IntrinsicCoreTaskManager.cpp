@@ -31,92 +31,108 @@ const float _stepSize = 0.016f;
 
 // Static members
 float TaskManager::_lastDeltaT = 0.016f;
+float TaskManager::_lastActualFrameDuration = 0.016f;
 float TaskManager::_totalTimePassed = 0.0f;
 uint32_t TaskManager::_frameCounter = 0u;
+uint64_t TaskManager::_lastUpdate = 0u;
+float TaskManager::_timeModulator = 1.0f;
 
 void TaskManager::executeTasks()
 {
-  if (_frameCounter > 0u)
-  {
-    _lastDeltaT = std::min(TimingHelper::timerEnd() * 0.001f, 0.3f);
-    _totalTimePassed += _lastDeltaT;
-
-    if (_lastDeltaT < Settings::Manager::_targetFrameRate)
-    {
-      TimingHelper::timerStart();
-      std::this_thread::sleep_for(std::chrono::milliseconds((uint32_t)(
-          (Settings::Manager::_targetFrameRate - _lastDeltaT) * 1000.0f)));
-      float actualTimeSlept = TimingHelper::timerEnd() * 0.001f;
-
-      _lastDeltaT += actualTimeSlept;
-    }
-  }
-  TimingHelper::timerStart();
-
-  {
 #if defined(_INTR_PROFILING_ENABLED)
-    MICROPROFILE_SCOPE(MAIN);
+  MICROPROFILE_SCOPE(MAIN);
 #endif // _INTR_PROFILING_ENABLED
 
-    _INTR_PROFILE_CPU("TaskManager", "Execute Tasks");
+  _INTR_PROFILE_CPU("TaskManager", "Execute Tasks");
 
+  if (_frameCounter > 0u)
+  {
+    _lastDeltaT = std::min(
+        (TimingHelper::getMicroseconds() - _lastUpdate) * 0.000001f, 0.3f);
+    _lastActualFrameDuration = _lastDeltaT;
+
+    // Adjust deltaT to target frame rate
+    while (_lastDeltaT < Settings::Manager::_targetFrameRate)
     {
-      _INTR_PROFILE_CPU("TaskManager", "Non-Rendering Tasks");
+      _lastDeltaT = (TimingHelper::getMicroseconds() - _lastUpdate) * 0.000001f;
+      std::this_thread::yield();
+    }
+  }
 
-      // Events and input
-      {
-        Input::System::reset();
-        SystemEventProvider::SDL::pumpEvents();
-      }
+  const float modDeltaT = _lastDeltaT * _timeModulator;
+  _totalTimePassed += modDeltaT;
+  _lastUpdate = TimingHelper::getMicroseconds();
 
-      // Game state update
-      {
-        GameStates::Manager::update(_lastDeltaT);
-      }
+  {
+    _INTR_PROFILE_CPU("TaskManager", "Non-Rendering Tasks");
 
-      // Physics
-      {
-        _INTR_PROFILE_CPU("Physics", "Simulate And Update");
-
-        _stepAccum += _lastDeltaT;
-
-        while (_stepAccum > _stepSize)
-        {
-          Physics::System::dispatchSimulation(_stepSize);
-          Physics::System::syncSimulation();
-
-          _stepAccum -= _stepSize;
-        }
-
-        Components::RigidBodyManager::updateNodesFromActors(
-            Components::RigidBodyManager::_activeRefs);
-        Components::RigidBodyManager::updateActorsFromNodes(
-            Components::RigidBodyManager::_activeRefs);
-        Physics::System::renderLineDebugGeometry();
-      }
-
-      // Post effect system
-      {
-        Components::PostEffectVolumeManager::blendPostEffects(
-            Components::PostEffectVolumeManager::_activeRefs);
-      }
-
-      // Fire events
-      {
-        Resources::EventManager::fireEvents();
-      }
+    // Events and input
+    {
+      Input::System::reset();
+      SystemEventProvider::SDL::pumpEvents();
     }
 
+    // Game state update
     {
-      _INTR_PROFILE_CPU("TaskManager", "Rendering Tasks");
-
-      // Rendering
-      Renderer::Vulkan::DefaultRenderProcess::renderFrame(_lastDeltaT);
+      GameStates::Manager::update(modDeltaT);
     }
 
+    // Scripts
     {
-      Physics::System::updatePvdCamera();
+      Components::ScriptManager::tickScripts(
+          Components::ScriptManager::_activeRefs, modDeltaT);
     }
+
+    // Physics
+    {
+      _INTR_PROFILE_CPU("TaskManager", "Simulate And Update");
+
+      _stepAccum += modDeltaT;
+
+      while (_stepAccum > _stepSize)
+      {
+        Physics::System::dispatchSimulation(modDeltaT);
+        Physics::System::syncSimulation();
+
+        _stepAccum -= modDeltaT;
+      }
+
+      Components::RigidBodyManager::updateNodesFromActors(
+          Components::RigidBodyManager::_activeRefs);
+      Components::RigidBodyManager::updateActorsFromNodes(
+          Components::RigidBodyManager::_activeRefs);
+      Physics::System::renderLineDebugGeometry();
+    }
+
+    // Swarms
+    {
+      _INTR_PROFILE_CPU("TaskManager", "Swarms");
+
+      Components::SwarmManager::updateSwarms(
+          Components::SwarmManager::_activeRefs, modDeltaT);
+    }
+
+    // Post effect system
+    {
+      Components::PostEffectVolumeManager::blendPostEffects(
+          Components::PostEffectVolumeManager::_activeRefs);
+    }
+
+    // Fire events
+    {
+      Resources::EventManager::fireEvents();
+    }
+  }
+
+  {
+    _INTR_PROFILE_CPU("TaskManager", "Rendering Tasks");
+
+    // Rendering
+    Renderer::Vulkan::RenderProcess::Default::renderFrame(modDeltaT);
+  }
+
+  {
+    Physics::System::updatePvdCamera();
   }
 
   ++_frameCounter;

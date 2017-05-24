@@ -1,4 +1,4 @@
-->
+// ->
 // Copyright (c) 2016 Benjamin Glatzel
 // Author: Benjamin Glatzel
 // <-
@@ -11,7 +11,7 @@
 // Ui
 #include "ui_IntrinsicEd.h"
 
-    IntrinsicEdNodeView* IntrinsicEd::_nodeView = nullptr;
+IntrinsicEdNodeView* IntrinsicEd::_nodeView = nullptr;
 IntrinsicEdPropertyView* IntrinsicEd::_propertyView = nullptr;
 IntrinsicEdManagerWindowGpuProgram* IntrinsicEd::_managerWindowGpuProgram =
     nullptr;
@@ -71,9 +71,10 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   Application::initEventSystem();
 
   _ui.setupUi(this);
+  setWindowTitle(QString("IntrinsicEd - ") + _INTR_VERSION_STRING);
 
   // Init. Intrinsic
-  Application::init(qWinAppInst(), (void*)_ui.centralWidget->winId());
+  Application::init(qWinAppInst(), (void*)_ui.viewPort->winId());
 
   // Activate editing game state
   GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
@@ -81,11 +82,11 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   // Init. resources
   {
     Intrinsic::AssetManagement::Resources::AssetManager::init();
-    Intrinsic::AssetManagement::Resources::AssetManager::loadFromSingleFile(
-        "managers/Asset.manager.json");
+    Intrinsic::AssetManagement::Resources::AssetManager::loadFromMultipleFiles(
+        "managers/assets/", ".asset.json");
   }
 
-  _viewport = _ui.centralWidget;
+  _viewport = _ui.viewPort;
 
 #if defined(_WIN32)
   _qtWindowProc = (WNDPROC)GetWindowLongPtr((HWND)winId(), GWLP_WNDPROC);
@@ -97,7 +98,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
       SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER);
   _INTR_ASSERT(sdlResult == 0u);
 
-  _sdlViewport = SDL_CreateWindowFrom((void*)_ui.centralWidget->winId());
+  _sdlViewport = SDL_CreateWindowFrom((void*)_ui.viewPort->winId());
   _INTR_ASSERT(_sdlViewport);
 
   _sdlMainWindow = SDL_CreateWindowFrom((void*)winId());
@@ -116,61 +117,45 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     _categoryToIconMapping["Mesh"] = ":Icons/user";
     _categoryToIconMapping["GpuProgram"] = ":Icons/calendar";
     _categoryToIconMapping["Resource"] = ":Icons/case";
-    _categoryToIconMapping["Properties_Surface"] = ":Icons/brush";
+    _categoryToIconMapping["PBR"] = ":Icons/lightbulb";
+    _categoryToIconMapping["Emissive"] = ":Icons/lightbulb";
     _categoryToIconMapping["Textures"] = ":Icons/picture";
-    _categoryToIconMapping["Textures_Water"] = ":Icons/picture";
-    _categoryToIconMapping["Textures_Layered"] = ":Icons/picture";
-    _categoryToIconMapping["Properties_UV"] = ":Icons/picture";
-    _categoryToIconMapping["Properties_Water"] = ":Icons/picture";
+    _categoryToIconMapping["Translucency"] = ":Icons/picture";
+    _categoryToIconMapping["UV"] = ":Icons/picture";
+    _categoryToIconMapping["Transparency"] = ":Icons/picture";
     _categoryToIconMapping["Material"] = ":Icons/brush";
     _categoryToIconMapping["Camera"] = ":Icons/film";
     _categoryToIconMapping["CameraController"] = ":Icons/film";
     _categoryToIconMapping["CharacterController"] = ":Icons/user";
+    _categoryToIconMapping["Swarm"] = ":Icons/users";
     _categoryToIconMapping["Player"] = ":Icons/user";
     _categoryToIconMapping["RigidBody"] = ":Icons/cube";
     _categoryToIconMapping["PostEffectVolume"] = ":Icons/picture";
+    _categoryToIconMapping["Light"] = ":Icons/lightbulb";
+    _categoryToIconMapping["IrradianceProbe"] = ":Icons/lightbulb";
   }
 
   {
     _componentToIconMapping["Camera"] = ":Icons/film";
     _componentToIconMapping["CameraController"] = ":Icons/film";
     _componentToIconMapping["CharacterController"] = ":Icons/user";
+    _componentToIconMapping["Swarm"] = ":Icons/users";
     _componentToIconMapping["Player"] = ":Icons/user";
     _componentToIconMapping["Node"] = ":Icons/target";
     _componentToIconMapping["Mesh"] = ":Icons/user";
     _componentToIconMapping["Script"] = ":Icons/script";
     _componentToIconMapping["RigidBody"] = ":Icons/cube";
     _componentToIconMapping["PostEffectVolume"] = ":Icons/picture";
-  }
-
-  // Style
-  {
-    qApp->setStyle(QStyleFactory::create("Fusion"));
-
-    QPalette darkPalette;
-    darkPalette.setColor(QPalette::Window, QColor(37, 41, 45));
-    darkPalette.setColor(QPalette::WindowText, Qt::white);
-    darkPalette.setColor(QPalette::Base, QColor(32, 36, 40));
-    darkPalette.setColor(QPalette::AlternateBase, QColor(35, 35, 35));
-    darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
-    darkPalette.setColor(QPalette::ToolTipText, Qt::white);
-    darkPalette.setColor(QPalette::Text, Qt::white);
-    darkPalette.setColor(QPalette::Button, QColor(53, 53, 53));
-    darkPalette.setColor(QPalette::ButtonText, Qt::white);
-    darkPalette.setColor(QPalette::BrightText, Qt::red);
-    darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-
-    darkPalette.setColor(QPalette::Highlight, QColor(236, 112, 0));
-    darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-
-    qApp->setPalette(darkPalette);
-    qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #202428; "
-                        "border: 1px solid #EC7000; }");
+    _componentToIconMapping["Light"] = ":Icons/lightbulb";
+    _componentToIconMapping["IrradianceProbe"] = ":Icons/lightbulb";
   }
 
   QObject::connect(_ui.actionExit, SIGNAL(triggered()), this, SLOT(onExit()));
   QObject::connect(_ui.actionLoad_World, SIGNAL(triggered()), this,
                    SLOT(onLoadWorld()));
+  QObject::connect(_ui.actionReload_Settings_And_Renderer_Config,
+                   SIGNAL(triggered()), this,
+                   SLOT(onReloadSettingsAndRendererConfig()));
   QObject::connect(_ui.actionSave_World, SIGNAL(triggered()), this,
                    SLOT(onSaveWorld()));
   QObject::connect(_ui.actionSave_Editor_Settings, SIGNAL(triggered()), this,
@@ -195,6 +180,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    SLOT(onMainGameState()));
   QObject::connect(_ui.actionEditingGameState, SIGNAL(triggered()), this,
                    SLOT(onEditingGameState()));
+  QObject::connect(_ui.actionBenchmarkGameState, SIGNAL(triggered()), this,
+                   SLOT(onBenchmarkGameState()));
 
   QObject::connect(_ui.actionCreateCube, SIGNAL(triggered()), this,
                    SLOT(onCreateCube()));
@@ -204,16 +191,17 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    SLOT(onCreateRigidBodySphere()));
   QObject::connect(_ui.actionCreateSphere, SIGNAL(triggered()), this,
                    SLOT(onCreateSphere()));
+  QObject::connect(_ui.actionCreateLight, SIGNAL(triggered()), this,
+                   SLOT(onCreateLight()));
 
   QObject::connect(_ui.actionShow_PhysX_Debug_Geometry, SIGNAL(triggered()),
                    this, SLOT(onDebugGeometryChanged()));
+  QObject::connect(_ui.actionOpen_Microprofile, SIGNAL(triggered()), this,
+                   SLOT(onOpenMicroprofile()));
   QObject::connect(_ui.actionShow_World_Bounding_Spheres, SIGNAL(triggered()),
                    this, SLOT(onDebugGeometryChanged()));
-
-  QObject::connect(_ui.actionSpawn_Vegetation, SIGNAL(triggered()), this,
-                   SLOT(onSpawnVegetation()));
-  QObject::connect(_ui.actionSpawn_Grass, SIGNAL(triggered()), this,
-                   SLOT(onSpawnGrass()));
+  QObject::connect(_ui.actionShow_Benchmark_Paths, SIGNAL(triggered()), this,
+                   SLOT(onDebugGeometryChanged()));
 
   QObject::connect(_ui.actionShow_Create_Context_Menu, SIGNAL(triggered()),
                    this, SLOT(onShowCreateContextMenu()));
@@ -222,6 +210,12 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   QObject::connect(_ui.actionShow_Debug_Geometry_Context_Menu,
                    SIGNAL(triggered()), this,
                    SLOT(onShowDebugGeometryContextMenu()));
+
+  QObject::connect(_ui.actionCompile_Shaders, SIGNAL(triggered()), this,
+                   SLOT(onCompileShaders()));
+
+  QObject::connect(_ui.actionRecompile_Shaders, SIGNAL(triggered()), this,
+                   SLOT(onRecompileShaders()));
 
   _propertyView = new IntrinsicEdPropertyView();
   addDockWidget(Qt::RightDockWidgetArea, _propertyView);
@@ -257,77 +251,112 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    _managerWindowPostEffect, SLOT(show()));
 
   // Editing toolbar
-  {{QLabel* label = new QLabel("Grid Size");
-  label->setMargin(5);
+  {
+    QLabel* label = new QLabel("Grid Size:");
+    label->setMargin(3);
+    label->setStyleSheet("font: 8pt");
 
-  QDoubleSpinBox* gridSizeSpinBox = new QDoubleSpinBox();
-  gridSizeSpinBox->setMinimum(0.05f);
-  gridSizeSpinBox->setSingleStep(0.5f);
+    QDoubleSpinBox* gridSizeSpinBox = new QDoubleSpinBox();
+    gridSizeSpinBox->setMinimum(0.01f);
+    gridSizeSpinBox->setSingleStep(0.5f);
+    gridSizeSpinBox->setToolTip("Grid Size");
 
-  gridSizeSpinBox->setValue(GameStates::Editing::_gridSize);
+    gridSizeSpinBox->setValue(GameStates::Editing::_gridSize);
 
-  _ui.gridToolBar->addWidget(label);
-  _ui.gridToolBar->addWidget(gridSizeSpinBox);
+    _ui.gridToolBar->addWidget(label);
+    _ui.gridToolBar->addWidget(gridSizeSpinBox);
 
-  QObject::connect(gridSizeSpinBox, SIGNAL(valueChanged(double)), this,
-                   SLOT(onGridSizeChanged(double)));
-}
+    QObject::connect(gridSizeSpinBox, SIGNAL(valueChanged(double)), this,
+                     SLOT(onGridSizeChanged(double)));
+  }
 
-{
-  QLabel* label = new QLabel("Gizmo Size");
-  label->setMargin(5);
+  {
+    QLabel* label = new QLabel("Gizmo Size:");
+    label->setMargin(3);
+    label->setStyleSheet("font: 8pt");
 
-  QDoubleSpinBox* gizmoSizeSpinBox = new QDoubleSpinBox();
-  gizmoSizeSpinBox->setMinimum(0.05f);
-  gizmoSizeSpinBox->setSingleStep(0.05f);
+    QDoubleSpinBox* gizmoSizeSpinBox = new QDoubleSpinBox();
+    gizmoSizeSpinBox->setMinimum(0.05f);
+    gizmoSizeSpinBox->setSingleStep(0.05f);
+    gizmoSizeSpinBox->setToolTip("Gizmo Size");
 
-  gizmoSizeSpinBox->setValue(GameStates::Editing::_gizmoSize);
+    gizmoSizeSpinBox->setValue(GameStates::Editing::_gizmoSize);
 
-  _ui.gridToolBar->addWidget(label);
-  _ui.gridToolBar->addWidget(gizmoSizeSpinBox);
+    _ui.gridToolBar->addWidget(label);
+    _ui.gridToolBar->addWidget(gizmoSizeSpinBox);
 
-  QObject::connect(gizmoSizeSpinBox, SIGNAL(valueChanged(double)), this,
-                   SLOT(onGizmoSizeChanged(double)));
-}
+    QObject::connect(gizmoSizeSpinBox, SIGNAL(valueChanged(double)), this,
+                     SLOT(onGizmoSizeChanged(double)));
+  }
 
-{
-  QLabel* label = new QLabel("Camera Speed");
-  label->setMargin(5);
+  {
+    QLabel* label = new QLabel("Camera Speed:");
+    label->setMargin(3);
+    label->setStyleSheet("font: 8pt");
 
-  QDoubleSpinBox* cameraSpeedSpinBox = new QDoubleSpinBox();
-  cameraSpeedSpinBox->setMinimum(0.05f);
-  cameraSpeedSpinBox->setMaximum(1000.0f);
-  cameraSpeedSpinBox->setSingleStep(0.05f);
+    QDoubleSpinBox* cameraSpeedSpinBox = new QDoubleSpinBox();
+    cameraSpeedSpinBox->setMinimum(0.05f);
+    cameraSpeedSpinBox->setMaximum(1000.0f);
+    cameraSpeedSpinBox->setSingleStep(0.05f);
+    cameraSpeedSpinBox->setToolTip("Camera Speed");
 
-  cameraSpeedSpinBox->setValue(GameStates::Editing::_cameraSpeed);
+    cameraSpeedSpinBox->setValue(GameStates::Editing::_cameraSpeed);
 
-  _ui.gridToolBar->addWidget(label);
-  _ui.gridToolBar->addWidget(cameraSpeedSpinBox);
+    _ui.gridToolBar->addWidget(label);
+    _ui.gridToolBar->addWidget(cameraSpeedSpinBox);
 
-  QObject::connect(cameraSpeedSpinBox, SIGNAL(valueChanged(double)), this,
-                   SLOT(onCameraSpeedChanged(double)));
-}
-}
+    QObject::connect(cameraSpeedSpinBox, SIGNAL(valueChanged(double)), this,
+                     SLOT(onCameraSpeedChanged(double)));
+  }
 
-// Context menus
-{
-  _createContextMenu.addAction(_ui.actionCreateCube);
-  _createContextMenu.addAction(_ui.actionCreateSphere);
-  _createContextMenu.addSeparator();
-  _createContextMenu.addAction(_ui.actionCreateRigidBody);
-  _createContextMenu.addAction(_ui.actionCreateRigidBody_Sphere);
+  _ui.gridToolBar->addSeparator();
 
-  _debugContextMenu.addAction(_ui.actionSpawn_Vegetation);
-  _debugContextMenu.addAction(_ui.actionSpawn_Grass);
+  {
 
-  _debugGeometryContextMenu.addAction(_ui.actionShow_World_Bounding_Spheres);
-  _debugGeometryContextMenu.addSeparator();
-  _debugGeometryContextMenu.addAction(_ui.actionShow_PhysX_Debug_Geometry);
-}
+    QLabel* label = new QLabel("Time Mod.:");
+    label->setMargin(3);
+    label->setStyleSheet("font: 8pt");
 
-onLoadEditorSettings();
+    QDoubleSpinBox* timeModSpinBox = new QDoubleSpinBox();
+    timeModSpinBox->setMinimum(0.0f);
+    timeModSpinBox->setMaximum(10.0f);
+    timeModSpinBox->setSingleStep(0.05f);
+    timeModSpinBox->setToolTip("Time Modulator");
 
-_mainWindow = this;
+    timeModSpinBox->setValue(TaskManager::_timeModulator);
+
+    _ui.gridToolBar->addWidget(label);
+    _ui.gridToolBar->addWidget(timeModSpinBox);
+
+    QObject::connect(timeModSpinBox, SIGNAL(valueChanged(double)), this,
+                     SLOT(onTimeModChanged(double)));
+  }
+
+  // Context menus
+  {
+    _createContextMenu.addAction(_ui.actionCreateCube);
+    _createContextMenu.addAction(_ui.actionCreateSphere);
+    _createContextMenu.addSeparator();
+    _createContextMenu.addAction(_ui.actionCreateLight);
+    _createContextMenu.addSeparator();
+    _createContextMenu.addAction(_ui.actionCreateRigidBody);
+    _createContextMenu.addAction(_ui.actionCreateRigidBody_Sphere);
+
+    _debugGeometryContextMenu.addAction(_ui.actionShow_World_Bounding_Spheres);
+    _debugGeometryContextMenu.addAction(_ui.actionShow_Benchmark_Paths);
+    _debugGeometryContextMenu.addSeparator();
+    _debugGeometryContextMenu.addAction(_ui.actionShow_PhysX_Debug_Geometry);
+  }
+
+  onLoadEditorSettings();
+
+  _settingsChangeWatch = new QFileSystemWatcher(this);
+  QObject::connect(_settingsChangeWatch, SIGNAL(fileChanged(const QString&)),
+                   this, SLOT(onSettingsFileChanged(const QString&)));
+  updateSettingsChangeWatch();
+  _settingsUpdatePending = false;
+
+  _mainWindow = this;
 }
 
 IntrinsicEd::~IntrinsicEd() {}
@@ -346,12 +375,13 @@ void IntrinsicEd::onLoadEditorSettings()
   restoreState(settings.value("mainWindowState").toByteArray());
 }
 
-void IntrinsicEd::onExit() {}
+void IntrinsicEd::onExit() { exit(0); }
 
 void IntrinsicEd::onLoadWorld()
 {
-  const QString fileName = QFileDialog::getOpenFileName(
-      this, tr("Open World"), QString("worlds"), tr("World File (*.json)"));
+  const QString fileName =
+      QFileDialog::getOpenFileName(this, tr("Open World"), QString("worlds"),
+                                   tr("World File (*.world.json)"));
 
   if (fileName.size() > 0u)
   {
@@ -360,10 +390,17 @@ void IntrinsicEd::onLoadWorld()
   }
 }
 
+void IntrinsicEd::onReloadSettingsAndRendererConfig()
+{
+  Settings::Manager::loadSettings();
+  Vulkan::RenderSystem::onViewportChanged();
+}
+
 void IntrinsicEd::onSaveWorld()
 {
-  const QString fileName = QFileDialog::getSaveFileName(
-      this, tr("Save World"), QString("worlds"), tr("World File (*.json)"));
+  const QString fileName =
+      QFileDialog::getSaveFileName(this, tr("Save World"), QString("worlds"),
+                                   tr("World File (*.world.json)"));
 
   if (fileName.size() > 0u)
   {
@@ -373,26 +410,13 @@ void IntrinsicEd::onSaveWorld()
 
 void IntrinsicEd::onFullscreen()
 {
-  _tempStoredGeometry = saveGeometry();
-  _tempStoredState = saveState();
-
-  _ui.centralWidget->setParent(nullptr);
-  _ui.centralWidget->showFullScreen();
-
-  onMainGameState();
+  _ui.viewPort->setParent(nullptr);
+  _ui.viewPort->showFullScreen();
 }
 
 void IntrinsicEd::onEndFullscreen()
 {
-  if (_ui.centralWidget->isFullScreen())
-  {
-    setCentralWidget(_ui.centralWidget);
-
-    restoreGeometry(_tempStoredGeometry);
-    restoreState(_tempStoredState);
-  }
-
-  onEditingGameState();
+  _ui.centralWidget->layout()->addWidget(_ui.viewPort);
 }
 
 void IntrinsicEd::onEditingModeDefault()
@@ -454,6 +478,7 @@ void IntrinsicEd::onMainGameState()
 {
   _ui.actionEditingGameState->setChecked(false);
   _ui.actionMainGameState->setChecked(true);
+  _ui.actionBenchmarkGameState->setChecked(false);
 
   GameStates::Manager::activateGameState(GameStates::GameState::kMain);
   SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -463,8 +488,20 @@ void IntrinsicEd::onEditingGameState()
 {
   _ui.actionEditingGameState->setChecked(true);
   _ui.actionMainGameState->setChecked(false);
+  _ui.actionBenchmarkGameState->setChecked(false);
 
   GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
+
+  SDL_SetRelativeMouseMode(SDL_FALSE);
+}
+
+void IntrinsicEd::onBenchmarkGameState()
+{
+  _ui.actionBenchmarkGameState->setChecked(true);
+  _ui.actionEditingGameState->setChecked(false);
+  _ui.actionMainGameState->setChecked(false);
+
+  GameStates::Manager::activateGameState(GameStates::GameState::kBenchmark);
 
   SDL_SetRelativeMouseMode(SDL_FALSE);
 }
@@ -614,6 +651,35 @@ void IntrinsicEd::onCreateSphere()
   Components::MeshManager::createResources(meshComponentsToCreate);
 }
 
+void IntrinsicEd::onCreateLight()
+{
+  Components::LightRefArray lightComponentsToCreate;
+
+  {
+    Entity::EntityRef entityRef =
+        Entity::EntityManager::createEntity(_N(Light));
+    Components::NodeRef nodeRef =
+        Components::NodeManager::createNode(entityRef);
+    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
+    Components::LightRef lightRef =
+        Components::LightManager::createLight(entityRef);
+    lightComponentsToCreate.push_back(lightRef);
+    Components::LightManager::resetToDefault(lightRef);
+
+    Components::CameraRef activeCamera = World::getActiveCamera();
+    Components::NodeRef cameraNode =
+        Components::NodeManager::getComponentForEntity(
+            Components::CameraManager::_entity(activeCamera));
+
+    Components::NodeManager::_position(nodeRef) =
+        Components::NodeManager::_worldPosition(cameraNode) +
+        Components::CameraManager::_forward(activeCamera) * 10.0f;
+    GameStates::Editing::_currentlySelectedEntity = entityRef;
+  }
+
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+}
+
 void IntrinsicEd::onGridSizeChanged(double p_Value)
 {
   GameStates::Editing::_gridSize = (float)p_Value;
@@ -629,26 +695,28 @@ void IntrinsicEd::onCameraSpeedChanged(double p_Value)
   GameStates::Editing::_cameraSpeed = (float)p_Value;
 }
 
+void IntrinsicEd::onTimeModChanged(double p_Value)
+{
+  TaskManager::_timeModulator = p_Value;
+}
+
+void IntrinsicEd::onOpenMicroprofile()
+{
+  QDesktopServices::openUrl(QUrl("http://127.0.0.1:1338"));
+}
+
 void updateStatusBar(QStatusBar* p_StatusBar)
 {
   static float timeSinceLastStatusBarUpdate = 0.0f;
-  static uint32_t frameIdx = 0u;
-  static float lastDeltaTs[60] = {};
-
-  lastDeltaTs[frameIdx] = TaskManager::_lastDeltaT;
-
-  float smoothedDeltaT = 0.0f;
-  for (uint32_t i = 0u; i < 60u; ++i)
-  {
-    smoothedDeltaT += lastDeltaTs[i];
-  }
-  smoothedDeltaT /= 60.0f;
 
   if (timeSinceLastStatusBarUpdate > 0.1f)
   {
     QColor color;
 
-    const float fps = 1.0f / smoothedDeltaT;
+    static float smoothedDeltaT = 0.0f;
+    smoothedDeltaT = (smoothedDeltaT + TaskManager::_lastDeltaT) / 2.0f;
+
+    const float fps = std::round(1.0f / smoothedDeltaT);
 
     if (fps >= 60.0f)
       color.setRgb(0, 255, 0);
@@ -661,9 +729,9 @@ void updateStatusBar(QStatusBar* p_StatusBar)
     palette.setColor(QPalette::WindowText, color);
     p_StatusBar->setPalette(palette);
 
-    _INTR_STRING statucBarText =
-        StringUtil::toString<float>(1.0f / smoothedDeltaT) + " FPS / " +
-        StringUtil::toString<float>(smoothedDeltaT * 1000.0f) + " ms";
+    _INTR_STRING statucBarText = StringUtil::toString<float>(fps) + " FPS / " +
+                                 StringUtil::toString<float>(smoothedDeltaT) +
+                                 " ms";
     p_StatusBar->showMessage(statucBarText.c_str());
     timeSinceLastStatusBarUpdate = 0.0f;
   }
@@ -671,8 +739,6 @@ void updateStatusBar(QStatusBar* p_StatusBar)
   {
     timeSinceLastStatusBarUpdate += TaskManager::_lastDeltaT;
   }
-
-  frameIdx = (frameIdx + 1u) % 60u;
 }
 
 void IntrinsicEd::closeEvent(QCloseEvent*)
@@ -680,238 +746,6 @@ void IntrinsicEd::closeEvent(QCloseEvent*)
   _viewport = nullptr;
 
   Application::shutdown();
-}
-
-struct SpawnVegetationDesc
-{
-  _INTR_ARRAY(Name) meshNames;
-  Name terrainName;
-  Name nodeName;
-
-  float minDist = 0.25f;
-  float density = 0.25f;
-  float slopeThreshold = 0.8f;
-  float seaLevel = 300.0f;
-  float mountainLevel = 1000.0f;
-  float noiseScale = 1.0f / 8000.0f;
-  float noiseOffset = 0.0f;
-  float noiseThreshold = -1.0f;
-  float minScale = 6.0f;
-  float maxScale = 8.0f;
-  float normalWeight = 0.4f;
-};
-
-void spawnVegetation(const SpawnVegetationDesc& p_Desc)
-{
-  Entity::EntityRef terrainEntityRef =
-      Entity::EntityManager::getEntityByName(p_Desc.terrainName);
-
-  if (!terrainEntityRef.isValid())
-    return;
-
-  Components::MeshRef terrainMeshRef =
-      Components::MeshManager::getComponentForEntity(terrainEntityRef);
-
-  if (!terrainMeshRef.isValid())
-    return;
-
-  Components::NodeRef terrainNodeRef =
-      Components::NodeManager::getComponentForEntity(terrainEntityRef);
-
-  if (!terrainNodeRef.isValid())
-    return;
-
-  const Name meshName = Components::MeshManager::_descMeshName(terrainMeshRef);
-  Resources::MeshRef meshResRef =
-      Resources::MeshManager::_getResourceByName(meshName);
-
-  if (!meshResRef.isValid() ||
-      Resources::MeshManager::_descIndicesPerSubMesh(meshResRef).empty())
-    return;
-
-  _INTR_ARRAY(uint32_t)& indices =
-      Resources::MeshManager::_descIndicesPerSubMesh(meshResRef)[0u];
-  _INTR_ARRAY(glm::vec3)& positions =
-      Resources::MeshManager::_descPositionsPerSubMesh(meshResRef)[0u];
-  _INTR_ARRAY(glm::vec3)& normals =
-      Resources::MeshManager::_descNormalsPerSubMesh(meshResRef)[0u];
-
-  Components::MeshRefArray meshComponentsToCreate;
-  Components::RigidBodyRefArray rigidBodyComponentsToCreate;
-
-  uint32_t spawnedTreeCount = 0u;
-
-  Components::NodeRef spawnedTreesNode;
-  Entity::EntityRef spawnedTreesEntity =
-      Entity::EntityManager::getEntityByName(p_Desc.nodeName);
-
-  if (!spawnedTreesEntity.isValid())
-  {
-    spawnedTreesEntity = Entity::EntityManager::createEntity(p_Desc.nodeName);
-    spawnedTreesNode = Components::NodeManager::createNode(spawnedTreesEntity);
-    Components::NodeManager::attachChild(World::getRootNode(),
-                                         spawnedTreesNode);
-    Components::NodeManager::updateTransforms({spawnedTreesNode});
-  }
-  else
-  {
-    spawnedTreesNode =
-        Components::NodeManager::getComponentForEntity(spawnedTreesEntity);
-  }
-
-  const glm::mat4& worldMatrix =
-      Components::NodeManager::_worldMatrix(terrainNodeRef);
-
-  for (uint32_t i = 0u; i < indices.size(); i += 3)
-  {
-    const uint32_t i0 = indices[i];
-    const uint32_t i1 = indices[i + 1u];
-    const uint32_t i2 = indices[i + 2u];
-
-    const glm::vec3 pos0 = glm::vec4(positions[i0], 1.0f);
-    const glm::vec3 pos1 = glm::vec4(positions[i1], 1.0f);
-    const glm::vec3 pos2 = glm::vec4(positions[i2], 1.0f);
-
-    const glm::vec3 n0 = glm::vec4(normals[i0], 1.0f);
-    const glm::vec3 n1 = glm::vec4(normals[i1], 1.0f);
-    const glm::vec3 n2 = glm::vec4(normals[i2], 1.0f);
-
-    const glm::vec3 b = Math::calcRandomBaryCoords();
-    const glm::vec3 pos =
-        worldMatrix *
-        glm::vec4(Math::baryInterpolate(b, pos0, pos1, pos2), 1.0f);
-    const glm::vec3 norm = glm::normalize(glm::vec3(
-        worldMatrix * glm::vec4(Math::baryInterpolate(b, n0, n1, n2), 1.0f)));
-    const glm::vec3 normWeighted = glm::mix(
-        norm, glm::vec3(0.0f, 1.0f, 0.0f),
-        (1.0f - p_Desc.normalWeight) * Math::calcRandomFloatMinMax(0.0f, 1.0f));
-
-    if (pos.y < p_Desc.seaLevel || pos.y > p_Desc.mountainLevel)
-      continue;
-
-    const float slope = glm::dot(norm, glm::vec3(0.0f, 1.0f, 0.0f));
-    const float dens = Math::calcRandomFloatMinMax(0.0f, 1.0f);
-    const float noise =
-        Math::noise(pos * p_Desc.noiseScale) + p_Desc.noiseOffset;
-
-    if (dens > p_Desc.density && slope > p_Desc.slopeThreshold &&
-        noise > p_Desc.noiseThreshold)
-    {
-      const glm::vec3 finalPos = pos;
-      const glm::quat finalOrient =
-          glm::rotation(glm::vec3(0.0f, 1.0f, 0.0f), normWeighted) *
-          glm::quat(glm::vec3(
-              0.0f, Math::calcRandomFloatMinMax(0.0f, glm::pi<float>() * 2.0f),
-              0.0f));
-      const glm::vec3 finalSize = glm::vec3(
-          Math::calcRandomFloatMinMax(p_Desc.minScale, p_Desc.maxScale));
-      const Name newVegMeshName =
-          p_Desc.meshNames[Math::calcRandomNumber() % p_Desc.meshNames.size()];
-      const glm::vec3 newTreeHalfExtent =
-          Math::calcAABBHalfExtent(Resources::MeshManager::_aabbPerSubMesh(
-              Resources::MeshManager::_getResourceByName(newVegMeshName))[0]);
-      const float newTreeRadius =
-          finalSize.x *
-          glm::length(glm::vec2(newTreeHalfExtent.x, newTreeHalfExtent.z));
-
-      bool invalid = false;
-
-      const glm::vec2 finalPosXz = glm::vec2(finalPos.x, finalPos.z);
-      for (uint32_t vegNodeIdx = 0u;
-           vegNodeIdx < Components::NodeManager::getActiveResourceCount();
-           ++vegNodeIdx)
-      {
-        Components::NodeRef vegNodeRef =
-            Components::NodeManager::getActiveResourceAtIndex(vegNodeIdx);
-
-        if (Components::NodeManager::_parent(vegNodeRef) != spawnedTreesNode)
-          continue;
-
-        const glm::vec2 worldPosXz =
-            glm::vec2(Components::NodeManager::_worldPosition(vegNodeRef).x,
-                      Components::NodeManager::_worldPosition(vegNodeRef).z);
-        const glm::vec3 halfExtents = Math::calcAABBHalfExtent(
-            Components::NodeManager::_worldAABB(vegNodeRef));
-        const float nodeRadius =
-            glm::length(glm::vec2(halfExtents.x, halfExtents.z));
-
-        if (glm::distance(worldPosXz, finalPosXz) <
-            (nodeRadius + newTreeRadius) * p_Desc.minDist)
-        {
-          invalid = true;
-          break;
-        }
-      }
-
-      if (invalid)
-        continue;
-
-      // Create random veg.
-      {
-        Entity::EntityRef entityRef = Entity::EntityManager::createEntity(
-            p_Desc.nodeName._string +
-            StringUtil::toString<uint32_t>(spawnedTreeCount));
-        Components::NodeRef nodeRef =
-            Components::NodeManager::createNode(entityRef);
-        Components::NodeManager::attachChild(spawnedTreesNode, nodeRef);
-
-        Components::MeshRef meshRef =
-            Components::MeshManager::createMesh(entityRef);
-        meshComponentsToCreate.push_back(meshRef);
-        Components::MeshManager::_descMeshName(meshRef) = newVegMeshName;
-
-        // Components::RigidBodyRef rigidBodyRef =
-        // Components::RigidBodyManager::createRigidBody(entityRef);
-        // rigidBodyComponentsToCreate.push_back(rigidBodyRef);
-        // Components::RigidBodyManager::_descRigidBodyType(rigidBodyRef) =
-        // Components::RigidBodyType::kBoxKinematic;
-
-        Components::NodeManager::_position(nodeRef) = finalPos;
-        Components::NodeManager::_orientation(nodeRef) = finalOrient;
-        Components::NodeManager::_size(nodeRef) = finalSize;
-
-        Components::NodeManager::updateTransforms({nodeRef});
-      }
-
-      ++spawnedTreeCount;
-    }
-  }
-
-  Components::NodeManager::rebuildTree();
-  Components::MeshManager::createResources(meshComponentsToCreate);
-  Components::RigidBodyManager::createResources(rigidBodyComponentsToCreate);
-}
-
-void IntrinsicEd::onSpawnVegetation()
-{
-  SpawnVegetationDesc desc;
-  desc.meshNames = {"Birch_01_24",      "Birch_02_26",     "Tree_Tall_01_8",
-                    "Tree_Tall_02_10",  "Tree_Tall_04_12", "Tree_Tall_05_14",
-                    "Tree_Trunk_01_70", "Spruce_01_52",    "Spruce_Tall_01_55",
-                    "Fir_01_49"};
-  desc.terrainName = _N(Terrain);
-  desc.nodeName = _N(SpawnedTrees);
-
-  spawnVegetation(desc);
-}
-
-void IntrinsicEd::onSpawnGrass()
-{
-  SpawnVegetationDesc desc;
-  desc.minDist = 0.0f;
-  desc.density = 0.0f;
-  desc.noiseThreshold = 0.0f;
-
-  desc.meshNames = {
-      "Bush_01_115",        "Bush_02_118",        "Fern_01_58",
-      "Fern_02_61",         "Fern_03_121",        "Fern_04_124",
-      "Grass_01_64",        "Grass_02_23",        "Grass_Tall_112",
-      "Ground_Plant_01_31", "Ground_Plant_02_33", "Ground_Plant_03_35",
-      "Ground_Plant_04_37", "Ground_Plant_05_39"};
-  desc.terrainName = _N(Terrain);
-  desc.nodeName = _N(SpawnedGrass);
-
-  spawnVegetation(desc);
 }
 
 void IntrinsicEd::onShowDebugContextMenu()
@@ -953,6 +787,49 @@ void IntrinsicEd::onDebugGeometryChanged()
         ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
             kWorldBoundingSpheres;
   }
+
+  if (_ui.actionShow_Benchmark_Paths->isChecked())
+  {
+    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags |=
+        Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
+            kBenchmarkPaths;
+  }
+  else
+  {
+    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags &=
+        ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
+            kBenchmarkPaths;
+  }
+}
+
+void IntrinsicEd::onCompileShaders()
+{
+  Intrinsic::Renderer::Vulkan::Resources::GpuProgramManager::
+      compileAllShaders();
+}
+
+void IntrinsicEd::onRecompileShaders()
+{
+  Intrinsic::Renderer::Vulkan::Resources::GpuProgramManager::compileAllShaders(
+      true);
+}
+
+void IntrinsicEd::onSettingsFileChanged(const QString&)
+{
+  _settingsUpdatePending = true;
+}
+
+void IntrinsicEd::updateSettingsChangeWatch()
+{
+  QStringList files = _settingsChangeWatch->files();
+  if (!files.empty())
+    _settingsChangeWatch->removePaths(files);
+
+  _settingsChangeWatch->addPath("settings.json");
+  _settingsChangeWatch->addPath(QString("config/") +
+                                Settings::Manager::_rendererConfig.c_str());
+  _settingsChangeWatch->addPath(QString("config/") +
+                                Settings::Manager::_materialPassConfig.c_str());
 }
 
 int IntrinsicEd::enterMainLoop()
@@ -963,6 +840,15 @@ int IntrinsicEd::enterMainLoop()
 
     TaskManager::executeTasks();
     updateStatusBar(_ui.statusBar);
+    _propertyView->updatePropertyView();
+
+    if (_settingsUpdatePending)
+    {
+      Settings::Manager::loadSettings();
+      updateSettingsChangeWatch();
+      Vulkan::RenderSystem::onViewportChanged();
+      _settingsUpdatePending = false;
+    }
   }
 
   return 0;

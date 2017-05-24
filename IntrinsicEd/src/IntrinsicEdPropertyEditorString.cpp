@@ -23,9 +23,8 @@ IntrinsicEdPropertyEditorString::IntrinsicEdPropertyEditorString(
     rapidjson::Document* p_Document, rapidjson::Value* p_CurrentProperties,
     rapidjson::Value* p_CurrentProperty, const char* p_PropertyName,
     QWidget* parent)
-    : QWidget(parent), _property(p_CurrentProperty),
-      _properties(p_CurrentProperties), _propertyName(p_PropertyName),
-      _document(p_Document)
+    : IntrinsicEdPropertyEditorBase(p_Document, p_CurrentProperties,
+                                    p_CurrentProperty, p_PropertyName, parent)
 {
   _ui.setupUi(this);
   updateFromProperty();
@@ -46,7 +45,13 @@ void IntrinsicEdPropertyEditorString::updateFromProperty()
     _ui.value->setReadOnly(true);
   }
 
-  _ui.value->setText(prop["value"].GetString());
+  if (_ui.value->text().toStdString().c_str() != prop["value"] &&
+      !_ui.value->hasFocus())
+  {
+    _ui.value->blockSignals(true);
+    _ui.value->setText(prop["value"].GetString());
+    _ui.value->blockSignals(false);
+  }
 
   _ui.propertyTitle->setText(_propertyName.c_str());
 }
@@ -56,8 +61,11 @@ void IntrinsicEdPropertyEditorString::onValueChanged()
   _INTR_ASSERT(_property);
   rapidjson::Value& prop = *_property;
 
-  prop["value"].SetString(_ui.value->text().toStdString().c_str(),
-                          _document->GetAllocator());
+  if (_ui.value->text().toStdString().c_str() != prop["value"])
+  {
+    prop["value"].SetString(_ui.value->text().toStdString().c_str(),
+                            _document->GetAllocator());
 
-  emit valueChanged(*_properties);
+    emit valueChanged(*_properties);
+  }
 }

@@ -1,0 +1,10 @@
+{
+    "name": "debug_line.vert",
+    "properties": {
+        "name": "debug_line.vert",
+        "gpuProgramName": "debug_line.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 0
+    }
+}

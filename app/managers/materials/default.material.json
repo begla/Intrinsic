@@ -1,0 +1,30 @@
+{
+    "name": "default",
+    "properties": {
+        "name": "default",
+        "materialPassMask": [
+            "GBufferDefault",
+            "Shadow",
+            "PerPixelPicking"
+        ],
+        "albedoTextureName": "checkerboard",
+        "emissiveTextureName": "white",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 1.0,
+        "emissiveIntensity": 0.0,
+        "normalTextureName": "default_NRM",
+        "pbrTextureName": "default_PBR",
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": 0.0
+    }
+}

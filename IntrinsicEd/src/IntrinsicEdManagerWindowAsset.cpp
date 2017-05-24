@@ -28,8 +28,9 @@ IntrinsicEdManagerWindowAsset::IntrinsicEdManagerWindowAsset(QWidget* parent)
       Application::_resourcePropertyCompilerMapping[_N(Asset)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(Asset)];
   _resourceIcon = QIcon(":/Icons/asset");
-  _managerFilePath = "managers/Asset.manager.json";
   _resourceName = "Asset";
+  _managerPath = "managers/assets/";
+  _managerExtension = ".asset.json";
 
   _assetChangeWatch = new QFileSystemWatcher(this);
   QObject::connect(_assetChangeWatch, SIGNAL(fileChanged(const QString&)), this,
@@ -39,7 +40,8 @@ IntrinsicEdManagerWindowAsset::IntrinsicEdManagerWindowAsset(QWidget* parent)
   QObject::connect(&_assetRecompileTimer, SIGNAL(timeout()),
                    SLOT(onCompileQueuedAssets()));
 
-  _assetRecompileTimer.setSingleShot(true);
+  _assetRecompileTimer.setInterval(16);
+  _assetRecompileTimer.start();
 
   onPopulateResourceTree();
 }
@@ -81,7 +83,7 @@ void IntrinsicEdManagerWindowAsset::onPopulateResourceTree()
     _INTR_ASSERT(assetEntry.isValid());
 
     rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-    _propertyCompilerEntry.compileFunction(assetEntry, properties, doc);
+    _propertyCompilerEntry.compileFunction(assetEntry, true, properties, doc);
 
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0, properties["name"]["value"].GetString());
@@ -96,15 +98,10 @@ void IntrinsicEdManagerWindowAsset::onPopulateResourceTree()
     {
       meshes->addChild(item);
     }
-    else if (
-        AssetManager::_descAssetType(assetEntry) ==
-            Intrinsic::AssetManagement::Resources::AssetType::kColorTexture ||
-        AssetManager::_descAssetType(assetEntry) ==
-            Intrinsic::AssetManagement::Resources::AssetType::kAlphaTexture ||
-        AssetManager::_descAssetType(assetEntry) ==
-            Intrinsic::AssetManagement::Resources::AssetType::kNormalTexture ||
-        AssetManager::_descAssetType(assetEntry) ==
-            Intrinsic::AssetManagement::Resources::AssetType::kHdrTexture)
+    else if (AssetManager::_descAssetType(assetEntry) >=
+                 AssetType::kTexturesBegin &&
+             AssetManager::_descAssetType(assetEntry) <=
+                 AssetType::kTexturesEnd)
     {
       textures->addChild(item);
     }
@@ -138,6 +135,26 @@ void IntrinsicEdManagerWindowAsset::initContextMenu(QMenu* p_ContextMenu)
     QObject::connect(compileAsset, SIGNAL(triggered()), this,
                      SLOT(onCompileAsset()));
   }
+  else if (currIt->text(0u) == "Textures")
+  {
+    p_ContextMenu->addSeparator();
+
+    QAction* compileAsset =
+        new QAction(QIcon(":/Icons/asset"), "Compile All Textures", this);
+    p_ContextMenu->addAction(compileAsset);
+    QObject::connect(compileAsset, SIGNAL(triggered()), this,
+                     SLOT(onCompileAllTextures()));
+  }
+  else if (currIt->text(0u) == "Meshes")
+  {
+    p_ContextMenu->addSeparator();
+
+    QAction* compileAsset =
+        new QAction(QIcon(":/Icons/asset"), "Compile All Meshes", this);
+    p_ContextMenu->addAction(compileAsset);
+    QObject::connect(compileAsset, SIGNAL(triggered()), this,
+                     SLOT(onCompileAllMeshes()));
+  }
 }
 
 void IntrinsicEdManagerWindowAsset::onCompileAsset()
@@ -151,7 +168,41 @@ void IntrinsicEdManagerWindowAsset::onCompileAsset()
                   resource) == _assetsToRecompile.end())
     {
       _assetsToRecompile.push_back(resource);
-      _assetRecompileTimer.start(100);
+    }
+  }
+}
+
+void IntrinsicEdManagerWindowAsset::onCompileAllTextures()
+{
+  for (uint32_t i = 0u; i < AssetManager::getActiveResourceCount(); ++i)
+  {
+    AssetRef ref = AssetManager::getActiveResourceAtIndex(i);
+
+    if (AssetManager::_descAssetType(ref) >= AssetType::kTexturesBegin &&
+        AssetManager::_descAssetType(ref) <= AssetType::kTexturesEnd)
+    {
+      if (std::find(_assetsToRecompile.begin(), _assetsToRecompile.end(),
+                    ref) == _assetsToRecompile.end())
+      {
+        _assetsToRecompile.push_back(ref);
+      }
+    }
+  }
+}
+
+void IntrinsicEdManagerWindowAsset::onCompileAllMeshes()
+{
+  for (uint32_t i = 0u; i < AssetManager::getActiveResourceCount(); ++i)
+  {
+    AssetRef ref = AssetManager::getActiveResourceAtIndex(i);
+
+    if (AssetManager::_descAssetType(ref) == AssetType::kMesh)
+    {
+      if (std::find(_assetsToRecompile.begin(), _assetsToRecompile.end(),
+                    ref) == _assetsToRecompile.end())
+      {
+        _assetsToRecompile.push_back(ref);
+      }
     }
   }
 }
@@ -159,7 +210,6 @@ void IntrinsicEdManagerWindowAsset::onCompileAsset()
 void IntrinsicEdManagerWindowAsset::onAssetChanged(const QString& p_FileName)
 {
   // Recompile assets
-
   for (uint32_t i = 0u; i < AssetManager::getActiveResourceCount(); ++i)
   {
     AssetRef assetRef = AssetManager::getActiveResourceAtIndex(i);
@@ -177,8 +227,6 @@ void IntrinsicEdManagerWindowAsset::onAssetChanged(const QString& p_FileName)
       }
     }
   }
-
-  _assetRecompileTimer.start(1000);
 }
 
 void IntrinsicEdManagerWindowAsset::onResourceTreePopulated()
@@ -198,10 +246,8 @@ void IntrinsicEdManagerWindowAsset::onResourceTreePopulated()
           QString(Settings::Manager::_assetMeshPath.c_str()) + "/" +
           AssetManager::_descAssetFileName(ref).c_str());
     }
-    else if (AssetManager::_descAssetType(ref) == AssetType::kColorTexture ||
-             AssetManager::_descAssetType(ref) == AssetType::kAlphaTexture ||
-             AssetManager::_descAssetType(ref) == AssetType::kHdrTexture ||
-             AssetManager::_descAssetType(ref) == AssetType::kNormalTexture)
+    else if (AssetManager::_descAssetType(ref) >= AssetType::kTexturesBegin &&
+             AssetManager::_descAssetType(ref) <= AssetType::kTexturesEnd)
     {
       _assetChangeWatch->addPath(
           QString(Settings::Manager::_assetTexturePath.c_str()) + "/" +
@@ -214,9 +260,21 @@ void IntrinsicEdManagerWindowAsset::onCompileQueuedAssets()
 {
   Intrinsic::AssetManagement::Resources::AssetManager::compileAssets(
       _assetsToRecompile);
-  _assetsToRecompile.clear();
 
-  onResourceTreePopulated();
+  if (!_assetsToRecompile.empty())
+  {
+    // TODO: Update only the assets which are affected by a changed asset
+    Vulkan::Resources::DrawCallManager::destroyResources(
+        Vulkan::Resources::DrawCallManager::_activeRefs);
+    Vulkan::Resources::DrawCallManager::createResources(
+        Vulkan::Resources::DrawCallManager::_activeRefs);
+    Vulkan::Resources::ComputeCallManager::destroyResources(
+        Vulkan::Resources::ComputeCallManager::_activeRefs);
+    Vulkan::Resources::ComputeCallManager::createResources(
+        Vulkan::Resources::ComputeCallManager::_activeRefs);
+
+    _assetsToRecompile.clear();
+  }
 }
 
 void IntrinsicEdManagerWindowAsset::dragEnterEvent(QDragEnterEvent* event)
@@ -253,7 +311,11 @@ void IntrinsicEdManagerWindowAsset::dropEvent(QDropEvent* event)
         }
         else if (extension == ".TGA" || extension == ".tga")
         {
-          assetType = AssetType::kColorTexture;
+          assetType = AssetType::kAlbedoTexture;
+        }
+        else if (extension == ".dds")
+        {
+          assetType = AssetType::kHdrTexture;
         }
 
         if (assetType != AssetType::kNone)
@@ -270,7 +332,7 @@ void IntrinsicEdManagerWindowAsset::dropEvent(QDropEvent* event)
       else
       {
         QTreeWidgetItem* item = _resourceToItemMapping[existingAsset];
-        item->setSelected(true);
+        _ui.resourceView->setCurrentItem(item);
         item->parent()->setExpanded(true);
         onItemSelected(item, nullptr);
       }
@@ -281,7 +343,7 @@ void IntrinsicEdManagerWindowAsset::dropEvent(QDropEvent* event)
       onPopulateResourceTree();
       QTreeWidgetItem* item = _resourceToItemMapping[lastCreatedAsset];
 
-      item->setSelected(true);
+      _ui.resourceView->setCurrentItem(item);
       item->parent()->setExpanded(true);
       onItemSelected(item, nullptr);
     }

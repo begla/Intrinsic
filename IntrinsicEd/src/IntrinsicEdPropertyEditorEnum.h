@@ -17,7 +17,7 @@
 // UI related includes
 #include "ui_IntrinsicEdPropertyEditorEnum.h"
 
-class IntrinsicEdPropertyEditorEnum : public QWidget
+class IntrinsicEdPropertyEditorEnum : public IntrinsicEdPropertyEditorBase
 {
   Q_OBJECT
 
@@ -39,8 +39,4 @@ private:
   void updateFromProperty();
 
   Ui::IntrinsicEdPropertyEditorEnumClass _ui;
-  rapidjson::Value* _property;
-  rapidjson::Value* _properties;
-  rapidjson::Document* _document;
-  _INTR_STRING _propertyName;
 };

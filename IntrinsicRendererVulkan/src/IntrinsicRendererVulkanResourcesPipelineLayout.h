@@ -78,12 +78,14 @@ struct PipelineLayoutManager
   }
 
   _INTR_INLINE static void compileDescriptor(PipelineLayoutRef p_Ref,
+                                             bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
     Dod::Resources::ResourceManagerBase<
         PipelineLayoutData,
         _INTR_MAX_PIPELINE_LAYOUT_COUNT>::_compileDescriptor(p_Ref,
+                                                             p_GenerateDesc,
                                                              p_Properties,
                                                              p_Document);
   }
@@ -120,37 +122,19 @@ struct PipelineLayoutManager
     createResources(_activeRefs);
   }
 
-  static void createResources(const PipelineLayoutRefArray& p_Pipelinelayouts);
+  static void createResources(const PipelineLayoutRefArray& p_PipelineLayouts);
+  static void destroyResources(const PipelineLayoutRefArray& p_PipelineLayouts);
 
-  _INTR_INLINE static void
-  destroyResources(const PipelineLayoutRefArray& p_Pipelinelayouts)
+  // <-
+
+  _INTR_INLINE static void destroyPipelineLayoutsAndResources(
+      const PipelineLayoutRefArray& p_PipelineLayouts)
   {
-    for (uint32_t i = 0u; i < p_Pipelinelayouts.size(); ++i)
+    destroyResources(p_PipelineLayouts);
+
+    for (uint32_t i = 0u; i < p_PipelineLayouts.size(); ++i)
     {
-      PipelineLayoutRef ref = p_Pipelinelayouts[i];
-
-      VkPipelineLayout& pipelineLayout = _vkPipelineLayout(ref);
-      if (pipelineLayout != VK_NULL_HANDLE)
-      {
-        vkDestroyPipelineLayout(RenderSystem::_vkDevice, pipelineLayout,
-                                nullptr);
-        pipelineLayout = VK_NULL_HANDLE;
-      }
-
-      VkDescriptorSetLayout& descSetLayout = _vkDescriptorSetLayout(ref);
-      if (descSetLayout != VK_NULL_HANDLE)
-      {
-        vkDestroyDescriptorSetLayout(RenderSystem::_vkDevice, descSetLayout,
-                                     nullptr);
-        descSetLayout = VK_NULL_HANDLE;
-      }
-
-      VkDescriptorPool& descPool = _vkDescriptorPool(ref);
-      if (descPool != VK_NULL_HANDLE)
-      {
-        vkDestroyDescriptorPool(RenderSystem::_vkDevice, descPool, nullptr);
-        descPool = VK_NULL_HANDLE;
-      }
+      destroyPipelineLayout(p_PipelineLayouts[i]);
     }
   }
 

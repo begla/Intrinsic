@@ -42,12 +42,9 @@ IntrinsicEdManagerWindowBase::IntrinsicEdManagerWindowBase(QWidget* parent)
                    this, SLOT(onItemChanged(QTreeWidgetItem*, int)));
 
   _ui.propertyView->setFeatures(0);
-  _ui.splitter->setStretchFactor(0, 1);
-  _ui.splitter->setStretchFactor(1, 2);
   _ui.resourceView->setSortingEnabled(true);
   _ui.resourceView->sortByColumn(0u, Qt::AscendingOrder);
   _resourceName = "Resource";
-  setWindowFlags(Qt::WindowStaysOnTopHint);
 }
 
 void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
@@ -78,7 +75,7 @@ void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
     _INTR_ASSERT(resource.isValid());
 
     rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-    _propertyCompilerEntry.compileFunction(resource, properties, doc);
+    _propertyCompilerEntry.compileFunction(resource, true, properties, doc);
 
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0, properties["name"]["value"].GetString());
@@ -120,7 +117,7 @@ void IntrinsicEdManagerWindowBase::onItemChanged(QTreeWidgetItem* item,
     Dod::Ref resource = _itemToResourceMapping[item];
 
     rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-    _propertyCompilerEntry.compileFunction(resource, properties, doc);
+    _propertyCompilerEntry.compileFunction(resource, true, properties, doc);
 
     if (strcmp(properties["name"]["value"].GetString(),
                item->text(0).toStdString().c_str()) != 0)
@@ -156,7 +153,7 @@ IntrinsicEdManagerWindowBase::makeResourceNameUnique(const char* p_Name)
           _resourceManagerEntry.getActiveResourceAtIndexFunction(i);
 
       rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
-      _propertyCompilerEntry.compileFunction(resource, properties, doc);
+      _propertyCompilerEntry.compileFunction(resource, true, properties, doc);
 
       if (properties["name"]["value"].GetString() == newResourceName)
       {
@@ -209,8 +206,8 @@ void IntrinsicEdManagerWindowBase::onCloneResource()
     rapidjson::Document doc;
     rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
 
-    _propertyCompilerEntry.compileFunction(templateResourceRef, properties,
-                                           doc);
+    _propertyCompilerEntry.compileFunction(templateResourceRef, true,
+                                           properties, doc);
     properties["name"]["value"].SetString(
         makeResourceNameUnique(properties["name"]["value"].GetString()).c_str(),
         doc.GetAllocator());

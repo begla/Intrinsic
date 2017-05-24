@@ -39,6 +39,17 @@ enum Flags
 };
 }
 
+namespace PresentMode
+{
+enum Enum
+{
+  kImmediate,  // = VK_PRESENT_MODE_IMMEDIATE_KHR
+  kMailbox,    // = VK_PRESENT_MODE_MAILBOX_KHR
+  kFifo,       // = VK_PRESENT_MODE_FIFO_KHR
+  kFifoRelaxed // = VK_PRESENT_MODE_FIFO_RELAXED_KHR
+};
+}
+
 struct Manager
 {
   static void loadSettings();
@@ -53,6 +64,14 @@ struct Manager
   static WindowMode::Enum _windowMode;
   static uint32_t _screenResolutionWidth;
   static uint32_t _screenResolutionHeight;
+  static PresentMode::Enum _presentMode;
+  static uint32_t _initialGameState;
+
+  static float _controllerDeadZone;
+  static bool _invertHorizontalCameraAxis;
+  static bool _invertVerticalCameraAxis;
+  static _INTR_STRING _rendererConfig;
+  static _INTR_STRING _materialPassConfig;
 };
 }
 }
