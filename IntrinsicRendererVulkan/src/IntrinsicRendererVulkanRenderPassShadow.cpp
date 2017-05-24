@@ -164,24 +164,15 @@ void Shadow::init()
   RenderPassRefArray renderPassesToCreate;
   ImageRefArray imagesToCreate;
 
-
   // Render passes
   {
     _renderPassRef = RenderPassManager::createRenderPass(_N(Shadow));
     RenderPassManager::resetToDefault(_renderPassRef);
 
-<<<<<<< HEAD
-	
-
-    AttachmentDescription shadowBufferAttachment = 
-	{
-		Vulkan::RenderSystem::_depthBufferFormat,
-=======
     AttachmentDescription shadowBufferAttachment = {
         (uint8_t)RenderSystem::_depthStencilFormatToUse,
->>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
         AttachmentFlags::kClearOnLoad | AttachmentFlags::kClearStencilOnLoad};
-		RenderPassManager::_descAttachments(_renderPassRef)
+    RenderPassManager::_descAttachments(_renderPassRef)
         .push_back(shadowBufferAttachment);
   }
   renderPassesToCreate.push_back(_renderPassRef);
@@ -199,12 +190,8 @@ void Shadow::init()
         Dod::Resources::ResourceFlags::kResourceVolatile);
 
     ImageManager::_descDimensions(_shadowBufferImageRef) = dim;
-<<<<<<< HEAD
-    ImageManager::_descImageFormat(_shadowBufferImageRef) = Vulkan::RenderSystem::_depthBufferFormat;
-=======
     ImageManager::_descImageFormat(_shadowBufferImageRef) =
         RenderSystem::_depthStencilFormatToUse;
->>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
     ImageManager::_descImageType(_shadowBufferImageRef) = ImageType::kTexture;
     ImageManager::_descArrayLayerCount(_shadowBufferImageRef) =
         _INTR_MAX_SHADOW_MAP_COUNT;

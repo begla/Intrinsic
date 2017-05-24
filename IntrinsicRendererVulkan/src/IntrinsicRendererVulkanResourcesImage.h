@@ -270,12 +270,6 @@ struct ImageManager
       VkPipelineStageFlags p_SrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
       VkPipelineStageFlags p_DstStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT)
   {
-<<<<<<< HEAD
-
-    VkImageSubresourceRange range;
-    range.aspectMask =
-        _descImageFormat(p_ImageRef) != Vulkan::RenderSystem::_depthBufferFormat//Format::kD24UnormS8UInt
-=======
     insertImageMemoryBarrier(RenderSystem::getPrimaryCommandBuffer(),
                              p_ImageRef, p_SrcImageLayout, p_DstImageLayout,
                              p_SrcStages, p_DstStages);
@@ -290,7 +284,6 @@ struct ImageManager
     VkImageSubresourceRange range;
     range.aspectMask =
         _descImageFormat(p_ImageRef) != RenderSystem::_depthStencilFormatToUse
->>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
             ? VK_IMAGE_ASPECT_COLOR_BIT
             : (VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
     range.baseMipLevel = 0u;
@@ -314,11 +307,7 @@ struct ImageManager
   {
     VkImageSubresourceRange range;
     range.aspectMask =
-<<<<<<< HEAD
-        _descImageFormat(p_ImageRef) != Vulkan::RenderSystem::_depthBufferFormat //Format::kD24UnormS8UInt
-=======
         _descImageFormat(p_ImageRef) != RenderSystem::_depthStencilFormatToUse
->>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
             ? VK_IMAGE_ASPECT_COLOR_BIT
             : (VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
     range.baseMipLevel = p_MipLevel;

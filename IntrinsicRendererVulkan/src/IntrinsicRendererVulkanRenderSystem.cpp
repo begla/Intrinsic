@@ -56,19 +56,7 @@ uint32_t RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex = (uint32_t)-1;
 
 uint32_t RenderSystem::_backbufferIndex = 0u;
 uint32_t RenderSystem::_activeBackbufferMask = 0u;
-<<<<<<< HEAD
-Format::Enum RenderSystem::_depthBufferFormat = Format::kD24UnormS8UInt;
-
-// <-
-
-LockFreeStack<Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT> RenderSystem::
-    _visibleDrawCallsPerMaterialPass[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT]
-                                    [MaterialPass::kCount];
-LockFreeStack<Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT>
-    RenderSystem::_visibleMeshComponents[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT];
-=======
 Format::Enum RenderSystem::_depthStencilFormatToUse = Format::kD32SFloat;
->>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
 
 // Private static members
 VkCommandPool RenderSystem::_vkPrimaryCommandPool;
@@ -144,12 +132,11 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     PipelineManager::createAllResources();
   }
 
-  // Init. swap chain, cmd buffers and get supported depth buffer
+  // Init. swap chain and cmd buffers
   {
     initOrUpdateVkSwapChain();
     initVkSynchronization();
     initVkCommandBuffers();
-	initVkSupportedDepthBufferFormat();
   }
 
   // Format setup
@@ -791,19 +778,6 @@ void RenderSystem::initOrUpdateVkSwapChain()
     bool found = false;
     for (uint32_t i = 0u; i < presentModeCount; ++i)
     {
-<<<<<<< HEAD
-		if (presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
-		{
-			presentModeToUse = VK_PRESENT_MODE_MAILBOX_KHR;
-			found = true;
-			break;
-		}
-		if ((presentModeToUse != VK_PRESENT_MODE_MAILBOX_KHR) && (presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR))
-		{
-			presentModeToUse = VK_PRESENT_MODE_IMMEDIATE_KHR;
-			found = true;
-		}
-=======
       _INTR_LOG_INFO("Present mode '%u' available...", presentModes[i]);
 
       if (presentModes[i] == presentModeToUse)
@@ -811,7 +785,6 @@ void RenderSystem::initOrUpdateVkSwapChain()
         _INTR_LOG_INFO("Using present mode '%u'...", presentModes[i]);
         found = true;
       }
->>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
     }
 
     if (!found)
@@ -1123,15 +1096,6 @@ void RenderSystem::initVkTempCommandBuffer()
                                     nullptr, &_vkTempCommandBufferFence);
     _INTR_VK_CHECK_RESULT(result);
   }
-}
-
-void RenderSystem::initVkSupportedDepthBufferFormat()
-{
-	if (!Intrinsic::Renderer::Vulkan::Helper::GetSupportedDepthFormat(Intrinsic::Renderer::Vulkan::RenderSystem::_vkPhysicalDevice, Vulkan::RenderSystem::_depthBufferFormat))
-	{
-		//Could not find optimal depth format
-		_INTR_ASSERT(false);
-	}
 }
 
 void RenderSystem::initVkCommandBuffers()

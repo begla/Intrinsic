@@ -206,18 +206,12 @@ void Debug::init()
     _renderPassRef = RenderPassManager::createRenderPass(_N(Debug));
     RenderPassManager::resetToDefault(_renderPassRef);
 
-
     AttachmentDescription albedoAttachment = {Format::kR16G16B16A16Float, 0u};
     AttachmentDescription normalAttachment = {Format::kR16G16B16A16Float, 0u};
     AttachmentDescription parameter0Attachment = {Format::kR16G16B16A16Float,
                                                   0u};
-<<<<<<< HEAD
-    AttachmentDescription depthStencilAttachment = { Vulkan::RenderSystem::_depthBufferFormat, //Format::kD24UnormS8UInt,
-                                                    0u};
-=======
     AttachmentDescription depthStencilAttachment = {
         (uint8_t)RenderSystem::_depthStencilFormatToUse, 0u};
->>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
 
     RenderPassManager::_descAttachments(_renderPassRef)
         .push_back(albedoAttachment);

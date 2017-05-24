@@ -67,17 +67,8 @@ void VertexLayoutManager::createResources(
       const VertexAttribute& vtxAttribute = vertexAttributes[i];
 
       {
-		VkFormat format = Helper::mapFormatToVkFormat((Format::Enum)vtxAttribute.format);
-		if (format == VK_FORMAT_R16G16B16_SFLOAT)
-		{
-			format = VK_FORMAT_R16G16B16A16_SFLOAT;
-		}
         vertexAttributeDesc.binding = vtxAttribute.binding;
         vertexAttributeDesc.location = vtxAttribute.location;
-<<<<<<< HEAD
-		vertexAttributeDesc.format = format;
-          
-=======
         vertexAttributeDesc.format =
             Helper::mapFormatToVkFormat((Format::Enum)vtxAttribute.format);
 
@@ -92,7 +83,6 @@ void VertexLayoutManager::createResources(
               "Vertex buffer format is not supported on this platform");
         }
 
->>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
         vertexAttributeDesc.offset = vtxAttribute.offset;
       }
     }

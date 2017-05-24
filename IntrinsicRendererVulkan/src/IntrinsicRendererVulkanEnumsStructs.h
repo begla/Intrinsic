@@ -185,7 +185,6 @@ enum Enum
   // Depth/Stencil
   kD24UnormS8UInt,
 
-
   // TODO: Clean this up
   kB8G8R8A8Srgb,
   kBC6UFloat,
@@ -193,13 +192,6 @@ enum Enum
   kBC3Srgb,
   kR32SFloat,
   kR32UInt,
-<<<<<<< HEAD
-
-  kD16UnormS8UInt,
-	kD32sFLOATs8UINT,
-	kD32sFLOAT,
-	kD16UNORM
-=======
   kD16UnormS8UInt,
   kD32SFloatS8UInt,
   kD32SFloat,
@@ -207,7 +199,6 @@ enum Enum
   kB10G11R11UFloat,
 
   kCount
->>>>>>> c38c40efd79533577cbe3d578b7b645b2afe767b
 };
 }
 
