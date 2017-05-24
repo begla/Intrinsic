@@ -727,10 +727,6 @@ void Lighting::onReinitRendering()
         ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
         Samplers::kLinearClamp);
     DrawCallManager::bindImage(
-        _drawCallRef, _N(irradianceTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(default_ibl_cube_irradiance)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
         _drawCallRef, _N(specularTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(default_ibl_cube_specular)),
         Samplers::kLinearClamp);
@@ -800,10 +796,6 @@ void Lighting::onReinitRendering()
     DrawCallManager::bindImage(
         _drawCallTransparentsRef, _N(kelvinLutTex), GpuProgramType::kFragment,
         ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallTransparentsRef, _N(irradianceTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(default_ibl_cube_irradiance)),
         Samplers::kLinearClamp);
     DrawCallManager::bindImage(
         _drawCallTransparentsRef, _N(specularTex), GpuProgramType::kFragment,

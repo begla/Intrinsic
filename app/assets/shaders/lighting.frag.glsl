@@ -45,28 +45,27 @@ layout (binding = 2) uniform sampler2D normalTex;
 layout (binding = 3) uniform sampler2D parameter0Tex;
 layout (binding = 4) uniform sampler2D depthTex;
 layout (binding = 5) uniform sampler2D ssaoTex;
-layout (binding = 6) uniform samplerCube irradianceTex;
-layout (binding = 7) uniform samplerCube specularTex;
-layout (binding = 8) uniform sampler2DArrayShadow shadowBufferTex;
-layout (binding = 9) MATERIAL_BUFFER;
-layout (binding = 10) buffer LightBuffer
+layout (binding = 6) uniform samplerCube specularTex;
+layout (binding = 7) uniform sampler2DArrayShadow shadowBufferTex;
+layout (binding = 8) MATERIAL_BUFFER;
+layout (binding = 9) buffer LightBuffer
 {
   Light lights[];
 };
-layout (binding = 11) buffer LightIndexBuffer
+layout (binding = 10) buffer LightIndexBuffer
 {
   uint lightIndices[];
 };
-layout (binding = 12) buffer IrradProbeBuffer
+layout (binding = 11) buffer IrradProbeBuffer
 {
   IrradProbe irradProbes[];
 };
-layout (binding = 13) buffer IrradProbeIndexBuffer
+layout (binding = 12) buffer IrradProbeIndexBuffer
 {
   uint irradProbeIndices[];
 };
-layout (binding = 14) uniform sampler2D kelvinLutTex;
-layout (binding = 15) uniform sampler2D noiseTex;
+layout (binding = 13) uniform sampler2D kelvinLutTex;
+layout (binding = 14) uniform sampler2D noiseTex;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
@@ -115,10 +114,11 @@ void main()
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
-  vec3 irrad = d.diffuseColor * texture(irradianceTex, R).rgb;
+  vec3 irrad = vec3(0.0);
 
   if (isGridPosValid(gridPos))
   {
+    float irradWeight = 0.0;
     const uint irradProbeCount = irradProbeIndices[clusterIdx];
 
     for (uint pi=0; pi<irradProbeCount; ++pi)
@@ -130,11 +130,14 @@ void main()
       {
         const float fadeRange = probe.posAndRadius.w * probeFadeRange;
         const float fadeStart = probe.posAndRadius.w - fadeRange;
-        const float fade = max(distToProbe - fadeStart, 0.0) / fadeRange;
+        const float fade = 1.0 - max(distToProbe - fadeStart, 0.0) / fadeRange;
         
-        irrad = mix(d.diffuseColor * sampleSH(probe.data, R) / MATH_PI, irrad, fade);
+        irrad += d.diffuseColor * sampleSH(probe.data, R) / MATH_PI * fade;
+        irradWeight += fade;
       }
     }
+    if (irradWeight > 1.0)
+      irrad /= irradWeight;
   }
 
   outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, parameter0Sample.z) * irrad; 

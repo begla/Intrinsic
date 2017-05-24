@@ -229,10 +229,6 @@ createComputeCallAccumulation(glm::vec3 p_Dim,
         computeCallRef, _N(kelvinLutTex), GpuProgramType::kCompute,
         ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
         Samplers::kLinearClamp);
-    ComputeCallManager::bindImage(
-        computeCallRef, _N(irradianceTex), GpuProgramType::kCompute,
-        ImageManager::getResourceByName(_N(default_ibl_cube_irradiance)),
-        Samplers::kLinearClamp);
     ComputeCallManager::bindBuffer(
         computeCallRef, _N(LightBuffer), GpuProgramType::kCompute,
         p_LightBuffer, UboType::kInvalidUbo,
