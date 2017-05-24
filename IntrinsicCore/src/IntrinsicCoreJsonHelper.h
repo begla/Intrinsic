@@ -33,9 +33,9 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
   if (p_GenerateDesc)
   {
     rapidjson::Value propertyCat =
-        rapidjson::Value(p_Category._string.c_str(), p_Doc.GetAllocator());
+        rapidjson::Value(p_Category.getString().c_str(), p_Doc.GetAllocator());
     rapidjson::Value propertyEditor =
-        rapidjson::Value(p_Editor._string.c_str(), p_Doc.GetAllocator());
+        rapidjson::Value(p_Editor.getString().c_str(), p_Doc.GetAllocator());
 
     property.AddMember("cat", propertyCat, p_Doc.GetAllocator());
     property.AddMember("type", "vec2", p_Doc.GetAllocator());
@@ -75,9 +75,9 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
   if (p_GenerateDesc)
   {
     rapidjson::Value propertyCat =
-        rapidjson::Value(p_Category._string.c_str(), p_Doc.GetAllocator());
+        rapidjson::Value(p_Category.getString().c_str(), p_Doc.GetAllocator());
     rapidjson::Value propertyEditor =
-        rapidjson::Value(p_Editor._string.c_str(), p_Doc.GetAllocator());
+        rapidjson::Value(p_Editor.getString().c_str(), p_Doc.GetAllocator());
 
     property.AddMember("cat", propertyCat, p_Doc.GetAllocator());
     property.AddMember("type", "vec3", p_Doc.GetAllocator());
@@ -120,9 +120,9 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
   if (p_GenerateDesc)
   {
     rapidjson::Value propertyCat =
-        rapidjson::Value(p_Category._string.c_str(), p_Doc.GetAllocator());
+        rapidjson::Value(p_Category.getString().c_str(), p_Doc.GetAllocator());
     rapidjson::Value propertyEditor =
-        rapidjson::Value(p_Editor._string.c_str(), p_Doc.GetAllocator());
+        rapidjson::Value(p_Editor.getString().c_str(), p_Doc.GetAllocator());
 
     property.AddMember("cat", propertyCat, p_Doc.GetAllocator());
     property.AddMember("type", "vec4", p_Doc.GetAllocator());
@@ -165,9 +165,9 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
   if (p_GenerateDesc)
   {
     rapidjson::Value propertyCat =
-        rapidjson::Value(p_Category._string.c_str(), p_Doc.GetAllocator());
+        rapidjson::Value(p_Category.getString().c_str(), p_Doc.GetAllocator());
     rapidjson::Value propertyEditor =
-        rapidjson::Value(p_Editor._string.c_str(), p_Doc.GetAllocator());
+        rapidjson::Value(p_Editor.getString().c_str(), p_Doc.GetAllocator());
 
     property.AddMember("cat", propertyCat, p_Doc.GetAllocator());
     property.AddMember("type", "quat", p_Doc.GetAllocator());
@@ -192,9 +192,9 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
 {
   rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);
   rapidjson::Value propertyCat =
-      rapidjson::Value(p_Category._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Category.getString().c_str(), p_Doc.GetAllocator());
   rapidjson::Value propertyEditor =
-      rapidjson::Value(p_Editor._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Editor.getString().c_str(), p_Doc.GetAllocator());
 
   if (p_GenerateDesc)
   {
@@ -231,12 +231,12 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
 {
   rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);
   rapidjson::Value propertyCat =
-      rapidjson::Value(p_Category._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Category.getString().c_str(), p_Doc.GetAllocator());
   rapidjson::Value propertyEditor =
-      rapidjson::Value(p_Editor._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Editor.getString().c_str(), p_Doc.GetAllocator());
 
   rapidjson::Value propertyValue =
-      rapidjson::Value(p_Value._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Value.getString().c_str(), p_Doc.GetAllocator());
 
   if (p_GenerateDesc)
   {
@@ -262,9 +262,9 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
 {
   rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);
   rapidjson::Value propertyCat =
-      rapidjson::Value(p_Category._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Category.getString().c_str(), p_Doc.GetAllocator());
   rapidjson::Value propertyEditor =
-      rapidjson::Value(p_Editor._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Editor.getString().c_str(), p_Doc.GetAllocator());
 
   rapidjson::Value propertyValue =
       rapidjson::Value(p_Value.c_str(), p_Doc.GetAllocator());
@@ -293,9 +293,9 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
 {
   rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);
   rapidjson::Value propertyCat =
-      rapidjson::Value(p_Category._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Category.getString().c_str(), p_Doc.GetAllocator());
   rapidjson::Value propertyEditor =
-      rapidjson::Value(p_Editor._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Editor.getString().c_str(), p_Doc.GetAllocator());
 
   if (p_GenerateDesc)
   {
@@ -322,9 +322,9 @@ createPropertyEnum(rapidjson::Document& p_Doc, bool p_GenerateDesc,
 {
   rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);
   rapidjson::Value propertyCat =
-      rapidjson::Value(p_Category._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Category.getString().c_str(), p_Doc.GetAllocator());
   rapidjson::Value propertyEditor =
-      rapidjson::Value(p_Editor._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Editor.getString().c_str(), p_Doc.GetAllocator());
 
   if (p_GenerateDesc)
   {
@@ -365,9 +365,9 @@ _INTR_INLINE rapidjson::Value createPropertyFlags(
 {
   rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);
   rapidjson::Value propertyCat =
-      rapidjson::Value(p_Category._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Category.getString().c_str(), p_Doc.GetAllocator());
   rapidjson::Value propertyEditor =
-      rapidjson::Value(p_Editor._string.c_str(), p_Doc.GetAllocator());
+      rapidjson::Value(p_Editor.getString().c_str(), p_Doc.GetAllocator());
 
   // Create a list of selected flags
   rapidjson::Value value = rapidjson::Value(rapidjson::kArrayType);

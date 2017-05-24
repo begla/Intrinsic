@@ -102,7 +102,7 @@ void IntrinsicEdNodeViewTreeWidget::onPopulateNodeTree()
         Entity::EntityManager::_name(Components::NodeManager::_entity(nodeRef));
 
     QTreeWidgetItem* item = nullptr;
-    QString nodeTitle = name._string.c_str();
+    QString nodeTitle = name.getString().c_str();
 
     if (!Components::NodeManager::_parent(nodeRef).isValid())
     {
@@ -156,7 +156,7 @@ void IntrinsicEdNodeViewTreeWidget::createAddComponentContextMenu(QMenu* p_Menu)
     for (auto it = Application::_componentManagerMapping.begin();
          it != Application::_componentManagerMapping.end(); ++it)
     {
-      const _INTR_STRING& compName = it->first._string;
+      const _INTR_STRING& compName = it->first.getString();
       Dod::Components::ComponentManagerEntry& entry =
           Application::_componentManagerMapping[compName];
 
@@ -187,7 +187,7 @@ void IntrinsicEdNodeViewTreeWidget::createRemoveComponentContextMenu(
     for (auto it = Application::_componentManagerMapping.begin();
          it != Application::_componentManagerMapping.end(); ++it)
     {
-      const _INTR_STRING& compName = it->first._string;
+      const _INTR_STRING& compName = it->first.getString();
       Dod::Components::ComponentManagerEntry& entry =
           Application::_componentManagerMapping[compName];
 
@@ -369,7 +369,8 @@ void IntrinsicEdNodeViewTreeWidget::createNode(QTreeWidgetItem* p_Parent)
 
       item->setText(0, Entity::EntityManager::_name(
                            Components::NodeManager::_entity(nodeRef))
-                           ._string.c_str());
+                           .getString()
+                           .c_str());
       item->setIcon(0, QIcon(":/Icons/target"));
     }
     else
@@ -380,7 +381,8 @@ void IntrinsicEdNodeViewTreeWidget::createNode(QTreeWidgetItem* p_Parent)
 
       item->setText(0, Entity::EntityManager::_name(
                            Components::NodeManager::_entity(nodeRef))
-                           ._string.c_str());
+                           .getString()
+                           .c_str());
       item->setIcon(0, QIcon(":/Icons/globe"));
     }
 
