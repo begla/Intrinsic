@@ -1,3 +1,6 @@
+*.dir
+x64
+
 app/Intrinsic
 app/*.exe
 app/*.lib
