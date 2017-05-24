@@ -90,8 +90,8 @@ struct ResourceManagerBase : Dod::ManagerBase<IdCount, DataType>
     {
       _INTR_LOG_WARNING("Resource '%s' not found - falling back to default "
                         "resource '%s'...",
-                        p_Name._string.c_str(),
-                        _defaultResourceName._string.c_str());
+                        p_Name.getString().c_str(),
+                        _defaultResourceName.getString().c_str());
       resourceIt = _nameResourceMap.find(_defaultResourceName);
     }
 
@@ -227,7 +227,7 @@ protected:
 
       rapidjson::Value resource = rapidjson::Value(rapidjson::kObjectType);
       rapidjson::Value nameValue;
-      nameValue.SetString(name._string.c_str(), resources.GetAllocator());
+      nameValue.SetString(name.getString().c_str(), resources.GetAllocator());
 
       resource.AddMember("name", nameValue, resources.GetAllocator());
 
@@ -334,7 +334,7 @@ protected:
 
     rapidjson::Document resource = rapidjson::Document(rapidjson::kObjectType);
     rapidjson::Value nameValue;
-    nameValue.SetString(name._string.c_str(), resource.GetAllocator());
+    nameValue.SetString(name.getString().c_str(), resource.GetAllocator());
 
     resource.AddMember("name", nameValue, resource.GetAllocator());
 
@@ -344,7 +344,7 @@ protected:
     resource.AddMember("properties", properties, resource.GetAllocator());
 
     _INTR_STRING fileName =
-        _INTR_STRING(p_Path) + name._string + _INTR_STRING(p_Extension);
+        _INTR_STRING(p_Path) + name.getString() + _INTR_STRING(p_Extension);
 
     FILE* fp = fopen(fileName.c_str(), "wb");
 
