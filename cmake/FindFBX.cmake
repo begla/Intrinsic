@@ -7,7 +7,7 @@
 FIND_PATH(FBX_INCLUDE_DIR fbxsdk.h
   PATH_SUFFIXES include
   PATHS
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx
+  ${CMAKE_SOURCE_DIR}/Intrinsic_Dependencies/dependencies/fbx
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -39,6 +39,7 @@ ENDIF()
 #Debug FBX LIBRARY DIR
 MESSAGE(STATUS  "SOURCE DIR PATH"  ${CMAKE_SOURCE_DIR})
 MESSAGE(STATUS 	"FBX LIBRARY DIR: " ${FBX_LIBRARY_DIR}/debug)
+MESSAGE(STATUS  "FBX INCLUDE DIR: " ${FBX_INCLUDE_DIR})
 
 
 FIND_LIBRARY(FBX_LIBRARY_DEBUG 
@@ -47,7 +48,7 @@ FIND_LIBRARY(FBX_LIBRARY_DEBUG
   PATHS
   ${FBX_LIBRARY_DIR}
   ${FBX_LIBRARY_DIR}/debug
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx
+  ${CMAKE_SOURCE_DIR}/Intrinsic_Dependencies/dependencies/fbx
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
@@ -64,7 +65,7 @@ FIND_LIBRARY(FBX_LIBRARY_RELEASE
   PATHS
   ${FBX_LIBRARY_DIR}
   ${FBX_LIBRARY_DIR}/release
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx
+  ${CMAKE_SOURCE_DIR}/Intrinsic_Dependencies/dependencies/fbx
   ~/Library/Frameworks
   /Library/Frameworks
   /usr/local
