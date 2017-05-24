@@ -57,7 +57,7 @@ void main()
 
   const mat3 TBN = mat3(inTangent, inBinormal, ns * inNormal);
 
-  const vec2 uv0 = clamp(UV0_TRANSFORMED, 0.001, 0.999);
+  const vec2 uv0 = clamp(UV0_TRANSFORMED, 0.01, 0.99);
 
   const vec2 blendScale = vec2(25.0);
   const vec2 blendLookupUV = mod(abs(inWorldPosition.xz), blendScale) / blendScale;

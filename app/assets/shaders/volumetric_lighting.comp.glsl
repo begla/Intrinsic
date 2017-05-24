@@ -54,25 +54,24 @@ layout (binding = 0) uniform PerInstance
 layout (binding = 1) uniform sampler2DArrayShadow shadowBufferTex;
 layout (binding = 2, r11f_g11f_b10f) uniform image3D output0Tex;
 layout (binding = 3) uniform sampler3D prevVolLightBufferTex;
-layout (binding = 4) uniform samplerCube irradianceTex;
-layout (binding = 5) buffer LightBuffer
+layout (binding = 4) buffer LightBuffer
 {
   Light lights[];
 };
-layout (binding = 6) buffer LightIndexBuffer
+layout (binding = 5) buffer LightIndexBuffer
 {
   uint lightIndices[];
 };
-layout (binding = 7) buffer IrradProbeBuffer
+layout (binding = 6) buffer IrradProbeBuffer
 {
   IrradProbe irradProbes[];
 };
-layout (binding = 8) buffer IrradProbeIndexBuffer
+layout (binding = 7) buffer IrradProbeIndexBuffer
 {
   uint irradProbeIndices[];
 };
-layout (binding = 9) uniform sampler2DArray shadowBufferExpTex;
-layout (binding = 10) uniform sampler2D kelvinLutTex;
+layout (binding = 8) uniform sampler2DArray shadowBufferExpTex;
+layout (binding = 9) uniform sampler2D kelvinLutTex;
 
 // TODO
 const vec3 heightRefPosWS = vec3(0.0, 700.0, 0.0);
@@ -135,9 +134,6 @@ void main()
   vec3 lighting = vec3(0.0);
   lighting += shadowAttenuation * lightColor;
 
-  // Global irradiance
-  lighting += texture(irradianceTex, rayWS).rgb * uboPerInstance.data0.z;
-
   const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
   const uint clusterIdx = calcClusterIndex(gridPos);
 
@@ -164,7 +160,7 @@ void main()
     }
   }
 
-  lighting += irrad ;
+  lighting += irrad * uboPerInstance.data0.w;
 
   // Local lights
   if (isGridPosValid(gridPos))
