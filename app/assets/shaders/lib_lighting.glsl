@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #define PSSM_SPLIT_COUNT 4u
-#define MAX_SHADOW_MAP_COUNT 16u
+#define MAX_SHADOW_MAP_COUNT 4u
 #define EPSILON 1.0e-6
 #define IBL_MIP_OFFSET 3
 #define IBL_MIP_COUNT 9

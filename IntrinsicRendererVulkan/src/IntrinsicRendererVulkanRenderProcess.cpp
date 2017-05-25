@@ -398,16 +398,20 @@ void Default::renderFrame(float p_DeltaT)
       for (uint32_t i = 0u; i < _cameras.size(); ++i)
       {
         Components::CameraRef camRef = _cameras[i];
-        _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
-            _shadowFrustums[camRef];
-        RenderPass::Shadow::prepareFrustums(camRef, shadowFrustums);
+
         Core::Resources::FrustumRef frustumRef =
             Components::CameraManager::_frustum(camRef);
-
         _cameraToIdMapping[camRef] = (uint8_t)_activeFrustums.size();
         _activeFrustums.push_back(frustumRef);
-        _activeFrustums.insert(RenderProcess::Default::_activeFrustums.end(),
-                               shadowFrustums.begin(), shadowFrustums.end());
+
+        if (_cameraNames[i] == _N(ActiveCamera))
+        {
+          _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+              _shadowFrustums[camRef];
+          RenderPass::Shadow::prepareFrustums(camRef, shadowFrustums);
+          _activeFrustums.insert(RenderProcess::Default::_activeFrustums.end(),
+                                 shadowFrustums.begin(), shadowFrustums.end());
+        }
       }
 
       Components::CameraManager::updateFrustums(
