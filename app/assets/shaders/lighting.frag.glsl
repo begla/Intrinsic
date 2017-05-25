@@ -118,7 +118,6 @@ void main()
 
   if (isGridPosValid(gridPos))
   {
-    float irradWeight = 0.0;
     const uint irradProbeCount = irradProbeIndices[clusterIdx];
 
     for (uint pi=0; pi<irradProbeCount; ++pi)
@@ -132,15 +131,13 @@ void main()
         const float fadeStart = probe.posAndRadius.w - fadeRange;
         const float fade = 1.0 - max(distToProbe - fadeStart, 0.0) / fadeRange;
         
-        irrad += d.diffuseColor * sampleSH(probe.data, R) / MATH_PI * fade;
-        irradWeight += fade;
+        irrad = mix(irrad, (pi == 0 ? uboPerInstance.data0.y : 1.0) 
+          * d.diffuseColor * sampleSH(probe.data, R) / MATH_PI, fade);
       }
     }
-    if (irradWeight > 1.0)
-      irrad /= irradWeight;
   }
 
-  outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, parameter0Sample.z) * irrad; 
+  outColor.rgb += min(ssaoSample.r, parameter0Sample.z) * irrad; 
 
   // Specular
   //const float specLod = burleyToMip(d.roughness, dot(normalWS, R0));
