@@ -87,8 +87,9 @@ struct PerInstanceData
 // Have to match the values in the shader
 const float _gridDepth = 10000.0f;
 const glm::uvec3 _gridRes = glm::uvec3(16u, 8u, GRID_DEPTH_SLICE_COUNT);
+const float _gridDepthExp = 3.0f;
 const float _gridDepthSliceScale =
-    _gridDepth * (1.0f / ((_gridRes.z - 1u) * (_gridRes.z - 1u)));
+    _gridDepth / glm::pow((float)(_gridRes.z - 1u), _gridDepthExp);
 const float _gridDepthSliceScaleRcp = 1.0f / _gridDepthSliceScale;
 
 const uint32_t _totalClusterCount = _gridRes.x * _gridRes.y * _gridRes.z;
@@ -106,7 +107,7 @@ _INTR_INLINE uint32_t calcClusterIndex(glm::uvec3 p_GridPos)
 
 _INTR_INLINE float calcGridDepthSlice(uint32_t p_DepthSliceIdx)
 {
-  return (p_DepthSliceIdx * p_DepthSliceIdx) * _gridDepthSliceScale;
+  return glm::pow((float)p_DepthSliceIdx, _gridDepthExp) * _gridDepthSliceScale;
 }
 
 _INTR_INLINE Math::AABB2 calcAABBForDepthSlice(uint32_t p_DepthSlice,
@@ -870,10 +871,19 @@ void Lighting::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 
   cullLightsAndWriteBuffers(p_CameraRef);
 
-  renderLighting(_framebufferRef, _drawCallRef, _lightingBufferImageRef,
-                 p_CameraRef);
-  renderLighting(_framebufferTransparentsRef, _drawCallTransparentsRef,
-                 _lightingBufferTransparentsImageRef, p_CameraRef);
+  {
+    _INTR_PROFILE_GPU("Opaque");
+
+    renderLighting(_framebufferRef, _drawCallRef, _lightingBufferImageRef,
+                   p_CameraRef);
+  }
+
+  {
+    _INTR_PROFILE_GPU("Transparents");
+
+    renderLighting(_framebufferTransparentsRef, _drawCallTransparentsRef,
+                   _lightingBufferTransparentsImageRef, p_CameraRef);
+  }
 }
 }
 }
