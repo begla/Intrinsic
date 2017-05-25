@@ -76,7 +76,7 @@ void main()
   const float depth = textureLod(depthTex, inUV0, 0.0).x;
 
   // Pass through sky
-  if (depth == 1.0)
+  if (depth >= 1.0)
   { 
     outColor.rgba = albedoSample;
     return;
@@ -183,7 +183,7 @@ void main()
     // DEBUG: Visualize clusters
     /*if (lightCount > 0)
     {
-      outColor = vec4(gridPos / vec3(gridRes), 0.0);
+      outColor = vec4(gridPos / vec3(gridRes) * lightCount / 64.0, 0.0);
       return;
     }*/
 
@@ -220,7 +220,5 @@ void main()
       }
     }
   }
-  
-  outColor.a = 1.0;
 }
   
