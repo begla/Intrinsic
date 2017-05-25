@@ -65,9 +65,9 @@ vec3 sampleColorOffsets(sampler2D scene, vec2 uv0, vec3 offsets, vec2 framebuffe
 
 const float lensDirtLumThreshold = 0.2;
 const float lensDirtIntens = 0.9;
-const float toneMappingLumTarget = 0.9;
+const float toneMappingLumTarget = 1.0;
 const float toneMappingMaxExposure = 3.0;
-const float bloomFactor = 1.0;
+const float bloomFactor = 3.0;
 const float filmGrainBias = 0.0;
 const float filmGrainMax = 1.0;
 const float lensFlareFactor = 1.0;
