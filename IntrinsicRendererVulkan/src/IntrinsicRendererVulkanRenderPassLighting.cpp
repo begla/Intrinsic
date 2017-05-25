@@ -237,7 +237,7 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
 {
   _INTR_PROFILE_CPU("Lighting", "Cull Lights And Write Buffers");
 
-  // TODO: Coarse frustum culling pre-pass
+  // TODO: Add coarse frustum culling pre-pass
   {
     _INTR_PROFILE_CPU("Lighting", "Write Light And Irrad Buffer");
 
@@ -258,6 +258,11 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
                     Components::LightManager::_descIntensity(lightRef)),
           glm::vec4(Components::LightManager::_descTemperature(lightRef))};
     }
+
+    // Sort probes by priority
+    // TODO: Could be done once if a priority changes
+    Components::IrradianceProbeManager::sortByPriority(
+        Components::IrradianceProbeManager::_activeRefs);
 
     for (uint32_t i = 0u;
          i < Components::IrradianceProbeManager::_activeRefs.size(); ++i)

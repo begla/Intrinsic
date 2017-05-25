@@ -404,6 +404,7 @@ void Default::renderFrame(float p_DeltaT)
         _cameraToIdMapping[camRef] = (uint8_t)_activeFrustums.size();
         _activeFrustums.push_back(frustumRef);
 
+        // Only allow shadows for the main view
         if (_cameraNames[i] == _N(ActiveCamera))
         {
           _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
