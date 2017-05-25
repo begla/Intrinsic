@@ -14,7 +14,7 @@
 
 #pragma once
 
-#define _INTR_GPU_PAGE_SIZE_IN_BYTES (90u * 1024u * 1024u)
+#define _INTR_GPU_PAGE_SIZE_IN_BYTES (80u * 1024u * 1024u)
 
 namespace Intrinsic
 {
