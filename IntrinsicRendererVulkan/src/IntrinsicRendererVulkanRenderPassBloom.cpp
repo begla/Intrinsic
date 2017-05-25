@@ -87,7 +87,7 @@ _INTR_INLINE void dispatchLum(VkCommandBuffer p_CommandBuffer)
   {
     lumData.dim[0] = bloomBaseDim.x;
     lumData.dim[1] = bloomBaseDim.y;
-    lumData.bloomThreshold.x = 1.0f;
+    lumData.bloomThreshold.x = 0.5f;
   }
 
   ComputeCallManager::updateUniformMemory({_lumComputeCallRef}, &lumData,
