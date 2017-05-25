@@ -46,9 +46,11 @@ struct IrradianceProbeData : Dod::Components::ComponentDataBase
   {
     descRadius.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
     descSHCoeffs.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+    descPriority.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
   }
 
   _INTR_ARRAY(float) descRadius;
+  _INTR_ARRAY(uint32_t) descPriority;
   _INTR_ARRAY(SHCoeffs) descSHCoeffs;
 };
 
@@ -99,6 +101,11 @@ struct IrradianceProbeManager
                                              _N(IrradianceProbe), _N(float),
                                              _descRadius(p_Ref), false, false),
                            p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "priority",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
+                          _N(float), _descPriority(p_Ref), false, false),
+        p_Document.GetAllocator());
 
     p_Properties.AddMember(
         "shL0",
@@ -155,6 +162,9 @@ struct IrradianceProbeManager
     if (p_Properties.HasMember("radius"))
       _descRadius(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["radius"]);
+    if (p_Properties.HasMember("priority"))
+      _descPriority(p_Ref) =
+          (uint32_t)JsonHelper::readPropertyFloat(p_Properties["priority"]);
 
     if (p_Properties.HasMember("shL0"))
       _descSHCoeffs(p_Ref).L0 =
@@ -187,6 +197,23 @@ struct IrradianceProbeManager
 
   // <-
 
+  _INTR_INLINE static void sortByPriority(IrradianceProbeRefArray& p_Probes)
+  {
+    _INTR_PROFILE_CPU("General", "Sort Irradiance Probes");
+
+    struct Comparator
+    {
+      bool operator()(const Dod::Ref& a, const Dod::Ref& b) const
+      {
+        return _descPriority(a) < _descPriority(b);
+      }
+    } comp;
+
+    Algorithm::parallelSort<Dod::Ref, Comparator>(p_Probes, comp);
+  }
+
+  // <-
+
   // Getter/Setter
   // ->
 
@@ -194,6 +221,10 @@ struct IrradianceProbeManager
   _INTR_INLINE static float& _descRadius(IrradianceProbeRef p_Ref)
   {
     return _data.descRadius[p_Ref._id];
+  }
+  _INTR_INLINE static uint32_t& _descPriority(IrradianceProbeRef p_Ref)
+  {
+    return _data.descPriority[p_Ref._id];
   }
 
   _INTR_INLINE static SHCoeffs& _descSHCoeffs(IrradianceProbeRef p_Ref)

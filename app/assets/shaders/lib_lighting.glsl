@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #define PSSM_SPLIT_COUNT 4u
-#define MAX_SHADOW_MAP_COUNT 16u
+#define MAX_SHADOW_MAP_COUNT 4u
 #define EPSILON 1.0e-6
 #define IBL_MIP_OFFSET 3
 #define IBL_MIP_COUNT 9
@@ -36,8 +36,9 @@ const float probeFadeRange = 0.2;
 const uint maxLightCountPerCluster = 128;
 const float gridDepth = 10000.0f;
 const uvec3 gridRes = uvec3(16u, 8u, 24u);
+const float gridDepthExp = 3.0;
 const float gridDepthSliceScale =
-    gridDepth * (1.0f / ((gridRes.z - 1u) * (gridRes.z - 1u)));
+    gridDepth / pow(gridRes.z - 1.0, gridDepthExp);
 const float gridDepthSliceScaleRcp = 1.0f / gridDepthSliceScale;
 
 uint calcClusterIndex(uvec3 gridPos)
@@ -49,12 +50,12 @@ uint calcClusterIndex(uvec3 gridPos)
 
 float calcGridDepthSlice(uint depthSliceIdx)
 {
-  return (depthSliceIdx * depthSliceIdx) * gridDepthSliceScale;
+  return pow(depthSliceIdx, gridDepthExp) * gridDepthSliceScale;
 }
 
 uint calcGridDepthIndex(float depthVS)
 {
-  return uint(sqrt(depthVS * gridDepthSliceScaleRcp));
+  return uint(pow(depthVS * gridDepthSliceScaleRcp, 1.0 / gridDepthExp));
 }
 
 uvec3 calcGridPosForViewPos(vec3 posVS, vec4 nearFar, vec4 nearFarWidthHeight)

@@ -27,22 +27,14 @@ struct Name
 
   _INTR_INLINE void setName(const char* p_String)
   {
-#if !defined(INTR_FINAL_BUILD)
-    _string = p_String;
-#endif // INTR_FINAL_BUILD
-    _hash = Math::hash(_string.c_str(), _string.size());
+    _hash = Math::hash(p_String, strlen(p_String));
+    if (_stringMap.find(_hash) == _stringMap.end())
+      _stringMap[_hash] = p_String;
   }
 
   _INTR_INLINE bool isValid() const { return _hash != 0u; }
 
-  _INTR_INLINE _INTR_STRING getString() const
-  {
-#if !defined(INTR_FINAL_BUILD)
-    return _string;
-#else
-    return StringUtil::toString(_hash);
-#endif // INTR_FINAL_BUILD
-  }
+  _INTR_INLINE _INTR_STRING getString() const { return _stringMap[_hash]; }
 
   _INTR_INLINE bool operator==(const Name& p_Rhs) const
   {
@@ -54,10 +46,8 @@ struct Name
     return !(*this == p_Rhs);
   }
 
-#if !defined(INTR_FINAL_BUILD)
-  _INTR_STRING _string;
-#endif // INTR_FINAL_BUILD
   uint32_t _hash;
+  static _INTR_HASH_MAP(uint32_t, _INTR_STRING) _stringMap;
 };
 }
 }

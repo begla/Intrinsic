@@ -113,7 +113,7 @@ void main()
   const vec3 posWS = uboPerInstance.camPos.xyz + screenToViewSpacePos(posSS.xy, 
     uboPerInstance.eyeWSVectorX.xyz, uboPerInstance.eyeWSVectorY.xyz, uboPerInstance.eyeWSVectorZ.xyz,
     linDepth, uboPerInstance.projMatrix);
-  const vec3 rayWS = normalize(posWS - uboPerInstance.camPos.xyz);
+  const vec3 rayWS = normalize(posWS - uboPerInstance.camPos.xyz); 
 
   // Directional light
   vec4 posLS;
@@ -153,9 +153,9 @@ void main()
       {
         const float fadeRange = probe.posAndRadius.w * probeFadeRange;
         const float fadeStart = probe.posAndRadius.w - fadeRange;
-        const float fade = max(distToProbe - fadeStart, 0.0) / fadeRange;
+        const float fade = 1.0 - max(distToProbe - fadeStart, 0.0) / fadeRange;
         
-        irrad = mix(sampleSH(probe.data, rayWS) / MATH_PI, irrad, fade);
+        irrad = mix(irrad, sampleSH(probe.data, rayWS) / MATH_PI, fade);
       }
     }
   }

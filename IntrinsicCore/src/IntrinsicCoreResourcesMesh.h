@@ -207,10 +207,10 @@ struct MeshManager
                                         p_Document.GetAllocator());
         indicesPerSubMesh.PushBack(indices, p_Document.GetAllocator());
 
-        rapidjson::Value mateiralName = rapidjson::Value(
-            _descMaterialNamesPerSubMesh(p_Ref)[subMeshIdx]._string.c_str(),
+        rapidjson::Value materialName = rapidjson::Value(
+            _descMaterialNamesPerSubMesh(p_Ref)[subMeshIdx].getString().c_str(),
             p_Document.GetAllocator());
-        materialNamesPerSubMesh.PushBack(mateiralName,
+        materialNamesPerSubMesh.PushBack(materialName,
                                          p_Document.GetAllocator());
       }
 

@@ -70,7 +70,7 @@ Components::NodeRef World::cloneNodeFull(Components::NodeRef p_Ref)
         Components::NodeManager::_entity(referenceNodes[i]);
 
     Entity::EntityRef clonedEntityRef = Entity::EntityManager::createEntity(
-        Entity::EntityManager::_name(referenceEntityRef)._string.c_str());
+        Entity::EntityManager::_name(referenceEntityRef).getString().c_str());
 
     for (auto propCompIt =
              Application::_componentPropertyCompilerMapping.begin();
@@ -78,7 +78,7 @@ Components::NodeRef World::cloneNodeFull(Components::NodeRef p_Ref)
          ++propCompIt)
     {
       rapidjson::Value componentType = rapidjson::Value(
-          propCompIt->first._string.c_str(), doc.GetAllocator());
+          propCompIt->first.getString().c_str(), doc.GetAllocator());
 
       auto compManagerEntryIt =
           Application::_componentManagerMapping.find(componentType.GetString());
@@ -241,7 +241,7 @@ void World::save(const _INTR_STRING& p_FilePath)
     {
       rapidjson::Value node = rapidjson::Value(rapidjson::kObjectType);
       rapidjson::Value name = rapidjson::Value(
-          Entity::EntityManager::_name(entityRef)._string.c_str(),
+          Entity::EntityManager::_name(entityRef).getString().c_str(),
           worldDesc.GetAllocator());
 
       node.AddMember("name", name, worldDesc.GetAllocator());
@@ -262,7 +262,7 @@ void World::save(const _INTR_STRING& p_FilePath)
            ++propCompIt)
       {
         rapidjson::Value componentType = rapidjson::Value(
-            propCompIt->first._string.c_str(), worldDesc.GetAllocator());
+            propCompIt->first.getString().c_str(), worldDesc.GetAllocator());
 
         auto compManagerEntryIt = Application::_componentManagerMapping.find(
             componentType.GetString());
