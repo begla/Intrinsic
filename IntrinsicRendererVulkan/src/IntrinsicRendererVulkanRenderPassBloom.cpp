@@ -87,7 +87,7 @@ _INTR_INLINE void dispatchLum(VkCommandBuffer p_CommandBuffer)
   {
     lumData.dim[0] = bloomBaseDim.x;
     lumData.dim[1] = bloomBaseDim.y;
-    lumData.bloomThreshold.x = 0.5f;
+    lumData.bloomThreshold.x = 0.9f;
   }
 
   ComputeCallManager::updateUniformMemory({_lumComputeCallRef}, &lumData,
@@ -212,8 +212,20 @@ _INTR_INLINE void dispatchAdd(VkCommandBuffer p_CommandBuffer,
   ComputeCallManager::updateUniformMemory({_addComputeCallRefs[p_MipLevel0]},
                                           &addData, sizeof(PerInstanceDataAdd));
 
+  ImageManager::insertImageMemoryBarrierSubResource(
+      _summedImageRef, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+      VK_IMAGE_LAYOUT_GENERAL, p_MipLevel0, 0u,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+
   RenderSystem::dispatchComputeCall(_addComputeCallRefs[p_MipLevel0],
                                     p_CommandBuffer);
+
+  ImageManager::insertImageMemoryBarrierSubResource(
+      _summedImageRef, VK_IMAGE_LAYOUT_GENERAL,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, p_MipLevel0, 0u,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
 }
 }
 
@@ -631,9 +643,18 @@ void Bloom::onReinitRendering()
           computeCallBlurXRef, _N(outTex), GpuProgramType::kCompute,
           _blurPingPongImageRef, Samplers::kInvalidSampler,
           BindingFlags::kAdressSubResource, 0u, i);
-      ComputeCallManager::bindImage(computeCallBlurXRef, _N(inTex),
-                                    GpuProgramType::kCompute, _brightImageRef,
-                                    Samplers::kLinearClamp);
+      if (i == 3u)
+      {
+        ComputeCallManager::bindImage(computeCallBlurXRef, _N(inTex),
+                                      GpuProgramType::kCompute, _brightImageRef,
+                                      Samplers::kLinearClamp);
+      }
+      else
+      {
+        ComputeCallManager::bindImage(computeCallBlurXRef, _N(inTex),
+                                      GpuProgramType::kCompute, _summedImageRef,
+                                      Samplers::kLinearClamp);
+      }
 
       computeCallsToCreate.push_back(computeCallBlurXRef);
       _blurXComputeCallRefs.push_back(computeCallBlurXRef);
@@ -736,7 +757,8 @@ void Bloom::render(float p_DeltaT, Components::CameraRef p_CameraRef)
       _lumImageRef, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL,
       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   ImageManager::insertImageMemoryBarrier(
-      _summedImageRef, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL,
+      _summedImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   ImageManager::insertImageMemoryBarrier(
       _blurImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
@@ -761,10 +783,6 @@ void Bloom::render(float p_DeltaT, Components::CameraRef p_CameraRef)
   dispatchAdd(primaryCmdBuffer, 0u, 1u);
   dispatchBlur(primaryCmdBuffer, 0u);
 
-  ImageManager::insertImageMemoryBarrier(
-      _summedImageRef, VK_IMAGE_LAYOUT_GENERAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   ImageManager::insertImageMemoryBarrier(
       _lumImageRef, VK_IMAGE_LAYOUT_GENERAL,
       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,

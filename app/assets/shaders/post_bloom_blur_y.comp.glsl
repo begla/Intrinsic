@@ -18,21 +18,27 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
-#define BLUR_WIDTH 9
-#define HALF_BLUR_WIDTH 4
+#define BLUR_WIDTH 15
+#define HALF_BLUR_WIDTH 7
 
 #define BLUR_THREADS 128
 
 const float blurWeights[] = {
-    0.004815026,
-    0.028716039,
-    0.102818575,
-    0.221024189,
-    0.28525234,
-    0.221024189,
-    0.102818575,
-    0.028716039,
-    0.004815026
+  0.0,
+  0.0,
+  0.000003,
+  0.000229,
+  0.005977,
+  0.060598,
+  0.24173,
+  0.382925,
+  0.24173,
+  0.060598,
+  0.005977,
+  0.000229,
+  0.000003,
+  0.0,
+  0.0
 };
 
 layout (binding = 0) uniform PerInstance
@@ -48,7 +54,8 @@ shared vec4 temp[BLUR_THREADS];
 layout (local_size_x = BLUR_THREADS, local_size_y = 1) in;
 void main()
 {
-  ivec2 coord = ivec2(gl_LocalInvocationIndex - HALF_BLUR_WIDTH + (BLUR_THREADS - HALF_BLUR_WIDTH * 2) * gl_WorkGroupID.x, gl_WorkGroupID.y).yx;
+  ivec2 coord = ivec2(gl_LocalInvocationIndex - HALF_BLUR_WIDTH + (BLUR_THREADS - HALF_BLUR_WIDTH * 2) 
+    * gl_WorkGroupID.x, gl_WorkGroupID.y).yx;
   temp[gl_LocalInvocationIndex] = texelFetch(inTex, coord, uboPerInstance.mipLevel.x);
 
   barrier();
