@@ -160,7 +160,7 @@ void main()
     }
   }
 
-  lighting += irrad * uboPerInstance.data0.w;
+  lighting += irrad * uboPerInstance.data0.z;
 
   // Local lights
   if (isGridPosValid(gridPos))
