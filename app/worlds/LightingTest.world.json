@@ -43,59 +43,126 @@
         ]
     },
     {
-        "name": "MainCamera",
+        "name": "Cube",
         "offsetToParent": -1,
         "propertyEntries": [
             {
                 "type": "Node",
                 "properties": {
                     "localPos": [
-                        1887.968505859375,
-                        -1880.980224609375,
-                        -1865.6180419921876
+                        0.0,
+                        0.0,
+                        0.0
                     ],
                     "localOrient": [
-                        -0.10390432924032211,
-                        -0.39573612809181216,
-                        -0.045118384063243869,
-                        0.9113512635231018
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
                     ],
                     "localSize": [
-                        0.0,
-                        0.0,
-                        0.0
+                        2000.0,
+                        2000.0,
+                        2000.0
                     ],
                     "worldPos": [
-                        1887.968505859375,
-                        -1880.980224609375,
-                        -1865.6180419921876
-                    ],
-                    "worldOrient": [
-                        -0.10390432924032211,
-                        -0.39573612809181216,
-                        -0.045118384063243869,
-                        0.9113512635231018
-                    ],
-                    "worldSize": [
                         0.0,
                         0.0,
                         0.0
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "worldSize": [
+                        2000.0,
+                        2000.0,
+                        2000.0
                     ]
                 }
             },
             {
-                "type": "Camera",
+                "type": "Mesh",
                 "properties": {
-                    "fov": 70.0,
-                    "nearPlane": 1.0,
-                    "farPlane": 10000.0
+                    "meshName": "cube_inverted",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "PostEffectVolume0",
+        "offsetToParent": -2,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        5000.0,
+                        5000.0,
+                        5000.0
+                    ],
+                    "worldPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "worldSize": [
+                        5000.0,
+                        5000.0,
+                        5000.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "sky",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "PostEffectVolume",
+                "properties": {
+                    "postEffectName": "IrradianceTest",
+                    "radius": 4000.0,
+                    "blendRange": 2.0
                 }
             }
         ]
     },
     {
         "name": "GameCamera",
-        "offsetToParent": -2,
+        "offsetToParent": -3,
         "propertyEntries": [
             {
                 "type": "Node",
@@ -157,119 +224,52 @@
         ]
     },
     {
-        "name": "PostEffectVolume0",
-        "offsetToParent": -3,
-        "propertyEntries": [
-            {
-                "type": "Node",
-                "properties": {
-                    "localPos": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "localOrient": [
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
-                    ],
-                    "localSize": [
-                        2000.0,
-                        2000.0,
-                        2000.0
-                    ],
-                    "worldPos": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "worldOrient": [
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
-                    ],
-                    "worldSize": [
-                        2000.0,
-                        2000.0,
-                        2000.0
-                    ]
-                }
-            },
-            {
-                "type": "Mesh",
-                "properties": {
-                    "meshName": "sky",
-                    "colorTint": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ]
-                }
-            },
-            {
-                "type": "PostEffectVolume",
-                "properties": {
-                    "postEffectName": "IrradianceTest",
-                    "radius": 4000.0,
-                    "blendRange": 2.0
-                }
-            }
-        ]
-    },
-    {
-        "name": "Cube",
+        "name": "MainCamera",
         "offsetToParent": -4,
         "propertyEntries": [
             {
                 "type": "Node",
                 "properties": {
                     "localPos": [
-                        0.0,
-                        0.0,
-                        0.0
+                        1862.0770263671876,
+                        -1885.874267578125,
+                        -1834.67333984375
                     ],
                     "localOrient": [
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
+                        -0.12030448019504547,
+                        -0.3408214747905731,
+                        -0.04402421787381172,
+                        0.9313589334487915
                     ],
                     "localSize": [
-                        2000.0,
-                        2000.0,
-                        2000.0
-                    ],
-                    "worldPos": [
                         0.0,
                         0.0,
                         0.0
                     ],
+                    "worldPos": [
+                        1862.0770263671876,
+                        -1885.874267578125,
+                        -1834.67333984375
+                    ],
                     "worldOrient": [
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
+                        -0.12030448019504547,
+                        -0.3408214747905731,
+                        -0.04402421787381172,
+                        0.9313589334487915
                     ],
                     "worldSize": [
-                        2000.0,
-                        2000.0,
-                        2000.0
+                        0.0,
+                        0.0,
+                        0.0
                     ]
                 }
             },
             {
-                "type": "Mesh",
+                "type": "Camera",
                 "properties": {
-                    "meshName": "cube_inverted",
-                    "colorTint": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ]
+                    "fov": 70.0,
+                    "nearPlane": 1.0,
+                    "farPlane": 10000.0
                 }
             }
         ]
