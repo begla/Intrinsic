@@ -51,11 +51,22 @@ struct Light
   glm::vec4 temp;
 };
 
+struct TestLight
+{
+  glm::vec3 spawnPos;
+  Light light;
+};
+
 struct IrradProbe
 {
   glm::vec4 posAndRadius;
   glm::vec4 data[7]; // Packed SH coefficients
 };
+
+_INTR_ARRAY(TestLight) _testLights;
+
+uint32_t _currentLightCount = 0u;
+uint32_t _currentIrradProbeCount = 0u;
 
 uint32_t* _lightIndexBufferGpuMemory = nullptr;
 Light* _lightBufferGpuMemory = nullptr;
@@ -244,6 +255,7 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
   {
     _INTR_PROFILE_CPU("Lighting", "Write Light And Irrad Buffer");
 
+    _currentLightCount = 0u;
     for (uint32_t i = 0u; i < Components::LightManager::_activeRefs.size(); ++i)
     {
       Components::LightRef lightRef = Components::LightManager::_activeRefs[i];
@@ -254,16 +266,25 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
       const glm::vec3 lightPosVS =
           Components::CameraManager::_viewMatrix(p_CameraRef) *
           glm::vec4(Components::NodeManager::_worldPosition(lightNodeRef), 1.0);
-      _lightBufferMemory[i] = {
+      _lightBufferMemory[_currentLightCount] = {
           glm::vec4(lightPosVS,
                     Components::LightManager::_descRadius(lightRef)),
           glm::vec4(Components::LightManager::_descColor(lightRef),
                     Components::LightManager::_descIntensity(lightRef)),
           glm::vec4(Components::LightManager::_descTemperature(lightRef))};
+      ++_currentLightCount;
+    }
+
+    // Write test lights
+    for (uint32_t i = 0u; i < _testLights.size(); ++i)
+    {
+      _lightBufferMemory[_currentLightCount] = _testLights[i].light;
+      ++_currentLightCount;
     }
 
     // Sort probes by priority
     // TODO: Could be done once if a priority changes
+    _currentIrradProbeCount = 0u;
     Components::IrradianceProbeManager::sortByPriority(
         Components::IrradianceProbeManager::_activeRefs);
 
@@ -279,12 +300,13 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
       const glm::vec3 irradProbePosVS =
           Components::CameraManager::_viewMatrix(p_CameraRef) *
           glm::vec4(Components::NodeManager::_worldPosition(irradNodeRef), 1.0);
-      _irradProbeBufferMemory[i].posAndRadius = glm::vec4(
+      _irradProbeBufferMemory[_currentIrradProbeCount].posAndRadius = glm::vec4(
           irradProbePosVS,
           Components::IrradianceProbeManager::_descRadius(irradProbeRef));
-      memcpy(_irradProbeBufferMemory[i].data,
+      memcpy(_irradProbeBufferMemory[_currentIrradProbeCount].data,
              &Components::IrradianceProbeManager::_descSHCoeffs(irradProbeRef),
              sizeof(Components::SHCoeffs));
+      ++_currentIrradProbeCount;
     }
   }
 
@@ -306,8 +328,7 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
       const Math::AABB2 depthSliceAABB = calcAABBForDepthSlice(
           z, _perInstanceData.nearFarWidthHeight, _perInstanceData.nearFar);
 
-      for (uint32_t i = 0u; i < Components::LightManager::_activeRefs.size();
-           ++i)
+      for (uint32_t i = 0u; i < _currentLightCount; ++i)
       {
         const Light& light = _lightBufferMemory[i];
         if (Math::calcIntersectSphereAABB(
@@ -318,8 +339,7 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
         }
       }
 
-      for (uint32_t i = 0u;
-           i < Components::IrradianceProbeManager::_activeRefs.size(); ++i)
+      for (uint32_t i = 0u; i < _currentIrradProbeCount; ++i)
       {
         const IrradProbe& irradProbe = _irradProbeBufferMemory[i];
         if (Math::calcIntersectSphereAABB(
@@ -340,10 +360,9 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
   }
 
   memcpy(_lightBufferGpuMemory, _lightBufferMemory,
-         Components::LightManager::_activeRefs.size() * sizeof(Light));
+         _currentLightCount * sizeof(Light));
   memcpy(_irradProbeBufferGpuMemory, _irradProbeBufferMemory,
-         Components::IrradianceProbeManager::_activeRefs.size() *
-             sizeof(IrradProbe));
+         _currentIrradProbeCount * sizeof(IrradProbe));
 
   {
     _INTR_PROFILE_CPU("Lighting", "Wait For Jobs");
@@ -511,8 +530,7 @@ void Lighting::init()
       BufferManager::_descMemoryPoolType(_lightBuffer) =
           MemoryPoolType::kStaticStagingBuffers;
       BufferManager::_descSizeInBytes(_lightBuffer) =
-          MAX_LIGHT_COUNT_PER_CLUSTER * _gridRes.x * _gridRes.y * _gridRes.z *
-          sizeof(Light);
+          _INTR_MAX_LIGHT_COMPONENT_COUNT * sizeof(Light);
       buffersToCreate.push_back(_lightBuffer);
     }
 
@@ -849,10 +867,57 @@ void Lighting::destroy() {}
 
 // <-
 
+namespace
+{
+void spawnAndSimulateTestLights(Components::CameraRef p_CameraRef)
+{
+  // Spawn lights if none are there yet
+  if (_testLights.empty())
+  {
+    static uint32_t testLightCount = 4096u * 8u;
+
+    _testLights.resize(testLightCount);
+    for (uint32_t i = 0u; i < testLightCount; ++i)
+    {
+      TestLight& light = _testLights[i];
+      light.spawnPos =
+          glm::vec3(Math::calcRandomFloatMinMax(-2000.0f, 2000.0f), 0.0f,
+                    Math::calcRandomFloatMinMax(-2000.0f, 2000.0f));
+      light.light.colorAndIntensity =
+          glm::vec4(Math::calcRandomFloat(), Math::calcRandomFloat(),
+                    Math::calcRandomFloat(), 5000.0f);
+      light.light.temp = glm::vec4(6500.0f);
+      light.light.posAndRadius = glm::vec4(glm::vec3(0.0f), 100.0f);
+    }
+  }
+
+  // Update position and lights
+  for (uint32_t i = 0u; i < _testLights.size(); ++i)
+  {
+    TestLight& light = _testLights[i];
+    const glm::vec3 worldPos = glm::vec3(
+        light.spawnPos.x,
+        light.spawnPos.y + 2000.0f * sin(light.spawnPos.x + light.spawnPos.y +
+                                         TaskManager::_totalTimePassed * 0.1f),
+        light.spawnPos.z);
+
+    light.light.posAndRadius = glm::vec4(
+        glm::vec3(Components::CameraManager::_viewMatrix(p_CameraRef) *
+                  glm::vec4(worldPos, 1.0f)),
+        light.light.posAndRadius.w);
+  }
+}
+}
+
 void Lighting::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
   _INTR_PROFILE_CPU("Render Pass", "Render Lighting");
   _INTR_PROFILE_GPU("Render Lighting");
+
+  // Testing code for profiling purposes
+  {
+      // spawnAndSimulateTestLights(p_CameraRef);
+  }
 
   // Update global per instance data
   {
