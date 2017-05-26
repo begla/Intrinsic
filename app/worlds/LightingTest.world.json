@@ -1,0 +1,277 @@
+[
+    {
+        "name": "LightingTest",
+        "offsetToParent": 0,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "MainCamera",
+        "offsetToParent": -1,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        1887.968505859375,
+                        -1880.980224609375,
+                        -1865.6180419921876
+                    ],
+                    "localOrient": [
+                        -0.10390432924032211,
+                        -0.39573612809181216,
+                        -0.045118384063243869,
+                        0.9113512635231018
+                    ],
+                    "localSize": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "worldPos": [
+                        1887.968505859375,
+                        -1880.980224609375,
+                        -1865.6180419921876
+                    ],
+                    "worldOrient": [
+                        -0.10390432924032211,
+                        -0.39573612809181216,
+                        -0.045118384063243869,
+                        0.9113512635231018
+                    ],
+                    "worldSize": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                }
+            },
+            {
+                "type": "Camera",
+                "properties": {
+                    "fov": 70.0,
+                    "nearPlane": 1.0,
+                    "farPlane": 10000.0
+                }
+            }
+        ]
+    },
+    {
+        "name": "GameCamera",
+        "offsetToParent": -2,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -938.4696044921875,
+                        574.0117797851563,
+                        -288.30108642578127
+                    ],
+                    "localOrient": [
+                        0.07182473689317703,
+                        -0.6936193108558655,
+                        0.0698389932513237,
+                        0.7133413553237915
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        -938.4696044921875,
+                        574.0117797851563,
+                        -288.30108642578127
+                    ],
+                    "worldOrient": [
+                        0.07182473689317703,
+                        -0.6936193108558655,
+                        0.0698389932513237,
+                        0.7133413553237915
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "CameraController",
+                "properties": {
+                    "cameraControllerType": 0,
+                    "targetObjectName": "Player",
+                    "targetEulerAngles": [
+                        0.200699120759964,
+                        -1.542762041091919,
+                        0.0
+                    ]
+                }
+            },
+            {
+                "type": "Camera",
+                "properties": {
+                    "fov": 80.0,
+                    "nearPlane": 1.0,
+                    "farPlane": 10000.0
+                }
+            }
+        ]
+    },
+    {
+        "name": "PostEffectVolume0",
+        "offsetToParent": -3,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        2000.0,
+                        2000.0,
+                        2000.0
+                    ],
+                    "worldPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "worldSize": [
+                        2000.0,
+                        2000.0,
+                        2000.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "sky",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "PostEffectVolume",
+                "properties": {
+                    "postEffectName": "IrradianceTest",
+                    "radius": 4000.0,
+                    "blendRange": 2.0
+                }
+            }
+        ]
+    },
+    {
+        "name": "Cube",
+        "offsetToParent": -4,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        2000.0,
+                        2000.0,
+                        2000.0
+                    ],
+                    "worldPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "worldSize": [
+                        2000.0,
+                        2000.0,
+                        2000.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "cube_inverted",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    }
+]
