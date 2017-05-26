@@ -813,7 +813,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
             rotationsPerFace[faceIdx];
         Components::NodeManager::updateTransforms({camNodeRef});
 
-        for (uint32_t f = 0u; f < 10u; ++f)
+        for (uint32_t f = 0u; f < 60u; ++f)
         {
           RenderProcess::Default::renderFrame(0.0f);
           ++TaskManager::_frameCounter;

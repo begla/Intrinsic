@@ -189,7 +189,7 @@ float burleyToMipApprox(float perceptualRoughness)
 float coeffsSH(int l, int m, vec3 v)
 {
    float res = (1.0 / 2.0) * sqrt(1.0 / MATH_PI);
-   float x = v.x, y = v.y, z = v.z;
+   float x = -v.x, y = v.y, z = v.z;
  
    switch(l)
    {
