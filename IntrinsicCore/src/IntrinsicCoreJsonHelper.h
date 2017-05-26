@@ -153,6 +153,75 @@ _INTR_INLINE glm::vec4 readPropertyVec4(const rapidjson::Value& p_Property)
 _INTR_INLINE rapidjson::Value
 createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
                const Name& p_Category, const Name& p_Editor,
+               const SHCoeffs& p_Value, bool p_ReadOnly, bool p_Internal)
+{
+  rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);
+  rapidjson::Value values = rapidjson::Value(rapidjson::kArrayType);
+
+  glm::vec3* rawCoeffs = (glm::vec3*)&p_Value;
+
+  for (uint32_t i = 0u; i < 9u; ++i)
+  {
+    const glm::vec3& coeff = rawCoeffs[i];
+
+    values.PushBack(coeff.x, p_Doc.GetAllocator());
+    values.PushBack(coeff.y, p_Doc.GetAllocator());
+    values.PushBack(coeff.z, p_Doc.GetAllocator());
+  }
+
+  if (p_GenerateDesc)
+  {
+    rapidjson::Value propertyCat =
+        rapidjson::Value(p_Category.getString().c_str(), p_Doc.GetAllocator());
+    rapidjson::Value propertyEditor =
+        rapidjson::Value(p_Editor.getString().c_str(), p_Doc.GetAllocator());
+
+    property.AddMember("cat", propertyCat, p_Doc.GetAllocator());
+    property.AddMember("type", "sh", p_Doc.GetAllocator());
+    property.AddMember("editor", propertyEditor, p_Doc.GetAllocator());
+    property.AddMember("readOnly", p_ReadOnly, p_Doc.GetAllocator());
+    property.AddMember("internal", p_Internal, p_Doc.GetAllocator());
+
+    property.AddMember("values", values, p_Doc.GetAllocator());
+  }
+  else
+  {
+    property = values;
+  }
+
+  return property;
+}
+
+_INTR_INLINE SHCoeffs readPropertySH(const rapidjson::Value& p_Property)
+{
+  SHCoeffs coeffs;
+  glm::vec3* rawCoeffs = (glm::vec3*)&coeffs;
+
+  if (p_Property.IsObject())
+  {
+    for (uint32_t i = 0u; i < 9u; ++i)
+    {
+      rawCoeffs[i] = glm::vec3(p_Property["values"][i * 3u].GetFloat(),
+                               p_Property["values"][i * 3u + 1u].GetFloat(),
+                               p_Property["values"][i * 3u + 2u].GetFloat());
+    }
+  }
+  else
+  {
+    for (uint32_t i = 0u; i < 9u; ++i)
+    {
+      rawCoeffs[i] = glm::vec3(p_Property[i * 3u].GetFloat(),
+                               p_Property[i * 3u + 1u].GetFloat(),
+                               p_Property[i * 3u + 2u].GetFloat());
+    }
+  }
+
+  return coeffs;
+}
+
+_INTR_INLINE rapidjson::Value
+createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
+               const Name& p_Category, const Name& p_Editor,
                const glm::quat& p_Value, bool p_ReadOnly, bool p_Internal)
 {
   rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);

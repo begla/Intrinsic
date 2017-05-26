@@ -698,6 +698,26 @@ _INTR_INLINE glm::vec3 bezierQuadratic(const _INTR_ARRAY(glm::vec3) p_Points,
 
   return interpPoints[0];
 }
+
+// <-
+
+_INTR_INLINE SHCoeffs blendSH(const SHCoeffs& p_Left, const SHCoeffs& p_Right,
+                              float p_Blend)
+{
+  SHCoeffs result;
+  {
+    glm::vec3* rawResult = (glm::vec3*)&result;
+
+    glm::vec3* rawLeft = (glm::vec3*)&p_Left;
+    glm::vec3* rawRight = (glm::vec3*)&p_Right;
+
+    for (uint32_t i = 0u; i < 9u; ++i)
+    {
+      rawResult[i] = glm::mix(rawLeft[i], rawRight[i], p_Blend);
+    }
+  }
+  return result;
+}
 }
 }
 }

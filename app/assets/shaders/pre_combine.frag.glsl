@@ -83,7 +83,8 @@ void main()
     const MaterialParameters matParamsTransp = materialParameters[matBufferEntryIdxTransp];
 
     fogDepth = min(fogDepth, depthTransp.r);
-    const float depthLinTransp = linearizeDepth(depthTransp, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
+    const float depthLinTransp = linearizeDepth(depthTransp, uboPerInstance.camParams.x, 
+      uboPerInstance.camParams.y);
 
     // Refraction
     const float distStrength = albedoTransparents.a * matParamsTransp.refractionFactor;
@@ -104,13 +105,16 @@ void main()
     }
 
     // Water fog
-    const float linDepthOpaque = linearizeDepth(waterFogDepth, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
-    const float linDepthTransp = linearizeDepth(depthTransp, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
+    const float linDepthOpaque = linearizeDepth(waterFogDepth, uboPerInstance.camParams.x, 
+      uboPerInstance.camParams.y);
+    const float linDepthTransp = linearizeDepth(depthTransp, uboPerInstance.camParams.x, 
+      uboPerInstance.camParams.y);
 
     const float waterFog = min(1.0 - exp(-(linDepthOpaque - linDepthTransp) * waterFogDensity), waterFogMaxBlendFactor);
     const float waterFogDecay = clamp(pow(waterFog, waterFogDecayExp), 0.0, 1.0);
 
-    opaque.rgb = mix(opaque.rgb, mix(waterFogColor0, waterFogColor1, waterFogDecay), albedoTransparents.a * waterFog * uboPerInstance.postParams0.x);
+    opaque.rgb = mix(opaque.rgb, mix(waterFogColor0, waterFogColor1, waterFogDecay), 
+      albedoTransparents.a * waterFog * uboPerInstance.postParams0.x * uboPerInstance.postParams0.y);
     const vec3 transp = albedoTransparents.rgb * lightingTransp;
     outColor.rgb = mix(opaque, transp, albedoTransparents.a);
   }
@@ -131,7 +135,8 @@ void main()
 
     const vec3 lightVec = vec3(1.0, 0.45, -0.15);
     fog.a = 1.0 - min(max((1.0 - exp((-rayDist + fogStart) * fogDensity)), 0.0), fogMaxBlendFactor);
-    fog.rgb = (1.0 - fog.a) * texture(irradianceTex, ray).rgb * uboPerInstance.postParams0.x;
+    fog.rgb = (1.0 - fog.a) * texture(irradianceTex, ray).rgb * uboPerInstance.postParams0.x
+      * uboPerInstance.postParams0.y;
   }
 
   // Volumetrics

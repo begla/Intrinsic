@@ -300,11 +300,18 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
       QObject::connect(captureProbe, SIGNAL(triggered()), this,
                        SLOT(onCaptureIrradianceProbe()));
 
-      QAction* loadSHCoeffs =
-          new QAction(QIcon(":/Icons/lightbulb"), "Load SH Coefficients", this);
-      contextMenu->addAction(loadSHCoeffs);
-      QObject::connect(loadSHCoeffs, SIGNAL(triggered()), this,
+      QAction* loadSHCoeffsDay = new QAction(
+          QIcon(":/Icons/lightbulb"), "Load SH Coefficients (Day)", this);
+
+      contextMenu->addAction(loadSHCoeffsDay);
+      QObject::connect(loadSHCoeffsDay, SIGNAL(triggered()), this,
                        SLOT(onLoadSHCoeffsFromFile()));
+
+      QAction* loadSHCoeffsNight = new QAction(
+          QIcon(":/Icons/lightbulb"), "Load SH Coefficients (Night)", this);
+      contextMenu->addAction(loadSHCoeffsNight);
+      QObject::connect(loadSHCoeffsNight, SIGNAL(triggered()), this,
+                       SLOT(onLoadSHCoeffsFromFileNight()));
 
       contextMenu->addSeparator();
     }
@@ -654,7 +661,12 @@ void IntrinsicEdNodeViewTreeWidget::onCurrentlySelectedEntityChanged(
   }
 }
 
-void IntrinsicEdNodeViewTreeWidget::onLoadSHCoeffsFromFile()
+void IntrinsicEdNodeViewTreeWidget::onLoadSHCoeffsFromFileNight()
+{
+  onLoadSHCoeffsFromFile(true);
+}
+
+void IntrinsicEdNodeViewTreeWidget::onLoadSHCoeffsFromFile(bool p_CaptureNight)
 {
   QTreeWidgetItem* currIt = currentItem();
   if (currIt)
@@ -668,9 +680,13 @@ void IntrinsicEdNodeViewTreeWidget::onLoadSHCoeffsFromFile()
             currentEntity);
     if (irradProbeRef.isValid())
     {
-      glm::vec3* coeffs =
-          (glm::vec3*)&Components::IrradianceProbeManager::_descSHCoeffs(
-              irradProbeRef);
+      glm::vec3* coeffs = nullptr;
+      if (!p_CaptureNight)
+        coeffs = (glm::vec3*)&Components::IrradianceProbeManager::_descSHDay(
+            irradProbeRef);
+      else
+        coeffs = (glm::vec3*)&Components::IrradianceProbeManager::_descSHNight(
+            irradProbeRef);
 
       const QString fileName = QFileDialog::getOpenFileName(
           this, tr("Load SH Coefficients"), QString("media/irradiance_probes/"),
@@ -767,7 +783,10 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
     }
 
     using namespace Intrinsic::Renderer::Vulkan;
+    uint32_t prevDebugStageFlags = RenderPass::Debug::_activeDebugStageFlags;
+    RenderPass::Debug::_activeDebugStageFlags = 0u;
     RenderPass::Lighting::_globalAmbientFactor = 0.0f;
+    RenderPass::VolumetricLighting::_globalScatteringFactor = 0.0f;
 
     static glm::uvec2 atlasIndices[6]{glm::uvec2(0u, 1u), glm::uvec2(1u, 1u),
                                       glm::uvec2(2u, 1u), glm::uvec2(3u, 1u),
@@ -797,6 +816,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
         for (uint32_t f = 0u; f < 60u; ++f)
         {
           RenderProcess::Default::renderFrame(0.0f);
+          ++TaskManager::_frameCounter;
           qApp->processEvents();
         }
 
@@ -878,6 +898,8 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
       RenderSystem::resizeSwapChain(true);
 
       RenderPass::Lighting::_globalAmbientFactor = 1.0f;
+      RenderPass::VolumetricLighting::_globalScatteringFactor = 1.0f;
+      RenderPass::Debug::_activeDebugStageFlags = prevDebugStageFlags;
       World::setActiveCamera(prevCamera);
       World::destroyNodeFull(camNodeRef);
     }

@@ -176,7 +176,7 @@ void displayDebugLineGeometryForSelectedObject()
 }
 
 // Static members
-uint32_t Debug::_activeDebugStageFlags = 0u;
+uint32_t Debug::_activeDebugStageFlags = DebugStageFlags::kSelectedObject;
 
 void Debug::init()
 {
@@ -473,7 +473,8 @@ void Debug::render(float p_DeltaT, Components::CameraRef p_CameraRef)
       _parseBenchmark = true;
     }
 
-    displayDebugLineGeometryForSelectedObject();
+    if ((_activeDebugStageFlags & DebugStageFlags::kSelectedObject) > 0u)
+      displayDebugLineGeometryForSelectedObject();
   }
 
   // Line debug rendering

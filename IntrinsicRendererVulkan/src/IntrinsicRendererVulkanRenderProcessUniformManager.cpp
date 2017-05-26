@@ -193,6 +193,9 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
   UniformManager::_uniformDataSource.postParams0.x =
       Core::Resources::PostEffectManager::_descAmbientFactor(
           Core::Resources::PostEffectManager::_blendTargetRef);
+  UniformManager::_uniformDataSource.postParams0.y =
+      Core::Resources::PostEffectManager::_descDayNightFactor(
+          Core::Resources::PostEffectManager::_blendTargetRef);
 
   UniformManager::_uniformDataSource.cameraParameters.x =
       Components::CameraManager::_descNearPlane(p_Camera);

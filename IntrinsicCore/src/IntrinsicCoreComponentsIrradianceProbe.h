@@ -23,21 +23,6 @@ namespace Components
 typedef Dod::Ref IrradianceProbeRef;
 typedef _INTR_ARRAY(IrradianceProbeRef) IrradianceProbeRefArray;
 
-struct SHCoeffs
-{
-  glm::vec3 L0;
-
-  glm::vec3 L10;
-  glm::vec3 L11;
-  glm::vec3 L12;
-
-  glm::vec3 L20;
-  glm::vec3 L21;
-  glm::vec3 L22;
-  glm::vec3 L23;
-  glm::vec3 L24;
-};
-
 struct IrradianceProbeData : Dod::Components::ComponentDataBase
 {
   IrradianceProbeData()
@@ -45,13 +30,17 @@ struct IrradianceProbeData : Dod::Components::ComponentDataBase
             _INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT)
   {
     descRadius.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
-    descSHCoeffs.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
     descPriority.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+
+    descSHDay.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+    descSHNight.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
   }
 
   _INTR_ARRAY(float) descRadius;
   _INTR_ARRAY(uint32_t) descPriority;
-  _INTR_ARRAY(SHCoeffs) descSHCoeffs;
+
+  _INTR_ARRAY(SHCoeffs) descSHDay;
+  _INTR_ARRAY(SHCoeffs) descSHNight;
 };
 
 struct IrradianceProbeManager
@@ -76,7 +65,8 @@ struct IrradianceProbeManager
   _INTR_INLINE static void resetToDefault(MeshRef p_Ref)
   {
     _descRadius(p_Ref) = 20.0f;
-    memset(&_descSHCoeffs(p_Ref), 0x00, sizeof(SHCoeffs));
+    memset(&_descSHDay(p_Ref), 0x00, sizeof(SHCoeffs));
+    memset(&_descSHNight(p_Ref), 0x00, sizeof(SHCoeffs));
   }
 
   // <-
@@ -107,51 +97,16 @@ struct IrradianceProbeManager
                           _N(float), _descPriority(p_Ref), false, false),
         p_Document.GetAllocator());
 
-    p_Properties.AddMember(
-        "shL0",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L0, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL10",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L10, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL11",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L11, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL12",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L12, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL20",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L20, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL21",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L21, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL22",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L22, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL23",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L23, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL24",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L24, false, false),
-        p_Document.GetAllocator());
+    p_Properties.AddMember("shDay",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(IrradianceProbe), _N(sh),
+                                             _descSHDay(p_Ref), false, false),
+                           p_Document.GetAllocator());
+    p_Properties.AddMember("shNight",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(IrradianceProbe), _N(sh),
+                                             _descSHNight(p_Ref), false, false),
+                           p_Document.GetAllocator());
   }
 
   // <-
@@ -166,33 +121,10 @@ struct IrradianceProbeManager
       _descPriority(p_Ref) =
           (uint32_t)JsonHelper::readPropertyFloat(p_Properties["priority"]);
 
-    if (p_Properties.HasMember("shL0"))
-      _descSHCoeffs(p_Ref).L0 =
-          JsonHelper::readPropertyVec3(p_Properties["shL0"]);
-    if (p_Properties.HasMember("shL10"))
-      _descSHCoeffs(p_Ref).L10 =
-          JsonHelper::readPropertyVec3(p_Properties["shL10"]);
-    if (p_Properties.HasMember("shL11"))
-      _descSHCoeffs(p_Ref).L11 =
-          JsonHelper::readPropertyVec3(p_Properties["shL11"]);
-    if (p_Properties.HasMember("shL12"))
-      _descSHCoeffs(p_Ref).L12 =
-          JsonHelper::readPropertyVec3(p_Properties["shL12"]);
-    if (p_Properties.HasMember("shL20"))
-      _descSHCoeffs(p_Ref).L20 =
-          JsonHelper::readPropertyVec3(p_Properties["shL20"]);
-    if (p_Properties.HasMember("shL21"))
-      _descSHCoeffs(p_Ref).L21 =
-          JsonHelper::readPropertyVec3(p_Properties["shL21"]);
-    if (p_Properties.HasMember("shL22"))
-      _descSHCoeffs(p_Ref).L22 =
-          JsonHelper::readPropertyVec3(p_Properties["shL22"]);
-    if (p_Properties.HasMember("shL23"))
-      _descSHCoeffs(p_Ref).L23 =
-          JsonHelper::readPropertyVec3(p_Properties["shL23"]);
-    if (p_Properties.HasMember("shL24"))
-      _descSHCoeffs(p_Ref).L24 =
-          JsonHelper::readPropertyVec3(p_Properties["shL24"]);
+    if (p_Properties.HasMember("shDay"))
+      _descSHDay(p_Ref) = JsonHelper::readPropertySH(p_Properties["shDay"]);
+    if (p_Properties.HasMember("shNight"))
+      _descSHNight(p_Ref) = JsonHelper::readPropertySH(p_Properties["shNight"]);
   }
 
   // <-
@@ -227,9 +159,13 @@ struct IrradianceProbeManager
     return _data.descPriority[p_Ref._id];
   }
 
-  _INTR_INLINE static SHCoeffs& _descSHCoeffs(IrradianceProbeRef p_Ref)
+  _INTR_INLINE static SHCoeffs& _descSHDay(IrradianceProbeRef p_Ref)
   {
-    return _data.descSHCoeffs[p_Ref._id];
+    return _data.descSHDay[p_Ref._id];
+  }
+  _INTR_INLINE static SHCoeffs& _descSHNight(IrradianceProbeRef p_Ref)
+  {
+    return _data.descSHNight[p_Ref._id];
   }
 };
 }
