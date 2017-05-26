@@ -16,7 +16,7 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
-#define MAX_LIGHT_COUNT_PER_CLUSTER 128u
+#define MAX_LIGHT_COUNT_PER_CLUSTER 256u
 #define MAX_IRRAD_PROBES_PER_CLUSTER 4u
 #define GRID_DEPTH_SLICE_COUNT 24u
 #define GRID_SIZE_Y 8u
@@ -874,7 +874,7 @@ void spawnAndSimulateTestLights(Components::CameraRef p_CameraRef)
   // Spawn lights if none are there yet
   if (_testLights.empty())
   {
-    static uint32_t testLightCount = 4096u * 8u;
+    static uint32_t testLightCount = 4096u * 4u;
 
     _testLights.resize(testLightCount);
     for (uint32_t i = 0u; i < testLightCount; ++i)
@@ -916,7 +916,18 @@ void Lighting::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 
   // Testing code for profiling purposes
   {
-      // spawnAndSimulateTestLights(p_CameraRef);
+    Components::NodeRef rootNodeRef = World::getRootNode();
+    Entity::EntityRef rootEntityRef =
+        Components::NodeManager::_entity(rootNodeRef);
+
+    if (Entity::EntityManager::_name(rootEntityRef) == _N(LightingTest))
+    {
+      spawnAndSimulateTestLights(p_CameraRef);
+    }
+    else
+    {
+      _testLights.clear();
+    }
   }
 
   // Update global per instance data

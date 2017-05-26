@@ -33,7 +33,7 @@ const float probeFadeRange = 0.2;
 // ->
 
 // Have to match the values on C++ side
-const uint maxLightCountPerCluster = 128;
+const uint maxLightCountPerCluster = 256;
 const float gridDepth = 10000.0f;
 const uvec3 gridRes = uvec3(16u, 8u, 24u);
 const float gridDepthExp = 3.0;
