@@ -106,6 +106,7 @@ void main()
 
   const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
   const uint clusterIdx = calcClusterIndex(gridPos);
+  const bool gridPosValid = isGridPosValid(gridPos);
 
   // Ambient lighting
   const vec3 normalWS = (uboPerInstance.invViewMatrix * vec4(d.N, 0.0)).xyz;
@@ -116,7 +117,7 @@ void main()
 
   vec3 irrad = vec3(0.0);
 
-  if (isGridPosValid(gridPos))
+  if (gridPosValid)
   {
     const uint irradProbeCount = irradProbeIndices[clusterIdx];
 
@@ -175,7 +176,7 @@ void main()
     outColor.rgb += translColor;    
   }
 
-  if (isGridPosValid(gridPos))
+  if (gridPosValid)
   {
     // Point lights
     const uint lightCount = lightIndices[clusterIdx];
