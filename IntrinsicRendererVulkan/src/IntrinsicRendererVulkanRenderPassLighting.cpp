@@ -19,6 +19,7 @@
 #define MAX_LIGHT_COUNT_PER_CLUSTER 128u
 #define MAX_IRRAD_PROBES_PER_CLUSTER 4u
 #define GRID_DEPTH_SLICE_COUNT 24u
+#define GRID_SIZE_Y 8u
 
 namespace Intrinsic
 {
@@ -86,7 +87,8 @@ struct PerInstanceData
 
 // Have to match the values in the shader
 const float _gridDepth = 10000.0f;
-const glm::uvec3 _gridRes = glm::uvec3(16u, 8u, GRID_DEPTH_SLICE_COUNT);
+const glm::uvec3 _gridRes =
+    glm::uvec3(16u, GRID_SIZE_Y, GRID_DEPTH_SLICE_COUNT);
 const float _gridDepthExp = 3.0f;
 const float _gridDepthSliceScale =
     _gridDepth / glm::pow((float)(_gridRes.z - 1u), _gridDepthExp);
@@ -178,9 +180,9 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
   void ExecuteRange(enki::TaskSetPartition p_Range,
                     uint32_t p_ThreadNum) override
   {
-    _INTR_PROFILE_CPU("Lighting", "Cull Lights For Depth Slice");
+    _INTR_PROFILE_CPU("Lighting", "Cull Lights And Probes For Depth Slice");
 
-    for (uint32_t y = 0u; y < _gridRes.y; ++y)
+    for (uint32_t y = p_Range.start; y < p_Range.end; ++y)
     {
       for (uint32_t x = 0u; x < _gridRes.x; ++x)
       {
@@ -297,6 +299,7 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
     {
       LightCullingParallelTaskSet& taskSet = _cullingTaskSets[z];
       taskSet._z = z;
+      taskSet.m_SetSize = GRID_SIZE_Y;
       taskSet._availableLights.clear();
       taskSet._availableIrradProbes.clear();
 
