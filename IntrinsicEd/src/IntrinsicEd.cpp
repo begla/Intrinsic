@@ -386,6 +386,7 @@ void IntrinsicEd::onLoadWorld()
   if (fileName.size() > 0u)
   {
     World::load(fileName.toStdString().c_str());
+    GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
     _nodeView->populateNodeTree();
   }
 }
