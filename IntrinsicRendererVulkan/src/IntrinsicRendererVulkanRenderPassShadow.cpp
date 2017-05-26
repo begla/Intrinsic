@@ -153,7 +153,7 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
 // <-
 
 // Static members
-glm::uvec2 Shadow::_shadowMapSize = glm::uvec2(1024u, 1024u);
+glm::uvec2 Shadow::_shadowMapSize = glm::uvec2(1536u, 1536u);
 
 // <-
 
