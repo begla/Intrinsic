@@ -34,7 +34,9 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
     descMainLightColor.resize(_INTR_MAX_POST_EFFECT_COUNT);
     descMainLightOrientation.resize(_INTR_MAX_POST_EFFECT_COUNT);
     descMainLightIntens.resize(_INTR_MAX_POST_EFFECT_COUNT);
+
     descAmbientFactor.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descDayNightFactor.resize(_INTR_MAX_POST_EFFECT_COUNT);
   }
 
   // <-
@@ -47,6 +49,7 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(float) descMainLightIntens;
 
   _INTR_ARRAY(float) descAmbientFactor;
+  _INTR_ARRAY(float) descDayNightFactor;
 };
 
 struct PostEffectManager
@@ -74,6 +77,7 @@ struct PostEffectManager
     _descMainLightOrientation(p_Ref) = glm::quat();
     _descMainLightTemp(p_Ref) = 3200.0f;
     _descAmbientFactor(p_Ref) = 1.0f;
+    _descDayNightFactor(p_Ref) = 1.0f;
   }
 
   // <-
@@ -130,6 +134,11 @@ struct PostEffectManager
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
                           _descAmbientFactor(p_Ref), false, false),
         p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "dayNightFactor",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descDayNightFactor(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   // <-
@@ -160,6 +169,9 @@ struct PostEffectManager
     if (p_Properties.HasMember("ambientFactor"))
       _descAmbientFactor(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["ambientFactor"]);
+    if (p_Properties.HasMember("dayNightFactor"))
+      _descDayNightFactor(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["dayNightFactor"]);
   }
 
   // <-
@@ -210,6 +222,9 @@ struct PostEffectManager
                    _descMainLightOrientation(p_Right), p_BlendFactor);
     _descAmbientFactor(p_Target) = glm::mix(
         _descAmbientFactor(p_Left), _descAmbientFactor(p_Right), p_BlendFactor);
+    _descDayNightFactor(p_Target) =
+        glm::mix(_descDayNightFactor(p_Left), _descDayNightFactor(p_Right),
+                 p_BlendFactor);
   }
 
   // <-
@@ -243,6 +258,10 @@ struct PostEffectManager
   _INTR_INLINE static float& _descAmbientFactor(PostEffectRef p_Ref)
   {
     return _data.descAmbientFactor[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descDayNightFactor(PostEffectRef p_Ref)
+  {
+    return _data.descDayNightFactor[p_Ref._id];
   }
 
   // Static members

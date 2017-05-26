@@ -132,20 +132,20 @@ void main()
         const float fadeStart = probe.posAndRadius.w - fadeRange;
         const float fade = 1.0 - max(distToProbe - fadeStart, 0.0) / fadeRange;
         
-        irrad = mix(irrad, (pi == 0 ? uboPerInstance.data0.y : 1.0) 
-          * d.diffuseColor * sampleSH(probe.data, R) / MATH_PI, fade);
+        irrad = mix(irrad, d.diffuseColor * sampleSH(probe.data, R) / MATH_PI, fade);
       }
     }
   }
 
-  outColor.rgb += min(ssaoSample.r, parameter0Sample.z) * irrad; 
+  outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, parameter0Sample.z) * irrad;
 
   // Specular
   //const float specLod = burleyToMip(d.roughness, dot(normalWS, R0));
   const float specLod = burleyToMipApprox(d.roughness);
-  const vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
+  vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
 
-  outColor.rgb += uboPerInstance.data0.y * parameter0Sample.z * spec;
+  outColor.rgb += uboPerInstance.data0.z * uboPerInstance.data0.y 
+    * parameter0Sample.z * spec;
 
   // Emissive
   outColor.rgb += parameter0Sample.w * matParams.emissiveIntensity * d.baseColor;

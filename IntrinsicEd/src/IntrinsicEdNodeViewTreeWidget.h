@@ -61,7 +61,8 @@ public slots:
   void onItemDoubleClicked(QTreeWidgetItem* item, int column);
   void onItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
   void onItemChanged(QTreeWidgetItem* item, int column);
-  void onLoadSHCoeffsFromFile();
+  void onLoadSHCoeffsFromFileNight();
+  void onLoadSHCoeffsFromFile(bool p_CaptureNight = false);
   void onCaptureIrradianceProbe();
 
 signals:

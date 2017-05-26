@@ -303,9 +303,16 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
       _irradProbeBufferMemory[_currentIrradProbeCount].posAndRadius = glm::vec4(
           irradProbePosVS,
           Components::IrradianceProbeManager::_descRadius(irradProbeRef));
-      memcpy(_irradProbeBufferMemory[_currentIrradProbeCount].data,
-             &Components::IrradianceProbeManager::_descSHCoeffs(irradProbeRef),
-             sizeof(Components::SHCoeffs));
+
+      // Blend day/night SH and copy to memory
+      SHCoeffs blendedSH = Math::blendSH(
+          Components::IrradianceProbeManager::_descSHNight(irradProbeRef),
+          Components::IrradianceProbeManager::_descSHDay(irradProbeRef),
+          Core::Resources::PostEffectManager::_descDayNightFactor(
+              Core::Resources::PostEffectManager::_blendTargetRef));
+
+      memcpy(_irradProbeBufferMemory[_currentIrradProbeCount].data, &blendedSH,
+             sizeof(SHCoeffs));
       ++_currentIrradProbeCount;
     }
   }
@@ -418,6 +425,9 @@ void renderLighting(Resources::FramebufferRef p_FramebufferRef,
         Core::Resources::PostEffectManager::_descAmbientFactor(
             Core::Resources::PostEffectManager::_blendTargetRef) *
         Lighting::_globalAmbientFactor;
+    _perInstanceData.data0.z =
+        Core::Resources::PostEffectManager::_descDayNightFactor(
+            Core::Resources::PostEffectManager::_blendTargetRef);
 
     const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
         RenderProcess::Default::_shadowFrustums[p_CameraRef];

@@ -118,6 +118,21 @@ namespace Intrinsic
 {
 namespace Core
 {
+// Struct defining a third order SH
+struct SHCoeffs
+{
+  glm::vec3 L0;
+
+  glm::vec3 L10;
+  glm::vec3 L11;
+  glm::vec3 L12;
+
+  glm::vec3 L20;
+  glm::vec3 L21;
+  glm::vec3 L22;
+  glm::vec3 L23;
+  glm::vec3 L24;
+};
 }
 }
 using namespace Intrinsic::Core;

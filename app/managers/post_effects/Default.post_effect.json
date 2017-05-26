@@ -16,6 +16,7 @@
             1.0,
             1.0
         ],
-        "ambientFactor": 1.0
+        "ambientFactor": 1.0,
+        "dayNightFactor": 1.0
     }
 }

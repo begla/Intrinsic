@@ -108,10 +108,12 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
 
     _perInstanceData.data0.x =
         Core::Resources::PostEffectManager::_descVolumetricLightingScattering(
-            Core::Resources::PostEffectManager::_blendTargetRef);
+            Core::Resources::PostEffectManager::_blendTargetRef) *
+        VolumetricLighting::_globalScatteringFactor;
     _perInstanceData.data0.z =
         Core::Resources::PostEffectManager::_descAmbientFactor(
-            Core::Resources::PostEffectManager::_blendTargetRef);
+            Core::Resources::PostEffectManager::_blendTargetRef) *
+        Lighting::_globalAmbientFactor;
     _perInstanceData.mainLightDirAndTemp = glm::vec4(
         mainLightDir, Core::Resources::PostEffectManager::_descMainLightTemp(
                           Core::Resources::PostEffectManager::_blendTargetRef));
@@ -383,6 +385,9 @@ _INTR_INLINE void blurExponentialShadowMaps(uint32_t p_ShadowMapCount)
   }
 }
 }
+
+// Static members
+float VolumetricLighting::_globalScatteringFactor = 1.0f;
 
 void VolumetricLighting::init()
 {

@@ -82,8 +82,14 @@ layout (local_size_x = 4u, local_size_y = 4u, local_size_z = 4u) in;
 void main()
 {
   const float densityFactor = uboPerInstance.data0.x;
-  const float localLightIntens = uboPerInstance.data0.y;
   vec3 cellIndex = vec3(gl_GlobalInvocationID.xyz) + 0.5;
+
+  if (densityFactor < EPSILON)
+  {
+    imageStore(output0Tex, ivec3(cellIndex), vec4(0.0));
+  }
+
+  const float localLightIntens = uboPerInstance.data0.y;
 
   // Temporal reprojection
   float reprojWeight = 0.85; 
