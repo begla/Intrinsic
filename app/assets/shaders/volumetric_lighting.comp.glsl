@@ -157,11 +157,12 @@ void main()
 
   const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
   const uint clusterIdx = calcClusterIndex(gridPos);
+  const bool gridPosValid = isGridPosValid(gridPos);
 
   vec3 irrad = vec3(0.0);
 
   // Local irradiance
-  if (isGridPosValid(gridPos)
+  if (gridPosValid
     && density > EPSILON)
   {
     const uint irradProbeCount = irradProbeIndices[clusterIdx];
@@ -185,7 +186,7 @@ void main()
   lighting += irrad * uboPerInstance.data0.z;
 
   // Local lights
-  if (isGridPosValid(gridPos)
+  if (gridPosValid
     && density > EPSILON)
   {
     uint lightCount = lightIndices[clusterIdx];
