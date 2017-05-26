@@ -86,7 +86,7 @@ void main()
   vec3 cellIndex = vec3(gl_GlobalInvocationID.xyz) + 0.5;
 
   // Temporal reprojection
-  float reprojWeight = 0.95; 
+  float reprojWeight = 0.85; 
 
   const vec3 posSSCenter = cellIndexToScreenSpacePos(cellIndex);
   const float linDepthCenter = volumeZToDepth(posSSCenter.z);
