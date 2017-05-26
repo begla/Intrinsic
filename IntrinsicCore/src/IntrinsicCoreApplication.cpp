@@ -46,7 +46,7 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
   Physics::System::init();
 
   // Threading
-  _scheduler.Initialize(std::max(enki::GetNumHardwareThreads() - 1u, 1u));
+  _scheduler.Initialize(std::min(enki::GetNumHardwareThreads(), 4u));
 
   // Init. managers
   initManagers();
