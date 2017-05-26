@@ -725,7 +725,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
   Components::NodeRef irradNodeRef;
   Entity::EntityRef currentEntity;
 
-  static const glm::uvec2 cubeMapRes = glm::uvec2(320u, 320u);
+  static const glm::uvec2 cubeMapRes = glm::uvec2(256u, 256u);
 
   QTreeWidgetItem* currIt = currentItem();
   if (currIt)
@@ -813,7 +813,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
             rotationsPerFace[faceIdx];
         Components::NodeManager::updateTransforms({camNodeRef});
 
-        for (uint32_t f = 0u; f < 60u; ++f)
+        for (uint32_t f = 0u; f < 10u; ++f)
         {
           RenderProcess::Default::renderFrame(0.0f);
           ++TaskManager::_frameCounter;
