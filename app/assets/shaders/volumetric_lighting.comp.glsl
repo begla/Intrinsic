@@ -86,7 +86,7 @@ void main()
   vec3 cellIndex = vec3(gl_GlobalInvocationID.xyz) + 0.5;
 
   // Temporal reprojection
-  float reprojWeight = 0.85; 
+  float reprojWeight = 0.95; 
 
   const vec3 posSSCenter = cellIndexToScreenSpacePos(cellIndex);
   const float linDepthCenter = volumeZToDepth(posSSCenter.z);
@@ -102,7 +102,7 @@ void main()
 
   // Temporal super-sampling
   const vec3 offset = (uboPerInstance.haltonSamples.xyz * 2.0 - 1.0) * 0.5;
-  cellIndex += offset * vec3(1.0, 1.0, 1.0);
+  cellIndex += offset.xyz * vec3(1.0, 1.0, 1.0);
 
   const vec3 posSS = cellIndexToScreenSpacePos(cellIndex);
   const float linDepth = volumeZToDepth(posSS.z);
@@ -115,24 +115,45 @@ void main()
     linDepth, uboPerInstance.projMatrix);
   const vec3 rayWS = normalize(posWS - uboPerInstance.camPos.xyz); 
 
-  // Directional light
-  vec4 posLS;
-  uint shadowMapIdx = findBestFittingSplit(posVS.xyz, posLS, uboPerInstance.shadowViewProjMatrix);
-
-  float shadowAttenuation = 1.0; 
-
-  if (shadowMapIdx != uint(-1)) 
-  {
-    const vec4 shadowSample = texture(shadowBufferExpTex, vec3(posLS.xy, shadowMapIdx));
-    shadowAttenuation = clamp(calculateShadowESM(shadowSample, posLS.z)*1.1 - 0.1, 0.0, 1.0);
-  }
-
+  // Calc. density
   float density = densityFactor * layerThick;
-  const vec3 lightColor = uboPerInstance.mainLightColorAndIntens.rgb * uboPerInstance.mainLightColorAndIntens.a 
-    * kelvinToRGB(uboPerInstance.mainLightDirAndTemp.a, kelvinLutTex) / MATH_PI;
+  vec3 finalHeightPos = heightRefPosWS;
 
+  // Noise
+#if 1
+  float noiseAccum = 1.0;
+  noiseAccum *= noise(posWS * clamp(5.0 / linDepth, 0.005, 0.08) + uboPerInstance.eyeWSVectorX.w * 0.5);
+  noiseAccum *= noise(posWS * clamp(10.0 / linDepth, 0.005, 0.08) + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.382871);
+  density *= clamp(noiseAccum, 0.0, 1.0);
+  //finalHeightPos.y -= noise(posWS * clamp(10.0 / linDepth, 0.005, 0.08) + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.75827618) * 50.0;
+#endif
+
+  const float heightAttenuation = 1.0 - clamp(exp(-(finalHeightPos.y - posWS.y) * heightAttenuationFactor), 0.0, 1.0);
+  density *= heightAttenuation;  
+
+  // Lighting
   vec3 lighting = vec3(0.0);
-  lighting += shadowAttenuation * lightColor;
+
+  if (density > EPSILON)
+  {
+    // Directional light
+    vec4 posLS;
+    uint shadowMapIdx = findBestFittingSplit(posVS.xyz, posLS, uboPerInstance.shadowViewProjMatrix);
+
+    float shadowAttenuation = 1.0; 
+
+    if (shadowMapIdx != uint(-1)) 
+    {
+      const vec4 shadowSample = texture(shadowBufferExpTex, vec3(posLS.xy, shadowMapIdx));
+      shadowAttenuation = clamp(calculateShadowESM(shadowSample, posLS.z)*1.1 - 0.1, 0.0, 1.0);
+    }
+
+    const vec3 lightColor = uboPerInstance.mainLightColorAndIntens.rgb * uboPerInstance.mainLightColorAndIntens.a 
+      * kelvinToRGB(uboPerInstance.mainLightDirAndTemp.a, kelvinLutTex) / MATH_PI;
+
+
+    lighting += shadowAttenuation * lightColor;
+  }
 
   const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
   const uint clusterIdx = calcClusterIndex(gridPos);
@@ -140,7 +161,8 @@ void main()
   vec3 irrad = vec3(0.0);
 
   // Local irradiance
-  if (isGridPosValid(gridPos))
+  if (isGridPosValid(gridPos)
+    && density > EPSILON)
   {
     const uint irradProbeCount = irradProbeIndices[clusterIdx];
 
@@ -163,7 +185,8 @@ void main()
   lighting += irrad * uboPerInstance.data0.z;
 
   // Local lights
-  if (isGridPosValid(gridPos))
+  if (isGridPosValid(gridPos)
+    && density > EPSILON)
   {
     uint lightCount = lightIndices[clusterIdx];
     for (uint li=0; li<lightCount; ++li)
@@ -179,20 +202,6 @@ void main()
         * light.colorAndIntensity.a * kelvinToRGB(light.temp.r, kelvinLutTex) / MATH_PI;
     }   
   }
-
-  vec3 finalHeightPos = heightRefPosWS;
-
-  // Noise
-#if 1
-  float noiseAccum = 1.0;
-  noiseAccum *= noise(posWS * clamp(5.0 / linDepth, 0.005, 0.08) + uboPerInstance.eyeWSVectorX.w * 0.5);
-  noiseAccum *= noise(posWS * clamp(10.0 / linDepth, 0.005, 0.08) + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.382871);
-  density *= clamp(noiseAccum, 0.0, 1.0);
-  finalHeightPos.y -= noise(posWS * clamp(10.0 / linDepth, 0.005, 0.08) + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.75827618) * 50.0;
-#endif
-
-  const float heightAttenuation = 1.0 - clamp(exp(-(finalHeightPos.y - posWS.y) * heightAttenuationFactor), 0.0, 1.0);
-  density *= heightAttenuation;
 
   const vec4 fog = vec4(density * lighting, density);
   imageStore(output0Tex, ivec3(cellIndex), mix(fog, reprojFog, reprojWeight));
