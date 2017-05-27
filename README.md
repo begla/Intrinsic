@@ -5,7 +5,6 @@
 Intrinsic is a Vulkan based cross-platform game and rendering engine. The project is currently in an early stage of development.
 
 ![Intrinsic](media/screenshot_0.jpg)
-![IntrinsicEd](media/screenshot_1.jpg)
 
 # Getting Started
 
@@ -26,7 +25,6 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 2. Create a new environment variable `INTR_QTDIR` pointing to `...\QtX.X\X.X\msvc2015_64` or `...\QtX.X\X.X\msvc2017_64`
 
 3. Download an install the Vulkan SDK
-
 
 4. Get access to the latest PhysX SDK from NVIDIA: https://developer.nvidia.com/physx-sdk
 5. Follow the instructions from NVIDIA and compile the PhysX libraries for the configurations *Release*, *Profile* and *Debug*
@@ -98,6 +96,17 @@ sudo apt install git cmake ninja-build libsdl2-dev
 6. Execute following scripts: `ConfigAndBuildDependencies`, `Config_Release`, `Build` and last but not least `Run_Release`
 7. You're all set - yey!
 
+# Screenshots
+
+![IntrinsicEd](media/screenshot_1.jpg)
+*Editor application 'IntrinsicEd'*
+
+![IntrinsicEd](media/screenshot_2.jpg)
+*Irradiance test world*
+
+![IntrinsicEd](media/screenshot_3.jpg)
+*16k lights with volumetric scattering in the lighting test world*
+
 # Build Status
 
 | Platform | Build Status |
@@ -156,8 +165,7 @@ Intrinsic uses the following proprietary libraries:
 * Cloc (see http://cloc.sourceforge.net)
 * 7za (see http://www.7-zip.org/download.html)
 
-Assets (amongst other things) sourced from:
+Assets sourced from:
 
 * https://cloud.blender.org/
 * http://www.hdrlabs.com/sibl/archive.html
-
