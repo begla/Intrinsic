@@ -774,7 +774,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
           readBackBufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
       Intrinsic::Renderer::Vulkan::Resources::BufferManager::
           _descMemoryPoolType(readBackBufferRef) = Intrinsic::Renderer::Vulkan::
-              MemoryPoolType::kResolutionDependentStagingBuffers;
+              MemoryPoolType::kVolatileStagingBuffers;
 
       Intrinsic::Renderer::Vulkan::Resources::BufferManager::_descBufferType(
           readBackBufferRef) =
@@ -897,6 +897,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
           {readBackBufferRef});
       Intrinsic::Renderer::Vulkan::Resources::BufferManager::destroyBuffer(
           readBackBufferRef);
+      GpuMemoryManager::resetPool(MemoryPoolType::kVolatileStagingBuffers);
 
       RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
       RenderSystem::resizeSwapChain(true);
