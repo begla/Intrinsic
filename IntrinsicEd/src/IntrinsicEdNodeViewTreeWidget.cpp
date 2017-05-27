@@ -688,8 +688,12 @@ void IntrinsicEdNodeViewTreeWidget::onLoadSHCoeffsFromFile(bool p_CaptureNight)
         coeffs = (glm::vec3*)&Components::IrradianceProbeManager::_descSHNight(
             irradProbeRef);
 
+      // Load SH from LYS output
       const QString fileName = QFileDialog::getOpenFileName(
-          this, tr("Load SH Coefficients"), QString("media/irradiance_probes/"),
+          this, tr("Load SH Coefficients"),
+          QString("media/irradiance_probes/") +
+              Entity::EntityManager::_name(currentEntity).getString().c_str() +
+              "_sh_irrad.ash",
           tr("LYS File (*.ash)"));
 
       if (fileName.size() > 0u)
