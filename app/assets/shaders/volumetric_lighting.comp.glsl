@@ -83,12 +83,6 @@ void main()
 {
   const float densityFactor = uboPerInstance.data0.x;
   vec3 cellIndex = vec3(gl_GlobalInvocationID.xyz) + 0.5;
-
-  if (densityFactor < EPSILON)
-  {
-    imageStore(output0Tex, ivec3(cellIndex), vec4(0.0));
-  }
-
   const float localLightIntens = uboPerInstance.data0.y;
 
   // Temporal reprojection
