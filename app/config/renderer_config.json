@@ -762,6 +762,7 @@
 				["Image", "lens_dirt", "lensDirtTex", "Fragment", "NearestClamp"],
 				["Image", "film_grain_noise", "filmGrainTex", "Fragment", "NearestClamp"],
 				["Image", "LensFlare", "lensFlareTex", "Fragment", "LinearClamp"],
+				["Image", "vignette", "vignetteTex", "Fragment", "LinearClamp"],
 				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"],
 				["Buffer", "BloomLumBuffer", "AvgLum", "Fragment"]
 			],

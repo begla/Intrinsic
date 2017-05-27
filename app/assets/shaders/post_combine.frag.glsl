@@ -34,6 +34,7 @@ layout (binding = 8) buffer AvgLum
 {
   float avgLum[];
 };
+layout (binding = 9) uniform sampler2D vignetteTex;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
@@ -53,8 +54,10 @@ vec3 tonemap(vec3 x)
 
 vec3 sampleColorOffsets(sampler2D scene, vec2 uv0, vec3 offsets, vec2 framebufferSize)
 {
-  const vec2 direction = uv0 * 2.0 - 1.0;
-  offsets *= clamp(length(direction) - 0.3, 0.0, 1.0);
+  vec2 direction = uv0.xy * 2.0 - 1.0;
+  const float dirLen = length(direction);
+  offsets *= clamp(dirLen - 0.5, 0.0, 1.0);
+  direction /= dirLen;
 
   const vec2 pixelSize = 1.0 / framebufferSize;
 
@@ -66,21 +69,21 @@ vec3 sampleColorOffsets(sampler2D scene, vec2 uv0, vec3 offsets, vec2 framebuffe
 const float lensDirtLumThreshold = 0.05;
 const float lensDirtIntens = 1.0;
 const float toneMappingLumTarget = 1.0;
-const float toneMappingMaxExposure = 3.0;
-const float bloomFactor = 1.5;
+const float toneMappingMaxExposure = 2.0;
+const float bloomFactor = 2.0;
 const float filmGrainBias = 0.0;
 const float filmGrainMax = 1.0;
-const float lensFlareFactor = 2.0;
+const float lensFlareFactor = 3.0;
 
 void main()
 {
   const vec2 framebufferSize = vec2(textureSize(sceneTex, 0));
 
   // Chromatic abberation
-  const vec3 colorOffsets = 3.0 * vec3(1, 2, 3);
+  const vec3 colorOffsets = 8.0 * vec3(1.0, 2.0, 3.0);
   vec3 scene = sampleColorOffsets(sceneTex, inUV0, colorOffsets, framebufferSize);
+  const vec3 sceneBlurred = sampleColorOffsets(sceneBlurredTex, inUV0, colorOffsets, framebufferSize);
 
-  const vec3 sceneBlurred = textureLod(sceneBlurredTex, inUV0, 0.0).rgb;
   const float depth = textureLod(depthBufferTex, inUV0, 0.0).r;
   const float linDepth = linearizeDepth(depth, uboPerInstance.camParams.x, uboPerInstance.camParams.y) * uboPerInstance.camParams.y;
 
@@ -101,7 +104,7 @@ void main()
   // Lens dirt
   outColor.rgb += lensDirtIntens * lensDirt.rgb * clamp(bloom.a - lensDirtLumThreshold, 0.0, 1.0);
   // Vignette
-  outColor.rgb *= 1.0 - clamp(pow(length(inUV0 * 2.0 - 1.0), 1.5) * 0.5, 0.0, 1.0);
+  outColor.rgb *= textureLod(vignetteTex, inUV0, 0.0).rrr;
 
   // Film grain
   const vec4 grain = texelFetch(filmGrainTex, 
