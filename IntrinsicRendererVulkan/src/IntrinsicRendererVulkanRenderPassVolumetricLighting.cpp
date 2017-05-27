@@ -327,7 +327,7 @@ _INTR_INLINE void blurExponentialShadowMaps(uint32_t p_ShadowMapCount)
 {
   using namespace Resources;
 
-  static const float blurRadius = 2.0f;
+  static const float blurRadius = 5.0f;
 
   for (uint32_t shadowMapIndex = 0u; shadowMapIndex < p_ShadowMapCount;
        ++shadowMapIndex)
@@ -442,7 +442,7 @@ void VolumetricLighting::init()
     pipelineLayoutsToCreate.push_back(pipelineLayoutEsm);
   }
 
-  const glm::uvec2 expShadowBufferDim = RenderPass::Shadow::_shadowMapSize / 4u;
+  const glm::uvec2 expShadowBufferDim = glm::uvec2(256u, 256u);
 
   // Render passes
   RenderPassRefArray renderPassesToCreate;
