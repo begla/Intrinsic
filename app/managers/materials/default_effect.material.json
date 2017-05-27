@@ -23,7 +23,7 @@
         "translucencyThickness": 1.0,
         "emissiveIntensity": 0.0,
         "normalTextureName": "default_NRM",
-        "pbrTextureName": "default_NRM",
+        "pbrTextureName": "checkerboard_NRM",
         "metalMaskBias": 0.0,
         "roughnessBias": 0.0,
         "specularBias": 0.0
