@@ -33,8 +33,7 @@ layout (location = 0) in vec2 inUV0;
 
 void main()
 { 
-  const vec2 uv0 = UV0_TRANSFORMED_ANIMATED;
-
+  const vec2 uv0 = UV0_TRANSFORM_ANIMATED(inUV0);
   vec4 albedo = texture(albedoTex, uv0);
 
   albedo.rgb /= albedo.a;

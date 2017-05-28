@@ -57,8 +57,8 @@ void main()
 { 
   const mat3 TBN = mat3(inTangent, inBinormal, inNormal);
 
-  const vec2 uv0 = UV0_TRANSFORMED_ANIMATED;
-  const vec2 uv0Raw = UV0;
+  const vec2 uv0 = UV0_TRANSFORM_ANIMATED(inUV0);
+  const vec2 uv0Raw = UV0(inUV0);
 
   const vec4 albedo0 = texture(albedoTex0, uv0);
   const vec4 normal0 = texture(normalTex0, uv0);
