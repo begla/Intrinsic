@@ -55,8 +55,10 @@ void main()
     ns = -1.0;
   }
 
+  const vec2 pixelOffset = 1.0 / textureSize(albedoTex, 0).xy * 50.0;
   const mat3 TBN = mat3(inTangent, inBinormal, ns * inNormal);
-  const vec2 uv0 = clamp(UV0_TRANSFORMED, 0.01, 0.99);
+
+  vec2 uv0 = UV0_TRANSFORM((inUV0 * (1.0 - pixelOffset) + 0.5 * pixelOffset));
 
   const vec2 blendScale = vec2(25.0);
   const vec2 blendLookupUV = mod(abs(inWorldPosition.xz), blendScale) / blendScale;

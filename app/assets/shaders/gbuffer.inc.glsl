@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define UV0_TRANSFORMED_ANIMATED vec2(inUV0.x * uboPerMaterial.uvOffsetScale.z + uboPerMaterial.uvOffsetScale.x, \
-    (1.0 - inUV0.y) * uboPerMaterial.uvOffsetScale.w + uboPerMaterial.uvOffsetScale.y) \
+#define UV0_TRANSFORM_ANIMATED(_uv0) vec2(_uv0.x * uboPerMaterial.uvOffsetScale.z + uboPerMaterial.uvOffsetScale.x, \
+    (1.0 - _uv0.y) * uboPerMaterial.uvOffsetScale.w + uboPerMaterial.uvOffsetScale.y) \
     + uboPerMaterial.uvAnimation.xy * vec2(uboPerInstance.data0.w)
-#define UV0_TRANSFORMED_ANIMATED_FACTOR(_fact) vec2(inUV0.x * uboPerMaterial.uvOffsetScale.z + uboPerMaterial.uvOffsetScale.x, \
-    (1.0 - inUV0.y) * uboPerMaterial.uvOffsetScale.w + uboPerMaterial.uvOffsetScale.y) \
+#define UV0_TRANSFORM_ANIMATED_FACTOR(_uv0, _fact) vec2(_uv0.x * uboPerMaterial.uvOffsetScale.z + uboPerMaterial.uvOffsetScale.x, \
+    (1.0 - _uv0.y) * uboPerMaterial.uvOffsetScale.w + uboPerMaterial.uvOffsetScale.y) \
     + _fact * uboPerMaterial.uvAnimation.xy * vec2(uboPerInstance.data0.w)
-#define UV0_TRANSFORMED vec2(inUV0.x * uboPerMaterial.uvOffsetScale.z + uboPerMaterial.uvOffsetScale.x, \
-  (1.0 - inUV0.y) * uboPerMaterial.uvOffsetScale.w + uboPerMaterial.uvOffsetScale.y)
-#define UV0 vec2(inUV0.x, (1.0 - inUV0.y))
+#define UV0_TRANSFORM(_uv0) vec2(_uv0.x * uboPerMaterial.uvOffsetScale.z + uboPerMaterial.uvOffsetScale.x, \
+  (1.0 - _uv0.y) * uboPerMaterial.uvOffsetScale.w + uboPerMaterial.uvOffsetScale.y)
+#define UV0(_uv0) vec2(_uv0.x, (1.0 - _uv0.y))
 
 #define PER_INSTANCE_UBO layout (binding = 1) uniform PerInstance \
 { \

@@ -60,9 +60,9 @@ void main()
 
   const mat3 TBN = mat3(inTangent, inBinormal, inNormal);
 
-  const vec2 uv0 = UV0_TRANSFORMED_ANIMATED;
-  const vec2 uv0InverseAnim = UV0_TRANSFORMED_ANIMATED_FACTOR(vec2(0.2, 0.9));
-  const vec2 uv0Raw = UV0;
+  const vec2 uv0 = UV0_TRANSFORM_ANIMATED(inUV0);
+  const vec2 uv0InverseAnim = UV0_TRANSFORM_ANIMATED_FACTOR(inUV0, vec2(0.2, 0.9));
+  const vec2 uv0Raw = UV0(inUV0);
 
   vec4 albedo = texture(albedoTex, uv0);
   albedo.a = waterBaseAlpha;

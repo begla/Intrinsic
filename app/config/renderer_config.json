@@ -171,7 +171,7 @@
 		{
 			"name" : "Output",
 			"renderSize" : "Full",
-			"imageFormat" : "B8G8R8A8UNorm"
+			"imageFormat" : "B8G8R8A8Srgb"
 		},
 		{
 			"name" : "SMAAEdge",
@@ -793,7 +793,7 @@
 			"perInstanceDataBufferName" : "PerInstanceDataSMAA",
 			"perInstanceDataVertexBufferName" : "PerInstanceDataSMAA",
 			"inputs" : [
-				["Image", "Output", "inputTex", "Fragment", "LinearClamp"]
+				["Image", "Output", "inputTex", "Fragment", "LinearClamp", 2]
 			],
 			"outputs" : [
 				["SMAAEdge", [0.0, 0.0, 0.0, 0.0]]
@@ -843,7 +843,7 @@
 			"perInstanceDataVertexBufferName" : "PerInstanceDataSMAA",
 			"viewportRenderSize" : "Full",
 			"inputs" : [
-				["Image", "Output", "inputTex", "Fragment", "LinearClamp"],
+				["Image", "Output", "inputTex", "Fragment", "LinearClamp", 2],
 				["Image", "SMAABlend", "blendTex", "Fragment", "LinearClamp"]
 			],
 			"outputs" : [
@@ -857,7 +857,7 @@
 			"fragmentGpuProgram" : "blit.frag",
 			"viewportRenderSize" : "Full",
 			"inputs" : [
-				["Image", "Output", "inputTex", "Fragment", "NearestClamp"]
+				["Image", "Output", "inputTex", "Fragment", "NearestClamp", 2]
 			],
 			"outputs" : [
 				["Backbuffer"]
