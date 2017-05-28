@@ -156,7 +156,8 @@ void main()
   // Cloud shadows
   const vec4 posWS = uboPerInstance.invViewMatrix * vec4(posVS, 1.0);
   const float cloudShadows = clamp(texture(noiseTex, 
-    clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0 + uboPerInstance.data0.x * 0.01).r * 3.0 - 0.5, 0.25, 1.0);
+    clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0 
+    + uboPerInstance.data0.x * 0.025).r * 3.0 - 0.5, 0.1, 1.0);
 
   // Direct lighting
   float shadowAttenuation = cloudShadows * calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
