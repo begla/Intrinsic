@@ -9,16 +9,12 @@ You can find some simple build and setup instructions in `GETTING_STARTED.md`.
 # Screenshots
 
 ![Intrinsic](media/screenshot_0.jpg)
-*Default world*
 
 ![IntrinsicEd](media/screenshot_1.jpg)
-*Editor application 'IntrinsicEd'*
-
-![IntrinsicEd](media/screenshot_2.jpg)
-*Irradiance test world*
 
 ![IntrinsicEd](media/screenshot_3.jpg)
-*16k lights with volumetric scattering in the lighting test world*
+
+![IntrinsicEd](media/screenshot_2.jpg)
 
 # Build Status
 
