@@ -22,17 +22,18 @@ layout (binding = 2) uniform sampler2D inputTex;
 layout (binding = 3) uniform sampler2D blendTex;
 
 layout (location = 0) in vec2 inUV0;
-layout (location = 1) in vec4 inOffsets[2];
+layout (location = 1) in vec4 inOffset;
 layout (location = 0) out vec4 outColor;
 
 #include "ubos.inc.glsl"
 
 PER_INSTANCE_DATA_SMAA_FRAG;
 
-#define SMAA_PIXEL_SIZE uboPerInstance.backbufferSize.zw
+#define SMAA_INCLUDE_PS 1
+#define SMAA_INCLUDE_VS 0
 #include "SMAA.h"
 
 void main()
 {
-  outColor = SMAANeighborhoodBlendingPS(inUV0, inOffsets, inputTex, blendTex);
+  outColor = SMAANeighborhoodBlendingPS(inUV0, inOffset, inputTex, blendTex);
 }
