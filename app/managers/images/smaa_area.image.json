@@ -3,7 +3,7 @@
     "properties": {
         "name": "smaa_area",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 6,
         "flags": 16,
         "dimensions": [
             160.0,
