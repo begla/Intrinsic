@@ -42,7 +42,7 @@ OUTPUT
 void main()
 { 
   const mat3 TBN = mat3(inTangent, inBinormal, inNormal);
-  const vec2 uv0 = UV0_TRANSFORMED_ANIMATED;
+  const vec2 uv0 = UV0_TRANSFORM_ANIMATED(inUV0);
 
   GBuffer gbuffer;
   {
