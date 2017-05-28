@@ -4,14 +4,6 @@
         "name": "smaa_area",
         "imageType": 1,
         "imageFormat": 6,
-        "flags": 16,
-        "dimensions": [
-            160.0,
-            560.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 1,
         "fileName": "smaa_area.dds"
     }
 }

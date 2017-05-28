@@ -4,14 +4,6 @@
         "name": "hbao_noise",
         "imageType": 1,
         "imageFormat": 7,
-        "flags": 16,
-        "dimensions": [
-            4.0,
-            4.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 3,
         "fileName": "hbao_noise.dds"
     }
 }

@@ -4,14 +4,6 @@
         "name": "vignette",
         "imageType": 1,
         "imageFormat": 10,
-        "flags": 16,
-        "dimensions": [
-            256.0,
-            256.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 9,
         "fileName": "vignette.dds"
     }
 }

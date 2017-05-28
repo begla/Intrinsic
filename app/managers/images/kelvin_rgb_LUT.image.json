@@ -4,14 +4,6 @@
         "name": "kelvin_rgb_LUT",
         "imageType": 1,
         "imageFormat": 7,
-        "flags": 16,
-        "dimensions": [
-            720.0,
-            1.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 10,
         "fileName": "kelvin_rgb_LUT.dds"
     }
 }
