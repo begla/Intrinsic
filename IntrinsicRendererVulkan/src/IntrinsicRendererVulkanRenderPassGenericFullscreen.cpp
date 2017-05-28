@@ -129,11 +129,14 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
       const rapidjson::Value& input = inputs[i];
       if (strcmp(input[0].GetString(), "Image") == 0u)
       {
+        const uint32_t bindingFlags =
+            input.Size() >= 6u ? input[5].GetUint() : false;
+
         DrawCallManager::bindImage(
             _drawCallRef, input[2].GetString(),
             Helper::mapGpuProgramType(input[3].GetString()),
             ImageManager::getResourceByName(input[1].GetString()),
-            Helper::mapSampler(input[4].GetString()));
+            Helper::mapSampler(input[4].GetString()), bindingFlags);
       }
       else if (strcmp(input[0].GetString(), "Buffer") == 0u)
       {

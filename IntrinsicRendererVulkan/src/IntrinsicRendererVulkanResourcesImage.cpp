@@ -98,6 +98,9 @@ void createTexture(ImageRef p_Ref)
   VkImage& vkImage = ImageManager::_vkImage(p_Ref);
   VkFormat vkFormat =
       Helper::mapFormatToVkFormat(ImageManager::_descImageFormat(p_Ref));
+  const bool isSrgbFormat = vkFormat == VK_FORMAT_B8G8R8A8_SRGB ||
+                            vkFormat == VK_FORMAT_B8G8R8A8_UNORM;
+
   GpuMemoryAllocationInfo& memoryAllocationInfo =
       ImageManager::_memoryAllocationInfo(p_Ref);
   MemoryPoolType::Enum memoryPoolType =
@@ -228,7 +231,8 @@ void createTexture(ImageRef p_Ref)
     imageCreateInfo.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
   }
 
-  imageCreateInfo.flags = 0u;
+  imageCreateInfo.flags =
+      isSrgbFormat ? VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT : 0u;
 
   VkResult result = vkCreateImage(RenderSystem::_vkDevice, &imageCreateInfo,
                                   nullptr, &vkImage);
@@ -307,6 +311,19 @@ void createTexture(ImageRef p_Ref)
 
   result = vkCreateImageView(RenderSystem::_vkDevice, &imageViewCreateInfo,
                              nullptr, &ImageManager::_vkImageView(p_Ref));
+
+  if (isSrgbFormat)
+  {
+    imageViewCreateInfo.format = VK_FORMAT_B8G8R8A8_SRGB;
+    result =
+        vkCreateImageView(RenderSystem::_vkDevice, &imageViewCreateInfo,
+                          nullptr, &ImageManager::_vkImageViewGamma(p_Ref));
+    imageViewCreateInfo.format = VK_FORMAT_B8G8R8A8_UNORM;
+    result =
+        vkCreateImageView(RenderSystem::_vkDevice, &imageViewCreateInfo,
+                          nullptr, &ImageManager::_vkImageViewLinear(p_Ref));
+  }
+
   _INTR_VK_CHECK_RESULT(result);
 }
 

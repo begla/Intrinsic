@@ -277,7 +277,8 @@ void Default::loadRendererConfig()
         {
           ImageManager::_descImageFormat(imageRef) =
               Helper::mapFormat(imageFormat.GetString());
-          ImageManager::_descImageFlags(imageRef) |= ImageFlags::kUsageStorage;
+          // ImageManager::_descImageFlags(imageRef) |=
+          // ImageFlags::kUsageStorage;
         }
 
         ImageManager::_descImageType(imageRef) = ImageType::kTexture;

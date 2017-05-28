@@ -752,7 +752,7 @@ void RenderSystem::initOrUpdateVkSwapChain()
       _vkPhysicalDevice, _vkSurface, &surfaceCapabilities);
   _INTR_VK_CHECK_RESULT(result);
 
-  static VkFormat surfaceFormatToUse = VK_FORMAT_B8G8R8A8_SRGB;
+  static VkFormat surfaceFormatToUse = VK_FORMAT_B8G8R8A8_UNORM;
   static VkColorSpaceKHR surfaceColorSpaceToUse =
       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
   VkPresentModeKHR presentModeToUse =
