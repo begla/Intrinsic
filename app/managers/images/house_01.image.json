@@ -4,14 +4,6 @@
         "name": "house_01",
         "imageType": 1,
         "imageFormat": 10,
-        "flags": 16,
-        "dimensions": [
-            1024.0,
-            1024.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 11,
         "fileName": "house_01.dds"
     }
 }

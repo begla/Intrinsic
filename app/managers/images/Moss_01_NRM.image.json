@@ -4,14 +4,6 @@
         "name": "Moss_01_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "flags": 16,
-        "dimensions": [
-            2048.0,
-            2048.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 12,
         "fileName": "Moss_01_NRM.dds"
     }
 }
