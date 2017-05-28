@@ -31,3 +31,13 @@
   vec4 blurParams; \
   vec4 camParams; \
 } uboPerInstance
+
+#define PER_INSTANCE_DATA_SMAA_VERT layout (binding = 0) uniform PerInstance \
+{ \
+  vec4 backbufferSize; \
+} uboPerInstance
+
+#define PER_INSTANCE_DATA_SMAA_FRAG layout (binding = 1) uniform PerInstance \
+{ \
+  vec4 backbufferSize; \
+} uboPerInstance

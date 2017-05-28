@@ -267,6 +267,9 @@ _INTR_INLINE VkFormat mapFormatToVkFormat(Format::Enum p_Format)
     return VK_FORMAT_BC5_SNORM_BLOCK;
   case Format::kBC6UFloat:
     return VK_FORMAT_BC6H_UFLOAT_BLOCK;
+
+  case Format::kR8UNorm:
+    return VK_FORMAT_R8_UNORM;
   }
 
   _INTR_ASSERT(false && "Failed to map format");

@@ -18,14 +18,27 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
-#include "lib_math.glsl"
+out gl_PerVertex
+{
+  vec4 gl_Position;
+};
 
-layout (binding = 0) uniform sampler2D inputTex;
+layout (location = 0) out vec2 outUV0;
+layout (location = 1) out vec4 outOffsets[2];
 
-layout (location = 0) in vec2 inUV0;
-layout (location = 0) out vec4 outColor;
+#include "ubos.inc.glsl"
+
+PER_INSTANCE_DATA_SMAA_VERT;
+
+#define SMAA_PIXEL_SIZE uboPerInstance.backbufferSize.zw
+#define SMAA_ONLY_COMPILE_VS 1
+#include "SMAA.h"
 
 void main()
 {
-  outColor = textureLod(inputTex, inUV0, 0.0).rgba;
+  outUV0 = vec2(float(gl_VertexIndex / 2) * 2.0, float(gl_VertexIndex % 2) * 2.0);
+  const vec4 position = vec4(float(gl_VertexIndex / 2) * 4.0 - 1.0, float(gl_VertexIndex % 2) 
+  	* 4.0 - 1.0, 0.0, 1.0);
+
+  SMAANeighborhoodBlendingVS(position, gl_Position, outUV0, outOffsets);
 }

@@ -394,6 +394,14 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
     }
   }
 
+  VkFormatProperties props;
+  vkGetPhysicalDeviceFormatProperties(RenderSystem::_vkPhysicalDevice, vkFormat,
+                                      &props);
+
+  _INTR_ASSERT((props.optimalTilingFeatures &
+                VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) > 0u &&
+               "Format does not support optimal tiling");
+
   VkImageCreateInfo imageCreateInfo = {};
   {
     imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -556,6 +564,13 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
 
     offset += static_cast<uint32_t>(tex2D[i].size());
   }
+
+  VkFormatProperties props;
+  vkGetPhysicalDeviceFormatProperties(RenderSystem::_vkPhysicalDevice, vkFormat,
+                                      &props);
+  _INTR_ASSERT((props.optimalTilingFeatures &
+                VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) > 0u &&
+               "Format does not support optimal tiling");
 
   VkImageCreateInfo imageCreateInfo = {};
   {

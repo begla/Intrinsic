@@ -1,0 +1,10 @@
+{
+    "name": "smaa_edge.frag",
+    "properties": {
+        "name": "smaa_edge.frag",
+        "gpuProgramName": "smaa_edge.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

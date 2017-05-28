@@ -139,6 +139,9 @@ _uniformOffsetMapping = {
     {"PostParams0",
      UniformDataRef(&UniformManager::_uniformDataSource.postParams0,
                     sizeof(glm::vec4))},
+    {"BackbufferSize",
+     UniformDataRef(&UniformManager::_uniformDataSource.backbufferSize,
+                    sizeof(glm::vec4))},
     {"HaltonSamples",
      UniformDataRef(&UniformManager::_uniformDataSource.haltonSamples,
                     sizeof(glm::ivec4))}};
@@ -232,6 +235,10 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
       glm::vec4(_haltonSamples[TaskManager::_frameCounter % 32].x,
                 _haltonSamples[TaskManager::_frameCounter % 32].y,
                 _haltonSamples[TaskManager::_frameCounter % 32].z, 0.0f);
+
+  glm::vec2 backbufferSize = glm::vec2(RenderSystem::_backbufferDimensions);
+  UniformManager::_uniformDataSource.backbufferSize =
+      glm::vec4(backbufferSize, 1.0f / backbufferSize);
 }
 
 // <-
@@ -269,8 +276,14 @@ void UniformManager::resetAllocator() { _uniformBufferMemoryAllocator.reset(); }
 UniformBufferDataEntry
 UniformManager::requestUniformBufferData(const Name& p_Name)
 {
-  const UniformBuffer& buffer = _uniformBuffers[p_Name];
-  return UniformBufferDataEntry(buffer.data, buffer.dataSize);
+  auto it = _uniformBuffers.find(p_Name);
+  if (it != _uniformBuffers.end())
+  {
+    const UniformBuffer& buffer = it->second;
+    return UniformBufferDataEntry(buffer.data, buffer.dataSize);
+  }
+
+  return UniformBufferDataEntry(nullptr, 0u);
 }
 }
 }
