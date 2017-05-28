@@ -72,7 +72,7 @@ const float toneMappingLumTarget = 1.0;
 const float toneMappingMaxExposure = 2.0;
 const float bloomFactor = 2.0;
 const float filmGrainBias = 0.0;
-const float filmGrainMax = 1.0;
+const float filmGrainMax = 0.05;
 const float lensFlareFactor = 3.0;
 
 void main()

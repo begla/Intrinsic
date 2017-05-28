@@ -20,13 +20,8 @@
 
 #include "lib_math.glsl"
 
-layout (binding = 0) uniform PerInstance
-{
-  float _dummy;
-} uboPerInstance;
-
-layout (binding = 1) uniform sampler2D brightnessTex;
-layout (binding = 2) uniform sampler2D lensFlareTex;
+layout (binding = 0) uniform sampler2D brightnessTex;
+layout (binding = 1) uniform sampler2D lensFlareTex;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;

@@ -60,6 +60,7 @@ struct UniformManager
     glm::vec4 blurParamsYLow;
     glm::vec4 cameraParameters;
     glm::vec4 postParams0;
+    glm::vec4 backbufferSize;
 
   } _uniformDataSource;
 };

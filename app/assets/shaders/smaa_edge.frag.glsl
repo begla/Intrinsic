@@ -12,32 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
+#version 450
 
-namespace Intrinsic
-{
-namespace Renderer
-{
-namespace Vulkan
-{
-namespace RenderPass
-{
-struct GenericFullscreen : Base
-{
-  void init(const rapidjson::Value& p_RenderPassDesc);
-  void destroy();
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_shading_language_420pack : enable
+#extension GL_GOOGLE_include_directive : enable
 
-  void render(float p_DeltaT, Components::CameraRef p_CameraRef);
+layout (binding = 2) uniform sampler2D inputTex;
 
-private:
-  Resources::PipelineRef _pipelineRef;
-  Resources::PipelineLayoutRef _pipelineLayoutRef;
-  Resources::DrawCallRef _drawCallRef;
+layout (location = 0) in vec2 inUV0;
+layout (location = 1) in vec4 inOffsets[3];
+layout (location = 0) out vec4 outColor;
 
-  Name _perInstanceDataBufferName;
-  Name _perInstanceDataVertexBufferName;
-};
-}
-}
-}
+#include "ubos.inc.glsl"
+
+PER_INSTANCE_DATA_SMAA_FRAG;
+
+#define SMAA_PIXEL_SIZE uboPerInstance.backbufferSize.zw
+#include "SMAA.h"
+
+void main()
+{
+  outColor = SMAALumaEdgeDetectionPS(inUV0, inOffsets, inputTex);
 }

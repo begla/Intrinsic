@@ -1,0 +1,10 @@
+{
+    "name": "smaa_weight.frag",
+    "properties": {
+        "name": "smaa_weight.frag",
+        "gpuProgramName": "smaa_weight.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

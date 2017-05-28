@@ -1,0 +1,10 @@
+{
+    "name": "smaa_blend.vert",
+    "properties": {
+        "name": "smaa_blend.vert",
+        "gpuProgramName": "smaa_blend.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 0
+    }
+}

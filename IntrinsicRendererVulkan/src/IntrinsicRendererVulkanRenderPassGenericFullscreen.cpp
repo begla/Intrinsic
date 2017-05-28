@@ -37,13 +37,26 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
   const rapidjson::Value& inputs = p_RenderPassDesc["inputs"];
 
   _perInstanceDataBufferName =
-      p_RenderPassDesc["perInstanceDataBufferName"].GetString();
+      p_RenderPassDesc.HasMember("perInstanceDataBufferName")
+          ? p_RenderPassDesc["perInstanceDataBufferName"].GetString()
+          : "";
+  _perInstanceDataVertexBufferName =
+      p_RenderPassDesc.HasMember("perInstanceDataVertexBufferName")
+          ? p_RenderPassDesc["perInstanceDataVertexBufferName"].GetString()
+          : "";
   RenderProcess::UniformBufferDataEntry bufferDataEntry =
       RenderProcess::UniformManager::requestUniformBufferData(
           _perInstanceDataBufferName);
+  RenderProcess::UniformBufferDataEntry bufferDataVertexEntry =
+      RenderProcess::UniformManager::requestUniformBufferData(
+          _perInstanceDataVertexBufferName);
 
   const _INTR_STRING fragGpuProgramName =
       p_RenderPassDesc["fragmentGpuProgram"].GetString();
+  const _INTR_STRING vertGpuProgramName =
+      p_RenderPassDesc.HasMember("vertexGpuProgram")
+          ? p_RenderPassDesc["vertexGpuProgram"].GetString()
+          : "fullscreen_triangle.vert";
 
   // Pipeline layout
   PipelineLayoutRef pipelineLayout;
@@ -53,7 +66,8 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
 
     GpuProgramManager::reflectPipelineLayout(
         8u,
-        {Resources::GpuProgramManager::getResourceByName(fragGpuProgramName)},
+        {Resources::GpuProgramManager::getResourceByName(vertGpuProgramName),
+         Resources::GpuProgramManager::getResourceByName(fragGpuProgramName)},
         pipelineLayout);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayout);
@@ -69,7 +83,7 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
     PipelineManager::_descFragmentProgram(_pipelineRef) =
         GpuProgramManager::getResourceByName(fragGpuProgramName);
     PipelineManager::_descVertexProgram(_pipelineRef) =
-        GpuProgramManager::getResourceByName("fullscreen_triangle.vert");
+        GpuProgramManager::getResourceByName(vertGpuProgramName);
     PipelineManager::_descRenderPass(_pipelineRef) = _renderPassRef;
     PipelineManager::_descPipelineLayout(_pipelineRef) = pipelineLayout;
     PipelineManager::_descVertexLayout(_pipelineRef) = Dod::Ref();
@@ -95,10 +109,20 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
     DrawCallManager::_descPipeline(_drawCallRef) = _pipelineRef;
     DrawCallManager::_descVertexCount(_drawCallRef) = 3u;
 
-    DrawCallManager::bindBuffer(
-        _drawCallRef, _N(PerInstance), GpuProgramType::kFragment,
-        UniformManager::_perInstanceUniformBuffer,
-        UboType::kPerInstanceFragment, bufferDataEntry.size);
+    if (bufferDataEntry.size > 0u)
+    {
+      DrawCallManager::bindBuffer(
+          _drawCallRef, _N(PerInstance), GpuProgramType::kFragment,
+          UniformManager::_perInstanceUniformBuffer,
+          UboType::kPerInstanceFragment, bufferDataEntry.size);
+    }
+    if (bufferDataVertexEntry.size > 0u)
+    {
+      DrawCallManager::bindBuffer(
+          _drawCallRef, _N(PerInstance), GpuProgramType::kVertex,
+          UniformManager::_perInstanceUniformBuffer,
+          UboType::kPerInstanceVertex, bufferDataVertexEntry.size);
+    }
 
     for (uint32_t i = 0u; i < inputs.Size(); ++i)
     {
@@ -171,9 +195,13 @@ void GenericFullscreen::render(float p_DeltaT,
   const RenderProcess::UniformBufferDataEntry uniformData =
       RenderProcess::UniformManager::requestUniformBufferData(
           _perInstanceDataBufferName);
+  const RenderProcess::UniformBufferDataEntry uniformDataVertex =
+      RenderProcess::UniformManager::requestUniformBufferData(
+          _perInstanceDataVertexBufferName);
 
   DrawCallManager::allocateAndUpdateUniformMemory(
-      {_drawCallRef}, nullptr, 0u, uniformData.uniformData, uniformData.size);
+      {_drawCallRef}, uniformDataVertex.uniformData, uniformDataVertex.size,
+      uniformData.uniformData, uniformData.size);
 
   RenderSystem::beginRenderPass(
       _renderPassRef,

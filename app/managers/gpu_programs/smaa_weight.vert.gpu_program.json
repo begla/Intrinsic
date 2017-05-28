@@ -1,0 +1,10 @@
+{
+    "name": "smaa_weight.vert",
+    "properties": {
+        "name": "smaa_weight.vert",
+        "gpuProgramName": "smaa_weight.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 0
+    }
+}

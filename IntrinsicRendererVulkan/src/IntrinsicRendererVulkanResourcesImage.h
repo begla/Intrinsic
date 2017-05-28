@@ -114,26 +114,6 @@ struct ImageManager
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
                           (uint32_t)_descImageFormat(p_Ref), false, true),
         p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "flags",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
-                          (uint32_t)_descImageFlags(p_Ref), false, true),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "dimensions",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
-                          glm::vec3(_descDimensions(p_Ref)), false, true),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "arrayLayerCount",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
-                          _descArrayLayerCount(p_Ref), false, true),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "mipLevelCount",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
-                          _descMipLevelCount(p_Ref), false, true),
-        p_Document.GetAllocator());
     p_Properties.AddMember("fileName",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
                                              _N(Image), "string",
@@ -154,18 +134,6 @@ struct ImageManager
     if (p_Properties.HasMember("imageFormat"))
       _descImageFormat(p_Ref) = (Format::Enum)JsonHelper::readPropertyUint(
           p_Properties["imageFormat"]);
-    if (p_Properties.HasMember("flags"))
-      _descImageFlags(p_Ref) =
-          JsonHelper::readPropertyUint(p_Properties["flags"]);
-    if (p_Properties.HasMember("dimensions"))
-      _descDimensions(p_Ref) =
-          JsonHelper::readPropertyVec3(p_Properties["dimensions"]);
-    if (p_Properties.HasMember("arrayLayerCount"))
-      _descArrayLayerCount(p_Ref) =
-          JsonHelper::readPropertyUint(p_Properties["arrayLayerCount"]);
-    if (p_Properties.HasMember("mipLevelCount"))
-      _descMipLevelCount(p_Ref) =
-          JsonHelper::readPropertyUint(p_Properties["mipLevelCount"]);
     if (p_Properties.HasMember("fileName"))
       _descFileName(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["fileName"]);

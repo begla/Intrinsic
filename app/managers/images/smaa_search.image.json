@@ -1,0 +1,17 @@
+{
+    "name": "smaa_search",
+    "properties": {
+        "name": "smaa_search",
+        "imageType": 1,
+        "imageFormat": 25,
+        "flags": 16,
+        "dimensions": [
+            66.0,
+            33.0,
+            1.0
+        ],
+        "arrayLayerCount": 1,
+        "mipLevelCount": 1,
+        "fileName": "smaa_search.dds"
+    }
+}

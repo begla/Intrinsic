@@ -1,0 +1,10 @@
+{
+    "name": "smaa_blend.frag",
+    "properties": {
+        "name": "smaa_blend.frag",
+        "gpuProgramName": "smaa_blend.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}
