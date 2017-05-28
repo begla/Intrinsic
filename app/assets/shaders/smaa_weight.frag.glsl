@@ -31,7 +31,8 @@ layout (location = 0) out vec4 outColor;
 
 PER_INSTANCE_DATA_SMAA_FRAG;
 
-#define SMAA_PIXEL_SIZE uboPerInstance.backbufferSize.zw
+#define SMAA_INCLUDE_PS 1
+#define SMAA_INCLUDE_VS 0
 #include "SMAA.h"
 
 void main()

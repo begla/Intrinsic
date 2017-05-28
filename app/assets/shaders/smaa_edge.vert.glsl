@@ -30,15 +30,15 @@ layout (location = 1) out vec4 outOffsets[3];
 
 PER_INSTANCE_DATA_SMAA_VERT;
 
-#define SMAA_PIXEL_SIZE uboPerInstance.backbufferSize.zw
-#define SMAA_ONLY_COMPILE_VS 1
+#define SMAA_INCLUDE_PS 0
+#define SMAA_INCLUDE_VS 1
 #include "SMAA.h"
 
 void main()
 {
   outUV0 = vec2(float(gl_VertexIndex / 2) * 2.0, float(gl_VertexIndex % 2) * 2.0);
-  const vec4 position = vec4(float(gl_VertexIndex / 2) * 4.0 - 1.0, float(gl_VertexIndex % 2) 
+  gl_Position= vec4(float(gl_VertexIndex / 2) * 4.0 - 1.0, float(gl_VertexIndex % 2) 
   	* 4.0 - 1.0, 0.0, 1.0);
   
-  SMAAEdgeDetectionVS(position, gl_Position, outUV0, outOffsets);
+  SMAAEdgeDetectionVS(outUV0, outOffsets);
 }
