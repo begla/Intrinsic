@@ -114,13 +114,7 @@ void main()
   outColor.rgb = tonemap(outColor.rgb);
   vec3 whiteScale = 1.0/tonemap(vec3(W));
   outColor.rgb *= whiteScale;
-
-  // Film grain
-  const vec3 grain = texelFetch(filmGrainTex, 
-    (ivec2(inUV0 * framebufferSize.xy) + ivec2(uboPerInstance.haltonSamples.xy * 255.0)) & 255, 0).rgb 
-    * 2.0 - 1.0;
-  outColor.rgb += grain * min(outColor.rgb + filmGrainBlackLimit, filmGrainAmount);
-
+  
   // Bleach Bypass
   {
     vec3 lumCoeff = vec3(0.25, 0.65, 0.1);
@@ -133,4 +127,11 @@ void main()
     const float strength = 0.5;
     outColor.rgb = mix(outColor.rgb, mix(result1, result2, L), strength);
   }
+
+  // Film grain
+  const vec3 grain = texelFetch(filmGrainTex, 
+    (ivec2(inUV0 * framebufferSize.xy) + ivec2(uboPerInstance.haltonSamples.xy * 255.0)) & 255, 0).rgb 
+    * 2.0 - 1.0;
+  outColor.rgb += grain * min(outColor.rgb + filmGrainBlackLimit, filmGrainAmount);
+
 }
