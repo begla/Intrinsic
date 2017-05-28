@@ -71,16 +71,18 @@ const float lensDirtIntens = 1.0;
 const float toneMappingLumTarget = 1.0;
 const float toneMappingMaxExposure = 2.0;
 const float bloomFactor = 2.0;
-const float filmGrainBias = 0.0;
-const float filmGrainMax = 0.05;
+const float filmGrainQuantStepsRcp = 1.0 / (64.0 - 1.0);
+const float filmGrainBlackLimit = 0.5 * pow(filmGrainQuantStepsRcp, 2.0);
+const float filmGrainAmount = 0.75 * (pow(1.0 + filmGrainQuantStepsRcp, 2.0) - 1.0);
 const float lensFlareFactor = 3.0;
+const float chromaticAbbFactor = 0.0;
 
 void main()
 {
   const vec2 framebufferSize = vec2(textureSize(sceneTex, 0));
 
   // Chromatic abberation
-  const vec3 colorOffsets = 8.0 * vec3(1.0, 2.0, 3.0);
+  const vec3 colorOffsets = chromaticAbbFactor * vec3(1.0, 2.0, 3.0);
   vec3 scene = sampleColorOffsets(sceneTex, inUV0, colorOffsets, framebufferSize);
   const vec3 sceneBlurred = sampleColorOffsets(sceneBlurredTex, inUV0, colorOffsets, framebufferSize);
 
@@ -97,8 +99,9 @@ void main()
 
   const float exposure = min(toneMappingLumTarget / avgLum[0], toneMappingMaxExposure);
 
+  outColor = vec4(scene.rgb, 1.0);
   // Bloom
-  outColor = vec4(scene.rgb + bloomFactor * bloom.rgb, 1.0);
+  outColor.rgb += bloomFactor * bloom.rgb;
   // Lens flares
   outColor.rgb += lensFlare.rgb * lensFlareFactor * lensDirt.rgb;
   // Lens dirt
@@ -106,16 +109,17 @@ void main()
   // Vignette
   outColor.rgb *= textureLod(vignetteTex, inUV0, 0.0).rrr;
 
-  // Film grain
-  const vec4 grain = texelFetch(filmGrainTex, 
-    (ivec2(inUV0 * framebufferSize.xy) + ivec2(uboPerInstance.haltonSamples.xy * 255.0)) & 255, 0).rgba;
-  outColor.rgb = grain.rgb * min(outColor.rgb + filmGrainBias, filmGrainMax) + outColor.rgb;
-
   // Tonemapping
   outColor.rgb *= exposure;
   outColor.rgb = tonemap(outColor.rgb);
   vec3 whiteScale = 1.0/tonemap(vec3(W));
   outColor.rgb *= whiteScale;
+
+  // Film grain
+  const vec3 grain = texelFetch(filmGrainTex, 
+    (ivec2(inUV0 * framebufferSize.xy) + ivec2(uboPerInstance.haltonSamples.xy * 255.0)) & 255, 0).rgb 
+    * 2.0 - 1.0;
+  outColor.rgb += grain * min(outColor.rgb + filmGrainBlackLimit, filmGrainAmount);
 
   // Bleach Bypass
   {
