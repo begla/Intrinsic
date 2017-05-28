@@ -289,7 +289,9 @@ struct BindingFlags
 {
   enum Flags
   {
-    kAdressSubResource = 0x01
+    kAdressSubResource = 0x01,
+    kForceLinearSampling = 0x02,
+    kForceGammaSampling = 0x04
   };
 };
 

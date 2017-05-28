@@ -226,8 +226,22 @@ VkDescriptorSet PipelineLayoutManager::allocateAndWriteDescriptorSet(
         {
           if ((info.bindingFlags & BindingFlags::kAdressSubResource) == 0u)
           {
-            imageInfo.imageView =
-                Resources::ImageManager::_vkImageView(info.resource);
+            if ((info.bindingFlags & BindingFlags::kForceGammaSampling) > 0u)
+            {
+              imageInfo.imageView =
+                  Resources::ImageManager::_vkImageViewGamma(info.resource);
+            }
+            else if ((info.bindingFlags & BindingFlags::kForceLinearSampling) >
+                     0u)
+            {
+              imageInfo.imageView =
+                  Resources::ImageManager::_vkImageViewLinear(info.resource);
+            }
+            else
+            {
+              imageInfo.imageView =
+                  Resources::ImageManager::_vkImageView(info.resource);
+            }
           }
           else
           {

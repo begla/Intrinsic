@@ -41,6 +41,8 @@ struct ImageData : Dod::Resources::ResourceDataBase
 
     vkImage.resize(_INTR_MAX_IMAGE_COUNT);
     vkImageView.resize(_INTR_MAX_IMAGE_COUNT);
+    vkImageViewLinear.resize(_INTR_MAX_IMAGE_COUNT);
+    vkImageViewGamma.resize(_INTR_MAX_IMAGE_COUNT);
     vkSubResourceImageViews.resize(_INTR_MAX_IMAGE_COUNT);
     memoryAllocationInfo.resize(_INTR_MAX_IMAGE_COUNT);
   }
@@ -58,6 +60,8 @@ struct ImageData : Dod::Resources::ResourceDataBase
   // Resources
   _INTR_ARRAY(VkImage) vkImage;
   _INTR_ARRAY(VkImageView) vkImageView;
+  _INTR_ARRAY(VkImageView) vkImageViewLinear;
+  _INTR_ARRAY(VkImageView) vkImageViewGamma;
   _INTR_ARRAY(ImageViewArray) vkSubResourceImageViews;
   _INTR_ARRAY(GpuMemoryAllocationInfo) memoryAllocationInfo;
 };
@@ -180,6 +184,8 @@ struct ImageManager
       VkImage& vkImage = _vkImage(ref);
       ImageViewArray& vkImageViews = _vkSubResourceImageViews(ref);
       VkImageView& vkImageView = _vkImageView(ref);
+      VkImageView& vkImageViewLinear = _vkImageViewLinear(ref);
+      VkImageView& vkImageViewGamma = _vkImageViewGamma(ref);
 
       if (!hasImageFlags(ref, ImageFlags::kExternalImage))
       {
@@ -211,6 +217,20 @@ struct ImageManager
           RenderSystem::releaseResource(_N(VkImageView), (void*)vkImageView,
                                         nullptr);
           vkImageView = VK_NULL_HANDLE;
+        }
+
+        if (vkImageViewLinear != VK_NULL_HANDLE)
+        {
+          RenderSystem::releaseResource(_N(VkImageView),
+                                        (void*)vkImageViewLinear, nullptr);
+          vkImageViewLinear = VK_NULL_HANDLE;
+        }
+
+        if (vkImageViewGamma != VK_NULL_HANDLE)
+        {
+          RenderSystem::releaseResource(_N(VkImageView),
+                                        (void*)vkImageViewGamma, nullptr);
+          vkImageViewGamma = VK_NULL_HANDLE;
         }
       }
       vkImageViews.clear();
@@ -348,6 +368,14 @@ struct ImageManager
   _INTR_INLINE static VkImageView& _vkImageView(ImageRef p_Ref)
   {
     return _data.vkImageView[p_Ref._id];
+  }
+  _INTR_INLINE static VkImageView& _vkImageViewLinear(ImageRef p_Ref)
+  {
+    return _data.vkImageViewLinear[p_Ref._id];
+  }
+  _INTR_INLINE static VkImageView& _vkImageViewGamma(ImageRef p_Ref)
+  {
+    return _data.vkImageViewGamma[p_Ref._id];
   }
   _INTR_INLINE static VkImageView&
   _vkSubResourceImageView(ImageRef p_Ref, uint32_t p_ArrayLayerIndex,
