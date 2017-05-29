@@ -263,9 +263,8 @@ void Bloom::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutLumBright);
 
     GpuProgramManager::reflectPipelineLayout(
-        32u,
-        {Resources::GpuProgramManager::getResourceByName(
-            "post_bloom_bright_lum.comp")},
+        32u, {Resources::GpuProgramManager::getResourceByName(
+                 "post_bloom_bright_lum.comp")},
         pipelineLayoutLumBright);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayoutLumBright);
@@ -277,9 +276,8 @@ void Bloom::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutAvgLum);
 
     GpuProgramManager::reflectPipelineLayout(
-        32u,
-        {Resources::GpuProgramManager::getResourceByName(
-            "post_bloom_avg_lum.comp")},
+        32u, {Resources::GpuProgramManager::getResourceByName(
+                 "post_bloom_avg_lum.comp")},
         pipelineLayoutAvgLum);
   }
 
@@ -292,9 +290,8 @@ void Bloom::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutAdd);
 
     GpuProgramManager::reflectPipelineLayout(
-        32u,
-        {Resources::GpuProgramManager::getResourceByName(
-            "post_bloom_add.comp")},
+        32u, {Resources::GpuProgramManager::getResourceByName(
+                 "post_bloom_add.comp")},
         pipelineLayoutAdd);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayoutAdd);
@@ -306,9 +303,8 @@ void Bloom::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutBlur);
 
     GpuProgramManager::reflectPipelineLayout(
-        128u,
-        {Resources::GpuProgramManager::getResourceByName(
-            "post_bloom_blur_x.comp")},
+        128u, {Resources::GpuProgramManager::getResourceByName(
+                  "post_bloom_blur_x.comp")},
         pipelineLayoutBlur);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayoutBlur);

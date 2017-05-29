@@ -16,6 +16,9 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+// Lib. includes
+#include <gli/gli.hpp>
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -97,6 +100,39 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
     _perMaterialDataFragmentOffset(matRef) =
         UniformManager::allocatePerMaterialDataMemory();
 
+    // Update the average normal length
+    ImageRef normalRef =
+        ImageManager::_getResourceByName(_descNormalTextureName(matRef));
+
+    float avgNormalLength = 1.0f;
+    // if (normalRef.isValid())
+    //{
+    //  _INTR_STRING texturePath =
+    //      "media/textures/" + ImageManager::_descFileName(normalRef);
+
+    //  gli::texture2d normalTexture =
+    //      gli::texture2d(gli::load(texturePath.c_str()));
+    //  gli::texture2d normalTexDec =
+    //      gli::convert(normalTexture, gli::FORMAT_RGB32_SFLOAT_PACK32);
+
+    //  glm::vec3 avgNormal = glm::vec3(0.0f);
+    //  for (int32_t y = 0u; y < normalTexDec.extent().y; ++y)
+    //  {
+    //    for (int32_t x = 0u; x < normalTexDec.extent().x; ++x)
+    //    {
+    //      const gli::vec3 normal =
+    //      gli::normalize(normalTexDec.load<gli::vec3>(
+    //                                   gli::extent2d(x, y), 0u)) *
+    //                                   2.0f -
+    //                               1.0f;
+    //      avgNormal += normal;
+    //    }
+    //  }
+
+    // avgNormal /= normalTexDec.extent().x * normalTexDec.extent().y;
+    //  avgNormalLength = glm::length(avgNormal);
+    //}
+
     // Update material pass flags
     {
       uint32_t& materialPassMask = _materialPassMask(matRef);
@@ -128,7 +164,6 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
         entry.translucencyThicknessFactor = _descTranslucencyThickness(matRef);
         entry.emissveIntensity = _descEmissiveIntensity(matRef);
       }
-
       MaterialBuffer::updateMaterialBufferEntry(materialBufferEntryIdx, entry);
     }
 
@@ -148,7 +183,8 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
       fragmentData.pbrBias = glm::vec4(_descPbrBias(matRef), 0.0f);
       fragmentData.uvAnimation =
           glm::vec4(_descUvAnimation(matRef), 0.0f, 0.0f);
-      fragmentData.data0[0] = materialBufferEntryIdx;
+      fragmentData.data0.x = materialBufferEntryIdx;
+      fragmentData.data1.x = avgNormalLength;
 
       UniformManager::updatePerMaterialDataMemory(
           &fragmentData, sizeof(PerMaterialDataFragment),

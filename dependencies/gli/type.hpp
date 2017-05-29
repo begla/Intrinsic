@@ -10,7 +10,7 @@
 #define GLM_FORCE_EXPLICIT_CTOR
 #include <glm/glm.hpp>
 #include <glm/gtc/vec1.hpp>
-#include <glm/gtx/std_based_type.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 
 #if GLM_COMPILER & GLM_COMPILER_VC
 #	define GLI_FORCE_INLINE __forceinline
@@ -34,31 +34,31 @@ namespace gli
 
 	using std::size_t;
 
-	typedef tvec1<int> extent1d;
-	typedef tvec2<int> extent2d;
-	typedef tvec3<int> extent3d;
-	typedef tvec4<int> extent4d;
+	typedef ivec1 extent1d;
+	typedef ivec2 extent2d;
+	typedef ivec3 extent3d;
+	typedef ivec4 extent4d;
 
 	template <typename T, precision P>
-	inline tvec4<T, P> make_vec4(tvec1<T, P> const & v)
+	inline vec<4, T, P> make_vec4(vec<1, T, P> const & v)
 	{
-		return tvec4<T, P>(v.x, static_cast<T>(0), static_cast<T>(0), static_cast<T>(1));
+		return vec<4, T, P>(v.x, static_cast<T>(0), static_cast<T>(0), static_cast<T>(1));
 	}
 
 	template <typename T, precision P>
-	inline tvec4<T, P> make_vec4(tvec2<T, P> const & v)
+	inline vec<4, T, P> make_vec4(vec<2, T, P> const & v)
 	{
-		return tvec4<T, P>(v.x, v.y, static_cast<T>(0), static_cast<T>(1));
+		return vec<4, T, P>(v.x, v.y, static_cast<T>(0), static_cast<T>(1));
 	}
 
 	template <typename T, precision P>
-	inline tvec4<T, P> make_vec4(tvec3<T, P> const & v)
+	inline vec<4, T, P> make_vec4(vec<3, T, P> const & v)
 	{
-		return tvec4<T, P>(v.x, v.y, v.z, static_cast<T>(1));
+		return vec<4, T, P>(v.x, v.y, v.z, static_cast<T>(1));
 	}
 
 	template <typename T, precision P>
-	inline tvec4<T, P> make_vec4(tvec4<T, P> const & v)
+	inline vec<4, T, P> make_vec4(vec<4, T, P> const & v)
 	{
 		return v;
 	}

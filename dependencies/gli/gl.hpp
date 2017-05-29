@@ -328,7 +328,7 @@ namespace gli
 			PROFILE_KTX
 		};
 
-		typedef glm::tvec4<int> swizzles;
+		typedef glm::vec<4, int> swizzles;
 
 		struct format
 		{

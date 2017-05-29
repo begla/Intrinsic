@@ -38,7 +38,8 @@ struct PerMaterialDataFragment
   glm::vec4 pbrBias;
   glm::vec4 waterParams;
 
-  uint32_t data0[4];
+  glm::uvec4 data0;
+  glm::vec4 data1;
 };
 
 namespace MaterialPass

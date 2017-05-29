@@ -10,7 +10,7 @@
 #include "texture3d.hpp"
 #include "texture_cube.hpp"
 #include "texture_cube_array.hpp"
-#include "filter.hpp"
+#include "sampler.hpp"
 
 namespace gli
 {

@@ -1,0 +1,222 @@
+[
+    {
+        "name": "MaterialTest",
+        "offsetToParent": 0,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "PostEffectVolume0",
+        "offsetToParent": -1,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -920.1539916992188,
+                        588.333984375,
+                        -201.64154052734376
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        500.0,
+                        500.0,
+                        500.0
+                    ],
+                    "worldPos": [
+                        -920.1539916992188,
+                        588.333984375,
+                        -201.64154052734376
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "worldSize": [
+                        500.0,
+                        500.0,
+                        500.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "sky",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "PostEffectVolume",
+                "properties": {
+                    "postEffectName": "IrradianceTest",
+                    "radius": 500.0,
+                    "blendRange": 2.0
+                }
+            }
+        ]
+    },
+    {
+        "name": "GameCamera",
+        "offsetToParent": -2,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -938.4696044921875,
+                        574.0117797851563,
+                        -288.30108642578127
+                    ],
+                    "localOrient": [
+                        0.07182473689317703,
+                        -0.6936193108558655,
+                        0.0698389932513237,
+                        0.7133413553237915
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        -938.4696044921875,
+                        574.0117797851563,
+                        -288.30108642578127
+                    ],
+                    "worldOrient": [
+                        0.07182473689317703,
+                        -0.6936193108558655,
+                        0.0698389932513237,
+                        0.7133413553237915
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "CameraController",
+                "properties": {
+                    "cameraControllerType": 0,
+                    "targetObjectName": "Player",
+                    "targetEulerAngles": [
+                        0.200699120759964,
+                        -1.542762041091919,
+                        0.0
+                    ]
+                }
+            },
+            {
+                "type": "Camera",
+                "properties": {
+                    "fov": 80.0,
+                    "nearPlane": 1.0,
+                    "farPlane": 10000.0
+                }
+            }
+        ]
+    },
+    {
+        "name": "MainCamera",
+        "offsetToParent": -3,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -877.5934448242188,
+                        636.7124633789063,
+                        -218.33070373535157
+                    ],
+                    "localOrient": [
+                        0.13459816575050355,
+                        -0.6770222783088684,
+                        0.12795983254909516,
+                        0.7121449708938599
+                    ],
+                    "localSize": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "worldPos": [
+                        -877.5934448242188,
+                        636.7124633789063,
+                        -218.33070373535157
+                    ],
+                    "worldOrient": [
+                        0.13459816575050355,
+                        -0.6770222783088684,
+                        0.12795983254909516,
+                        0.7121449708938599
+                    ],
+                    "worldSize": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                }
+            },
+            {
+                "type": "Camera",
+                "properties": {
+                    "fov": 70.0,
+                    "nearPlane": 1.0,
+                    "farPlane": 10000.0
+                }
+            }
+        ]
+    }
+]

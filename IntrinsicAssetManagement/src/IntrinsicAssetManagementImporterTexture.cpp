@@ -73,7 +73,7 @@ ImageRef createTexture(const _INTR_STRING& p_TextureName,
 
     ImageManager::_descImageType(imageRef) =
         Renderer::Vulkan::ImageType::kTextureFromFile;
-	ImageManager::_descImageFormat(imageRef) = p_Format;
+    ImageManager::_descImageFormat(imageRef) = p_Format;
     ImageManager::_descFileName(imageRef) = p_TextureName + ".dds";
 
     imagesToCreate.push_back(imageRef);

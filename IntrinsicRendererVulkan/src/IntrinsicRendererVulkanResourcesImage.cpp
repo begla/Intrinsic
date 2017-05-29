@@ -17,7 +17,7 @@
 #include "stdafx.h"
 
 // Lib. includes
-#include "gli.hpp"
+#include <gli/gli.hpp>
 
 namespace Intrinsic
 {

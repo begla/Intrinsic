@@ -37,6 +37,7 @@
   vec4 waterParams; \
   \
   uvec4 data0; \
+  vec4 data1; \
 } uboPerMaterial
 
 #define BINDINGS_GBUFFER layout (binding = 3) uniform sampler2D albedoTex; \

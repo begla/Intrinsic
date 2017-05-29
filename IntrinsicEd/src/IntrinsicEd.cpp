@@ -732,7 +732,7 @@ void updateStatusBar(QStatusBar* p_StatusBar)
 
     _INTR_STRING statucBarText = StringUtil::toString<float>(fps) + " FPS / " +
                                  StringUtil::toString<float>(smoothedDeltaT) +
-                                 " ms";
+                                 " s";
     p_StatusBar->showMessage(statucBarText.c_str());
     timeSinceLastStatusBarUpdate = 0.0f;
   }
