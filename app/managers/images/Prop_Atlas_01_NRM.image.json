@@ -4,6 +4,7 @@
         "name": "Prop_Atlas_01_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "Prop_Atlas_01_NRM.dds"
+        "fileName": "Prop_Atlas_01_NRM.dds",
+        "avgNormLength": 0.9487378001213074
     }
 }

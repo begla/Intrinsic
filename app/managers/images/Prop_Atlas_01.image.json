@@ -4,6 +4,7 @@
         "name": "Prop_Atlas_01",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "Prop_Atlas_01.dds"
+        "fileName": "Prop_Atlas_01.dds",
+        "avgNormLength": 1.0
     }
 }

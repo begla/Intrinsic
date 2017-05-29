@@ -14,18 +14,13 @@
 
 #pragma once
 
-// Defines
-#define _INTR_MAX_ASSET_COUNT 4096u
-
-// FBX
-#undef snprintf
-#include "fbxsdk.h"
-
 // Core related includes
 #include "stdafx.h"
 
+// Defines
+#define _INTR_MAX_ASSET_COUNT 4096u
+
 // Asset Management related includes
-#include "IntrinsicAssetManagementHelperFbx.h"
 #include "IntrinsicAssetManagementResourcesAsset.h"
 #include "IntrinsicAssetManagementImporterFbx.h"
 #include "IntrinsicAssetManagementImporterTexture.h"

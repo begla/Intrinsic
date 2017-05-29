@@ -4,6 +4,7 @@
         "name": "Moss_01",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "Moss_01.dds"
+        "fileName": "Moss_01.dds",
+        "avgNormLength": 1.0
     }
 }

@@ -4,6 +4,7 @@
         "name": "water_PBR",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "water_PBR.dds"
+        "fileName": "water_PBR.dds",
+        "avgNormLength": 1.0
     }
 }

@@ -4,6 +4,7 @@
         "name": "Tree_Atlas_01_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "Tree_Atlas_01_NRM.dds"
+        "fileName": "Tree_Atlas_01_NRM.dds",
+        "avgNormLength": 0.9055908918380737
     }
 }

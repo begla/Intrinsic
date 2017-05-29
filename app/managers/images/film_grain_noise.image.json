@@ -4,6 +4,7 @@
         "name": "film_grain_noise",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "film_grain_noise.dds"
+        "fileName": "film_grain_noise.dds",
+        "avgNormLength": 1.0
     }
 }

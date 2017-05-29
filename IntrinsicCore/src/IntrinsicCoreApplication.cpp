@@ -14,6 +14,7 @@
 
 // Precompiled header file
 #include "stdafx.h"
+#include <cmath>
 
 // Renderer includes
 #include "IntrinsicRendererVulkanRenderSystem.h"
@@ -42,6 +43,8 @@ bool Application::_running = true;
 
 void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
 {
+  std::isnan(1234.0f);
+
   // Init. physics
   Physics::System::init();
 

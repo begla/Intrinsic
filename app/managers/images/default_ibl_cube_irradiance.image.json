@@ -4,6 +4,7 @@
         "name": "default_ibl_cube_irradiance",
         "imageType": 1,
         "imageFormat": 15,
-        "fileName": "default_ibl_cube_irradiance.dds"
+        "fileName": "default_ibl_cube_irradiance.dds",
+        "avgNormLength": 1.0
     }
 }

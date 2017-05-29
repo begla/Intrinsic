@@ -4,6 +4,7 @@
         "name": "house_01_E",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "house_01_E.dds"
+        "fileName": "house_01_E.dds",
+        "avgNormLength": 1.0
     }
 }

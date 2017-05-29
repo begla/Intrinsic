@@ -16,9 +16,6 @@
 #include "stdafx_editor.h"
 #include "stdafx.h"
 
-// Lib. includes
-#include "gli.hpp"
-
 // Helpers
 void expandAllParents(QTreeWidgetItem* p_Item)
 {

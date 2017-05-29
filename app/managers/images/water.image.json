@@ -4,6 +4,7 @@
         "name": "water",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "water.dds"
+        "fileName": "water.dds",
+        "avgNormLength": 1.0
     }
 }

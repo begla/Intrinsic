@@ -14,7 +14,6 @@
 
 // Precompiled header file
 #include "stdafx_assets.h"
-#include "stdafx.h"
 #include "stdafx_vulkan.h"
 
 using namespace Intrinsic::Renderer::Vulkan::Resources;
@@ -136,6 +135,34 @@ void ImporterTexture::importNormalMapTextureFromFile(
                   ".dds");
   ImageRef imgRef =
       createTexture(fileName, Renderer::Vulkan::Format::kBC1RGBUNorm);
+
+  // Calc. avg. normal length for specular AA
+  float avgNormalLength = 1.0f;
+  {
+    _INTR_STRING texturePath = "media/textures/" + fileName + ".dds";
+
+    gli::texture2d normalTexture =
+        gli::texture2d(gli::load(texturePath.c_str()));
+    gli::texture2d normalTexDec =
+        gli::convert(normalTexture, gli::FORMAT_RGB32_SFLOAT_PACK32);
+
+    glm::vec3 avgNormal = glm::vec3(0.0f);
+    for (int32_t y = 0u; y < normalTexDec.extent().y; ++y)
+    {
+      for (int32_t x = 0u; x < normalTexDec.extent().x; ++x)
+      {
+        const gli::vec3 normal = gli::normalize(
+            normalTexDec.load<gli::vec3>(gli::extent2d(x, y), 0u) * 2.0f -
+            1.0f);
+
+        avgNormal += normal;
+      }
+    }
+
+    avgNormal /= normalTexDec.extent().x * normalTexDec.extent().y;
+    avgNormalLength = glm::length(avgNormal);
+  }
+  ImageManager::_descAvgNormLength(imgRef) = avgNormalLength;
 }
 
 // <-

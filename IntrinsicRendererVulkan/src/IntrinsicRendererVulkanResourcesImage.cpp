@@ -16,9 +16,6 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
-// Lib. includes
-#include <gli/gli.hpp>
-
 namespace Intrinsic
 {
 namespace Renderer

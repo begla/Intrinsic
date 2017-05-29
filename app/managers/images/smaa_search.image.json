@@ -4,6 +4,7 @@
         "name": "smaa_search",
         "imageType": 1,
         "imageFormat": 25,
-        "fileName": "smaa_search.dds"
+        "fileName": "smaa_search.dds",
+        "avgNormLength": 1.0
     }
 }

@@ -4,6 +4,7 @@
         "name": "house_01_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "house_01_NRM.dds"
+        "fileName": "house_01_NRM.dds",
+        "avgNormLength": 0.9393026232719421
     }
 }

@@ -4,6 +4,7 @@
         "name": "Rock_01_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "Rock_01_NRM.dds"
+        "fileName": "Rock_01_NRM.dds",
+        "avgNormLength": 0.8875740766525269
     }
 }

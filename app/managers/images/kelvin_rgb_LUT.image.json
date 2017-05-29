@@ -4,6 +4,7 @@
         "name": "kelvin_rgb_LUT",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "kelvin_rgb_LUT.dds"
+        "fileName": "kelvin_rgb_LUT.dds",
+        "avgNormLength": 1.0
     }
 }

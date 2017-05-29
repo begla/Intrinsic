@@ -4,6 +4,7 @@
         "name": "gravel_01_PBR",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "gravel_01_PBR.dds"
+        "fileName": "gravel_01_PBR.dds",
+        "avgNormLength": 1.0
     }
 }

@@ -4,6 +4,7 @@
         "name": "stones",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "stones.dds"
+        "fileName": "stones.dds",
+        "avgNormLength": 1.0
     }
 }

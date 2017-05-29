@@ -4,6 +4,7 @@
         "name": "vignette",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "vignette.dds"
+        "fileName": "vignette.dds",
+        "avgNormLength": 1.0
     }
 }

@@ -4,6 +4,7 @@
         "name": "smaa_area",
         "imageType": 1,
         "imageFormat": 6,
-        "fileName": "smaa_area.dds"
+        "fileName": "smaa_area.dds",
+        "avgNormLength": 1.0
     }
 }

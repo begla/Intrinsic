@@ -4,6 +4,7 @@
         "name": "stones_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "stones_NRM.dds"
+        "fileName": "stones_NRM.dds",
+        "avgNormLength": 0.8544360399246216
     }
 }
