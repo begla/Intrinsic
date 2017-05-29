@@ -38,7 +38,6 @@ layout (binding = 9) uniform sampler2D depthBufferTex;
 layout (binding = 10) uniform sampler2D depthBufferTranspTex;
 layout (binding = 11) MATERIAL_BUFFER;
 layout (binding = 12) uniform sampler3D volLightScatteringBufferTex;
-layout (binding = 13) uniform samplerCube irradianceTex;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
@@ -52,6 +51,7 @@ const float waterFogMaxBlendFactor = 0.95;
 const float waterFogDecayExp = 16.0;
 const vec3 waterFogColor0 = vec3(0.0, 1.0, 1.0);
 const vec3 waterFogColor1 = vec3(0.0, 0.2, 0.2);
+const vec3 fogColor = vec3(0.5, 0.7, 1.0);
 
 void main()
 {
@@ -115,7 +115,7 @@ void main()
 
     opaque.rgb = mix(opaque.rgb, mix(waterFogColor0, waterFogColor1, waterFogDecay), 
       albedoTransparents.a * waterFog * uboPerInstance.postParams0.x * uboPerInstance.postParams0.y);
-    const vec3 transp = albedoTransparents.rgb * lightingTransp;
+    const vec3 transp = lightingTransp;
     outColor.rgb = mix(opaque, transp, albedoTransparents.a);
   }
   else
@@ -135,7 +135,7 @@ void main()
 
     const vec3 lightVec = vec3(1.0, 0.45, -0.15);
     fog.a = 1.0 - min(max((1.0 - exp((-rayDist + fogStart) * fogDensity)), 0.0), fogMaxBlendFactor);
-    fog.rgb = (1.0 - fog.a) * texture(irradianceTex, ray).rgb * uboPerInstance.postParams0.x
+    fog.rgb = (1.0 - fog.a) * fogColor * uboPerInstance.postParams0.x
       * uboPerInstance.postParams0.y;
   }
 

@@ -1,8 +1,0 @@
-{
-    "name": "default_ibl_cube_radiance",
-    "properties": {
-        "name": "default_ibl_cube_radiance",
-        "assetFileName": "default_ibl_cube_radiance.dds",
-        "assetType": 6
-    }
-}
