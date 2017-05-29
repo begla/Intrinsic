@@ -170,8 +170,26 @@
       "boundResources" : "GBufferFoliage"
     },
     {
+      "name" : "GBufferGrass",
+      "baseVertexGpuProgram" : "gbuffer_grass.vert",
+      "baseFragmentGpuProgram" : "gbuffer_foliage.frag",
+      "renderPass" : "GBuffer",
+      "blendStates" : ["Default", "Default", "Default"],
+      "rasterizationState" : "DoubleSided",
+      "boundResources" : "GBufferFoliage"
+    },
+    {
       "name" : "ShadowFoliage",
       "baseVertexGpuProgram" : "shadow_foliage.vert",
+      "baseFragmentGpuProgram" : "shadow_foliage.frag",
+      "renderPass" : "Shadow",
+      "viewportSize": "ShadowMap",
+      "rasterizationState" : "DoubleSided",
+      "boundResources" : "ShadowFoliage"
+    },
+    {
+      "name" : "ShadowGrass",
+      "baseVertexGpuProgram" : "shadow_grass.vert",
       "baseFragmentGpuProgram" : "shadow_foliage.frag",
       "renderPass" : "Shadow",
       "viewportSize": "ShadowMap",
@@ -202,6 +220,15 @@
       "viewportSize" : "PerPixelPicking",
       "blendStates" : ["Default"],
       "boundResources" : "PerPixelPicking"
+    },
+    {
+      "name" : "GBufferGrassPrePass",
+      "baseVertexGpuProgram" : "gbuffer_grass.vert",
+      "baseFragmentGpuProgram" : "gbuffer_foliage_prepass.frag",
+      "renderPass" : "GBufferPrePassFoliage",
+      "blendStates" : [],
+      "rasterizationState" : "DoubleSided",
+      "boundResources" : "GBufferFoliage"
     },
     {
       "name" : "GBufferFoliagePrePass",

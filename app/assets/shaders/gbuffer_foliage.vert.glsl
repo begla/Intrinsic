@@ -14,6 +14,8 @@
 
 #version 450
 
+/* __PREPROCESSOR DEFINES__ */
+
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
@@ -43,17 +45,32 @@ layout (location = 5) out vec3 outWorldPosition;
 void main()
 { 
   vec3 localPos = inPosition.xyz;
-  const vec3 worldPos = (uboPerInstance.worldMatrix * vec4(inPosition.xyz, 1.0)).xyz;
-  const vec3 worldNormal = normalize((uboPerInstance.worldMatrix * vec4(inNormal.xyz, 0.0)).xyz);
-  outWorldPosition = worldPos;
+  applyMainBending(localPos, vec2(0.0, 0.0), 0.05);
 
-  applyWind(worldPos, worldNormal, inColor.r, uboPerInstance.data0.w, localPos);
-  gl_Position = uboPerInstance.worldViewProjMatrix * vec4(localPos, 1.0);
+  outWorldPosition = (uboPerInstance.worldMatrix 
+    * vec4(inPosition.xyz, 1.0)).xyz;
+  const vec3 worldNormal = normalize((uboPerInstance.worldMatrix 
+    * vec4(inNormal.xyz, 0.0)).xyz);
+
+  const vec2 windStrength = calcWindStrength(uboPerInstance.data0.w);
+  
+#if defined (GRASS)
+  applyGrassWind(localPos, outWorldPosition,
+    uboPerInstance.data0.w, windStrength);
+#else
+  applyTreeWind(localPos, outWorldPosition, worldNormal, inColor.r, 
+    uboPerInstance.data0.w, windStrength);
+#endif // GRASS
+
+  gl_Position = uboPerInstance.worldViewProjMatrix 
+  * vec4(localPos, 1.0);
 
   outColor = inColor.xyz;
-  outNormal = normalize(uboPerInstance.normalMatrix * vec4(inNormal, 0.0)).xyz;
-  outTangent = normalize(uboPerInstance.normalMatrix * vec4(inTangent, 0.0)).xyz;
-  outBinormal = normalize(uboPerInstance.normalMatrix * vec4(inBinormal, 0.0)).xyz;
+  outNormal = normalize(uboPerInstance.normalMatrix 
+    * vec4(inNormal, 0.0)).xyz;
+  outTangent = normalize(uboPerInstance.normalMatrix 
+    * vec4(inTangent, 0.0)).xyz;
+  outBinormal = normalize(uboPerInstance.normalMatrix 
+    * vec4(inBinormal, 0.0)).xyz;
   outUV0 = inUV0;
 }
- 

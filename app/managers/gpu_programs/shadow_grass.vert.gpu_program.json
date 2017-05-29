@@ -1,0 +1,10 @@
+{
+    "name": "shadow_grass.vert",
+    "properties": {
+        "name": "shadow_grass.vert",
+        "gpuProgramName": "shadow_foliage.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "#define GRASS",
+        "gpuProgramType": 0
+    }
+}

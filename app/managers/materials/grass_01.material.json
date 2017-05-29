@@ -3,10 +3,10 @@
     "properties": {
         "name": "grass_01",
         "materialPassMask": [
-            "GBufferFoliage",
-            "ShadowFoliage",
+            "GBufferGrass",
+            "ShadowGrass",
             "PerPixelPicking",
-            "GBufferFoliagePrePass"
+            "GBufferGrassPrePass"
         ],
         "albedoTextureName": "grass_atlas_01",
         "emissiveTextureName": "white",
