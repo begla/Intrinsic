@@ -4,6 +4,7 @@
         "name": "foliage_blend_mask_01",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "foliage_blend_mask_01.dds"
+        "fileName": "foliage_blend_mask_01.dds",
+        "avgNormLength": 1.0
     }
 }

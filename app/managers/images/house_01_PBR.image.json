@@ -4,6 +4,7 @@
         "name": "house_01_PBR",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "house_01_PBR.dds"
+        "fileName": "house_01_PBR.dds",
+        "avgNormLength": 1.0
     }
 }

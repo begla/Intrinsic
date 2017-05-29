@@ -20,6 +20,17 @@
 #include "windows.h"
 #endif // _WIN32
 
+// GLM and GLI related includes
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <gli/gli.hpp>
+
 // Tinydir
 #include "tinydir/tinydir.h"
 
@@ -61,16 +72,6 @@
 #include <cfloat>
 #include <cmath>
 #include <thread>
-
-// GLM related includes
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#define GLM_ENABLE_EXPERIMENTAL
-
-#include "glm/glm.hpp"
-#include "glm/gtc/quaternion.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/quaternion.hpp"
-#include "glm/gtx/rotate_vector.hpp"
 
 // Core related includes
 #include "IntrinsicCoreVersion.h"

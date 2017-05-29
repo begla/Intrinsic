@@ -4,6 +4,7 @@
         "name": "blue",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "blue.dds"
+        "fileName": "blue.dds",
+        "avgNormLength": 1.0
     }
 }

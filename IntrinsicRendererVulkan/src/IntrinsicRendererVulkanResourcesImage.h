@@ -38,6 +38,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
     descMipLevelCount.resize(_INTR_MAX_IMAGE_COUNT);
     descFileName.resize(_INTR_MAX_IMAGE_COUNT);
     descMemoryPoolType.resize(_INTR_MAX_IMAGE_COUNT);
+    descAvgNormLength.resize(_INTR_MAX_IMAGE_COUNT);
 
     vkImage.resize(_INTR_MAX_IMAGE_COUNT);
     vkImageView.resize(_INTR_MAX_IMAGE_COUNT);
@@ -56,6 +57,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(uint32_t) descArrayLayerCount;
   _INTR_ARRAY(uint32_t) descMipLevelCount;
   _INTR_ARRAY(_INTR_STRING) descFileName;
+  _INTR_ARRAY(float) descAvgNormLength;
 
   // Resources
   _INTR_ARRAY(VkImage) vkImage;
@@ -89,6 +91,7 @@ struct ImageManager
     _descArrayLayerCount(p_Ref) = 1u;
     _descMipLevelCount(p_Ref) = 1u;
     _descFileName(p_Ref) = "";
+    _descAvgNormLength(p_Ref) = 1.0f;
   }
 
   _INTR_INLINE static void destroyImage(ImageRef p_Ref)
@@ -120,9 +123,14 @@ struct ImageManager
         p_Document.GetAllocator());
     p_Properties.AddMember("fileName",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(Image), "string",
+                                             _N(Image), _N(string),
                                              _descFileName(p_Ref), true, false),
                            p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "avgNormLength",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), _N(float),
+                          _descAvgNormLength(p_Ref), true, false),
+        p_Document.GetAllocator());
   }
 
   _INTR_INLINE static void initFromDescriptor(ImageRef p_Ref,
@@ -141,6 +149,9 @@ struct ImageManager
     if (p_Properties.HasMember("fileName"))
       _descFileName(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["fileName"]);
+    if (p_Properties.HasMember("avgNormLength"))
+      _descAvgNormLength(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["avgNormLength"]);
   }
 
   // <-
@@ -358,6 +369,10 @@ struct ImageManager
   _INTR_INLINE static _INTR_STRING& _descFileName(ImageRef p_Ref)
   {
     return _data.descFileName[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descAvgNormLength(ImageRef p_Ref)
+  {
+    return _data.descAvgNormLength[p_Ref._id];
   }
 
   // GPU resources

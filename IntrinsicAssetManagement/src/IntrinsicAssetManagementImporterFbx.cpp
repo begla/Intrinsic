@@ -13,10 +13,16 @@
 // limitations under the License.
 
 // Precompiled header file
-#define FBXSDK_NAMESPACE_USING 1
 #include "stdafx_assets.h"
-#include "stdafx.h"
 #include "stdafx_vulkan.h"
+
+// FBX
+#define FBXSDK_NAMESPACE_USING 1
+#undef snprintf
+#include "fbxsdk.h"
+
+// Helper
+#include "IntrinsicAssetManagementHelperFbx.h"
 
 namespace Intrinsic
 {

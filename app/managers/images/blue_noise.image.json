@@ -4,6 +4,7 @@
         "name": "blue_noise",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "blue_noise.dds"
+        "fileName": "blue_noise.dds",
+        "avgNormLength": 1.0
     }
 }

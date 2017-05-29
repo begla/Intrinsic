@@ -110,7 +110,7 @@ void main()
     gbuffer.normal = normalize(TBN * (normal.xyz * 2.0 - 1.0));
     gbuffer.metalMask = metalRoughness.x;
     gbuffer.specular = 0.0;
-    gbuffer.roughness = metalRoughness.y;
+    gbuffer.roughness = adjustRoughness(metalRoughness.y, uboPerMaterial.data1.x);
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
     gbuffer.emissive = 0.0;
     gbuffer.occlusion = 1.0; 

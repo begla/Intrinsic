@@ -14,7 +14,6 @@
 
 // Precompiled header file
 #include "stdafx_assets.h"
-#include "stdafx.h"
 #include "stdafx_vulkan.h"
 
 namespace Intrinsic

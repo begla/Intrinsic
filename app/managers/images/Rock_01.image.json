@@ -4,6 +4,7 @@
         "name": "Rock_01",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "Rock_01.dds"
+        "fileName": "Rock_01.dds",
+        "avgNormLength": 1.0
     }
 }

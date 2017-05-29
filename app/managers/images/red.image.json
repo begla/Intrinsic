@@ -4,6 +4,7 @@
         "name": "red",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "red.dds"
+        "fileName": "red.dds",
+        "avgNormLength": 1.0
     }
 }

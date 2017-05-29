@@ -4,6 +4,7 @@
         "name": "noise",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "noise.dds"
+        "fileName": "noise.dds",
+        "avgNormLength": 1.0
     }
 }

@@ -4,6 +4,7 @@
         "name": "checkerboard",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "checkerboard.dds"
+        "fileName": "checkerboard.dds",
+        "avgNormLength": 1.0
     }
 }

@@ -619,6 +619,9 @@ namespace detail
 		return detail::compute_smoothstep_vector<L, T, P, vecType, detail::is_aligned<P>::value>::call(edge0, edge1, x);
 	}
 
+#	if GLM_HAS_CXX11_STL
+		using std::isnan;
+#	else
 		template<typename genType> 
 		GLM_FUNC_QUALIFIER bool isnan(genType x)
 		{
@@ -629,7 +632,7 @@ namespace detail
 #			elif GLM_COMPILER & GLM_COMPILER_VC
 				return _isnan(x) != 0;
 #			elif GLM_COMPILER & GLM_COMPILER_INTEL
-#				if GLM_PLATFORM & GLM_PLATFORM_WINDOWS
+#				if GLM_PLATFORM & GLM_PLATFORM_WINDOWS
 					return _isnan(x) != 0;
 #				else
 					return ::isnan(x) != 0;
@@ -642,6 +645,7 @@ namespace detail
 				return std::isnan(x);
 #			endif
 		}
+#	endif
 
 	template<length_t L, typename T, precision P, template<length_t, typename, precision> class vecType>
 	GLM_FUNC_QUALIFIER vecType<L, bool, P> isnan(vecType<L, T, P> const & x)

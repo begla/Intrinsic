@@ -4,6 +4,7 @@
         "name": "terrain_BLEND",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "terrain_BLEND.dds"
+        "fileName": "terrain_BLEND.dds",
+        "avgNormLength": 1.0
     }
 }

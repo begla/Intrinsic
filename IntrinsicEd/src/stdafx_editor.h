@@ -14,12 +14,12 @@
 
 #pragma once
 
+// Core related includes
+#include "stdafx.h"
+
 // Qt related includes
 #include <QtWidgets>
 #include <QtWidgets/QMainWindow>
-
-// Core related includes
-#include "stdafx.h"
 
 // ->Ed related includes
 #include "IntrinsicEdViewport.h"

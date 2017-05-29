@@ -4,6 +4,7 @@
         "name": "water_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "water_NRM.dds"
+        "fileName": "water_NRM.dds",
+        "avgNormLength": 0.9966722130775452
     }
 }

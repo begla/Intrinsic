@@ -4,6 +4,7 @@
         "name": "grass_atlas_01_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "grass_atlas_01_NRM.dds"
+        "fileName": "grass_atlas_01_NRM.dds",
+        "avgNormLength": 1.0071773529052735
     }
 }

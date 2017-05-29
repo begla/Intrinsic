@@ -4,6 +4,7 @@
         "name": "default_PBR",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "default_PBR.dds"
+        "fileName": "default_PBR.dds",
+        "avgNormLength": 1.0
     }
 }

@@ -4,6 +4,7 @@
         "name": "black",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "black.dds"
+        "fileName": "black.dds",
+        "avgNormLength": 1.0
     }
 }

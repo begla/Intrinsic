@@ -4,6 +4,7 @@
         "name": "white",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "white.dds"
+        "fileName": "white.dds",
+        "avgNormLength": 1.0
     }
 }

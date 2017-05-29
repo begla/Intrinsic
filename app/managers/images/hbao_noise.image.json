@@ -4,6 +4,7 @@
         "name": "hbao_noise",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "hbao_noise.dds"
+        "fileName": "hbao_noise.dds",
+        "avgNormLength": 1.0
     }
 }

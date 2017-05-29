@@ -272,6 +272,8 @@ void IntrinsicEdManagerWindowAsset::onCompileQueuedAssets()
         Vulkan::Resources::ComputeCallManager::_activeRefs);
     Vulkan::Resources::ComputeCallManager::createResources(
         Vulkan::Resources::ComputeCallManager::_activeRefs);
+    Vulkan::Resources::MaterialManager::createResources(
+        Vulkan::Resources::MaterialManager::_activeRefs);
 
     _assetsToRecompile.clear();
   }

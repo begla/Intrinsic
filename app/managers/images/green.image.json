@@ -4,6 +4,7 @@
         "name": "green",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "green.dds"
+        "fileName": "green.dds",
+        "avgNormLength": 1.0
     }
 }

@@ -4,6 +4,7 @@
         "name": "foam",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "foam.dds"
+        "fileName": "foam.dds",
+        "avgNormLength": 1.0
     }
 }
