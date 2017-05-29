@@ -1,0 +1,9 @@
+{
+    "name": "stones",
+    "properties": {
+        "name": "stones",
+        "imageType": 1,
+        "imageFormat": 10,
+        "fileName": "stones.dds"
+    }
+}
