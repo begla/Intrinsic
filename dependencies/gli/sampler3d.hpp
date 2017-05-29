@@ -24,8 +24,8 @@ namespace gli
 		typedef typename texture_type::size_type size_type;
 		typedef typename texture_type::extent_type extent_type;
 		typedef interpolate_type level_type;
-		typedef tvec3<interpolate_type, P> normalized_type;
-		typedef tvec4<T, P> texel_type;
+		typedef vec<3, interpolate_type, P> normalized_type;
+		typedef vec<4, T, P> texel_type;
 
 		sampler3d(texture_type const& Texture, wrap Wrap, filter Mip = FILTER_NEAREST, filter Min = FILTER_NEAREST, texel_type const& BorderColor = texel_type(0, 0, 0, 1));
 

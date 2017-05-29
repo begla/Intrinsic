@@ -22,13 +22,8 @@ namespace Vulkan
 {
 struct MaterialBufferEntry
 {
-  // Water
   float refractionFactor;
-
-  // Translucency
   float translucencyThicknessFactor;
-
-  // Emissive
   float emissveIntensity;
 };
 

@@ -1,19 +1,10 @@
 /// @brief Include to use filter enum, to select filtering methods.
-/// @file gli/filter.hpp
+/// @file gli/core/filter.hpp
 
 #pragma once
 
-namespace gli{
-namespace detail
+namespace gli
 {
-	enum dimension
-	{
-		DIMENSION_1D,
-		DIMENSION_2D,
-		DIMENSION_3D
-	};
-}//namespace detail
-
 	/// Texture filtring modes
 	enum filter
 	{
@@ -29,4 +20,4 @@ namespace detail
 	};
 }//namespace gli
 
-#include "./core/filter.inl"
+#include "filter.inl"

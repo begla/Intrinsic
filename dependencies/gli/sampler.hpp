@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <gli/filter.hpp>
+#include "core/filter.hpp"
 
 namespace gli
 {
@@ -34,6 +34,7 @@ namespace gli
 	{
 	public:
 		sampler(wrap Wrap, filter Mip, filter Min);
+		virtual ~sampler() = default;
 
 	protected:
 		typedef float(*wrap_type)(float const & SamplerCoord);

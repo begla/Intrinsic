@@ -51,7 +51,7 @@ void main()
     const vec4 pbr = texture(pbrTex, uv0);
     gbuffer.metalMask = pbr.r + uboPerMaterial.pbrBias.r;
     gbuffer.specular = pbr.g + uboPerMaterial.pbrBias.g;
-    gbuffer.roughness = adjustRoughness(pbr.b + uboPerMaterial.pbrBias.b, 1.0);
+    gbuffer.roughness = adjustRoughness(pbr.b + uboPerMaterial.pbrBias.b, uboPerMaterial.data1.x);
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
     gbuffer.emissive = texture(emissiveTex, uv0).r;
     gbuffer.occlusion = 1.0;

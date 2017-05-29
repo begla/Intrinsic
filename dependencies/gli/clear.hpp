@@ -40,7 +40,6 @@ namespace gli
 	// Clear multiple layers of a texture
 	template <typename texture_type, typename gen_type>
 	void clear_layer(texture_type& Texture, size_t BaseLayer, size_t LayerCount, gen_type const& BlockData);
-
 }//namespace gli
 
 #include "./core/clear.inl"

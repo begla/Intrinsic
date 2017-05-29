@@ -51,7 +51,7 @@ namespace detail
 			{  1, glm::u8vec3(1, 1, 1), 1, swizzles(SWIZZLE_RED, SWIZZLE_ZERO, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_SCALED_BIT | CAP_SIGNED_BIT | CAP_DDS_GLI_EXT_BIT},										//FORMAT_R8_SSCALED,
 			{  1, glm::u8vec3(1, 1, 1), 1, swizzles(SWIZZLE_RED, SWIZZLE_ZERO, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_INTEGER_BIT | CAP_UNSIGNED_BIT},															//FORMAT_R8_UINT,
 			{  1, glm::u8vec3(1, 1, 1), 1, swizzles(SWIZZLE_RED, SWIZZLE_ZERO, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_INTEGER_BIT | CAP_SIGNED_BIT},															//FORMAT_R8_SINT,
-			{  1, glm::u8vec3(1, 1, 1), 3, swizzles(SWIZZLE_RED, SWIZZLE_ZERO, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_NORMALIZED_BIT | CAP_UNSIGNED_BIT | CAP_COLORSPACE_SRGB_BIT | CAP_DDS_GLI_EXT_BIT},		//FORMAT_R8_SRGB,
+			{  1, glm::u8vec3(1, 1, 1), 1, swizzles(SWIZZLE_RED, SWIZZLE_ZERO, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_NORMALIZED_BIT | CAP_UNSIGNED_BIT | CAP_COLORSPACE_SRGB_BIT | CAP_DDS_GLI_EXT_BIT},		//FORMAT_R8_SRGB,
 
 			{  2, glm::u8vec3(1, 1, 1), 2, swizzles(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_NORMALIZED_BIT | CAP_UNSIGNED_BIT},														//FORMAT_RG8_UNORM,
 			{  2, glm::u8vec3(1, 1, 1), 2, swizzles(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_NORMALIZED_BIT | CAP_SIGNED_BIT},														//FORMAT_RG8_SNORM,
@@ -200,8 +200,8 @@ namespace detail
 			{ 16, glm::u8vec3(4, 4, 1), 4, swizzles(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA), CAP_COMPRESSED_BIT | CAP_COLORSPACE_SRGB_BIT | CAP_NORMALIZED_BIT | CAP_UNSIGNED_BIT},		//FORMAT_RGBA_DXT5_SRGB_BLOCK16,
 			{  8, glm::u8vec3(4, 4, 1), 1, swizzles(SWIZZLE_RED, SWIZZLE_ZERO, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_COMPRESSED_BIT | CAP_NORMALIZED_BIT | CAP_UNSIGNED_BIT},										//FORMAT_R_ATI1N_UNORM_BLOCK8,
 			{  8, glm::u8vec3(4, 4, 1), 1, swizzles(SWIZZLE_RED, SWIZZLE_ZERO, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_COMPRESSED_BIT | CAP_NORMALIZED_BIT | CAP_SIGNED_BIT},										//FORMAT_R_ATI1N_SNORM_BLOCK8,
-			{ 16, glm::u8vec3(4, 4, 1), 2, swizzles(SWIZZLE_RED, SWIZZLE_ZERO, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_COMPRESSED_BIT | CAP_NORMALIZED_BIT | CAP_UNSIGNED_BIT},										//FORMAT_RG_ATI2N_UNORM_BLOCK16,
-			{ 16, glm::u8vec3(4, 4, 1), 2, swizzles(SWIZZLE_RED, SWIZZLE_ZERO, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_COMPRESSED_BIT | CAP_NORMALIZED_BIT | CAP_SIGNED_BIT},										//FORMAT_RG_ATI2N_SNORM_BLOCK16,
+			{ 16, glm::u8vec3(4, 4, 1), 2, swizzles(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_COMPRESSED_BIT | CAP_NORMALIZED_BIT | CAP_UNSIGNED_BIT},									//FORMAT_RG_ATI2N_UNORM_BLOCK16,
+			{ 16, glm::u8vec3(4, 4, 1), 2, swizzles(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_ZERO, SWIZZLE_ONE), CAP_COMPRESSED_BIT | CAP_NORMALIZED_BIT | CAP_SIGNED_BIT},										//FORMAT_RG_ATI2N_SNORM_BLOCK16,
 			{ 16, glm::u8vec3(4, 4, 1), 3, swizzles(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ONE), CAP_COMPRESSED_BIT | CAP_FLOAT_BIT | CAP_UNSIGNED_BIT},											//FORMAT_RGB_BP_UFLOAT_BLOCK16,
 			{ 16, glm::u8vec3(4, 4, 1), 3, swizzles(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ONE), CAP_COMPRESSED_BIT | CAP_FLOAT_BIT | CAP_SIGNED_BIT},											//FORMAT_RGB_BP_SFLOAT_BLOCK16,
 			{ 16, glm::u8vec3(4, 4, 1), 3, swizzles(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ONE), CAP_COMPRESSED_BIT | CAP_NORMALIZED_BIT | CAP_UNSIGNED_BIT},									//FORMAT_RGBA_BP_UNORM_BLOCK16,
@@ -297,6 +297,11 @@ namespace detail
 		return detail::get_format_info(Format).Flags & detail::CAP_COMPRESSED_BIT ? true : false;
 	}
 
+	inline bool is_s3tc_compressed(format Format)
+	{
+		return Format >= FORMAT_RGB_DXT1_UNORM_BLOCK8 && Format <= FORMAT_RGBA_DXT5_SRGB_BLOCK16;
+	}
+
 	inline bool is_srgb(format Format)
 	{
 		return detail::get_format_info(Format).Flags & detail::CAP_COLORSPACE_SRGB_BIT ? true : false;
@@ -316,4 +321,72 @@ namespace detail
 	{
 		return detail::get_format_info(Format).Component;
 	}
+
+	inline bool is_unsigned(format Format)
+	{
+		return detail::get_format_info(Format).Flags & detail::CAP_UNSIGNED_BIT ? true : false;
+	}
+
+	inline bool is_signed(format Format)
+	{
+		return detail::get_format_info(Format).Flags & detail::CAP_SIGNED_BIT ? true : false;
+	}
+
+	inline bool is_integer(format Format)
+	{
+		return detail::get_format_info(Format).Flags & detail::CAP_INTEGER_BIT ? true : false;
+	}
+
+	inline bool is_signed_integer(format Format)
+	{
+		return is_integer(Format) && is_signed(Format);
+	}
+
+	inline bool is_unsigned_integer(format Format)
+	{
+		return is_integer(Format) && is_unsigned(Format);
+	}
+
+	inline bool is_float(format Format)
+	{
+		return detail::get_format_info(Format).Flags & detail::CAP_FLOAT_BIT ? true : false;
+	}
+
+	inline bool is_normalized(format Format)
+	{
+		return detail::get_format_info(Format).Flags & detail::CAP_NORMALIZED_BIT ? true : false;
+	}
+
+	inline bool is_unorm(format Format)
+	{
+		return is_normalized(Format) && is_unsigned(Format);
+	}
+
+	inline bool is_snorm(format Format)
+	{
+		return is_normalized(Format) && is_signed(Format);
+	}
+
+	inline bool is_packed(format Format)
+	{
+		uint16_t flags = detail::get_format_info(Format).Flags;
+		
+		return (flags & detail::CAP_PACKED8_BIT) != 0 || (flags & detail::CAP_PACKED16_BIT) != 0 || (flags & detail::CAP_PACKED32_BIT) != 0;
+	}
+
+	inline bool is_depth(format Format)
+	{
+		return (detail::get_format_info(Format).Flags & detail::CAP_DEPTH_BIT) ? true : false;
+	}
+
+	inline bool is_stencil(format Format)
+	{
+		return (detail::get_format_info(Format).Flags & detail::CAP_STENCIL_BIT) ? true : false;
+	}
+
+	inline bool is_depth_stencil(format Format)
+	{
+		return is_depth(Format) && is_stencil(Format);
+	}
+
 }//namespace gli

@@ -64,7 +64,7 @@ void main()
     gbuffer.normal = normalize(inNormal);
     gbuffer.metalMask = uboPerMaterial.pbrBias.r;
     gbuffer.specular = 0.5 + uboPerMaterial.pbrBias.g;
-    gbuffer.roughness = adjustRoughness(0.5 + uboPerMaterial.pbrBias.b, 1.0);
+    gbuffer.roughness = 0.5 + uboPerMaterial.pbrBias.b;
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
     gbuffer.occlusion = 1.0;
   }

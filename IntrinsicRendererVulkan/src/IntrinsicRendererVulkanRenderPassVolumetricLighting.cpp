@@ -408,9 +408,8 @@ void VolumetricLighting::init()
       PipelineLayoutManager::resetToDefault(pipelineLayoutAccum);
 
       GpuProgramManager::reflectPipelineLayout(
-          8u,
-          {Resources::GpuProgramManager::getResourceByName(
-              "volumetric_lighting.comp")},
+          8u, {Resources::GpuProgramManager::getResourceByName(
+                  "volumetric_lighting.comp")},
           pipelineLayoutAccum);
     }
     pipelineLayoutsToCreate.push_back(pipelineLayoutAccum);
@@ -421,9 +420,8 @@ void VolumetricLighting::init()
       PipelineLayoutManager::resetToDefault(pipelineLayoutScattering);
 
       GpuProgramManager::reflectPipelineLayout(
-          8u,
-          {Resources::GpuProgramManager::getResourceByName(
-              "volumetric_lighting_scattering.comp")},
+          8u, {Resources::GpuProgramManager::getResourceByName(
+                  "volumetric_lighting_scattering.comp")},
           pipelineLayoutScattering);
     }
     pipelineLayoutsToCreate.push_back(pipelineLayoutScattering);
@@ -434,9 +432,8 @@ void VolumetricLighting::init()
       PipelineLayoutManager::resetToDefault(pipelineLayoutEsm);
 
       GpuProgramManager::reflectPipelineLayout(
-          8u,
-          {Resources::GpuProgramManager::getResourceByName(
-              "esm_generate.frag")},
+          8u, {Resources::GpuProgramManager::getResourceByName(
+                  "esm_generate.frag")},
           pipelineLayoutEsm);
     }
     pipelineLayoutsToCreate.push_back(pipelineLayoutEsm);

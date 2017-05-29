@@ -1,10 +1,11 @@
 #include <glm/gtc/integer.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/component_wise.hpp>
 
 namespace gli
 {
-	template <typename T, precision P, template <typename, precision> class vecType>
-	inline T levels(vecType<T, P> const& Extent)
+	template <length_t L, typename T, precision P, template <length_t, typename, precision> class vecType>
+	inline T levels(vecType<L, T, P> const& Extent)
 	{
 		return glm::log2(compMax(Extent)) + static_cast<T>(1);
 	}
