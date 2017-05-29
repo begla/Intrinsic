@@ -14,6 +14,8 @@
 
 #version 450
 
+/* __PREPROCESSOR DEFINES__ */
+
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
@@ -38,10 +40,20 @@ layout (location = 0) out vec2 outUV0;
 void main()
 {
   vec3 localPos = inPosition.xyz;
-  const vec3 worldPos = (uboPerInstance.worldMatrix * vec4(inPosition.xyz, 1.0)).xyz;
-  const vec3 worldNormal = normalize((uboPerInstance.worldMatrix * vec4(inNormal.xyz, 0.0)).xyz);
+  const vec3 worldPos = (uboPerInstance.worldMatrix 
+  	* vec4(inPosition.xyz, 1.0)).xyz;
+  const vec3 worldNormal = normalize((uboPerInstance.worldMatrix 
+  	* vec4(inNormal.xyz, 0.0)).xyz);
 
-  applyWind(worldPos, worldNormal, inColor.r, uboPerInstance.data0.w, localPos);
+  const vec2 windStrength = calcWindStrength(uboPerInstance.data0.w);
+  
+#if defined (GRASS)
+  applyGrassWind(localPos, worldPos,
+    uboPerInstance.data0.w, windStrength);
+#else
+  applyTreeWind(localPos, worldPos, worldNormal, inColor.r, 
+    uboPerInstance.data0.w, windStrength);
+#endif // GRASS
 
   gl_Position = uboPerInstance.worldViewProjMatrix * vec4(localPos, 1.0);
 

@@ -14,6 +14,13 @@
 
 float hash(float n) { return fract(sin(n) * 753.5453123); }
 
+const float windStrengthFreq = 0.25;
+const float grassFreq = 5.0;
+const float foliageFreq = 2.0;
+const float grassIntensFact = 0.1;
+const float foliageIntensFact = 0.5;
+const float minWindStrength = 0.2;
+
 float noise(in vec3 x)
 {
     vec3 p = floor(x);
@@ -27,13 +34,108 @@ float noise(in vec3 x)
                    mix(hash(n + 270.0), hash(n + 271.0),f.x),f.y),f.z);
 }
 
-void applyWind(vec3 worldPos, vec3 worldNormal, float intensity, float time, inout vec3 localPos)
+// Crytek vegetation animation
+// ->
+vec4 smoothCurve(vec4 x)
+{  
+  return x * x * (3.0 - 2.0 * x);  
+}
+
+vec4 triangleWave(vec4 x) 
+{  
+  return abs(fract(x + 0.5) * 2.0 - 1.0);  
+}
+
+vec4 smoothTriangleWave(vec4 x) 
+{  
+  return smoothCurve(triangleWave(x));  
+}  
+
+#define SIDE_TO_SIDE_FREQ1 1.975
+#define SIDE_TO_SIDE_FREQ2 0.793
+#define UP_AND_DOWN_FREQ1 0.375
+#define UP_AND_DOWN_FREQ2 0.193
+
+void applyDetailBending(
+  inout vec3 vPos,
+  vec3 vNormal,
+  vec3 objectPosition,
+  float fDetailPhase,
+  float fBranchPhase,
+  float fTime,
+  float fEdgeAtten,
+  float fBranchAtten,
+  float fBranchAmp,
+  float fSpeed,
+  float fDetailFreq,
+  float fDetailAmp)
 {
-  const float freq = 2.0;
-  const float windStrength = clamp(noise(vec3(worldPos.xz * 0.001, time * 0.5)) , 0.1, 1.0);
-  localPos += windStrength * worldNormal * intensity * vec3(
-      noise(worldPos.xyz + 0.17281 + vec3(time * freq)) * 2.0 - 1.0
-    , noise(worldPos.xyz + 0.38791 + vec3(time * freq)) * 2.0 - 1.0
-    , noise(worldPos.xyz + 0.83911 + vec3(time * freq)) * 2.0 - 1.0
-    );
+  float fObjPhase = dot(objectPosition.xyz, vec3(1.0));  
+  fBranchPhase += fObjPhase;
+  float fVtxPhase = dot(vPos.xyz, vec3(fDetailPhase + fBranchPhase));  
+
+  vec2 vWavesIn = fTime + vec2(fVtxPhase, fBranchPhase);
+  vec4 vWaves = (fract(vWavesIn.xxyy *
+             vec4(SIDE_TO_SIDE_FREQ1, SIDE_TO_SIDE_FREQ2, 
+                  UP_AND_DOWN_FREQ1, UP_AND_DOWN_FREQ2)) *
+             2.0 - 1.0) * fSpeed * fDetailFreq;
+  vWaves = smoothTriangleWave(vWaves);
+  vec2 vWavesSum = vWaves.xz + vWaves.yw;  
+
+  vPos.xyz += vWavesSum.x * vec3(fEdgeAtten * fDetailAmp * vNormal.xyz);
+  vPos.y += vWavesSum.y * fBranchAtten * fBranchAmp;
+}
+
+void applyMainBending(inout vec3 pos, vec2 wind, float bendScale)
+{
+  float length = length(pos);
+  float bf = pos.y * bendScale;
+  bf += 1.0;
+  bf *= bf;
+  bf = bf * bf - bf;
+  vec3 newPos = pos;
+  newPos.xz += wind.xy * bf;
+  pos.xyz = normalize(newPos.xyz) * length;
+}
+// <-
+
+vec2 calcWindStrength(float time)
+{
+  return max(
+    vec2(noise(vec3(time * windStrengthFreq, 0.0, 0.0)),
+      noise(vec3(time * windStrengthFreq + 0.5891, 0.0, 0.0)))
+      * 2.0 - 1.0,
+    vec2(minWindStrength));
+}
+
+void applyTreeWind(
+  inout vec3 localPos, 
+  vec3 worldPos,
+  vec3 worldNormal,
+  float intensity,
+  float time,
+  vec2 windStrength)
+{
+  const vec2 wind = foliageIntensFact
+    * windStrength
+    * vec2(sin(worldPos.x * 0.05 + time * foliageFreq));
+  const float windS = length(windStrength);
+
+  applyDetailBending(localPos, worldNormal, worldPos,
+    0.0, 0.0, time, intensity, intensity, windS * 5.0, 1.0, 0.1, 
+    windS * 2.0);
+  applyMainBending(localPos, wind, 0.025);
+}
+
+void applyGrassWind(
+  inout vec3 localPos, 
+  vec3 worldPos,
+  float time,
+  vec2 windStrength)
+{
+  const vec2 wind = grassIntensFact
+    * windStrength
+    * clamp(sin(worldPos.x * 0.1 + time * grassFreq) * 0.5 + 0.5, 0.0, 1.0);
+
+  applyMainBending(localPos, wind, 0.8);
 } 

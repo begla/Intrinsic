@@ -293,6 +293,10 @@ void Shadow::render(float p_DeltaT, Components::CameraRef p_CameraRef)
         p_CameraRef, frustumIdx,
         MaterialManager::getMaterialPassId(_N(ShadowFoliage)))
         .copy(visibleDrawCalls);
+    RenderProcess::Default::getVisibleDrawCalls(
+        p_CameraRef, frustumIdx,
+        MaterialManager::getMaterialPassId(_N(ShadowGrass)))
+        .copy(visibleDrawCalls);
 
     DrawCallManager::sortDrawCallsFrontToBack(visibleDrawCalls);
 
