@@ -80,3 +80,19 @@ void writeGBuffer(in GBuffer gbuffer, inout vec4 outAlbedo, inout vec4 outNormal
   outNormal.a = clamp(gbuffer.roughness, 0.05, 1.0);
   outParameter0.rgba = vec4(clamp(gbuffer.metalMask, 0.0, 1.0), gbuffer.materialBufferIdx, gbuffer.occlusion, gbuffer.emissive);
 }
+
+// Specular AA
+// http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+float adjustRoughness(float inputRoughness , float avgNormalLength)
+{
+  if (avgNormalLength < 1.0)
+  {
+    float avgNormLen2 = avgNormalLength * avgNormalLength;
+    float kappa = (3.0 * avgNormalLength - avgNormalLength * avgNormLen2) / (1.0 - avgNormLen2);
+    float variance = 1.0 / (2.0 * kappa);
+
+    return sqrt(inputRoughness * inputRoughness + variance);
+  }
+
+  return inputRoughness;
+}
