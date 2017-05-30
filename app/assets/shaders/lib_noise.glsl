@@ -17,7 +17,7 @@ float hash(float n) { return fract(sin(n) * 753.5453123); }
 const float windStrengthFreq = 0.1;
 const float grassFreq = 3.0;
 const float foliageFreq = 0.25;
-const float grassIntensFact = 0.75;
+const float grassIntensFact = 0.6;
 const float foliageIntensFact = 1.0;
 
 float noise(in vec3 x)
