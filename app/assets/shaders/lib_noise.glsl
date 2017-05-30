@@ -17,8 +17,8 @@ float hash(float n) { return fract(sin(n) * 753.5453123); }
 const float windStrengthFreq = 0.1;
 const float grassFreq = 3.0;
 const float foliageFreq = 0.25;
-const float grassIntensFact = 0.5;
-const float foliageIntensFact = 0.75;
+const float grassIntensFact = 0.75;
+const float foliageIntensFact = 1.0;
 
 float noise(in vec3 x)
 {
@@ -123,11 +123,10 @@ void applyGrassBending(inout vec3 pos, vec2 wind)
 
 vec2 calcWindStrength(float time)
 {
-  return clamp(
-    vec2(
-      noise(vec3(time * windStrengthFreq, 0.0, 0.0)), 
-      noise(vec3(0.0, time * windStrengthFreq, 0.0))
-    ), 0.0, 1.0) * 2.0 - 1.0;
+  return vec2(
+      noise(vec3(time * windStrengthFreq, 0.0, 0.0)) * 2.0 - 1.0, 
+      noise(vec3(0.0, time * windStrengthFreq, 0.0)) * 2.0 - 1.0
+    );
 }
 
 void applyTreeWind(
