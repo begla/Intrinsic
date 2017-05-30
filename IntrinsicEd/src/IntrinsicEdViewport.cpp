@@ -59,6 +59,9 @@ void IntrinsicEdViewport::onKeyPressed(Resources::EventRef p_EventRef)
   case Input::Key::kF3:
     IntrinsicEd::_mainWindow->onMainGameState();
     break;
+  case Input::Key::kF10:
+    IntrinsicEd::_mainWindow->onRecompileShaders();
+    break;
   case Input::Key::k1:
     IntrinsicEd::_mainWindow->onEditingModeDefault();
     break;
