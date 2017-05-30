@@ -79,6 +79,7 @@ enum Enum
   kF1,
   kF2,
   kF3,
+  kF10,
 
   kF,
   kT,
