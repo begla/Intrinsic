@@ -363,6 +363,20 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
         Application::_scheduler.AddTaskSetToPipe(&taskSet);
         _activeTaskSets.push_back(z);
       }
+      else
+      {
+        // Reset counts
+        for (uint32_t y = 0u; y < _gridRes.y; ++y)
+        {
+          for (uint32_t x = 0u; x < _gridRes.x; ++x)
+          {
+            const glm::uint32_t clusterIdx =
+                calcClusterIndex(glm::uvec3(x, y, z));
+            _lightIndexBufferGpuMemory[clusterIdx] = 0u;
+            _irradProbeIndexBufferGpuMemory[clusterIdx] = 0u;
+          }
+        }
+      }
     }
   }
 
@@ -905,12 +919,11 @@ void spawnAndSimulateTestLights(Components::CameraRef p_CameraRef)
   for (uint32_t i = 0u; i < _testLights.size(); ++i)
   {
     TestLight& light = _testLights[i];
-    const glm::vec3 worldPos =
-        glm::vec3(light.spawnPos.x,
-                  light.spawnPos.y +
-                      2000.0f * sin(light.spawnPos.x + light.spawnPos.y +
-                                    TaskManager::_totalTimePassed * 0.1f),
-                  light.spawnPos.z);
+    const glm::vec3 worldPos = glm::vec3(
+        light.spawnPos.x,
+        light.spawnPos.y + 2000.0f * sin(light.spawnPos.x + light.spawnPos.y +
+                                         TaskManager::_totalTimePassed * 0.1f),
+        light.spawnPos.z);
 
     light.light.posAndRadius = glm::vec4(
         glm::vec3(Components::CameraManager::_viewMatrix(p_CameraRef) *
