@@ -739,6 +739,7 @@ void captureIrradProbe(
     // Render a couple of frames so everything is correctly faded in/out
     for (uint32_t f = 0u; f < 10u; ++f)
     {
+      World::updateDayNightCycle(0.0f);
       Components::PostEffectVolumeManager::blendPostEffects(
           Components::PostEffectVolumeManager::_activeRefs);
       RenderProcess::Default::renderFrame(0.0f);
