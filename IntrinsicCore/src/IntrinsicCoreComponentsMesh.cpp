@@ -61,6 +61,8 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
             viewMatrix * Components::NodeManager::_normalMatrix(nodeRef);
         perInstanceDataVertex.worldViewProjMatrix =
             viewProjectionMatrix * perInstanceDataVertex.worldMatrix;
+        perInstanceDataVertex.worldViewMatrix =
+            viewMatrix * perInstanceDataVertex.worldMatrix;
         perInstanceDataVertex.data0.w = TaskManager::_totalTimePassed;
         perInstanceDataVertex.data0.y = distToCamera;
       }
@@ -77,14 +79,19 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
         perInstanceDataFragment.camParams.w =
             1.0f / perInstanceDataFragment.camParams.y;
 
-        perInstanceDataFragment.data0.x =
-            Core::Resources::PostEffectManager::_descDayNightFactor(
-                Core::Resources::PostEffectManager::_blendTargetRef);
+        perInstanceDataFragment.data0.x = World::_currentDayNightFactor;
         perInstanceDataFragment.data0.y = distToCamera;
         perInstanceDataFragment.data0.z = (float)nodeRef._id;
         perInstanceDataFragment.data0.w = TaskManager::_totalTimePassed;
         perInstanceDataFragment.colorTint =
             Components::MeshManager::_descColorTint(meshCompRef);
+
+        const glm::vec3 mainLightDirVS =
+            viewMatrix *
+            (Core::Resources::PostEffectManager::calcActualMainLightOrientation(
+                 Core::Resources::PostEffectManager::_blendTargetRef) *
+             glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
+        perInstanceDataFragment.data1 = glm::vec4(mainLightDirVS, 0.0f);
 
         // Modulate tint when entity is selected
         if (GameStates::Manager::getActiveGameState() ==

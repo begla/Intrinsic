@@ -21,6 +21,12 @@ namespace Core
 {
 Components::NodeRef World::_rootNode;
 Components::CameraRef World::_activeCamera;
+float World::_currentTime = 0.1f;
+glm::quat World::_currentSkyLightOrientation = glm::quat();
+glm::vec3 World::_currentSkyLightColor = glm::vec3(1.0f);
+float World::_currentSkyLightTemp = 3200.0f;
+float World::_currentDayNightFactor = 0.0f;
+float World::_currentSkyLightIntesity = 0.0f;
 
 uint32_t calcOffsetToParent(const Components::NodeRefArray& p_Nodes,
                             Components::NodeRef p_Parent,
@@ -447,6 +453,63 @@ void World::load(const _INTR_STRING& p_FilePath)
       Components::NodeManager::_entity(_rootNode);
   Resources::EventManager::queueEventIfNotExisting(
       _N(CurrentlySelectedEntityChanged));
+}
+
+void World::updateDayNightCycle(float p_DeltaT)
+{
+  static const float dayNightCycleDurationInS = 5.0f * 60.0f;
+  static const float dayNightFadeInPerc = 0.1f;
+  static const glm::vec3 dayLightColor = glm::vec3(1.0f);
+  static const float dayLightTemp = 2220.0f;
+  static const glm::vec3 nightLightColor = glm::vec3(1.0f);
+  static const float nightLightTemp = 5600.0f;
+  static const float dayLightIntens = 10.0f;
+  static const float nightLightIntens = 0.05f;
+
+  _currentTime += p_DeltaT / dayNightCycleDurationInS;
+  _currentTime = glm::mod(_currentTime, 1.0f);
+
+  float currentDayNightFactor = 0.0f;
+  float currentPerc = 0.0f;
+  if (_currentTime < 0.5f)
+  {
+    const float dayPerc = _currentTime / 0.5f;
+    currentPerc = dayPerc;
+
+    if (_currentTime < dayNightFadeInPerc)
+    {
+      currentDayNightFactor = _currentTime / dayNightFadeInPerc;
+    }
+    else if (_currentTime > 0.5f - dayNightFadeInPerc)
+    {
+      currentDayNightFactor =
+          1.0f -
+          (_currentTime - (0.5f - dayNightFadeInPerc)) / dayNightFadeInPerc;
+    }
+    else
+    {
+      currentDayNightFactor = 1.0f;
+    }
+  }
+  else
+  {
+    const float nightPerc = (_currentTime - 0.5f) / 0.5f;
+    currentDayNightFactor = 0.0f;
+    currentPerc = nightPerc;
+  }
+
+  _currentSkyLightTemp =
+      glm::mix(nightLightTemp, dayLightTemp, currentDayNightFactor);
+  _currentSkyLightColor =
+      glm::mix(nightLightColor, dayLightColor, currentDayNightFactor);
+  _currentSkyLightOrientation = glm::quat(
+      glm::vec3(-std::sin(_currentTime * glm::pi<float>()) * glm::pi<float>(),
+                0.0f, 0.0f));
+
+  _currentSkyLightIntesity =
+      glm::mix(nightLightIntens, dayLightIntens, currentDayNightFactor);
+
+  _currentDayNightFactor = glm::mix(0.01f, 1.0f, currentDayNightFactor);
 }
 }
 }

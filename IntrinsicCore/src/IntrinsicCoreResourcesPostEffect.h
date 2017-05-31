@@ -201,6 +201,41 @@ struct PostEffectManager
 
   // <-
 
+  _INTR_INLINE static glm::vec3 calcActualMainLightColor(PostEffectRef p_Ref)
+  {
+    return glm::mix(_descMainLightColor(p_Ref), World::_currentSkyLightColor,
+                    _descDayNightFactor(p_Ref));
+  }
+
+  // <-
+
+  _INTR_INLINE static float calcActualMainLightIntens(PostEffectRef p_Ref)
+  {
+    return glm::mix(_descMainLightIntens(p_Ref),
+                    World::_currentSkyLightIntesity,
+                    _descDayNightFactor(p_Ref));
+  }
+
+  // <-
+
+  _INTR_INLINE static float calcActualMainLightTemp(PostEffectRef p_Ref)
+  {
+    return glm::mix(_descMainLightTemp(p_Ref), World::_currentSkyLightTemp,
+                    _descDayNightFactor(p_Ref));
+  }
+
+  // <-
+
+  _INTR_INLINE static glm::quat
+  calcActualMainLightOrientation(PostEffectRef p_Ref)
+  {
+    return glm::slerp(_descMainLightOrientation(p_Ref),
+                      World::_currentSkyLightOrientation,
+                      _descDayNightFactor(p_Ref));
+  }
+
+  // <-
+
   _INTR_INLINE static void blendPostEffect(Dod::Ref p_Target, Dod::Ref p_Left,
                                            Dod::Ref p_Right,
                                            float p_BlendFactor)

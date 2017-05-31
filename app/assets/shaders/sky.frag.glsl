@@ -31,13 +31,18 @@ layout (binding = 3) uniform samplerCube albedoTex;
 // Input
 layout (location = 0) in vec2 inUV0;
 layout (location = 1) in vec3 inNormal;
+layout (location = 2) in vec3 inPos;
 
 // Output
 layout (location = 0) out vec4 outAlbedo;
 
 void main()
 {
-	// TODO: Hack that fades sky with ambient factor
-  const vec4 albedo = textureLod(albedoTex, inNormal, 0.0) * uboPerInstance.data0.x;
+  // TODO: Hack that fades sky with ambient factor
+  vec4 albedo = textureLod(albedoTex, inNormal, 0.0) * uboPerInstance.data0.x;
+
+  // Fake sun/moon
+  albedo.rgb += pow(clamp(dot(uboPerInstance.data1.xyz, normalize(inPos)), 0.0, 1.0), 500.0);
+
   outAlbedo = vec4(albedo.rgb, 1.0);
 }

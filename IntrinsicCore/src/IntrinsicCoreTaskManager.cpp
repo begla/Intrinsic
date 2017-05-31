@@ -112,6 +112,11 @@ void TaskManager::executeTasks()
           Components::SwarmManager::_activeRefs, modDeltaT);
     }
 
+    // Update the day/night cycle
+    {
+      World::updateDayNightCycle(modDeltaT);
+    }
+
     // Post effect system
     {
       Components::PostEffectVolumeManager::blendPostEffects(

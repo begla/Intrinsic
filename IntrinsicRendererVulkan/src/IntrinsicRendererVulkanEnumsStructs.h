@@ -64,7 +64,9 @@ enum Enum
 
   kFull,
   kHalf,
-  kQuarter
+  kQuarter,
+
+  kCubemap
 };
 }
 

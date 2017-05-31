@@ -4,7 +4,7 @@
         "name": "LightingTest",
         "scattering": 0.0010000000474974514,
         "mainLightIntensity": 0.0,
-        "mainLightTemperature": 3200.0,
+        "mainLightTemperature": 6500.0,
         "mainLightOrientation": [
             0.0,
             0.0,
@@ -17,6 +17,6 @@
             1.0
         ],
         "ambientFactor": 1.0,
-        "dayNightFactor": 1.0
+        "dayNightFactor": 0.0
     }
 }

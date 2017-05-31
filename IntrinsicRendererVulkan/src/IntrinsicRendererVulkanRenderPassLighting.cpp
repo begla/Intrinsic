@@ -60,6 +60,7 @@ struct TestLight
 struct IrradProbe
 {
   glm::vec4 posAndRadius;
+  glm::vec4 data0;
   glm::vec4 data[7]; // Packed SH coefficients
 };
 
@@ -303,16 +304,20 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
       _irradProbeBufferMemory[_currentIrradProbeCount].posAndRadius = glm::vec4(
           irradProbePosVS,
           Components::IrradianceProbeManager::_descRadius(irradProbeRef));
+      _irradProbeBufferMemory[_currentIrradProbeCount].data0 = glm::vec4(
+          Components::IrradianceProbeManager::_descFalloffRangePerc(
+              irradProbeRef),
+          Components::IrradianceProbeManager::_descFalloffExp(irradProbeRef),
+          0.0f, 0.0f);
 
       // Blend day/night SH and copy to memory
-      SHCoeffs blendedSH = Math::blendSH(
+      Irradiance::SH9 blendedSH = Irradiance::blend(
           Components::IrradianceProbeManager::_descSHNight(irradProbeRef),
           Components::IrradianceProbeManager::_descSHDay(irradProbeRef),
-          Core::Resources::PostEffectManager::_descDayNightFactor(
-              Core::Resources::PostEffectManager::_blendTargetRef));
+          World::_currentDayNightFactor);
 
       memcpy(_irradProbeBufferMemory[_currentIrradProbeCount].data, &blendedSH,
-             sizeof(SHCoeffs));
+             sizeof(Irradiance::SH9));
       ++_currentIrradProbeCount;
     }
   }
@@ -410,7 +415,7 @@ void renderLighting(Resources::FramebufferRef p_FramebufferRef,
   {
     // Post effect data
     const glm::vec3 mainLightDir =
-        Core::Resources::PostEffectManager::_descMainLightOrientation(
+        Core::Resources::PostEffectManager::calcActualMainLightOrientation(
             Core::Resources::PostEffectManager::_blendTargetRef) *
         glm::vec3(0.0f, 0.0f, 1.0f);
     const glm::vec3 mainLightDirVS =
@@ -418,13 +423,13 @@ void renderLighting(Resources::FramebufferRef p_FramebufferRef,
         glm::vec4(mainLightDir, 0.0f);
 
     _perInstanceData.mainLightColorAndIntens =
-        glm::vec4(Core::Resources::PostEffectManager::_descMainLightColor(
+        glm::vec4(Core::Resources::PostEffectManager::calcActualMainLightColor(
                       Core::Resources::PostEffectManager::_blendTargetRef),
-                  Core::Resources::PostEffectManager::_descMainLightIntens(
+                  Core::Resources::PostEffectManager::calcActualMainLightIntens(
                       Core::Resources::PostEffectManager::_blendTargetRef));
     _perInstanceData.mainLightDirAndTemp =
         glm::vec4(mainLightDirVS,
-                  Core::Resources::PostEffectManager::_descMainLightTemp(
+                  Core::Resources::PostEffectManager::calcActualMainLightTemp(
                       Core::Resources::PostEffectManager::_blendTargetRef));
 
     _perInstanceData.invProjectionMatrix =
@@ -439,9 +444,7 @@ void renderLighting(Resources::FramebufferRef p_FramebufferRef,
         Core::Resources::PostEffectManager::_descAmbientFactor(
             Core::Resources::PostEffectManager::_blendTargetRef) *
         Lighting::_globalAmbientFactor;
-    _perInstanceData.data0.z =
-        Core::Resources::PostEffectManager::_descDayNightFactor(
-            Core::Resources::PostEffectManager::_blendTargetRef);
+    _perInstanceData.data0.z = World::_currentDayNightFactor;
 
     const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
         RenderProcess::Default::_shadowFrustums[p_CameraRef];

@@ -120,26 +120,12 @@ namespace Intrinsic
 {
 namespace Core
 {
-// Struct defining a third order SH
-struct SHCoeffs
-{
-  glm::vec3 L0;
-
-  glm::vec3 L10;
-  glm::vec3 L11;
-  glm::vec3 L12;
-
-  glm::vec3 L20;
-  glm::vec3 L21;
-  glm::vec3 L22;
-  glm::vec3 L23;
-  glm::vec3 L24;
-};
 }
 }
 using namespace Intrinsic::Core;
 
 // Core related includes
+#include "IntrinsicCoreIrradiance.h"
 #include "IntrinsicCoreTriangleOptimizer.h"
 #include "IntrinsicCoreSettingsManager.h"
 #include "IntrinsicCoreLockFreeStack.h"
@@ -162,7 +148,6 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreResourcesEvent.h"
 #include "IntrinsicCoreResourcesFrustum.h"
 #include "IntrinsicCoreResourcesMesh.h"
-#include "IntrinsicCoreResourcesPostEffect.h"
 #include "IntrinsicCoreComponentsNode.h"
 #include "IntrinsicCoreComponentsMesh.h"
 #include "IntrinsicCoreComponentsSwarm.h"
@@ -171,11 +156,13 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreComponentsCameraController.h"
 #include "IntrinsicCoreComponentsCharacterController.h"
 #include "IntrinsicCoreComponentsPlayer.h"
-#include "IntrinsicCoreComponentsPostEffectVolume.h"
 #include "IntrinsicCoreComponentsLight.h"
 #include "IntrinsicCoreComponentsIrradianceProbe.h"
 
 #include "IntrinsicCoreWorld.h"
+#include "IntrinsicCoreResourcesPostEffect.h"
+#include "IntrinsicCoreComponentsPostEffectVolume.h"
+
 #include "IntrinsicCoreTaskManager.h"
 #include "IntrinsicCorePhysicsSystem.h"
 #include "IntrinsicCoreInputSystem.h"

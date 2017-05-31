@@ -174,9 +174,10 @@ void main()
       const float distToProbe = distance(posVS, probe.posAndRadius.xyz);
       if (distToProbe < probe.posAndRadius.w)
       {
-        const float fadeRange = probe.posAndRadius.w * probeFadeRange;
+        const float fadeRange = probe.posAndRadius.w * probe.data0.x;
         const float fadeStart = probe.posAndRadius.w - fadeRange;
-        const float fade = 1.0 - max(distToProbe - fadeStart, 0.0) / fadeRange;
+        const float fade = pow(1.0 - max(distToProbe - fadeStart, 0.0) 
+          / fadeRange, probe.data0.y);
         
         irrad = mix(irrad, sampleSH(probe.data, rayWS) / MATH_PI, fade);
       }

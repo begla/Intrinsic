@@ -235,6 +235,8 @@ struct RenderSystem
       return _backbufferDimensions / 2u;
     case RenderSize::kQuarter:
       return _backbufferDimensions / 4u;
+    case RenderSize::kCubemap:
+      return glm::uvec2(256u, 256u);
     }
 
     return glm::uvec2(0u);

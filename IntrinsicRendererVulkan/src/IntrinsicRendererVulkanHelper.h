@@ -646,7 +646,8 @@ mapRenderSize(const _INTR_STRING& p_RenderSize)
   static _INTR_HASH_MAP(Name, RenderSize::Enum)
       renderSizes = {{"Full", RenderSize::kFull},
                      {"Half", RenderSize::kHalf},
-                     {"Quarter", RenderSize::kQuarter}};
+                     {"Quarter", RenderSize::kQuarter},
+                     {"Cubemap", RenderSize::kCubemap}};
 
   auto renderSize = renderSizes.find(p_RenderSize);
   if (renderSize != renderSizes.end())
