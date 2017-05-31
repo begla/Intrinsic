@@ -1,4 +1,4 @@
-os: Visual Studio 2017
+os: Visual Studio 2015
 platform:
   - x64
 
@@ -34,7 +34,7 @@ install:
   - git clone https://%INTR_GIT_TOKEN%@github.com/begla/Intrinsic_Dependencies.git
   - cd Intrinsic
   - cd scripts_win32
-  - call ConfigAndBuildDependenciesVS15.bat
+  - call ConfigAndBuildDependencies.bat
   - cd ..
   
 # Download and install Vulkan SDK
@@ -44,7 +44,7 @@ install:
 build_script:
   - dir
   - cd scripts_win32
-  - call ConfigVS15.bat
+  - call Config.bat
   - cd ../build
   - cmake --build . --config %CONFIGURATION%
   - cd ..
