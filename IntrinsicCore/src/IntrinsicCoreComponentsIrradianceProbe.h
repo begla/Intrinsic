@@ -31,16 +31,20 @@ struct IrradianceProbeData : Dod::Components::ComponentDataBase
   {
     descRadius.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
     descPriority.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+    descFalloffRangePerc.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+    descFalloffExponent.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
 
     descSHDay.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
     descSHNight.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
   }
 
   _INTR_ARRAY(float) descRadius;
+  _INTR_ARRAY(float) descFalloffRangePerc;
+  _INTR_ARRAY(float) descFalloffExponent;
   _INTR_ARRAY(uint32_t) descPriority;
 
-  _INTR_ARRAY(SHCoeffs) descSHDay;
-  _INTR_ARRAY(SHCoeffs) descSHNight;
+  _INTR_ARRAY(Irradiance::SH9) descSHDay;
+  _INTR_ARRAY(Irradiance::SH9) descSHNight;
 };
 
 struct IrradianceProbeManager
@@ -65,8 +69,10 @@ struct IrradianceProbeManager
   _INTR_INLINE static void resetToDefault(MeshRef p_Ref)
   {
     _descRadius(p_Ref) = 20.0f;
-    memset(&_descSHDay(p_Ref), 0x00, sizeof(SHCoeffs));
-    memset(&_descSHNight(p_Ref), 0x00, sizeof(SHCoeffs));
+    _descFalloffRangePerc(p_Ref) = 0.2f;
+    _descFalloffExp(p_Ref) = 1.0f;
+    memset(&_descSHDay(p_Ref), 0x00, sizeof(Irradiance::SH9));
+    memset(&_descSHNight(p_Ref), 0x00, sizeof(Irradiance::SH9));
   }
 
   // <-
@@ -91,6 +97,17 @@ struct IrradianceProbeManager
                                              _N(IrradianceProbe), _N(float),
                                              _descRadius(p_Ref), false, false),
                            p_Document.GetAllocator());
+    p_Properties.AddMember("falloffRangePerc",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(IrradianceProbe), _N(float),
+                                             _descFalloffRangePerc(p_Ref),
+                                             false, false),
+                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "falloffExp",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
+                          _N(float), _descFalloffExp(p_Ref), false, false),
+        p_Document.GetAllocator());
     p_Properties.AddMember(
         "priority",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
@@ -117,6 +134,12 @@ struct IrradianceProbeManager
     if (p_Properties.HasMember("radius"))
       _descRadius(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["radius"]);
+    if (p_Properties.HasMember("falloffRangePerc"))
+      _descFalloffRangePerc(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["falloffRangePerc"]);
+    if (p_Properties.HasMember("falloffExp"))
+      _descFalloffExp(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["falloffExp"]);
     if (p_Properties.HasMember("priority"))
       _descPriority(p_Ref) =
           (uint32_t)JsonHelper::readPropertyFloat(p_Properties["priority"]);
@@ -158,12 +181,20 @@ struct IrradianceProbeManager
   {
     return _data.descPriority[p_Ref._id];
   }
+  _INTR_INLINE static float& _descFalloffRangePerc(IrradianceProbeRef p_Ref)
+  {
+    return _data.descFalloffRangePerc[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descFalloffExp(IrradianceProbeRef p_Ref)
+  {
+    return _data.descFalloffExponent[p_Ref._id];
+  }
 
-  _INTR_INLINE static SHCoeffs& _descSHDay(IrradianceProbeRef p_Ref)
+  _INTR_INLINE static Irradiance::SH9& _descSHDay(IrradianceProbeRef p_Ref)
   {
     return _data.descSHDay[p_Ref._id];
   }
-  _INTR_INLINE static SHCoeffs& _descSHNight(IrradianceProbeRef p_Ref)
+  _INTR_INLINE static Irradiance::SH9& _descSHNight(IrradianceProbeRef p_Ref)
   {
     return _data.descSHNight[p_Ref._id];
   }

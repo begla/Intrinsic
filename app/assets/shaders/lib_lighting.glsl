@@ -27,7 +27,6 @@ const float translDistortion = 0.2;
 const float translPower = 12.0;
 const float translScale = 1.0;
 const vec3 translAmbient = vec3(0.0);
-const float probeFadeRange = 0.2;
 
 // Clustered lighting
 // ->
@@ -91,10 +90,37 @@ struct Light
 struct IrradProbe
 {
   vec4 posAndRadius;
+  vec4 data0;
   vec4 data[7];
 };
 
 // <-
+
+struct SH9
+{
+  vec3 L[9];
+};
+
+SH9 decodeSH9(vec4 data[7])
+{
+  SH9 result;
+  result.L[0] = data[0].xyz;
+
+  result.L[1] = vec3(data[0].w, data[1].xy);
+  result.L[2] = vec3(data[1].zw, data[2].x);
+  result.L[3] = data[2].yzw;
+
+  result.L[4] = data[3].xyz;
+  result.L[5] = vec3(data[3].w, data[4].xy);
+  result.L[6] = vec3(data[4].zw, data[5].x);
+  result.L[7] = data[5].yzw;
+  result.L[8] = data[6].xyz;
+
+  return result;
+}
+
+// <-
+
 struct LightingData
 {
   // Source
@@ -186,52 +212,51 @@ float burleyToMipApprox(float perceptualRoughness)
   return scale * (IBL_MIP_COUNT - 1 - IBL_MIP_OFFSET);
 }
 
-float coeffsSH(int l, int m, vec3 v)
+// Irradiance / SH
+// <-
+
+vec3 shDotProduct(in SH9 a, in SH9 b)
 {
-   float res = (1.0 / 2.0) * sqrt(1.0 / MATH_PI);
-   float x = -v.x, y = v.y, z = v.z;
- 
-   switch(l)
-   {
-      case 1:
-      { res = (1.0/2.0) * sqrt(3.0 / MATH_PI) * (m==-1 ? y : (m==0 ? z : x)); } break;
-      case 2:
-      {
-         const float s = (m==0 || m==2 ? 0.25 : 0.5) * sqrt((m==0 ? 5.0 : 15.0) / MATH_PI);
- 
-         if(m==-2) res = s * x*y;
-         else if(m==-1) res = s * y*z;
-         else if(m==0) res = s * (2*z*z - x*x - y*y);
-         else if(m==1) res = s * z*x;
-         else res = s * (x*x-y*y);
-      }
-      break;
-   }
- 
-   return res;
+  vec3 result = vec3(0.0);
+
+  for(uint i = 0; i < 9; ++i)
+    result += a.L[i] * b.L[i];
+
+  return result;
 }
 
-vec3 sampleSH(vec4 shCoeffs[7], vec3 v)
+SH9 projectOntoSH9(in vec3 n, in vec3 color, in float A0, in float A1, in float A2)
 {
-  vec3 coeffL0 = shCoeffs[0].xyz;
+    SH9 sh;
 
-  vec3 coeffL1[3] = vec3[3](vec3(shCoeffs[0].w, shCoeffs[1].xy),
-                vec3(shCoeffs[1].zw, shCoeffs[2].x),
-                shCoeffs[2].yzw);
+    // Band 0
+    sh.L[0] = 0.282095 * A0 * color;
 
-  vec3 coeffL2[5] = vec3[5](vec3(shCoeffs[3].xyz),
-                vec3(shCoeffs[3].w, shCoeffs[4].xy),
-                vec3(shCoeffs[4].zw, shCoeffs[5].x),
-                vec3(shCoeffs[5].yzw),
-                vec3(shCoeffs[6].xyz));
+    // Band 1
+    sh.L[1] = 0.488603 * n.y * A1 * color;
+    sh.L[2] = 0.488603 * n.z * A1 * color;
+    sh.L[3] = 0.488603 * n.x * A1 * color;
 
-  vec3 res = coeffsSH(0, 0, v) * coeffL0 + 
-    coeffsSH(1, -1, v) * coeffL1[0] + coeffsSH(1, 0, v) * coeffL1[1] + coeffsSH(1, 1, v) * coeffL1[2] +
-    coeffsSH(2, -2, v) * coeffL2[0] + coeffsSH(2, -1, v) * coeffL2[1] + coeffsSH(2, 0, v) * coeffL2[2] +
-    coeffsSH(2, 1, v) * coeffL2[3] + coeffsSH(2, 2, v) * coeffL2[4];
+    // Band 2
+    sh.L[4] = 1.092548 * n.x * n.y * A2 * color;
+    sh.L[5] = 1.092548 * n.y * n.z * A2 * color;
+    sh.L[6] = 0.315392 * (3.0 * n.z * n.z - 1.0) * A2 * color;
+    sh.L[7] = 1.092548 * n.x * n.z * A2 * color;
+    sh.L[8] = 0.546274 * (n.x * n.x - n.y * n.y) * A2 * color;
 
-  res = max(res, vec3(0.0));
-  return res;
+    return sh;
+}
+
+const float cosineA0 = MATH_PI;
+const float cosineA1 = (2.0 * MATH_PI) / 3.0;
+const float cosineA2 = (0.25 * MATH_PI);
+
+vec3 sampleSH(vec4 data[7], vec3 dir)
+{
+  dir = normalize(dir);
+  SH9 sh = decodeSH9(data);
+  SH9 dirSH = projectOntoSH9(dir, vec3(1.0), cosineA0, cosineA1, cosineA2);
+  return max(shDotProduct(dirSH, sh), 0.0);
 }
 
 // <-
@@ -416,33 +441,6 @@ vec2 warpDepth(float depth)
   const float neg = -exp(-ESM_NEGATIVE_EXPONENT * depth);
   return vec2(pos, neg);
 }
-
-/*float chebyshev(vec2 moments, float mean, float minVariance)
-{
-  // Compute variance
-  float variance = moments.y - (moments.x * moments.x);
-  variance = max(variance, minVariance);
-
-  // Compute probabilistic upper bound
-  float d = mean - moments.x;
-  float pMax = variance / (variance + (d * d));
-
-  // One-tailed Chebyshev
-  return (mean <= moments.x ? 1.0f : pMax);
-}
-
-float calculateShadowEVSM(vec4 moments, float shadowDepth)
-{
-  vec2 posMoments = vec2(moments.x, moments.z);
-  vec2 negMoments = vec2(moments.y, moments.w);
-  vec2 warpedDepth = warpDepth(shadowDepth);
-
-  vec2 depthScale = 0.0001 * ESM_EXPONENTS * warpedDepth;
-  vec2 minVariance = depthScale * depthScale;
-  float posResult = chebyshev(posMoments, warpedDepth.x, minVariance.x);
-  float negResult = chebyshev(negMoments, warpedDepth.y, minVariance.y);
-  return min(posResult, negResult);
-}*/
 
 float calculateShadowESM(vec4 moments, float shadowDepth)
 {

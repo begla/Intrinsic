@@ -31,6 +31,8 @@ struct World
   static void save(const _INTR_STRING& p_FilePath);
   static void load(const _INTR_STRING& p_FilePath);
 
+  static void updateDayNightCycle(float p_DeltaT);
+
   _INTR_INLINE static Components::NodeRef getRootNode() { return _rootNode; }
   _INTR_INLINE static void setRootNode(Components::NodeRef p_Node)
   {
@@ -45,6 +47,13 @@ struct World
   {
     _activeCamera = p_Camera;
   }
+
+  static float _currentTime;
+  static glm::quat _currentSkyLightOrientation;
+  static glm::vec3 _currentSkyLightColor;
+  static float _currentSkyLightTemp;
+  static float _currentSkyLightIntesity;
+  static float _currentDayNightFactor;
 
 protected:
   static Components::NodeRef _rootNode;

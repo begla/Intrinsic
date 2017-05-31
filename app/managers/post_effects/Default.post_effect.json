@@ -4,12 +4,12 @@
         "name": "Default",
         "scattering": 0.0,
         "mainLightIntensity": 10.0,
-        "mainLightTemperature": 2200.0,
+        "mainLightTemperature": 6500.0,
         "mainLightOrientation": [
-            -0.12940950691699983,
-            0.8365163207054138,
-            0.2241438776254654,
-            0.48296287655830386
+            0.0,
+            0.0,
+            0.0,
+            1.0
         ],
         "mainLightColor": [
             1.0,

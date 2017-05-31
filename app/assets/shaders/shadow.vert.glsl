@@ -18,7 +18,7 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
-#include "surface_vertex.inc.glsl"
+#include "gbuffer_vertex.inc.glsl"
 
 out gl_PerVertex
 {

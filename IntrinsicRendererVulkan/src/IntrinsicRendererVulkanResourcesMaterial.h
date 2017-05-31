@@ -261,6 +261,7 @@ struct MaterialManager
     if ((_materialPassMask(p_Ref) &
          (getMaterialPassFlag(_N(GBufferDefault)) |
           getMaterialPassFlag(_N(GBufferFoliage)) |
+          getMaterialPassFlag(_N(GBufferGrass)) |
           getMaterialPassFlag(_N(GBufferWater)) |
           getMaterialPassFlag(_N(GBufferTerrain)))) != 0u)
     {
@@ -292,7 +293,8 @@ struct MaterialManager
           p_Document.GetAllocator());
     }
 
-    if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferFoliage))) !=
+    if ((_materialPassMask(p_Ref) & (getMaterialPassFlag(_N(GBufferFoliage)) |
+                                     getMaterialPassFlag(_N(GBufferGrass)))) !=
         0u)
     {
       p_Properties.AddMember(

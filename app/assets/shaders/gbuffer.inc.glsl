@@ -27,6 +27,7 @@
   vec4 colorTint; \
   vec4 camParams; \
   vec4 data0; \
+  vec4 data1; \
 } uboPerInstance
 
 #define PER_MATERIAL_UBO layout (binding = 2) uniform PerMaterial \
@@ -35,7 +36,6 @@
   vec4 uvAnimation; \
   vec4 pbrBias; \
   vec4 waterParams; \
-  \
   uvec4 data0; \
   vec4 data1; \
 } uboPerMaterial

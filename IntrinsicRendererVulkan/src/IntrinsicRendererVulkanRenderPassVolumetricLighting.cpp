@@ -102,7 +102,7 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
   // Post effect data
   {
     const glm::vec3 mainLightDir =
-        Core::Resources::PostEffectManager::_descMainLightOrientation(
+        Core::Resources::PostEffectManager::calcActualMainLightOrientation(
             Core::Resources::PostEffectManager::_blendTargetRef) *
         glm::vec3(0.0f, 0.0f, 1.0f);
 
@@ -114,13 +114,14 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
         Core::Resources::PostEffectManager::_descAmbientFactor(
             Core::Resources::PostEffectManager::_blendTargetRef) *
         Lighting::_globalAmbientFactor;
-    _perInstanceData.mainLightDirAndTemp = glm::vec4(
-        mainLightDir, Core::Resources::PostEffectManager::_descMainLightTemp(
-                          Core::Resources::PostEffectManager::_blendTargetRef));
+    _perInstanceData.mainLightDirAndTemp =
+        glm::vec4(mainLightDir,
+                  Core::Resources::PostEffectManager::calcActualMainLightTemp(
+                      Core::Resources::PostEffectManager::_blendTargetRef));
     _perInstanceData.mainLightColorAndIntens =
-        glm::vec4(Core::Resources::PostEffectManager::_descMainLightColor(
+        glm::vec4(Core::Resources::PostEffectManager::calcActualMainLightColor(
                       Core::Resources::PostEffectManager::_blendTargetRef),
-                  Core::Resources::PostEffectManager::_descMainLightIntens(
+                  Core::Resources::PostEffectManager::calcActualMainLightIntens(
                       Core::Resources::PostEffectManager::_blendTargetRef));
   }
 
@@ -408,8 +409,9 @@ void VolumetricLighting::init()
       PipelineLayoutManager::resetToDefault(pipelineLayoutAccum);
 
       GpuProgramManager::reflectPipelineLayout(
-          8u, {Resources::GpuProgramManager::getResourceByName(
-                  "volumetric_lighting.comp")},
+          8u,
+          {Resources::GpuProgramManager::getResourceByName(
+              "volumetric_lighting.comp")},
           pipelineLayoutAccum);
     }
     pipelineLayoutsToCreate.push_back(pipelineLayoutAccum);
@@ -420,8 +422,9 @@ void VolumetricLighting::init()
       PipelineLayoutManager::resetToDefault(pipelineLayoutScattering);
 
       GpuProgramManager::reflectPipelineLayout(
-          8u, {Resources::GpuProgramManager::getResourceByName(
-                  "volumetric_lighting_scattering.comp")},
+          8u,
+          {Resources::GpuProgramManager::getResourceByName(
+              "volumetric_lighting_scattering.comp")},
           pipelineLayoutScattering);
     }
     pipelineLayoutsToCreate.push_back(pipelineLayoutScattering);
@@ -432,8 +435,9 @@ void VolumetricLighting::init()
       PipelineLayoutManager::resetToDefault(pipelineLayoutEsm);
 
       GpuProgramManager::reflectPipelineLayout(
-          8u, {Resources::GpuProgramManager::getResourceByName(
-                  "esm_generate.frag")},
+          8u,
+          {Resources::GpuProgramManager::getResourceByName(
+              "esm_generate.frag")},
           pipelineLayoutEsm);
     }
     pipelineLayoutsToCreate.push_back(pipelineLayoutEsm);
