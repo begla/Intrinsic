@@ -724,13 +724,6 @@ void captureIrradProbe(
   float prevMaxFps = Settings::Manager::_targetFrameRate;
   Settings::Manager::_targetFrameRate = 0.0f;
 
-  // Render a couple of frames so everything is correctly faded in/out
-  for (uint32_t f = 0u; f < 60u; ++f)
-  {
-    TaskManager::executeTasks();
-    qApp->processEvents();
-  }
-
   for (uint32_t i = 0u; i < p_IrradProbeRefs.size(); ++i)
   {
     Components::IrradianceProbeRef irradProbeRef = p_IrradProbeRefs[i];
@@ -741,6 +734,17 @@ void captureIrradProbe(
 
     Components::NodeManager::_position(camNodeRef) =
         Components::NodeManager::_worldPosition(irradNodeRef);
+    Components::NodeManager::updateTransforms({camNodeRef});
+
+    // Render a couple of frames so everything is correctly faded in/out
+    for (uint32_t f = 0u; f < 10u; ++f)
+    {
+      Components::PostEffectVolumeManager::blendPostEffects(
+          Components::PostEffectVolumeManager::_activeRefs);
+      RenderProcess::Default::renderFrame(0.0f);
+      ++TaskManager::_frameCounter;
+      qApp->processEvents();
+    }
 
     {
 #if defined(STORE_ATLAS_DDS)
@@ -759,6 +763,8 @@ void captureIrradProbe(
         Components::NodeManager::updateTransforms({camNodeRef});
 
         // Render face
+        Components::PostEffectVolumeManager::blendPostEffects(
+            Components::PostEffectVolumeManager::_activeRefs);
         RenderProcess::Default::renderFrame(0.0f);
         qApp->processEvents();
 
