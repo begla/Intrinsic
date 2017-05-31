@@ -422,6 +422,7 @@ void World::load(const _INTR_STRING& p_FilePath)
   // Set default camera
   _activeCamera = Components::CameraManager::getComponentForEntity(
       Entity::EntityManager::getEntityByName(_N(MainCamera)));
+  _currentTime = 0.1f;
 
   // Load component resources in order
   {
