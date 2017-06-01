@@ -26,9 +26,6 @@ PER_MATERIAL_UBO;
 PER_INSTANCE_UBO;
 PER_FRAME_UBO;
 
-// Bindings
-layout (binding = 4) uniform samplerCube albedoTex;
-
 // Input
 layout (location = 0) in vec2 inUV0;
 layout (location = 1) in vec3 inNormal;
@@ -74,7 +71,6 @@ vec3 calculateSkyModelRadiance(
 void main()
 {
   // TODO: Hack that fades sky with ambient factor
-  //vec4 albedo = textureLod(albedoTex, inNormal, 0.0) * uboPerInstance.data0.x;
   vec4 albedo = vec4(0.0);
   const vec3 V = normalize(inPosVS);
 
