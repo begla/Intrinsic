@@ -136,7 +136,7 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
       {
         entry.refractionFactor = _descRefractionFactor(matRef);
         entry.translucencyThicknessFactor = _descTranslucencyThickness(matRef);
-        entry.emissveIntensity = _descEmissiveIntensity(matRef);
+        entry.emissiveIntensity = _descEmissiveIntensity(matRef);
       }
       MaterialBuffer::updateMaterialBufferEntry(materialBufferEntryIdx, entry);
     }

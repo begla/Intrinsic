@@ -309,6 +309,25 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                      SLOT(onCameraSpeedChanged(double)));
   }
 
+  {
+    QLabel* label = new QLabel("Day/Night:");
+    label->setMargin(3);
+    label->setStyleSheet("font: 8pt");
+
+    _dayNightSlider = new QSlider(Qt::Horizontal);
+    _dayNightSlider->setMinimum(0);
+    _dayNightSlider->setMaximum(100);
+    _dayNightSlider->setSingleStep(1);
+    _dayNightSlider->setToolTip("Day/Night");
+    _dayNightSlider->setValue(World::_currentTime);
+
+    _ui.gridToolBar->addWidget(label);
+    _ui.gridToolBar->addWidget(_dayNightSlider);
+
+    QObject::connect(_dayNightSlider, SIGNAL(valueChanged(int)), this,
+                     SLOT(onDayNightSliderChanged(int)));
+  }
+
   _ui.gridToolBar->addSeparator();
 
   {
@@ -686,6 +705,11 @@ void IntrinsicEd::onGridSizeChanged(double p_Value)
   GameStates::Editing::_gridSize = (float)p_Value;
 }
 
+void IntrinsicEd::onDayNightSliderChanged(int p_Value)
+{
+  World::_currentTime = p_Value * 0.01f;
+}
+
 void IntrinsicEd::onGizmoSizeChanged(double p_Value)
 {
   GameStates::Editing::_gizmoSize = (float)p_Value;
@@ -833,14 +857,25 @@ void IntrinsicEd::updateSettingsChangeWatch()
                                 Settings::Manager::_materialPassConfig.c_str());
 }
 
+void IntrinsicEd::updateUI()
+{
+  updateStatusBar(_ui.statusBar);
+  if (!_dayNightSlider->hasFocus())
+  {
+    _dayNightSlider->blockSignals(true);
+    _dayNightSlider->setValue((int)(World::_currentTime * 100.0f));
+    _dayNightSlider->blockSignals(false);
+  }
+}
+
 int IntrinsicEd::enterMainLoop()
 {
   while (Application::_running)
   {
     qApp->processEvents();
 
+    updateUI();
     TaskManager::executeTasks();
-    updateStatusBar(_ui.statusBar);
     _propertyView->updatePropertyView();
 
     if (_settingsUpdatePending)

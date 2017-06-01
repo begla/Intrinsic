@@ -263,19 +263,27 @@ DrawCallRef DrawCallManager::createDrawCallForMesh(
                   ? p_PerInstanceDataFragmentSize
                   : p_PerInstanceDataVertexSize);
         }
+        else if (entry.resourceName == _N(PerFrame))
+        {
+          DrawCallManager::bindBuffer(
+              drawCallMesh, entry.slotName, entry.shaderStage,
+              UniformManager::_perFrameUniformBuffer,
+              entry.shaderStage == GpuProgramType::kFragment
+                  ? UboType::kPerFrameFragment
+                  : UboType::kPerFrameVertex,
+              entry.shaderStage == GpuProgramType::kFragment
+                  ? sizeof(RenderProcess::PerFrameDataFrament)
+                  : sizeof(RenderProcess::PerFrameDataVertex));
+        }
         else
         {
-          _INTR_ASSERT(false && "Buffer type type not supported");
+          _INTR_ASSERT(false && "Resource type not found");
         }
       }
-      else
-      {
-        _INTR_ASSERT(false && "Resource type not found");
-      }
     }
-  }
 
-  return drawCallMesh;
+    return drawCallMesh;
+  }
 }
 }
 }

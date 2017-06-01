@@ -96,6 +96,9 @@ struct DrawCallManager
   _INTR_INLINE static void allocateUniformMemory(DrawCallRef p_DrawCall)
   {
     _INTR_ARRAY(BindingInfo)& bindInfos = _descBindInfos(p_DrawCall);
+    static const uint32_t perFrameRangeSizeInBytes =
+        sizeof(RenderProcess::PerFrameDataVertex) +
+        sizeof(RenderProcess::PerFrameDataFrament);
 
     uint32_t dynamicOffsetIndex = 0u;
     for (uint32_t bIdx = 0u; bIdx < bindInfos.size(); ++bIdx)
@@ -127,6 +130,16 @@ struct DrawCallManager
           _dynamicOffsets(p_DrawCall)[dynamicOffsetIndex] =
               MaterialManager::_perMaterialDataFragmentOffset(
                   _descMaterial(p_DrawCall));
+        }
+        else if (bindInfo.bufferData.uboType == UboType::kPerFrameVertex)
+        {
+          _dynamicOffsets(p_DrawCall)[dynamicOffsetIndex] = RenderProcess::
+              UniformManager::getDynamicOffsetForPerFrameDataVertex();
+        }
+        else if (bindInfo.bufferData.uboType == UboType::kPerFrameFragment)
+        {
+          _dynamicOffsets(p_DrawCall)[dynamicOffsetIndex] = RenderProcess::
+              UniformManager::getDynamicOffsetForPerFrameDataFragment();
         }
 
         ++dynamicOffsetIndex;

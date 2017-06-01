@@ -22,6 +22,17 @@ namespace Vulkan
 {
 namespace RenderProcess
 {
+struct PerFrameDataVertex
+{
+  glm::vec4 _dummy;
+};
+
+struct PerFrameDataFrament
+{
+  glm::vec4 skyModelConfigs[7];
+  glm::vec4 skyModelRadiances;
+};
+
 struct UniformBufferDataEntry
 {
   UniformBufferDataEntry(void* p_UniformData, uint32_t p_Size)
@@ -40,6 +51,19 @@ struct UniformManager
   static void updateUniformBuffers();
   static void resetAllocator();
   static UniformBufferDataEntry requestUniformBufferData(const Name& p_Name);
+
+  _INTR_INLINE static uint32_t getDynamicOffsetForPerFrameDataFragment()
+  {
+    return RenderSystem::_backbufferIndex * 2u *
+               _INTR_VK_PER_FRAME_BLOCK_SIZE_IN_BYTES +
+           _INTR_VK_PER_FRAME_BLOCK_SIZE_IN_BYTES;
+  }
+
+  _INTR_INLINE static uint32_t getDynamicOffsetForPerFrameDataVertex()
+  {
+    return RenderSystem::_backbufferIndex * 2u *
+           _INTR_VK_PER_FRAME_BLOCK_SIZE_IN_BYTES;
+  }
 
   static struct UniformDataSource
   {
@@ -61,7 +85,6 @@ struct UniformManager
     glm::vec4 cameraParameters;
     glm::vec4 postParams0;
     glm::vec4 backbufferSize;
-
   } _uniformDataSource;
 };
 }

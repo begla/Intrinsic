@@ -76,6 +76,7 @@ public slots:
   void onGizmoSizeChanged(double p_Value);
   void onCameraSpeedChanged(double p_Value);
   void onTimeModChanged(double p_Value);
+  void onDayNightSliderChanged(int p_Value);
   void onCreateCube();
   void onCreateRigidBody();
   void onCreateRigidBodySphere();
@@ -92,11 +93,13 @@ public slots:
 
 private:
   void updateSettingsChangeWatch();
+  void updateUI();
 
   QMenu _createContextMenu;
   QMenu _debugContextMenu;
   QMenu _debugGeometryContextMenu;
 
+  QSlider* _dayNightSlider;
   QFileSystemWatcher* _settingsChangeWatch;
   bool _settingsUpdatePending;
 

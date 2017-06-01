@@ -40,6 +40,12 @@
   vec4 data1; \
 } uboPerMaterial
 
+#define PER_FRAME_UBO layout (binding = 3) uniform PerFrame \
+{ \
+  vec4 skyModelConfigs[7]; \
+  vec4 skyModelRadiances; \
+} uboPerFrame
+
 #define BINDINGS_GBUFFER layout (binding = 3) uniform sampler2D albedoTex; \
 layout (binding = 4) uniform sampler2D normalTex; \
 layout (binding = 5) uniform sampler2D pbrTex

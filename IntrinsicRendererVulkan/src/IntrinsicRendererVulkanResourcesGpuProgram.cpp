@@ -231,8 +231,9 @@ void GpuProgramManager::reflectPipelineLayout(
     {
       spirv_cross::Resource& res = resources.uniform_buffers[i];
 
-      const bool isDynamic =
-          res.name == "PerInstance" || res.name == "PerMaterial";
+      const bool isDynamic = res.name == "PerInstance" ||
+                             res.name == "PerMaterial" ||
+                             res.name == "PerFrame";
 
       BindingDescription bd;
       {

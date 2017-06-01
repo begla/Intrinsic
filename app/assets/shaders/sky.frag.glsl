@@ -24,25 +24,67 @@
 // Ubos
 PER_MATERIAL_UBO;
 PER_INSTANCE_UBO;
+PER_FRAME_UBO;
 
 // Bindings
-layout (binding = 3) uniform samplerCube albedoTex;
+layout (binding = 4) uniform samplerCube albedoTex;
 
 // Input
 layout (location = 0) in vec2 inUV0;
 layout (location = 1) in vec3 inNormal;
-layout (location = 2) in vec3 inPos;
+layout (location = 2) in vec3 inPosVS;
+layout (location = 3) in vec3 inUpVS;
 
 // Output
 layout (location = 0) out vec4 outAlbedo;
 
+float getSkyModelConfig(uint channelIdx, uint configIdx)
+{
+  const uint idx = configIdx + channelIdx * 9u;
+  const uvec2 packedDataOffset = uvec2(idx / 4u, idx % 4u);
+  return uboPerFrame.skyModelConfigs[packedDataOffset.x][packedDataOffset.y];
+}
+
+/// Based on 'An Analytic Model for Full Spectral Sky-Dome Radiance'
+/// ACM Transactions on Graphics (Proceedings of ACM SIGGRAPH 2012)
+vec3 calculateSkyModelRadiance(
+  vec3 theta, 
+  vec3 gamma
+)
+{
+  vec3 configuration[9];
+  for (uint i=0; i<9; ++i)
+    configuration[i] = vec3(
+      getSkyModelConfig(0, i),
+      getSkyModelConfig(1, i), 
+      getSkyModelConfig(2, i)
+    );
+  
+  const vec3 expM = exp(configuration[4] * gamma);
+  const vec3 rayM = cos(gamma)*cos(gamma);
+  const vec3 mieM = (vec3(1.0) + cos(gamma)*cos(gamma)) / pow((1.0 
+    + configuration[8]*configuration[8] - 2.0*configuration[8]*cos(gamma)), vec3(1.5));
+  const vec3 zenith = sqrt(cos(theta));
+
+  return (vec3(1.0) + configuration[0] * exp(configuration[1] / (cos(theta) + vec3(0.01)))) *
+          (configuration[2] + configuration[3] * expM + configuration[5] * rayM 
+            + configuration[6] * mieM + configuration[7] * zenith);
+}
+
 void main()
 {
   // TODO: Hack that fades sky with ambient factor
-  vec4 albedo = textureLod(albedoTex, inNormal, 0.0) * uboPerInstance.data0.x;
+  //vec4 albedo = textureLod(albedoTex, inNormal, 0.0) * uboPerInstance.data0.x;
+  vec4 albedo = vec4(0.0);
+  const vec3 V = normalize(inPosVS);
+
+  const float theta = acos(max(dot(V, inUpVS), 0.0001));
+  const float gamma = acos(max(dot(V, uboPerInstance.data1.xyz), 0.0001));
+  albedo.rgb += clamp(calculateSkyModelRadiance(vec3(theta), vec3(gamma)) * uboPerFrame.skyModelRadiances.rgb * 0.025, 0.0, 10.0);
+  albedo.rgb *= uboPerInstance.data0.x;
 
   // Fake sun/moon
-  albedo.rgb += pow(clamp(dot(uboPerInstance.data1.xyz, normalize(inPos)), 0.0, 1.0), 500.0);
+  albedo.rgb += pow(clamp(dot(uboPerInstance.data1.xyz, V), 0.0, 1.0), 1500.0);
 
   outAlbedo = vec4(albedo.rgb, 1.0);
 }

@@ -199,7 +199,7 @@ void DrawCallDispatcher::queueDrawCalls(Core::Dod::RefArray& p_DrawCalls,
 
 // <-
 
-void DrawCallDispatcher::reset()
+void DrawCallDispatcher::onFrameEnded()
 {
   _INTR_PROFILE_COUNTER_SET("Total Dispatched Draw Calls",
                             _totalDispatchedDrawCallCountPerFrame);
