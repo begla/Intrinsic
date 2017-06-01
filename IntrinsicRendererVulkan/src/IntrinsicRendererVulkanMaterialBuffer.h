@@ -24,7 +24,7 @@ struct MaterialBufferEntry
 {
   float refractionFactor;
   float translucencyThicknessFactor;
-  float emissveIntensity;
+  float emissiveIntensity;
 };
 
 struct MaterialBuffer

@@ -1291,8 +1291,8 @@ void RenderSystem::beginFrame()
     insertPostPresentBarrier();
   }
 
-  UniformManager::resetPerInstanceAllocators();
-  DrawCallDispatcher::reset();
+  UniformManager::onFrameEnded();
+  DrawCallDispatcher::onFrameEnded();
 }
 
 // <-

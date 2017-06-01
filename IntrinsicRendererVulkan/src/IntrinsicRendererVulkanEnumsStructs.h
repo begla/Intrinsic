@@ -216,6 +216,9 @@ enum Enum
   kPerMaterialFragment,
   kPerMaterialVertex,
 
+  kPerFrameFragment,
+  kPerFrameVertex,
+
   kInvalidUbo,
 
   kCount,
@@ -223,7 +226,9 @@ enum Enum
   kRangeStartPerInstance = kPerInstanceFragment,
   kRangeEndPerInstance = kPerInstanceCompute,
   kRangeStartPerMaterial = kPerMaterialFragment,
-  kRangeEndPerMaterial = kPerMaterialVertex
+  kRangeEndPerMaterial = kPerMaterialVertex,
+  kRangeStartPerFrame = kPerFrameFragment,
+  kRangeEndPerFrame = kPerFrameVertex
 };
 }
 

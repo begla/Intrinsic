@@ -25,7 +25,10 @@ namespace Vulkan
 // Static members
 Resources::BufferRef _perInstanceUniformBuffer;
 Resources::BufferRef _perMaterialUniformBuffer;
+Resources::BufferRef _perFrameUniformBuffer;
+
 uint8_t* UniformManager::_perInstanceMemory = nullptr;
+uint8_t* UniformManager::_perFrameMemory = nullptr;
 Tlsf::Allocator _perMaterialAllocator;
 
 LockFreeFixedBlockAllocator<_INTR_VK_PER_INSTANCE_BLOCK_SMALL_COUNT,
@@ -41,6 +44,7 @@ LockFreeFixedBlockAllocator<_INTR_VK_PER_MATERIAL_BLOCK_COUNT,
     UniformManager::_perMaterialAllocator;
 
 Resources::BufferRef UniformManager::_perInstanceUniformBuffer;
+Resources::BufferRef UniformManager::_perFrameUniformBuffer;
 Resources::BufferRef UniformManager::_perMaterialUniformBuffer;
 Resources::BufferRef UniformManager::_perMaterialStagingUniformBuffer;
 
@@ -105,10 +109,30 @@ void UniformManager::init()
     buffersToCreate.push_back(_perMaterialStagingUniformBuffer);
   }
 
+  // Per frame data
+  _perFrameUniformBuffer =
+      BufferManager::createBuffer(_N(PerFrameConstantBuffer));
+  {
+    BufferManager::resetToDefault(_perFrameUniformBuffer);
+    BufferManager::addResourceFlags(
+        _perFrameUniformBuffer,
+        Dod::Resources::ResourceFlags::kResourceVolatile);
+
+    BufferManager::_descMemoryPoolType(_perFrameUniformBuffer) =
+        MemoryPoolType::kStaticStagingBuffers;
+    BufferManager::_descBufferType(_perFrameUniformBuffer) =
+        BufferType::kUniform;
+    BufferManager::_descSizeInBytes(_perFrameUniformBuffer) =
+        _INTR_VK_PER_FRAME_BLOCK_SIZE_IN_BYTES *
+        (uint32_t)RenderSystem::_vkSwapchainImages.size() * 2u;
+    buffersToCreate.push_back(_perFrameUniformBuffer);
+  }
+
   BufferManager::createResources(buffersToCreate);
 
   // Get host memory
   _perInstanceMemory = BufferManager::getGpuMemory(_perInstanceUniformBuffer);
+  _perFrameMemory = BufferManager::getGpuMemory(_perFrameUniformBuffer);
 
   // Init. per instance data memory blocks
   {
@@ -143,7 +167,7 @@ void UniformManager::init()
 
 // <-
 
-void UniformManager::resetPerInstanceAllocators()
+void UniformManager::onFrameEnded()
 {
   const uint32_t bufferIdx =
       RenderSystem::_backbufferIndex % _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;

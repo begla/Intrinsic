@@ -22,7 +22,7 @@ namespace Vulkan
 {
 struct DrawCallDispatcher
 {
-  static void reset();
+  static void onFrameEnded();
   static void queueDrawCalls(Core::Dod::RefArray& p_DrawCalls,
                              Core::Dod::Ref p_RenderPass,
                              Core::Dod::Ref p_Framebuffer);

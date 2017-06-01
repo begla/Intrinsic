@@ -23,7 +23,7 @@ namespace Vulkan
 struct UniformManager
 {
   static void init();
-  static void resetPerInstanceAllocators();
+  static void onFrameEnded();
 
   _INTR_INLINE static uint8_t* allocatePerInstanceDataMemory(uint32_t p_Size,
                                                              uint32_t& p_Offset)
@@ -99,9 +99,11 @@ struct UniformManager
 
   // Static members
   static uint8_t* _perInstanceMemory;
+  static uint8_t* _perFrameMemory;
 
   static Resources::BufferRef _perInstanceUniformBuffer;
   static Resources::BufferRef _perMaterialUniformBuffer;
+  static Resources::BufferRef _perFrameUniformBuffer;
 
 private:
   static LockFreeFixedBlockAllocator<
