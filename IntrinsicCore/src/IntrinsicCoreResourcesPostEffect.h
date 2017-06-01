@@ -30,10 +30,7 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
   {
     descVolumetricLightingScattering.resize(_INTR_MAX_POST_EFFECT_COUNT);
 
-    descMainLightTemp.resize(_INTR_MAX_POST_EFFECT_COUNT);
-    descMainLightColor.resize(_INTR_MAX_POST_EFFECT_COUNT);
-    descMainLightOrientation.resize(_INTR_MAX_POST_EFFECT_COUNT);
-    descMainLightIntens.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descSunOrientation.resize(_INTR_MAX_POST_EFFECT_COUNT);
 
     descAmbientFactor.resize(_INTR_MAX_POST_EFFECT_COUNT);
     descDayNightFactor.resize(_INTR_MAX_POST_EFFECT_COUNT);
@@ -43,10 +40,7 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
 
   _INTR_ARRAY(float) descVolumetricLightingScattering;
 
-  _INTR_ARRAY(float) descMainLightTemp;
-  _INTR_ARRAY(glm::vec3) descMainLightColor;
-  _INTR_ARRAY(glm::quat) descMainLightOrientation;
-  _INTR_ARRAY(float) descMainLightIntens;
+  _INTR_ARRAY(glm::quat) descSunOrientation;
 
   _INTR_ARRAY(float) descAmbientFactor;
   _INTR_ARRAY(float) descDayNightFactor;
@@ -72,10 +66,7 @@ struct PostEffectManager
   _INTR_INLINE static void resetToDefault(PostEffectRef p_Ref)
   {
     _descVolumetricLightingScattering(p_Ref) = 0.0f;
-    _descMainLightColor(p_Ref) = glm::vec3(1.0f);
-    _descMainLightIntens(p_Ref) = 10.0f;
-    _descMainLightOrientation(p_Ref) = glm::quat();
-    _descMainLightTemp(p_Ref) = 3200.0f;
+    _descSunOrientation(p_Ref) = glm::quat();
     _descAmbientFactor(p_Ref) = 1.0f;
     _descDayNightFactor(p_Ref) = 1.0f;
   }
@@ -108,27 +99,12 @@ struct PostEffectManager
                           false, false),
         p_Document.GetAllocator());
 
-    p_Properties.AddMember(
-        "mainLightIntensity",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
-                          _descMainLightIntens(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "mainLightTemperature",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
-                          _descMainLightTemp(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember("mainLightOrientation",
+    p_Properties.AddMember("sunOrientation",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
                                              _N(Lighting), _N(rotation),
-                                             _descMainLightOrientation(p_Ref),
-                                             false, false),
+                                             _descSunOrientation(p_Ref), false,
+                                             false),
                            p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "mainLightColor",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(vec3),
-                          _descMainLightColor(p_Ref), false, false),
-        p_Document.GetAllocator());
     p_Properties.AddMember(
         "ambientFactor",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
@@ -154,18 +130,9 @@ struct PostEffectManager
       _descVolumetricLightingScattering(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["scattering"]);
 
-    if (p_Properties.HasMember("mainLightIntensity"))
-      _descMainLightIntens(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["mainLightIntensity"]);
-    if (p_Properties.HasMember("mainLightTemperature"))
-      _descMainLightTemp(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["mainLightTemperature"]);
-    if (p_Properties.HasMember("mainLightOrientation"))
-      _descMainLightOrientation(p_Ref) =
-          JsonHelper::readPropertyQuat(p_Properties["mainLightOrientation"]);
-    if (p_Properties.HasMember("mainLightColor"))
-      _descMainLightColor(p_Ref) =
-          JsonHelper::readPropertyVec3(p_Properties["mainLightColor"]);
+    if (p_Properties.HasMember("sunOrientation"))
+      _descSunOrientation(p_Ref) =
+          JsonHelper::readPropertyQuat(p_Properties["sunOrientation"]);
     if (p_Properties.HasMember("ambientFactor"))
       _descAmbientFactor(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["ambientFactor"]);
@@ -201,35 +168,9 @@ struct PostEffectManager
 
   // <-
 
-  _INTR_INLINE static glm::vec3 calcActualMainLightColor(PostEffectRef p_Ref)
+  _INTR_INLINE static glm::quat calcActualSunOrientation(PostEffectRef p_Ref)
   {
-    return glm::mix(_descMainLightColor(p_Ref), World::_currentSkyLightColor,
-                    _descDayNightFactor(p_Ref));
-  }
-
-  // <-
-
-  _INTR_INLINE static float calcActualMainLightIntens(PostEffectRef p_Ref)
-  {
-    return glm::mix(_descMainLightIntens(p_Ref),
-                    World::_currentSkyLightIntesity,
-                    _descDayNightFactor(p_Ref));
-  }
-
-  // <-
-
-  _INTR_INLINE static float calcActualMainLightTemp(PostEffectRef p_Ref)
-  {
-    return glm::mix(_descMainLightTemp(p_Ref), World::_currentSkyLightTemp,
-                    _descDayNightFactor(p_Ref));
-  }
-
-  // <-
-
-  _INTR_INLINE static glm::quat
-  calcActualMainLightOrientation(PostEffectRef p_Ref)
-  {
-    return glm::slerp(_descMainLightOrientation(p_Ref),
+    return glm::slerp(_descSunOrientation(p_Ref),
                       World::_currentSkyLightOrientation,
                       _descDayNightFactor(p_Ref));
   }
@@ -244,17 +185,9 @@ struct PostEffectManager
         glm::mix(_descVolumetricLightingScattering(p_Left),
                  _descVolumetricLightingScattering(p_Right), p_BlendFactor);
 
-    _descMainLightColor(p_Target) =
-        glm::mix(_descMainLightColor(p_Left), _descMainLightColor(p_Right),
-                 p_BlendFactor);
-    _descMainLightIntens(p_Target) =
-        glm::mix(_descMainLightIntens(p_Left), _descMainLightIntens(p_Right),
-                 p_BlendFactor);
-    _descMainLightTemp(p_Target) = glm::mix(
-        _descMainLightTemp(p_Left), _descMainLightTemp(p_Right), p_BlendFactor);
-    _descMainLightOrientation(p_Target) =
-        glm::slerp(_descMainLightOrientation(p_Left),
-                   _descMainLightOrientation(p_Right), p_BlendFactor);
+    _descSunOrientation(p_Target) =
+        glm::slerp(_descSunOrientation(p_Left), _descSunOrientation(p_Right),
+                   p_BlendFactor);
     _descAmbientFactor(p_Target) = glm::mix(
         _descAmbientFactor(p_Left), _descAmbientFactor(p_Right), p_BlendFactor);
     _descDayNightFactor(p_Target) =
@@ -274,21 +207,9 @@ struct PostEffectManager
     return _data.descVolumetricLightingScattering[p_Ref._id];
   }
 
-  _INTR_INLINE static float& _descMainLightIntens(PostEffectRef p_Ref)
+  _INTR_INLINE static glm::quat& _descSunOrientation(PostEffectRef p_Ref)
   {
-    return _data.descMainLightIntens[p_Ref._id];
-  }
-  _INTR_INLINE static float& _descMainLightTemp(PostEffectRef p_Ref)
-  {
-    return _data.descMainLightTemp[p_Ref._id];
-  }
-  _INTR_INLINE static glm::vec3& _descMainLightColor(PostEffectRef p_Ref)
-  {
-    return _data.descMainLightColor[p_Ref._id];
-  }
-  _INTR_INLINE static glm::quat& _descMainLightOrientation(PostEffectRef p_Ref)
-  {
-    return _data.descMainLightOrientation[p_Ref._id];
+    return _data.descSunOrientation[p_Ref._id];
   }
   _INTR_INLINE static float& _descAmbientFactor(PostEffectRef p_Ref)
   {

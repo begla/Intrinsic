@@ -18,9 +18,6 @@
             0.0
         ],
         "translucencyThickness": 0.0,
-        "emissiveIntensity": 0.0,
-        "skyElevation": 0.20000000298023225,
-        "skyTurbidity": 5.0,
-        "skyAlbedo": 0.30000001192092898
+        "emissiveIntensity": 0.0
     }
 }

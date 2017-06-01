@@ -1,5 +1,6 @@
 #define PER_INSTANCE_DATA_PRE_COMBINE layout (binding = 0) uniform PerInstance \
 { \
+  mat4 invViewMatrix; \
   mat4 invProjMatrix; \
   mat4 invViewProjMatrix; \
   vec4 camPosition; \
@@ -41,3 +42,18 @@
 { \
   vec4 backbufferSize; \
 } uboPerInstance
+
+#define PER_FRAME_DATA(x) \
+layout (binding = x) uniform PerFrame \
+{ \
+  mat4 viewMatrix; \
+  mat4 invProjMatrix; \
+  mat4 invViewMatrix; \
+  \
+  vec4 skyModelConfigs[7]; \
+  vec4 skyModelRadiances; \
+  \
+  vec4 skyLightDirVS; \
+  vec4 skyLightDirWS; \
+  vec4 skyLightSH[7]; \
+} uboPerFrame

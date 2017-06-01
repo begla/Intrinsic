@@ -80,17 +80,10 @@ IrradProbe* _irradProbeBufferMemory = nullptr;
 
 struct PerInstanceData
 {
-  glm::mat4 viewMatrix;
-  glm::mat4 invProjectionMatrix;
-  glm::mat4 invViewMatrix;
-
   glm::mat4 shadowViewProjMatrix[_INTR_MAX_SHADOW_MAP_COUNT];
 
   glm::vec4 nearFarWidthHeight;
   glm::vec4 nearFar;
-
-  glm::vec4 mainLightColorAndIntens;
-  glm::vec4 mainLightDirAndTemp;
 
   glm::vec4 data0;
 } _perInstanceData;
@@ -414,31 +407,6 @@ void renderLighting(Resources::FramebufferRef p_FramebufferRef,
   // Update per instance data
   {
     // Post effect data
-    const glm::vec3 mainLightDir =
-        Core::Resources::PostEffectManager::calcActualMainLightOrientation(
-            Core::Resources::PostEffectManager::_blendTargetRef) *
-        glm::vec3(0.0f, 0.0f, 1.0f);
-    const glm::vec3 mainLightDirVS =
-        Components::CameraManager::_viewMatrix(p_CameraRef) *
-        glm::vec4(mainLightDir, 0.0f);
-
-    _perInstanceData.mainLightColorAndIntens =
-        glm::vec4(Core::Resources::PostEffectManager::calcActualMainLightColor(
-                      Core::Resources::PostEffectManager::_blendTargetRef),
-                  Core::Resources::PostEffectManager::calcActualMainLightIntens(
-                      Core::Resources::PostEffectManager::_blendTargetRef));
-    _perInstanceData.mainLightDirAndTemp =
-        glm::vec4(mainLightDirVS,
-                  Core::Resources::PostEffectManager::calcActualMainLightTemp(
-                      Core::Resources::PostEffectManager::_blendTargetRef));
-
-    _perInstanceData.invProjectionMatrix =
-        Components::CameraManager::_inverseProjectionMatrix(p_CameraRef);
-    _perInstanceData.viewMatrix =
-        Components::CameraManager::_viewMatrix(p_CameraRef);
-    _perInstanceData.invViewMatrix =
-        Components::CameraManager::_inverseViewMatrix(p_CameraRef);
-
     _perInstanceData.data0.x = TaskManager::_totalTimePassed;
     _perInstanceData.data0.y =
         Core::Resources::PostEffectManager::_descAmbientFactor(
@@ -632,6 +600,83 @@ void Lighting::init()
 
 // <-
 
+namespace
+{
+_INTR_INLINE void setupLightingDrawCall(Resources::DrawCallRef p_DrawCallRef,
+                                        bool p_Transparents)
+{
+  using namespace Resources;
+
+  DrawCallManager::_descVertexCount(p_DrawCallRef) = 3u;
+
+  DrawCallManager::bindBuffer(
+      p_DrawCallRef, _N(PerInstance), GpuProgramType::kFragment,
+      UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceFragment,
+      sizeof(PerInstanceData));
+  DrawCallManager::bindBuffer(
+      p_DrawCallRef, _N(PerFrame), GpuProgramType::kFragment,
+      UniformManager::_perFrameUniformBuffer, UboType::kPerFrameFragment,
+      sizeof(PerInstanceData));
+  DrawCallManager::bindImage(
+      p_DrawCallRef, _N(albedoTex), GpuProgramType::kFragment,
+      ImageManager::getResourceByName(
+          !p_Transparents ? _N(GBufferAlbedo) : _N(GBufferTransparentsAlbedo)),
+      Samplers::kLinearClamp);
+  DrawCallManager::bindImage(
+      p_DrawCallRef, _N(normalTex), GpuProgramType::kFragment,
+      ImageManager::getResourceByName(
+          !p_Transparents ? _N(GBufferNormal) : _N(GBufferTransparentsNormal)),
+      Samplers::kLinearClamp);
+  DrawCallManager::bindImage(
+      p_DrawCallRef, _N(parameter0Tex), GpuProgramType::kFragment,
+      ImageManager::getResourceByName(!p_Transparents
+                                          ? _N(GBufferParameter0)
+                                          : _N(GBufferTransparentsParameter0)),
+      Samplers::kLinearClamp);
+  DrawCallManager::bindImage(
+      p_DrawCallRef, _N(depthTex), GpuProgramType::kFragment,
+      ImageManager::getResourceByName(
+          !p_Transparents ? _N(GBufferDepth) : _N(GBufferTransparentsDepth)),
+      Samplers::kNearestClamp);
+  DrawCallManager::bindImage(
+      p_DrawCallRef, _N(ssaoTex), GpuProgramType::kFragment,
+      ImageManager::getResourceByName(_N(SSAO)), Samplers::kLinearClamp);
+  DrawCallManager::bindImage(
+      p_DrawCallRef, _N(kelvinLutTex), GpuProgramType::kFragment,
+      ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
+      Samplers::kLinearClamp);
+  DrawCallManager::bindImage(
+      p_DrawCallRef, _N(specularTex), GpuProgramType::kFragment,
+      ImageManager::getResourceByName(_N(default_ibl_cube_specular)),
+      Samplers::kLinearClamp);
+  DrawCallManager::bindImage(
+      p_DrawCallRef, _N(noiseTex), GpuProgramType::kFragment,
+      ImageManager::getResourceByName(_N(noise)), Samplers::kLinearRepeat);
+  DrawCallManager::bindImage(
+      p_DrawCallRef, _N(shadowBufferTex), GpuProgramType::kFragment,
+      ImageManager::getResourceByName(_N(ShadowBuffer)), Samplers::kShadow);
+  DrawCallManager::bindBuffer(
+      p_DrawCallRef, _N(MaterialBuffer), GpuProgramType::kFragment,
+      MaterialBuffer::_materialBuffer, UboType::kInvalidUbo,
+      BufferManager::_descSizeInBytes(MaterialBuffer::_materialBuffer));
+  DrawCallManager::bindBuffer(
+      p_DrawCallRef, _N(LightBuffer), GpuProgramType::kFragment, _lightBuffer,
+      UboType::kInvalidUbo, BufferManager::_descSizeInBytes(_lightBuffer));
+  DrawCallManager::bindBuffer(
+      p_DrawCallRef, _N(LightIndexBuffer), GpuProgramType::kFragment,
+      _lightIndexBuffer, UboType::kInvalidUbo,
+      BufferManager::_descSizeInBytes(_lightIndexBuffer));
+  DrawCallManager::bindBuffer(
+      p_DrawCallRef, _N(IrradProbeBuffer), GpuProgramType::kFragment,
+      _irradProbeBuffer, UboType::kInvalidUbo,
+      BufferManager::_descSizeInBytes(_irradProbeBuffer));
+  DrawCallManager::bindBuffer(
+      p_DrawCallRef, _N(IrradProbeIndexBuffer), GpuProgramType::kFragment,
+      _irradProbeIndexBuffer, UboType::kInvalidUbo,
+      BufferManager::_descSizeInBytes(_irradProbeIndexBuffer));
+}
+}
+
 void Lighting::onReinitRendering()
 {
   using namespace Resources;
@@ -751,64 +796,7 @@ void Lighting::onReinitRendering()
         _drawCallRef, Dod::Resources::ResourceFlags::kResourceVolatile);
 
     DrawCallManager::_descPipeline(_drawCallRef) = _pipelineRef;
-    DrawCallManager::_descVertexCount(_drawCallRef) = 3u;
-
-    DrawCallManager::bindBuffer(
-        _drawCallRef, _N(PerInstance), GpuProgramType::kFragment,
-        UniformManager::_perInstanceUniformBuffer,
-        UboType::kPerInstanceFragment, sizeof(PerInstanceData));
-    DrawCallManager::bindImage(
-        _drawCallRef, _N(albedoTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(GBufferAlbedo)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallRef, _N(normalTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(GBufferNormal)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallRef, _N(parameter0Tex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(GBufferParameter0)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallRef, _N(depthTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(GBufferDepth)),
-        Samplers::kNearestClamp);
-    DrawCallManager::bindImage(
-        _drawCallRef, _N(ssaoTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(SSAO)), Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallRef, _N(kelvinLutTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallRef, _N(specularTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(default_ibl_cube_specular)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallRef, _N(noiseTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(noise)), Samplers::kLinearRepeat);
-    DrawCallManager::bindImage(
-        _drawCallRef, _N(shadowBufferTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(ShadowBuffer)), Samplers::kShadow);
-    DrawCallManager::bindBuffer(
-        _drawCallRef, _N(MaterialBuffer), GpuProgramType::kFragment,
-        MaterialBuffer::_materialBuffer, UboType::kInvalidUbo,
-        BufferManager::_descSizeInBytes(MaterialBuffer::_materialBuffer));
-    DrawCallManager::bindBuffer(
-        _drawCallRef, _N(LightBuffer), GpuProgramType::kFragment, _lightBuffer,
-        UboType::kInvalidUbo, BufferManager::_descSizeInBytes(_lightBuffer));
-    DrawCallManager::bindBuffer(
-        _drawCallRef, _N(LightIndexBuffer), GpuProgramType::kFragment,
-        _lightIndexBuffer, UboType::kInvalidUbo,
-        BufferManager::_descSizeInBytes(_lightIndexBuffer));
-    DrawCallManager::bindBuffer(
-        _drawCallRef, _N(IrradProbeBuffer), GpuProgramType::kFragment,
-        _irradProbeBuffer, UboType::kInvalidUbo,
-        BufferManager::_descSizeInBytes(_irradProbeBuffer));
-    DrawCallManager::bindBuffer(
-        _drawCallRef, _N(IrradProbeIndexBuffer), GpuProgramType::kFragment,
-        _irradProbeIndexBuffer, UboType::kInvalidUbo,
-        BufferManager::_descSizeInBytes(_irradProbeIndexBuffer));
+    setupLightingDrawCall(_drawCallRef, false);
   }
 
   drawcallsToCreate.push_back(_drawCallRef);
@@ -822,66 +810,7 @@ void Lighting::onReinitRendering()
         Dod::Resources::ResourceFlags::kResourceVolatile);
 
     DrawCallManager::_descPipeline(_drawCallTransparentsRef) = _pipelineRef;
-    DrawCallManager::_descVertexCount(_drawCallTransparentsRef) = 3u;
-
-    DrawCallManager::bindBuffer(
-        _drawCallTransparentsRef, _N(PerInstance), GpuProgramType::kFragment,
-        UniformManager::_perInstanceUniformBuffer,
-        UboType::kPerInstanceFragment, sizeof(PerInstanceData));
-    DrawCallManager::bindImage(
-        _drawCallTransparentsRef, _N(albedoTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(GBufferTransparentsAlbedo)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallTransparentsRef, _N(normalTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(GBufferTransparentsNormal)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallTransparentsRef, _N(parameter0Tex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(GBufferTransparentsParameter0)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallTransparentsRef, _N(depthTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(GBufferTransparentsDepth)),
-        Samplers::kNearestClamp);
-    DrawCallManager::bindImage(
-        _drawCallTransparentsRef, _N(ssaoTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(SSAO)), Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallTransparentsRef, _N(kelvinLutTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallTransparentsRef, _N(specularTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(default_ibl_cube_specular)),
-        Samplers::kLinearClamp);
-    DrawCallManager::bindImage(
-        _drawCallTransparentsRef, _N(noiseTex), GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(noise)), Samplers::kLinearRepeat);
-    DrawCallManager::bindImage(
-        _drawCallTransparentsRef, _N(shadowBufferTex),
-        GpuProgramType::kFragment,
-        ImageManager::getResourceByName(_N(ShadowBuffer)), Samplers::kShadow);
-    DrawCallManager::bindBuffer(
-        _drawCallTransparentsRef, _N(MaterialBuffer), GpuProgramType::kFragment,
-        MaterialBuffer::_materialBuffer, UboType::kInvalidUbo,
-        BufferManager::_descSizeInBytes(MaterialBuffer::_materialBuffer));
-    DrawCallManager::bindBuffer(_drawCallTransparentsRef, _N(LightBuffer),
-                                GpuProgramType::kFragment, _lightBuffer,
-                                UboType::kInvalidUbo,
-                                BufferManager::_descSizeInBytes(_lightBuffer));
-    DrawCallManager::bindBuffer(
-        _drawCallTransparentsRef, _N(LightIndexBuffer),
-        GpuProgramType::kFragment, _lightIndexBuffer, UboType::kInvalidUbo,
-        BufferManager::_descSizeInBytes(_lightIndexBuffer));
-    DrawCallManager::bindBuffer(
-        _drawCallTransparentsRef, _N(IrradProbeBuffer),
-        GpuProgramType::kFragment, _irradProbeBuffer, UboType::kInvalidUbo,
-        BufferManager::_descSizeInBytes(_irradProbeBuffer));
-    DrawCallManager::bindBuffer(
-        _drawCallTransparentsRef, _N(IrradProbeIndexBuffer),
-        GpuProgramType::kFragment, _irradProbeIndexBuffer, UboType::kInvalidUbo,
-        BufferManager::_descSizeInBytes(_irradProbeIndexBuffer));
+    setupLightingDrawCall(_drawCallTransparentsRef, true);
   }
   drawcallsToCreate.push_back(_drawCallTransparentsRef);
 

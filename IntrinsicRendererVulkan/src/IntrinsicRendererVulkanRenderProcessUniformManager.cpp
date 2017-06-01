@@ -102,6 +102,9 @@ _uniformOffsetMapping = {
     {"ViewMatrix",
      UniformDataRef(&UniformManager::_uniformDataSource.viewMatrix,
                     sizeof(glm::mat4))},
+    {"InverseViewMatrix",
+     UniformDataRef(&UniformManager::_uniformDataSource.inverseViewMatrix,
+                    sizeof(glm::mat4))},
     {"PrevViewMatrix",
      UniformDataRef(&UniformManager::_uniformDataSource.prevViewMatrix,
                     sizeof(glm::mat4))},
@@ -214,6 +217,8 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
         1.0f / UniformManager::_uniformDataSource.cameraParameters.x;
     UniformManager::_uniformDataSource.cameraParameters.w =
         1.0f / UniformManager::_uniformDataSource.cameraParameters.y;
+    UniformManager::_uniformDataSource.inverseViewMatrix =
+        Components::CameraManager::_inverseViewMatrix(p_Camera);
     UniformManager::_uniformDataSource.projectionMatrix =
         Components::CameraManager::_projectionMatrix(p_Camera);
     UniformManager::_uniformDataSource.prevViewMatrix =
@@ -248,7 +253,7 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
         glm::vec4(backbufferSize, 1.0f / backbufferSize);
   }
 
-  // Uniforms for mesh draw calls
+  // Global per frame data
   {
     static const uint32_t perFrameRangeSizeInBytes =
         sizeof(RenderProcess::PerFrameDataVertex) +
@@ -277,19 +282,42 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 
     PerFrameDataFrament fragmentData;
     {
+      fragmentData.viewMatrix = UniformManager::_uniformDataSource.viewMatrix;
+      fragmentData.invProjectionMatrix =
+          UniformManager::_uniformDataSource.inverseProjectionMatrix;
+      fragmentData.invViewMatrix =
+          UniformManager::_uniformDataSource.inverseViewMatrix;
+
       // Sky model
-      const glm::vec3 lightDir =
-          Core::Resources::PostEffectManager::calcActualMainLightOrientation(
+      const glm::vec3 sunDir =
+          Core::Resources::PostEffectManager::calcActualSunOrientation(
               Core::Resources::PostEffectManager::_blendTargetRef) *
           glm::vec3(0.0f, 0.0f, 1.0f);
+      fragmentData.skyLightDirWS = glm::vec4(sunDir, 0.0f);
+      fragmentData.skyLightDirVS =
+          UniformManager::_uniformDataSource.viewMatrix *
+          fragmentData.skyLightDirWS;
+
       const float elevation =
           glm::half_pi<float>() -
-          std::acos(std::max(glm::dot(lightDir, glm::vec3(0.0f, 1.0f, 0.0f)),
+          std::acos(std::max(glm::dot(sunDir, glm::vec3(0.0f, 1.0f, 0.0f)),
                              0.00001f));
 
       // TODO: Move params to post effect
       SkyModel::ArHosekSkyModelState skyModel =
-          SkyModel::createSkyModelState(2.5f, 1.0f, elevation);
+          SkyModel::createSkyModelState(1.5f, 0.5f, elevation);
+
+      // TODO: Hardcoded RGB modification
+      const float radianceFactor = World::_currentDayNightFactor * 0.25f;
+      skyModel.radiances[0] *= radianceFactor;
+      skyModel.radiances[1] *= radianceFactor;
+      skyModel.radiances[2] *= radianceFactor;
+
+      // Project sky SH
+      {
+        Irradiance::SH9 skySH = SkyModel::project(skyModel, sunDir, 64u);
+        memcpy(fragmentData.skyLightSH, &skySH, sizeof(Irradiance::SH9));
+      }
 
       for (uint32_t channelIdx = 0u; channelIdx < 3u; ++channelIdx)
       {

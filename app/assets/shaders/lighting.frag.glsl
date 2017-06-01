@@ -22,50 +22,46 @@
 #include "lib_noise.glsl"
 #include "lib_lighting.glsl"
 #include "lib_buffers.glsl"
+#include "ubos.inc.glsl"
 
 layout (binding = 0) uniform PerInstance
 {
-  mat4 viewMatrix;
-  mat4 invProjMatrix;
-  mat4 invViewMatrix;
-
   mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT];
 
   vec4 nearFarWidthHeight;
   vec4 nearFar;
 
-  vec4 mainLightColorAndIntens;
-  vec4 mainLightDirAndTemp;
-
   vec4 data0;
-} uboPerInstance; 
+} uboPerInstance;
 
-layout (binding = 1) uniform sampler2D albedoTex;
-layout (binding = 2) uniform sampler2D normalTex;
-layout (binding = 3) uniform sampler2D parameter0Tex;
-layout (binding = 4) uniform sampler2D depthTex;
-layout (binding = 5) uniform sampler2D ssaoTex;
-layout (binding = 6) uniform samplerCube specularTex;
-layout (binding = 7) uniform sampler2DArrayShadow shadowBufferTex;
-layout (binding = 8) MATERIAL_BUFFER;
-layout (binding = 9) buffer LightBuffer
+PER_FRAME_DATA(1);
+
+layout (binding = 2) uniform sampler2D albedoTex;
+layout (binding = 3) uniform sampler2D normalTex;
+layout (binding = 4) uniform sampler2D parameter0Tex;
+layout (binding = 5) uniform sampler2D depthTex;
+layout (binding = 6) uniform sampler2D ssaoTex;
+layout (binding = 7) uniform samplerCube specularTex;
+layout (binding = 8) uniform sampler2DArrayShadow shadowBufferTex;
+layout (binding = 9) MATERIAL_BUFFER;
+layout (binding = 10) buffer LightBuffer
 {
   Light lights[];
 };
-layout (binding = 10) buffer LightIndexBuffer
+layout (binding = 11) buffer LightIndexBuffer
 {
   uint lightIndices[];
 };
-layout (binding = 11) buffer IrradProbeBuffer
+layout (binding = 12) buffer IrradProbeBuffer
 {
   IrradProbe irradProbes[];
 };
-layout (binding = 12) buffer IrradProbeIndexBuffer
+layout (binding = 13) buffer IrradProbeIndexBuffer
 {
   uint irradProbeIndices[];
 };
-layout (binding = 13) uniform sampler2D kelvinLutTex;
-layout (binding = 14) uniform sampler2D noiseTex;
+layout (binding = 14) uniform sampler2D kelvinLutTex;
+layout (binding = 15) uniform sampler2D noiseTex;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
@@ -84,7 +80,7 @@ void main()
 
   outColor.rgba = vec4(0.0);
 
-  const vec3 posVS = unproject(inUV0, depth, uboPerInstance.invProjMatrix);
+  const vec3 posVS = unproject(inUV0, depth, uboPerFrame.invProjMatrix);
 
   const vec4 ssaoSample = textureLod(ssaoTex, inUV0, 0.0);
   const vec4 normalSample = textureLod(normalTex, inUV0, 0.0);
@@ -99,9 +95,9 @@ void main()
   initLightingDataFromGBuffer(d);
 
   d.N = normalize(decodeNormal(normalSample.rg));  
-  d.L = uboPerInstance.mainLightDirAndTemp.xyz;
+  d.L = uboPerFrame.skyLightDirVS.xyz;
   d.V = -normalize(posVS); 
-  d.energy = vec3(uboPerInstance.mainLightColorAndIntens.w);
+  d.energy = vec3(20.0);
   calculateLightingData(d);
 
   const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
@@ -109,13 +105,14 @@ void main()
   const bool gridPosValid = isGridPosValid(gridPos);
 
   // Ambient lighting
-  const vec3 normalWS = (uboPerInstance.invViewMatrix * vec4(d.N, 0.0)).xyz;
-  const vec3 vWS = (uboPerInstance.invViewMatrix * vec4(d.V, 0.0)).xyz;
+  const vec3 normalWS = (uboPerFrame.invViewMatrix * vec4(d.N, 0.0)).xyz;
+  const vec3 vWS = (uboPerFrame.invViewMatrix * vec4(d.V, 0.0)).xyz;
 
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
-  vec3 irrad = vec3(0.0);
+  // Sky
+  vec3 irrad = d.diffuseColor * sampleSH(uboPerFrame.skyLightSH, normalWS) / MATH_PI;
 
   if (gridPosValid)
   {
@@ -134,7 +131,7 @@ void main()
           / fadeRange, probe.data0.y);
         
         irrad = mix(irrad, d.diffuseColor 
-          * sampleSH(probe.data, R) / MATH_PI, fade);
+          * sampleSH(probe.data, normalWS) / MATH_PI, fade);
       }
     }
   }
@@ -152,29 +149,29 @@ void main()
   // Emissive
   outColor.rgb += parameter0Sample.w * matParams.emissiveIntensity * d.baseColor;
 
-  const vec3 mainLightColor = uboPerInstance.mainLightColorAndIntens.rgb 
-    * kelvinToRGB(uboPerInstance.mainLightDirAndTemp.w, kelvinLutTex);
-
   // Cloud shadows
-  const vec4 posWS = uboPerInstance.invViewMatrix * vec4(posVS, 1.0);
+  const vec4 posWS = uboPerFrame.invViewMatrix * vec4(posVS, 1.0);
   const float cloudShadows = clamp(texture(noiseTex, 
     clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0 
     + uboPerInstance.data0.x * 0.025).r * 3.0 - 0.5, 0.1, 1.0);
 
-  // Direct lighting
+  // Sunlight
+  // TODO: Hardcoded light color
+  const vec3 sunlightColor = vec3(1.0, 0.3, 0.1) 
+    * sampleSH(uboPerFrame.skyLightSH, uboPerFrame.skyLightDirWS.xyz) / MATH_PI;
+
   float shadowAttenuation = cloudShadows * calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
-  outColor.rgb += shadowAttenuation * mainLightColor * calcLighting(d);
+  outColor.rgb += shadowAttenuation * sunlightColor * calcLighting(d);
 
   // Translucency
   // TODO: Move this to a library
-
   const float translThickness = matParams.translucencyThickness;
   if (translThickness > EPSILON)
   {
     const vec3 translLightVector = d.L + d.N * translDistortion;
     const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
     const vec3 transl = (translDot + translAmbient) * translThickness;
-    const vec3 translColor = uboPerInstance.mainLightColorAndIntens.w * d.diffuseColor * mainLightColor * transl;
+    const vec3 translColor = d.diffuseColor * sunlightColor * transl;
 
     outColor.rgb += translColor;    
   }

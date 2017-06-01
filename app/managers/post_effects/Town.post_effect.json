@@ -2,18 +2,11 @@
     "name": "Town",
     "properties": {
         "name": "Town",
-        "scattering": 0.004999999888241291,
-        "mainLightIntensity": 10.0,
-        "mainLightTemperature": 6500.0,
-        "mainLightOrientation": [
+        "scattering": 0.02500000037252903,
+        "sunOrientation": [
             0.0,
             0.0,
             0.0,
-            1.0
-        ],
-        "mainLightColor": [
-            1.0,
-            1.0,
             1.0
         ],
         "ambientFactor": 1.0,

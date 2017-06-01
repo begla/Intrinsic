@@ -39,19 +39,20 @@ layout (binding = 10) uniform sampler2D depthBufferTranspTex;
 layout (binding = 11) MATERIAL_BUFFER;
 layout (binding = 12) uniform sampler3D volLightScatteringBufferTex;
 
+PER_FRAME_DATA(13);
+
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
-const float fogDensity = 0.003; 
-const float fogStart = 900.0;
-const float fogMaxBlendFactor = 0.95;
+const float fogDensity = 0.001; 
+const float fogStart = 1200.0;
+const float fogMaxBlendFactor = 1.0;
 
 const float waterFogDensity = 90.0;
 const float waterFogMaxBlendFactor = 0.95;
 const float waterFogDecayExp = 16.0;
 const vec3 waterFogColor0 = vec3(0.0, 1.0, 1.0);
 const vec3 waterFogColor1 = vec3(0.0, 0.2, 0.2);
-const vec3 fogColor = vec3(0.5, 0.7, 1.0);
 
 void main()
 {
@@ -105,16 +106,20 @@ void main()
     }
 
     // Water fog
+    const vec3 normTranspWS = (uboPerInstance.invViewMatrix * vec4(normTranspVS.xyz, 0.0)).xyz;
+    const vec3 fogIrrad = sampleSH(uboPerFrame.skyLightSH, normTranspWS) / MATH_PI;
+
     const float linDepthOpaque = linearizeDepth(waterFogDepth, uboPerInstance.camParams.x, 
       uboPerInstance.camParams.y);
     const float linDepthTransp = linearizeDepth(depthTransp, uboPerInstance.camParams.x, 
       uboPerInstance.camParams.y);
 
-    const float waterFog = min(1.0 - exp(-(linDepthOpaque - linDepthTransp) * waterFogDensity), waterFogMaxBlendFactor);
+    const float waterFog = min(1.0 - exp(-(linDepthOpaque - linDepthTransp) * waterFogDensity), 
+      waterFogMaxBlendFactor);
     const float waterFogDecay = clamp(pow(waterFog, waterFogDecayExp), 0.0, 1.0);
 
-    opaque.rgb = mix(opaque.rgb, mix(waterFogColor0, waterFogColor1, waterFogDecay), 
-      albedoTransparents.a * waterFog * uboPerInstance.postParams0.x * uboPerInstance.postParams0.y);
+    opaque.rgb = mix(opaque.rgb, fogIrrad * mix(waterFogColor0, waterFogColor1, waterFogDecay), 
+      albedoTransparents.a * waterFog);
     const vec3 transp = lightingTransp;
     outColor.rgb = mix(opaque, transp, albedoTransparents.a);
   }
@@ -133,10 +138,10 @@ void main()
     const float rayDist = length(ray);
     const vec3 rayDir = ray / rayDist;
 
-    const vec3 lightVec = vec3(1.0, 0.45, -0.15);
-    fog.a = 1.0 - min(max((1.0 - exp((-rayDist + fogStart) * fogDensity)), 0.0), fogMaxBlendFactor);
-    fog.rgb = (1.0 - fog.a) * fogColor * uboPerInstance.postParams0.x
-      * uboPerInstance.postParams0.y;
+    const vec3 fogColor = sampleSH(uboPerFrame.skyLightSH, rayDir) / MATH_PI;
+
+    fog.a = clamp(exp((-rayDist + fogStart) * fogDensity), 0.0, 1.0);
+    fog.rgb = (1.0 - fog.a) * fogColor;
   }
 
   // Volumetrics
