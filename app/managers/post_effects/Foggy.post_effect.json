@@ -2,18 +2,11 @@
     "name": "Foggy",
     "properties": {
         "name": "Foggy",
-        "scattering": 0.009999999776482582,
-        "mainLightIntensity": 10.0,
-        "mainLightTemperature": 6500.0,
-        "mainLightOrientation": [
+        "scattering": 0.10000000149011612,
+        "sunOrientation": [
             0.0,
             0.0,
             0.0,
-            1.0
-        ],
-        "mainLightColor": [
-            1.0,
-            1.0,
             1.0
         ],
         "ambientFactor": 1.0,

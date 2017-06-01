@@ -503,9 +503,11 @@ void World::updateDayNightCycle(float p_DeltaT)
       glm::mix(nightLightTemp, dayLightTemp, currentDayNightFactor);
   _currentSkyLightColor =
       glm::mix(nightLightColor, dayLightColor, currentDayNightFactor);
-  _currentSkyLightOrientation = glm::quat(
-      glm::vec3(-std::sin(_currentTime * glm::pi<float>()) * glm::pi<float>(),
-                0.0f, 0.0f));
+
+  const float sunAngleRad =
+      glm::clamp(std::sin(_currentTime * glm::pi<float>()) * glm::pi<float>(),
+                 glm::radians(2.5f), glm::radians(177.5f));
+  _currentSkyLightOrientation = glm::quat(glm::vec3(-sunAngleRad, 0.0f, 0.0f));
 
   _currentSkyLightIntesity =
       glm::mix(nightLightIntens, dayLightIntens, currentDayNightFactor);

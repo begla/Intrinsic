@@ -54,7 +54,7 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
 
   const glm::vec3 eye =
       worldBoundsHalfExtentLength *
-      (Core::Resources::PostEffectManager::calcActualMainLightOrientation(
+      (Core::Resources::PostEffectManager::calcActualSunOrientation(
            Core::Resources::PostEffectManager::_blendTargetRef) *
        glm::vec3(0.0f, 0.0f, 1.0f));
   const glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f);

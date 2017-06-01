@@ -43,10 +43,10 @@ typedef struct ArHosekSkyModelState
 
 // <-
 
-void cookConfiguration(ArHosekSkyModelDataset p_Dataset,
-                       ArHosekSkyModelConfiguration p_Config,
-                       double p_Turbidity, double p_Albedo,
-                       double p_SolarElevation)
+_INTR_INLINE void cookConfiguration(ArHosekSkyModelDataset p_Dataset,
+                                    ArHosekSkyModelConfiguration p_Config,
+                                    double p_Turbidity, double p_Albedo,
+                                    double p_SolarElevation)
 {
   double* elevMatrix;
 
@@ -136,9 +136,10 @@ void cookConfiguration(ArHosekSkyModelDataset p_Dataset,
 
 // <-
 
-double cookRadianceConfiguration(ArHosekSkyModelRadianceDataset p_DataSet,
-                                 double p_Turbidity, double p_Albedo,
-                                 double p_SolarElevation)
+_INTR_INLINE double
+cookRadianceConfiguration(ArHosekSkyModelRadianceDataset p_DataSet,
+                          double p_Turbidity, double p_Albedo,
+                          double p_SolarElevation)
 {
   double* elevMatrix;
 
@@ -214,8 +215,71 @@ double cookRadianceConfiguration(ArHosekSkyModelRadianceDataset p_DataSet,
   return res;
 }
 
-ArHosekSkyModelState createSkyModelState(double p_Turbidity, double p_Albedo,
-                                         double p_Elevation)
+_INTR_INLINE glm::vec3
+calculateSkyModelRadiance(const ArHosekSkyModelState& p_SkyModelState,
+                          const glm::vec3& p_Theta, const glm::vec3& p_Gamma)
+{
+  glm::vec3 configuration[9];
+  for (uint32_t i = 0; i < 9; ++i)
+    configuration[i] =
+        glm::vec3(p_SkyModelState.configs[0][i], p_SkyModelState.configs[1][i],
+                  p_SkyModelState.configs[2][i]);
+
+  const glm::vec3 expM = glm::exp(configuration[4] * p_Gamma);
+  const glm::vec3 rayM = glm::cos(p_Gamma) * glm::cos(p_Gamma);
+  const glm::vec3 mieM =
+      (glm::vec3(1.0f) + glm::cos(p_Gamma) * glm::cos(p_Gamma)) /
+      glm::pow((1.0f + configuration[8] * configuration[8] -
+                2.0f * configuration[8] * glm::cos(p_Gamma)),
+               glm::vec3(1.5));
+  const glm::vec3 zenith = glm::sqrt(glm::cos(p_Theta));
+
+  return (glm::vec3(1.0f) +
+          configuration[0] * glm::exp(configuration[1] /
+                                      (glm::cos(p_Theta) + glm::vec3(0.01f)))) *
+         (configuration[2] + configuration[3] * expM + configuration[5] * rayM +
+          configuration[6] * mieM + configuration[7] * zenith);
+}
+
+_INTR_INLINE Irradiance::SH9
+project(const ArHosekSkyModelState& p_SkyModelState,
+        const glm::vec3& p_LightDir, uint32_t p_SampleCount)
+{
+  static _INTR_ARRAY(glm::vec3) randomRaySamples;
+  while (randomRaySamples.size() < p_SampleCount)
+  {
+    randomRaySamples.push_back(
+        glm::normalize(glm::vec3(Math::calcRandomFloatMinMax(-1.0f, 1.0f),
+                                 Math::calcRandomFloatMinMax(-1.0f, 1.0f),
+                                 Math::calcRandomFloatMinMax(-1.0f, 1.0f))));
+  }
+
+  Irradiance::SH9 result;
+  float weightSum = 0.0f;
+  for (uint32_t i = 0u; i < p_SampleCount; ++i)
+  {
+    const glm::vec3 randomRaySample = randomRaySamples[i];
+
+    const glm::vec3 theta = glm::vec3(glm::acos(glm::max(
+        glm::dot(randomRaySample, glm::vec3(0.0f, 1.0f, 0.0f)), 0.0001f)));
+    const glm::vec3 gamma = glm::vec3(
+        glm::acos(glm::max(glm::dot(randomRaySample, p_LightDir), 0.0001f)));
+
+    const glm::vec3 sample =
+        calculateSkyModelRadiance(p_SkyModelState, theta, gamma) *
+        glm::vec3(p_SkyModelState.radiances[0], p_SkyModelState.radiances[1],
+                  p_SkyModelState.radiances[2]);
+    result += Irradiance::project(randomRaySample, sample);
+    weightSum += 1.0f;
+  }
+
+  result *= glm::pi<float>() / weightSum;
+  return result;
+}
+
+_INTR_INLINE ArHosekSkyModelState createSkyModelState(double p_Turbidity,
+                                                      double p_Albedo,
+                                                      double p_Elevation)
 {
   ArHosekSkyModelState state;
 

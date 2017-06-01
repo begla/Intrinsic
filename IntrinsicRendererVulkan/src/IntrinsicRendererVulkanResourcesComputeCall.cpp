@@ -90,6 +90,11 @@ void ComputeCallManager::updateUniformMemory(
           memcpy(gpuMem, p_PerInstanceDataCompute,
                  p_PerInstanceDataComputeSize);
         }
+        else if (bindInfo.bufferData.uboType == UboType::kPerFrameFragment)
+        {
+          _dynamicOffsets(computeCallRef)[dynamicOffsetIndex] = RenderProcess::
+              UniformManager::getDynamicOffsetForPerFrameDataFragment();
+        }
 
         ++dynamicOffsetIndex;
       }

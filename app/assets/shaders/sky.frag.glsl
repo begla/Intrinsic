@@ -20,11 +20,14 @@
 
 #include "lib_math.glsl"
 #include "gbuffer.inc.glsl"
+#include "lib_lighting.glsl"
+#include "ubos.inc.glsl"
 
 // Ubos
 PER_MATERIAL_UBO;
 PER_INSTANCE_UBO;
-PER_FRAME_UBO;
+
+PER_FRAME_DATA(3);
 
 // Input
 layout (location = 0) in vec2 inUV0;
@@ -75,12 +78,13 @@ void main()
   const vec3 V = normalize(inPosVS);
 
   const float theta = acos(max(dot(V, inUpVS), 0.0001));
-  const float gamma = acos(max(dot(V, uboPerInstance.data1.xyz), 0.0001));
-  albedo.rgb += clamp(calculateSkyModelRadiance(vec3(theta), vec3(gamma)) * uboPerFrame.skyModelRadiances.rgb * 0.025, 0.0, 10.0);
-  albedo.rgb *= uboPerInstance.data0.x;
+  const float gamma = acos(max(dot(V, uboPerFrame.skyLightDirVS.xyz), 0.0001));
+  albedo.rgb += clamp(calculateSkyModelRadiance(vec3(theta), vec3(gamma)) 
+  	* uboPerFrame.skyModelRadiances.rgb / MATH_PI, 0.0, 10.0);
+  //albedo.rgb += sampleSH(uboPerFrame.skyLightSH, inNormal);
 
   // Fake sun/moon
-  albedo.rgb += pow(clamp(dot(uboPerInstance.data1.xyz, V), 0.0, 1.0), 1500.0);
+  albedo.rgb += pow(clamp(dot(uboPerFrame.skyLightDirVS.xyz, V), 0.0, 1.0), 1500.0);
 
   outAlbedo = vec4(albedo.rgb, 1.0);
 }

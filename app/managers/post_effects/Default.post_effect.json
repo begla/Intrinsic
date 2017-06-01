@@ -3,17 +3,10 @@
     "properties": {
         "name": "Default",
         "scattering": 0.0,
-        "mainLightIntensity": 10.0,
-        "mainLightTemperature": 6500.0,
-        "mainLightOrientation": [
+        "sunOrientation": [
             0.0,
             0.0,
             0.0,
-            1.0
-        ],
-        "mainLightColor": [
-            1.0,
-            1.0,
             1.0
         ],
         "ambientFactor": 1.0,

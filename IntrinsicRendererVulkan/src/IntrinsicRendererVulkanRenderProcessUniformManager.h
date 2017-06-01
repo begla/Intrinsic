@@ -29,8 +29,16 @@ struct PerFrameDataVertex
 
 struct PerFrameDataFrament
 {
+  glm::mat4 viewMatrix;
+  glm::mat4 invProjectionMatrix;
+  glm::mat4 invViewMatrix;
+
   glm::vec4 skyModelConfigs[7];
   glm::vec4 skyModelRadiances;
+
+  glm::vec4 skyLightDirVS;
+  glm::vec4 skyLightDirWS;
+  glm::vec4 skyLightSH[7];
 };
 
 struct UniformBufferDataEntry
@@ -67,6 +75,7 @@ struct UniformManager
 
   static struct UniformDataSource
   {
+    glm::mat4 inverseViewMatrix;
     glm::mat4 projectionMatrix;
     glm::mat4 inverseProjectionMatrix;
     glm::mat4 inverseViewProjectionMatrix;

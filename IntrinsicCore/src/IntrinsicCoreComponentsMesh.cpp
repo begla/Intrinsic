@@ -86,13 +86,6 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
         perInstanceDataFragment.colorTint =
             Components::MeshManager::_descColorTint(meshCompRef);
 
-        const glm::vec3 mainLightDirVS =
-            viewMatrix *
-            (Core::Resources::PostEffectManager::calcActualMainLightOrientation(
-                 Core::Resources::PostEffectManager::_blendTargetRef) *
-             glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
-        perInstanceDataFragment.data1 = glm::vec4(mainLightDirVS, 0.0f);
-
         // Modulate tint when entity is selected
         if (GameStates::Manager::getActiveGameState() ==
                 GameStates::GameState::kEditing &&

@@ -59,9 +59,6 @@ struct PerInstanceData
   glm::vec4 nearFar;
   glm::vec4 nearFarWidthHeight;
 
-  glm::vec4 mainLightDirAndTemp;
-  glm::vec4 mainLightColorAndIntens;
-
   glm::vec4 haltonSamples;
 } _perInstanceData;
 
@@ -101,11 +98,6 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
 
   // Post effect data
   {
-    const glm::vec3 mainLightDir =
-        Core::Resources::PostEffectManager::calcActualMainLightOrientation(
-            Core::Resources::PostEffectManager::_blendTargetRef) *
-        glm::vec3(0.0f, 0.0f, 1.0f);
-
     _perInstanceData.data0.x =
         Core::Resources::PostEffectManager::_descVolumetricLightingScattering(
             Core::Resources::PostEffectManager::_blendTargetRef) *
@@ -114,15 +106,6 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
         Core::Resources::PostEffectManager::_descAmbientFactor(
             Core::Resources::PostEffectManager::_blendTargetRef) *
         Lighting::_globalAmbientFactor;
-    _perInstanceData.mainLightDirAndTemp =
-        glm::vec4(mainLightDir,
-                  Core::Resources::PostEffectManager::calcActualMainLightTemp(
-                      Core::Resources::PostEffectManager::_blendTargetRef));
-    _perInstanceData.mainLightColorAndIntens =
-        glm::vec4(Core::Resources::PostEffectManager::calcActualMainLightColor(
-                      Core::Resources::PostEffectManager::_blendTargetRef),
-                  Core::Resources::PostEffectManager::calcActualMainLightIntens(
-                      Core::Resources::PostEffectManager::_blendTargetRef));
   }
 
   _perInstanceData.haltonSamples =
@@ -215,6 +198,10 @@ createComputeCallAccumulation(glm::vec3 p_Dim,
     ComputeCallManager::bindBuffer(
         computeCallRef, _N(PerInstance), GpuProgramType::kCompute,
         UniformManager::_perInstanceUniformBuffer, UboType::kPerInstanceCompute,
+        sizeof(PerInstanceData));
+    ComputeCallManager::bindBuffer(
+        computeCallRef, _N(PerFrame), GpuProgramType::kCompute,
+        UniformManager::_perFrameUniformBuffer, UboType::kPerFrameFragment,
         sizeof(PerInstanceData));
     ComputeCallManager::bindImage(
         computeCallRef, _N(shadowBufferTex), GpuProgramType::kCompute,

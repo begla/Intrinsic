@@ -4,6 +4,7 @@
 		{
 			"name" : "PerInstanceDataPreCombine",
 			"entries" : [
+				"InverseViewMatrix",
 				"InverseProjectionMatrix",
 				"InverseViewProjectionMatrix",
 				"CameraWorldPosition",
@@ -561,6 +562,7 @@
 			"fragmentGpuProgram" : "pre_combine.frag",
 			"viewportRenderSize" : "Full",
 			"perInstanceDataBufferName" : "PerInstanceDataPreCombine",
+			"needsPerFrameBufferFragment" : true,
 			"inputs" : [
 				["Image", "GBufferAlbedo", "albedoTex", "Fragment", "NearestClamp"],
 				["Image", "GBufferNormal", "normalTex", "Fragment", "NearestClamp"],

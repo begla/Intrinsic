@@ -22,6 +22,7 @@
 #include "lib_lighting.glsl"
 #include "lib_vol_lighting.glsl"
 #include "lib_noise.glsl"
+#include "ubos.inc.glsl"
 
 layout (binding = 0) uniform PerInstance
 {
@@ -45,33 +46,32 @@ layout (binding = 0) uniform PerInstance
   vec4 nearFar;
   vec4 nearFarWidthHeight;
 
-  vec4 mainLightDirAndTemp;
-  vec4 mainLightColorAndIntens;
-
   vec4 haltonSamples;
-} uboPerInstance; 
+} uboPerInstance;
 
-layout (binding = 1) uniform sampler2DArrayShadow shadowBufferTex;
-layout (binding = 2, r11f_g11f_b10f) uniform image3D output0Tex;
-layout (binding = 3) uniform sampler3D prevVolLightBufferTex;
-layout (binding = 4) buffer LightBuffer
+PER_FRAME_DATA(1);
+
+layout (binding = 2) uniform sampler2DArrayShadow shadowBufferTex;
+layout (binding = 3, r11f_g11f_b10f) uniform image3D output0Tex;
+layout (binding = 4) uniform sampler3D prevVolLightBufferTex;
+layout (binding = 5) buffer LightBuffer
 {
   Light lights[];
 };
-layout (binding = 5) buffer LightIndexBuffer
+layout (binding = 6) buffer LightIndexBuffer
 {
   uint lightIndices[];
 };
-layout (binding = 6) buffer IrradProbeBuffer
+layout (binding = 7) buffer IrradProbeBuffer
 {
   IrradProbe irradProbes[];
 };
-layout (binding = 7) buffer IrradProbeIndexBuffer
+layout (binding = 8) buffer IrradProbeIndexBuffer
 {
   uint irradProbeIndices[];
 };
-layout (binding = 8) uniform sampler2DArray shadowBufferExpTex;
-layout (binding = 9) uniform sampler2D kelvinLutTex;
+layout (binding = 9) uniform sampler2DArray shadowBufferExpTex;
+layout (binding = 10) uniform sampler2D kelvinLutTex;
 
 // TODO
 const vec3 heightRefPosWS = vec3(0.0, 700.0, 0.0);
@@ -136,7 +136,7 @@ void main()
 
   if (density > EPSILON)
   {
-    // Directional light
+    // Sunlight
     vec4 posLS;
     uint shadowMapIdx = findBestFittingSplit(posVS.xyz, posLS, uboPerInstance.shadowViewProjMatrix);
 
@@ -148,10 +148,9 @@ void main()
       shadowAttenuation = clamp(calculateShadowESM(shadowSample, posLS.z)*1.1 - 0.1, 0.0, 1.0);
     }
 
-    const vec3 lightColor = uboPerInstance.mainLightColorAndIntens.rgb * uboPerInstance.mainLightColorAndIntens.a 
-      * kelvinToRGB(uboPerInstance.mainLightDirAndTemp.a, kelvinLutTex) / MATH_PI;
-
-
+    // TODO: Hardcoded light color
+    const vec3 lightColor = vec3(1.0, 0.4, 0.2) 
+      * sampleSH(uboPerFrame.skyLightSH, uboPerFrame.skyLightDirWS.xyz) / MATH_PI;
     lighting += shadowAttenuation * lightColor;
   }
 
@@ -159,7 +158,8 @@ void main()
   const uint clusterIdx = calcClusterIndex(gridPos);
   const bool gridPosValid = isGridPosValid(gridPos);
 
-  vec3 irrad = vec3(0.0);
+  // Sky light
+  vec3 irrad = sampleSH(uboPerFrame.skyLightSH, rayWS) / MATH_PI;
 
   // Local irradiance
   if (gridPosValid

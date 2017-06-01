@@ -40,7 +40,6 @@ struct MeshPerInstanceDataFragment
   glm::vec4 colorTint;
   glm::vec4 camParams;
   glm::vec4 data0;
-  glm::vec4 data1;
 };
 
 struct MeshData : Dod::Components::ComponentDataBase

@@ -44,6 +44,7 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
       p_RenderPassDesc.HasMember("perInstanceDataVertexBufferName")
           ? p_RenderPassDesc["perInstanceDataVertexBufferName"].GetString()
           : "";
+
   RenderProcess::UniformBufferDataEntry bufferDataEntry =
       RenderProcess::UniformManager::requestUniformBufferData(
           _perInstanceDataBufferName);
@@ -122,6 +123,23 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
           _drawCallRef, _N(PerInstance), GpuProgramType::kVertex,
           UniformManager::_perInstanceUniformBuffer,
           UboType::kPerInstanceVertex, bufferDataVertexEntry.size);
+    }
+    if (p_RenderPassDesc.HasMember("needsPerFrameBufferFragment") &&
+        p_RenderPassDesc["needsPerFrameBufferFragment"].GetBool())
+    {
+      DrawCallManager::bindBuffer(
+          _drawCallRef, _N(PerFrame), GpuProgramType::kFragment,
+          UniformManager::_perFrameUniformBuffer, UboType::kPerFrameFragment,
+          sizeof(RenderProcess::PerFrameDataFrament));
+    }
+    if (p_RenderPassDesc.HasMember("needsPerFrameBufferVertex") &&
+        p_RenderPassDesc["needsPerFrameBufferVertex"].GetBool())
+    {
+      DrawCallManager::bindBuffer(
+          _drawCallRef, _N(PerFrame), GpuProgramType::kVertex,
+          UniformManager::_perFrameUniformBuffer, UboType::kPerFrameVertex,
+          sizeof(RenderProcess::PerFrameDataVertex));
+      ;
     }
 
     for (uint32_t i = 0u; i < inputs.Size(); ++i)
@@ -207,8 +225,9 @@ void GenericFullscreen::render(float p_DeltaT,
       uniformData.uniformData, uniformData.size);
 
   RenderSystem::beginRenderPass(
-      _renderPassRef, _framebufferRefs[RenderSystem::_backbufferIndex %
-                                       _framebufferRefs.size()],
+      _renderPassRef,
+      _framebufferRefs[RenderSystem::_backbufferIndex %
+                       _framebufferRefs.size()],
       VK_SUBPASS_CONTENTS_INLINE, (uint32_t)_clearValues.size(),
       _clearValues.data());
   {
