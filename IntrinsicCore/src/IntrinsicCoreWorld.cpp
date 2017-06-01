@@ -23,10 +23,7 @@ Components::NodeRef World::_rootNode;
 Components::CameraRef World::_activeCamera;
 float World::_currentTime = 0.1f;
 glm::quat World::_currentSkyLightOrientation = glm::quat();
-glm::vec3 World::_currentSkyLightColor = glm::vec3(1.0f);
-float World::_currentSkyLightTemp = 3200.0f;
 float World::_currentDayNightFactor = 0.0f;
-float World::_currentSkyLightIntesity = 0.0f;
 
 uint32_t calcOffsetToParent(const Components::NodeRefArray& p_Nodes,
                             Components::NodeRef p_Parent,
@@ -458,7 +455,7 @@ void World::load(const _INTR_STRING& p_FilePath)
 
 void World::updateDayNightCycle(float p_DeltaT)
 {
-  static const float dayNightCycleDurationInS = 5.0f * 60.0f;
+  static const float dayNightCycleDurationInS = 20.0f * 60.0f;
   static const float dayNightFadeInPerc = 0.1f;
   static const glm::vec3 dayLightColor = glm::vec3(1.0f);
   static const float dayLightTemp = 2220.0f;
@@ -499,18 +496,10 @@ void World::updateDayNightCycle(float p_DeltaT)
     currentPerc = nightPerc;
   }
 
-  _currentSkyLightTemp =
-      glm::mix(nightLightTemp, dayLightTemp, currentDayNightFactor);
-  _currentSkyLightColor =
-      glm::mix(nightLightColor, dayLightColor, currentDayNightFactor);
-
-  const float sunAngleRad =
+  float sunAngleRad =
       glm::clamp(std::sin(_currentTime * glm::pi<float>()) * glm::pi<float>(),
                  glm::radians(2.5f), glm::radians(177.5f));
   _currentSkyLightOrientation = glm::quat(glm::vec3(-sunAngleRad, 0.0f, 0.0f));
-
-  _currentSkyLightIntesity =
-      glm::mix(nightLightIntens, dayLightIntens, currentDayNightFactor);
 
   _currentDayNightFactor = glm::mix(0.01f, 1.0f, currentDayNightFactor);
 }
