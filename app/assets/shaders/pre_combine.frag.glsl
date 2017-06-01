@@ -46,7 +46,6 @@ layout (location = 0) out vec4 outColor;
 
 const float fogDensity = 0.001; 
 const float fogStart = 1200.0;
-const float fogMaxBlendFactor = 1.0;
 
 const float waterFogDensity = 90.0;
 const float waterFogMaxBlendFactor = 0.95;
