@@ -50,9 +50,6 @@ struct World
 
   static float _currentTime;
   static glm::quat _currentSkyLightOrientation;
-  static glm::vec3 _currentSkyLightColor;
-  static float _currentSkyLightTemp;
-  static float _currentSkyLightIntesity;
   static float _currentDayNightFactor;
 
 protected:
