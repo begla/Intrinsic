@@ -430,10 +430,10 @@ namespace detail
 		{
 			static_assert(std::numeric_limits<retType>::is_iec559, "CONVERT_MODE_RGB10A2USCALE requires a float sampler");
 			glm::detail::u10u10u10u2 Unpack;
-			Unpack.data.x = static_cast<uint>(Texel.x);
-			Unpack.data.y = static_cast<uint>(Texel.y);
-			Unpack.data.z = static_cast<uint>(Texel.z);
-			Unpack.data.w = static_cast<uint>(Texel.w);
+			Unpack.data.x = static_cast<glm::uint>(Texel.x);
+			Unpack.data.y = static_cast<glm::uint>(Texel.y);
+			Unpack.data.z = static_cast<glm::uint>(Texel.z);
+			Unpack.data.w = static_cast<glm::uint>(Texel.w);
 			access::store(Texture, TexelCoord, Layer, Face, Level, Unpack.pack);
 		}
 	};
