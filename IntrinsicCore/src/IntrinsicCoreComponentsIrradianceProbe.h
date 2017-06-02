@@ -34,8 +34,7 @@ struct IrradianceProbeData : Dod::Components::ComponentDataBase
     descFalloffRangePerc.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
     descFalloffExponent.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
 
-    descSHDay.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
-    descSHNight.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+    descSHs.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
   }
 
   _INTR_ARRAY(float) descRadius;
@@ -43,8 +42,7 @@ struct IrradianceProbeData : Dod::Components::ComponentDataBase
   _INTR_ARRAY(float) descFalloffExponent;
   _INTR_ARRAY(uint32_t) descPriority;
 
-  _INTR_ARRAY(Irradiance::SH9) descSHDay;
-  _INTR_ARRAY(Irradiance::SH9) descSHNight;
+  _INTR_ARRAY(_INTR_ARRAY(Irradiance::SH9)) descSHs;
 };
 
 struct IrradianceProbeManager
@@ -71,8 +69,6 @@ struct IrradianceProbeManager
     _descRadius(p_Ref) = 20.0f;
     _descFalloffRangePerc(p_Ref) = 0.2f;
     _descFalloffExp(p_Ref) = 1.0f;
-    memset(&_descSHDay(p_Ref), 0x00, sizeof(Irradiance::SH9));
-    memset(&_descSHNight(p_Ref), 0x00, sizeof(Irradiance::SH9));
   }
 
   // <-
@@ -114,16 +110,15 @@ struct IrradianceProbeManager
                           _N(float), _descPriority(p_Ref), false, false),
         p_Document.GetAllocator());
 
-    p_Properties.AddMember("shDay",
-                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(IrradianceProbe), _N(sh),
-                                             _descSHDay(p_Ref), false, false),
-                           p_Document.GetAllocator());
-    p_Properties.AddMember("shNight",
-                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(IrradianceProbe), _N(sh),
-                                             _descSHNight(p_Ref), false, false),
-                           p_Document.GetAllocator());
+    rapidjson::Value shs = rapidjson::Value(rapidjson::kArrayType);
+    for (uint32_t i = 0u; i < _descSHs(p_Ref).size(); ++i)
+    {
+      shs.PushBack(_INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                     _N(IrradianceProbe), _N(sh),
+                                     _descSHs(p_Ref)[i], false, false),
+                   p_Document.GetAllocator());
+    }
+    p_Properties.AddMember("shs", shs, p_Document.GetAllocator());
   }
 
   // <-
@@ -144,10 +139,15 @@ struct IrradianceProbeManager
       _descPriority(p_Ref) =
           (uint32_t)JsonHelper::readPropertyFloat(p_Properties["priority"]);
 
-    if (p_Properties.HasMember("shDay"))
-      _descSHDay(p_Ref) = JsonHelper::readPropertySH(p_Properties["shDay"]);
-    if (p_Properties.HasMember("shNight"))
-      _descSHNight(p_Ref) = JsonHelper::readPropertySH(p_Properties["shNight"]);
+    if (p_Properties.HasMember("shs"))
+    {
+      _descSHs(p_Ref).clear();
+      const rapidjson::Value& shs = p_Properties["shs"];
+      for (uint32_t i = 0u; i < shs.Size(); ++i)
+      {
+        _descSHs(p_Ref).push_back(JsonHelper::readPropertySH(shs[i]));
+      }
+    }
   }
 
   // <-
@@ -190,13 +190,10 @@ struct IrradianceProbeManager
     return _data.descFalloffExponent[p_Ref._id];
   }
 
-  _INTR_INLINE static Irradiance::SH9& _descSHDay(IrradianceProbeRef p_Ref)
+  _INTR_INLINE static _INTR_ARRAY(Irradiance::SH9) &
+      _descSHs(IrradianceProbeRef p_Ref)
   {
-    return _data.descSHDay[p_Ref._id];
-  }
-  _INTR_INLINE static Irradiance::SH9& _descSHNight(IrradianceProbeRef p_Ref)
-  {
-    return _data.descSHNight[p_Ref._id];
+    return _data.descSHs[p_Ref._id];
   }
 };
 }

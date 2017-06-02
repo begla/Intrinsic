@@ -95,9 +95,9 @@ void main()
   initLightingDataFromGBuffer(d);
 
   d.N = normalize(decodeNormal(normalSample.rg));  
-  d.L = uboPerFrame.skyLightDirVS.xyz;
+  d.L = uboPerFrame.sunLightDirVS.xyz;
   d.V = -normalize(posVS); 
-  d.energy = vec3(20.0);
+  d.energy = vec3(uboPerFrame.sunLightColorAndIntensity.w * 0.5);
   calculateLightingData(d);
 
   const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
@@ -156,9 +156,7 @@ void main()
     + uboPerInstance.data0.x * 0.025).r * 3.0 - 0.5, 0.1, 1.0);
 
   // Sunlight
-  // TODO: Hardcoded light color
-  const vec3 sunlightColor = vec3(1.0, 0.3, 0.1) 
-    * sampleSH(uboPerFrame.skyLightSH, uboPerFrame.skyLightDirWS.xyz) / MATH_PI;
+  const vec3 sunlightColor = uboPerFrame.sunLightColorAndIntensity.xyz;
 
   float shadowAttenuation = cloudShadows * calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
   outColor.rgb += shadowAttenuation * sunlightColor * calcLighting(d);
