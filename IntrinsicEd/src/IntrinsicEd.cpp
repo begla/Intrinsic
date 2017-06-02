@@ -338,8 +338,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
     QDoubleSpinBox* timeModSpinBox = new QDoubleSpinBox();
     timeModSpinBox->setMinimum(0.0f);
-    timeModSpinBox->setMaximum(10.0f);
-    timeModSpinBox->setSingleStep(0.05f);
+    timeModSpinBox->setMaximum(999.0f);
+    timeModSpinBox->setSingleStep(0.1f);
     timeModSpinBox->setToolTip("Time Modulator");
 
     timeModSpinBox->setValue(TaskManager::_timeModulator);
