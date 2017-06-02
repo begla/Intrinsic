@@ -468,8 +468,8 @@ void World::updateDayNightCycle(float p_DeltaT)
 
     sunColorGradient._values[0] = glm::vec4(glm::vec3(1.0f), 0.025f);
     sunColorGradient._values[1] = glm::vec4(1.0f, 0.643f, 0.376f, 0.5f);
-    sunColorGradient._values[2] = glm::vec4(1.0f, 1.0f, 0.9f, 1.0f);
-    sunColorGradient._values[3] = glm::vec4(1.0f, 1.0f, 0.9f, 1.0f);
+    sunColorGradient._values[2] = glm::vec4(1.0f, 0.6f, 0.5f, 1.0f);
+    sunColorGradient._values[3] = glm::vec4(1.0f, 0.6f, 0.5f, 1.0f);
     sunColorGradient._values[4] = glm::vec4(1.0f, 0.643f, 0.376f, 0.5f);
     sunColorGradient._values[5] = glm::vec4(glm::vec3(1.0f), 0.025f);
     sunColorGradient._values[6] = glm::vec4(glm::vec3(1.0f), 0.025f);
