@@ -2,7 +2,7 @@
     "name": "Foggy",
     "properties": {
         "name": "Foggy",
-        "scattering": 0.05000000074505806,
+        "scattering": 0.004999999888241291,
         "sunOrientation": [
             0.0,
             0.0,
