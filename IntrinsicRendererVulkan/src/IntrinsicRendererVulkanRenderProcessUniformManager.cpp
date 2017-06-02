@@ -288,15 +288,17 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
       fragmentData.invViewMatrix =
           UniformManager::_uniformDataSource.inverseViewMatrix;
 
-      // Sky model
+      // Sky
       const glm::vec3 sunDir =
           Core::Resources::PostEffectManager::calcActualSunOrientation(
               Core::Resources::PostEffectManager::_blendTargetRef) *
           glm::vec3(0.0f, 0.0f, 1.0f);
-      fragmentData.skyLightDirWS = glm::vec4(sunDir, 0.0f);
-      fragmentData.skyLightDirVS =
+      fragmentData.sunLightDirWS = glm::vec4(sunDir, 0.0f);
+      fragmentData.sunLightDirVS =
           UniformManager::_uniformDataSource.viewMatrix *
-          fragmentData.skyLightDirWS;
+          fragmentData.sunLightDirWS;
+      fragmentData.sunLightColorAndIntensity =
+          World::_currentSunLightColorAndIntensity;
 
       const float elevation =
           glm::half_pi<float>() -
@@ -305,20 +307,19 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 
       // TODO: Move params to post effect
       SkyModel::ArHosekSkyModelState skyModel =
-          SkyModel::createSkyModelState(1.5f, 0.5f, elevation);
-
-      // TODO: Hardcoded RGB modification
-      const float radianceFactor = World::_currentDayNightFactor * 0.25f;
+          SkyModel::createSkyModelStateRGB(2.0f, 0.0f, elevation);
+      const float radianceFactor = World::_currentDayNightFactor * 0.05f;
       skyModel.radiances[0] *= radianceFactor;
       skyModel.radiances[1] *= radianceFactor;
       skyModel.radiances[2] *= radianceFactor;
 
-      // Project sky SH
+      // Project sky light SH
       {
-        Irradiance::SH9 skySH = SkyModel::project(skyModel, sunDir, 64u);
-        memcpy(fragmentData.skyLightSH, &skySH, sizeof(Irradiance::SH9));
+        Irradiance::SH9 skyLightSH = SkyModel::project(skyModel, sunDir, 64u);
+        memcpy(fragmentData.skyLightSH, &skyLightSH, sizeof(Irradiance::SH9));
       }
 
+      // Pack sky model configs/radiance for sky sampling
       for (uint32_t channelIdx = 0u; channelIdx < 3u; ++channelIdx)
       {
         for (uint32_t i = 0u; i < 9u; ++i)

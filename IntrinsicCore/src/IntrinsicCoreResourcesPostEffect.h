@@ -171,7 +171,7 @@ struct PostEffectManager
   _INTR_INLINE static glm::quat calcActualSunOrientation(PostEffectRef p_Ref)
   {
     return glm::slerp(_descSunOrientation(p_Ref),
-                      World::_currentSkyLightOrientation,
+                      World::_currentSunLightOrientation,
                       _descDayNightFactor(p_Ref));
   }
 

@@ -148,9 +148,7 @@ void main()
       shadowAttenuation = clamp(calculateShadowESM(shadowSample, posLS.z)*1.1 - 0.1, 0.0, 1.0);
     }
 
-    // TODO: Hardcoded light color
-    const vec3 lightColor = vec3(1.0, 0.4, 0.2) 
-      * sampleSH(uboPerFrame.skyLightSH, uboPerFrame.skyLightDirWS.xyz) / MATH_PI;
+    const vec3 lightColor = uboPerFrame.sunLightColorAndIntensity.xyz * uboPerFrame.sunLightColorAndIntensity.w;
     lighting += shadowAttenuation * lightColor;
   }
 

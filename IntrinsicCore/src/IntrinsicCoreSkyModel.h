@@ -215,9 +215,39 @@ cookRadianceConfiguration(ArHosekSkyModelRadianceDataset p_DataSet,
   return res;
 }
 
+// <-
+// <-
+
+/// Creates the sky model state for the given parameters
+_INTR_INLINE ArHosekSkyModelState createSkyModelStateRGB(double p_Turbidity,
+                                                         double p_Albedo,
+                                                         double p_Elevation)
+{
+  ArHosekSkyModelState state;
+
+  state.solarRadius = TERRESTRIAL_SOLAR_RADIUS;
+  state.turbidity = p_Turbidity;
+  state.albedo = p_Albedo;
+  state.elevation = p_Elevation;
+
+  for (uint32_t channel = 0; channel < 3u; ++channel)
+  {
+    cookConfiguration(datasetsRGB[channel], state.configs[channel], p_Turbidity,
+                      p_Albedo, p_Elevation);
+
+    state.radiances[channel] = cookRadianceConfiguration(
+        datasetsRGBRad[channel], p_Turbidity, p_Albedo, p_Elevation);
+  }
+
+  return state;
+}
+
+// <-
+
+/// Calculates the radiance of the sky model setup at the given coordinates
 _INTR_INLINE glm::vec3
-calculateSkyModelRadiance(const ArHosekSkyModelState& p_SkyModelState,
-                          const glm::vec3& p_Theta, const glm::vec3& p_Gamma)
+calculateSkyModelRadianceRGB(const ArHosekSkyModelState& p_SkyModelState,
+                             const glm::vec3& p_Theta, const glm::vec3& p_Gamma)
 {
   glm::vec3 configuration[9];
   for (uint32_t i = 0; i < 9; ++i)
@@ -241,6 +271,9 @@ calculateSkyModelRadiance(const ArHosekSkyModelState& p_SkyModelState,
           configuration[6] * mieM + configuration[7] * zenith);
 }
 
+// <-
+
+/// Projects the current sky model setup to a third order SH
 _INTR_INLINE Irradiance::SH9
 project(const ArHosekSkyModelState& p_SkyModelState,
         const glm::vec3& p_LightDir, uint32_t p_SampleCount)
@@ -249,9 +282,11 @@ project(const ArHosekSkyModelState& p_SkyModelState,
   while (randomRaySamples.size() < p_SampleCount)
   {
     randomRaySamples.push_back(
-        glm::normalize(glm::vec3(Math::calcRandomFloatMinMax(-1.0f, 1.0f),
-                                 Math::calcRandomFloatMinMax(-1.0f, 1.0f),
-                                 Math::calcRandomFloatMinMax(-1.0f, 1.0f))));
+        glm::quat(glm::vec3(
+            Math::calcRandomFloatMinMax(0.0f, glm::two_pi<float>()),
+            Math::calcRandomFloatMinMax(0.0f, glm::two_pi<float>()),
+            Math::calcRandomFloatMinMax(0.0f, glm::two_pi<float>()))) *
+        glm::vec3(0.0f, 0.0f, 1.0));
   }
 
   Irradiance::SH9 result;
@@ -266,7 +301,7 @@ project(const ArHosekSkyModelState& p_SkyModelState,
         glm::acos(glm::max(glm::dot(randomRaySample, p_LightDir), 0.0001f)));
 
     const glm::vec3 sample =
-        calculateSkyModelRadiance(p_SkyModelState, theta, gamma) *
+        calculateSkyModelRadianceRGB(p_SkyModelState, theta, gamma) *
         glm::vec3(p_SkyModelState.radiances[0], p_SkyModelState.radiances[1],
                   p_SkyModelState.radiances[2]);
     result += Irradiance::project(randomRaySample, sample);
@@ -275,29 +310,6 @@ project(const ArHosekSkyModelState& p_SkyModelState,
 
   result *= glm::pi<float>() / weightSum;
   return result;
-}
-
-_INTR_INLINE ArHosekSkyModelState createSkyModelState(double p_Turbidity,
-                                                      double p_Albedo,
-                                                      double p_Elevation)
-{
-  ArHosekSkyModelState state;
-
-  state.solarRadius = TERRESTRIAL_SOLAR_RADIUS;
-  state.turbidity = p_Turbidity;
-  state.albedo = p_Albedo;
-  state.elevation = p_Elevation;
-
-  for (uint32_t channel = 0; channel < 3u; ++channel)
-  {
-    cookConfiguration(datasetsRGB[channel], state.configs[channel], p_Turbidity,
-                      p_Albedo, p_Elevation);
-
-    state.radiances[channel] = cookRadianceConfiguration(
-        datasetsRGBRad[channel], p_Turbidity, p_Albedo, p_Elevation);
-  }
-
-  return state;
 }
 }
 }

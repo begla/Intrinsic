@@ -53,7 +53,8 @@ layout (binding = x) uniform PerFrame \
   vec4 skyModelConfigs[7]; \
   vec4 skyModelRadiances; \
   \
-  vec4 skyLightDirVS; \
-  vec4 skyLightDirWS; \
+  vec4 sunLightDirVS; \
+  vec4 sunLightDirWS; \
   vec4 skyLightSH[7]; \
+  vec4 sunLightColorAndIntensity; \
 } uboPerFrame

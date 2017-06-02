@@ -654,8 +654,8 @@ void IntrinsicEdNodeViewTreeWidget::onCurrentlySelectedEntityChanged(
 namespace
 {
 void captureIrradProbe(
-    const Components::IrradianceProbeRefArray& p_IrradProbeRefs,
-    bool p_CaptureNight)
+    const Components::IrradianceProbeRefArray& p_IrradProbeRefs, bool p_Clear,
+    float p_Time)
 {
   using namespace Intrinsic::Renderer::Vulkan;
 
@@ -720,13 +720,19 @@ void captureIrradProbe(
   RenderPass::Lighting::_globalAmbientFactor = 0.0f;
   RenderPass::VolumetricLighting::_globalScatteringFactor = 0.0f;
   float prevTime = World::_currentTime;
-  World::_currentTime = p_CaptureNight ? 0.75f : 0.25f;
+  World::_currentTime = p_Time;
   float prevMaxFps = Settings::Manager::_targetFrameRate;
   Settings::Manager::_targetFrameRate = 0.0f;
 
   for (uint32_t i = 0u; i < p_IrradProbeRefs.size(); ++i)
   {
     Components::IrradianceProbeRef irradProbeRef = p_IrradProbeRefs[i];
+
+    if (p_Clear)
+    {
+      Components::IrradianceProbeManager::_descSHs(irradProbeRef).clear();
+    }
+
     Entity::EntityRef currentEntity =
         Components::IrradianceProbeManager::_entity(irradProbeRef);
     Components::NodeRef irradNodeRef =
@@ -845,26 +851,25 @@ void captureIrradProbe(
         const _INTR_STRING filePath =
             "media/irradiance_probes/" +
             Entity::EntityManager::_name(currentEntity).getString() +
-            "_cube_atlas" + ".dds";
+            "_cube_atlas_" + timeString + ".dds";
         gli::save_dds(tex, filePath.c_str());
       }
 
 #endif // STORE_ATLAS_DDS
       {
+        _INTR_STRING timeString = StringUtil::toString(p_Time);
+        StringUtil::replace(timeString, ".", "-");
+
         const _INTR_STRING filePath =
             "media/irradiance_probes/" +
-            Entity::EntityManager::_name(currentEntity).getString() + "_cube" +
-            ".dds";
+            Entity::EntityManager::_name(currentEntity).getString() + "_cube_" +
+            timeString + ".dds";
         gli::save_dds(texCube, filePath.c_str());
       }
 
       // Store SH irrad.
-      if (!p_CaptureNight)
-        Components::IrradianceProbeManager::_descSHDay(irradProbeRef) =
-            Irradiance::project(texCube);
-      else
-        Components::IrradianceProbeManager::_descSHNight(irradProbeRef) =
-            Irradiance::project(texCube);
+      Components::IrradianceProbeManager::_descSHs(irradProbeRef)
+          .push_back(Irradiance::project(texCube));
     }
   }
 
@@ -884,6 +889,8 @@ void captureIrradProbe(
   World::destroyNodeFull(camNodeRef);
 }
 }
+
+const uint32_t _shTimeSamples = 8u;
 
 void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
 {
@@ -907,8 +914,8 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
     RenderSystem::_customBackbufferDimensions = cubeMapRes;
     RenderSystem::resizeSwapChain(true);
 
-    captureIrradProbe({irradProbeRef}, false);
-    captureIrradProbe({irradProbeRef}, true);
+    for (uint32_t i = 0u; i < _shTimeSamples; ++i)
+      captureIrradProbe({irradProbeRef}, i == 0, i / (float)_shTimeSamples);
 
     RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
     RenderSystem::resizeSwapChain(true);
@@ -925,8 +932,9 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureAllIrradianceProbes()
   RenderSystem::_customBackbufferDimensions = cubeMapRes;
   RenderSystem::resizeSwapChain(true);
 
-  captureIrradProbe(Components::IrradianceProbeManager::_activeRefs, false);
-  captureIrradProbe(Components::IrradianceProbeManager::_activeRefs, true);
+  for (uint32_t i = 0u; i < _shTimeSamples; ++i)
+    captureIrradProbe(Components::IrradianceProbeManager::_activeRefs, i == 0,
+                      i / (float)_shTimeSamples);
 
   RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
   RenderSystem::resizeSwapChain(true);

@@ -137,7 +137,10 @@ void main()
     const float rayDist = length(ray);
     const vec3 rayDir = ray / rayDist;
 
-    const vec3 fogColor = sampleSH(uboPerFrame.skyLightSH, rayDir) / MATH_PI;
+    // Generate distance fog as a mixture of skylight irradiance and sunlight contribution
+    const float sunAmount = max(dot(rayDir, uboPerFrame.sunLightDirWS.xyz), 0.0);
+    vec3 fogColor = sampleSH(uboPerFrame.skyLightSH, rayDir) / MATH_PI;
+    fogColor += fogColor * uboPerFrame.sunLightColorAndIntensity.xyz * uboPerFrame.sunLightColorAndIntensity.w * pow(sunAmount, 8.0);
 
     fog.a = clamp(exp((-rayDist + fogStart) * fogDensity), 0.0, 1.0);
     fog.rgb = (1.0 - fog.a) * fogColor;

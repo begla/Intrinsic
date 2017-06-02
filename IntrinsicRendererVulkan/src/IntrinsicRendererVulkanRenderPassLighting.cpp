@@ -303,11 +303,35 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
           Components::IrradianceProbeManager::_descFalloffExp(irradProbeRef),
           0.0f, 0.0f);
 
-      // Blend day/night SH and copy to memory
-      Irradiance::SH9 blendedSH = Irradiance::blend(
-          Components::IrradianceProbeManager::_descSHNight(irradProbeRef),
-          Components::IrradianceProbeManager::_descSHDay(irradProbeRef),
-          World::_currentDayNightFactor);
+      const _INTR_ARRAY(Irradiance::SH9)& shs =
+          Components::IrradianceProbeManager::_descSHs(irradProbeRef);
+
+      // Blend SHs according to the time of day
+      Irradiance::SH9 blendedSH;
+      if (!shs.empty())
+      {
+        if (shs.size() >= 2u)
+        {
+          const uint32_t leftIdx =
+              std::min((uint32_t)(World::_currentTime * shs.size()),
+                       (uint32_t)shs.size() - 2u);
+
+          const float leftPerc = leftIdx / (float)shs.size();
+          const float rightPerc = (leftIdx + 1u) / (float)shs.size();
+
+          const float interp =
+              (World::_currentTime - leftPerc) / (rightPerc - leftPerc);
+
+          const Irradiance::SH9& left = shs[leftIdx];
+          const Irradiance::SH9& right = shs[leftIdx + 1u];
+
+          blendedSH = Irradiance::blend(left, right, interp);
+        }
+        else
+        {
+          blendedSH = shs[0];
+        }
+      }
 
       memcpy(_irradProbeBufferMemory[_currentIrradProbeCount].data, &blendedSH,
              sizeof(Irradiance::SH9));
@@ -364,6 +388,7 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
       else
       {
         // Reset counts
+        // TODO: Suboptimal
         for (uint32_t y = 0u; y < _gridRes.y; ++y)
         {
           for (uint32_t x = 0u; x < _gridRes.x; ++x)

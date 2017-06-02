@@ -73,18 +73,20 @@ vec3 calculateSkyModelRadiance(
 
 void main()
 {
-  // TODO: Hack that fades sky with ambient factor
   vec4 albedo = vec4(0.0);
   const vec3 V = normalize(inPosVS);
 
   const float theta = acos(max(dot(V, inUpVS), 0.0001));
-  const float gamma = acos(max(dot(V, uboPerFrame.skyLightDirVS.xyz), 0.0001));
+  const float gamma = acos(max(dot(V, uboPerFrame.sunLightDirVS.xyz), 0.0001));
+
+  // Apply sky model
   albedo.rgb += clamp(calculateSkyModelRadiance(vec3(theta), vec3(gamma)) 
-  	* uboPerFrame.skyModelRadiances.rgb / MATH_PI, 0.0, 10.0);
+  	* uboPerFrame.skyModelRadiances.rgb, 0.0, 100.0);
   //albedo.rgb += sampleSH(uboPerFrame.skyLightSH, inNormal);
 
-  // Fake sun/moon
-  albedo.rgb += pow(clamp(dot(uboPerFrame.skyLightDirVS.xyz, V), 0.0, 1.0), 1500.0);
+  // Sun/Moon
+  albedo.rgb += uboPerFrame.sunLightColorAndIntensity.xyz * uboPerFrame.sunLightColorAndIntensity.w 
+    * pow(clamp(dot(uboPerFrame.sunLightDirVS.xyz, V), 0.0, 1.0), 1500.0);
 
   outAlbedo = vec4(albedo.rgb, 1.0);
 }

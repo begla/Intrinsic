@@ -36,9 +36,10 @@ struct PerFrameDataFrament
   glm::vec4 skyModelConfigs[7];
   glm::vec4 skyModelRadiances;
 
-  glm::vec4 skyLightDirVS;
-  glm::vec4 skyLightDirWS;
+  glm::vec4 sunLightDirVS;
+  glm::vec4 sunLightDirWS;
   glm::vec4 skyLightSH[7];
+  glm::vec4 sunLightColorAndIntensity;
 };
 
 struct UniformBufferDataEntry

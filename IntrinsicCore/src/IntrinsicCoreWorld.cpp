@@ -22,7 +22,8 @@ namespace Core
 Components::NodeRef World::_rootNode;
 Components::CameraRef World::_activeCamera;
 float World::_currentTime = 0.1f;
-glm::quat World::_currentSkyLightOrientation = glm::quat();
+glm::quat World::_currentSunLightOrientation = glm::quat();
+glm::vec4 World::_currentSunLightColorAndIntensity = glm::vec4();
 float World::_currentDayNightFactor = 0.0f;
 
 uint32_t calcOffsetToParent(const Components::NodeRefArray& p_Nodes,
@@ -455,13 +456,27 @@ void World::load(const _INTR_STRING& p_FilePath)
 
 void World::updateDayNightCycle(float p_DeltaT)
 {
+  Math::Gradient<glm::vec4, 7u> sunColorGradient;
+  {
+    sunColorGradient._percentages[0] = 0.0f; // Sunrise
+    sunColorGradient._percentages[1] = 0.05f;
+    sunColorGradient._percentages[2] = 0.1f;
+    sunColorGradient._percentages[3] = 0.40f;
+    sunColorGradient._percentages[4] = 0.45f; // Dawn
+    sunColorGradient._percentages[5] = 0.5f;  // Night
+    sunColorGradient._percentages[6] = 1.0f;
+
+    sunColorGradient._values[0] = glm::vec4(glm::vec3(1.0f), 0.25f);
+    sunColorGradient._values[1] = glm::vec4(1.0f, 0.643f, 0.376f, 5.0f);
+    sunColorGradient._values[2] = glm::vec4(1.0f, 1.0f, 0.9f, 10.0f);
+    sunColorGradient._values[3] = glm::vec4(1.0f, 1.0f, 0.9f, 10.0f);
+    sunColorGradient._values[4] = glm::vec4(1.0f, 0.643f, 0.376f, 5.0f);
+    sunColorGradient._values[5] = glm::vec4(glm::vec3(1.0f), 0.25f);
+    sunColorGradient._values[6] = glm::vec4(glm::vec3(1.0f), 0.25f);
+  }
+
   static const float dayNightCycleDurationInS = 20.0f * 60.0f;
   static const float dayNightFadeInPerc = 0.1f;
-  static const glm::vec3 dayLightColor = glm::vec3(1.0f);
-  static const float dayLightTemp = 2220.0f;
-  static const glm::vec3 nightLightColor = glm::vec3(1.0f);
-  static const float nightLightTemp = 5600.0f;
-  static const float dayLightIntens = 10.0f;
   static const float nightLightIntens = 0.05f;
 
   _currentTime += p_DeltaT / dayNightCycleDurationInS;
@@ -499,9 +514,10 @@ void World::updateDayNightCycle(float p_DeltaT)
   float sunAngleRad =
       glm::clamp(std::sin(_currentTime * glm::pi<float>()) * glm::pi<float>(),
                  glm::radians(2.5f), glm::radians(177.5f));
-  _currentSkyLightOrientation = glm::quat(glm::vec3(-sunAngleRad, 0.0f, 0.0f));
-
-  _currentDayNightFactor = glm::mix(0.01f, 1.0f, currentDayNightFactor);
+  _currentSunLightOrientation = glm::quat(glm::vec3(-sunAngleRad, 0.0f, 0.0f));
+  _currentDayNightFactor = glm::mix(0.05f, 1.0f, currentDayNightFactor);
+  _currentSunLightColorAndIntensity =
+      Math::interpolateGradient<glm::vec4, 7u>(sunColorGradient, _currentTime);
 }
 }
 }

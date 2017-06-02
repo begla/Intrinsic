@@ -49,8 +49,10 @@ struct World
   }
 
   static float _currentTime;
-  static glm::quat _currentSkyLightOrientation;
   static float _currentDayNightFactor;
+
+  static glm::quat _currentSunLightOrientation;
+  static glm::vec4 _currentSunLightColorAndIntensity;
 
 protected:
   static Components::NodeRef _rootNode;
