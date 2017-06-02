@@ -856,6 +856,8 @@ void captureIrradProbe(
       }
 
 #endif // STORE_ATLAS_DDS
+
+#if defined(STORE_CUBE_DDS)
       {
         _INTR_STRING timeString = StringUtil::toString(p_Time);
         StringUtil::replace(timeString, ".", "-");
@@ -866,6 +868,7 @@ void captureIrradProbe(
             timeString + ".dds";
         gli::save_dds(texCube, filePath.c_str());
       }
+#endif // STORE_CUBE_DDS
 
       // Store SH irrad.
       Components::IrradianceProbeManager::_descSHs(irradProbeRef)
