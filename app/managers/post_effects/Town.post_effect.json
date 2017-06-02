@@ -2,7 +2,7 @@
     "name": "Town",
     "properties": {
         "name": "Town",
-        "scattering": 0.0020000000949949028,
+        "scattering": 0.05000000074505806,
         "sunOrientation": [
             0.0,
             0.0,
@@ -13,6 +13,6 @@
         "skyLightIntensity": 0.05000000074505806,
         "skyTurbidity": 2.0,
         "skyAlbedo": 0.0,
-        "sunIntensity": 10.0
+        "sunIntensity": 20.0
     }
 }
