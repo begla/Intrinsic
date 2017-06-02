@@ -204,8 +204,7 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
   // Uniforms for the render passes
   {
     UniformManager::_uniformDataSource.postParams0.x =
-        Core::Resources::PostEffectManager::_descAmbientFactor(
-            Core::Resources::PostEffectManager::_blendTargetRef);
+        RenderPass::Lighting::_globalAmbientFactor;
     UniformManager::_uniformDataSource.postParams0.y =
         World::_currentDayNightFactor;
 
@@ -299,6 +298,9 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
           fragmentData.sunLightDirWS;
       fragmentData.sunLightColorAndIntensity =
           World::_currentSunLightColorAndIntensity;
+      fragmentData.sunLightColorAndIntensity.w *=
+          Core::Resources::PostEffectManager::_descSunIntensity(
+              Core::Resources::PostEffectManager::_blendTargetRef);
 
       const float elevation =
           glm::half_pi<float>() -
@@ -307,8 +309,16 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 
       // TODO: Move params to post effect
       SkyModel::ArHosekSkyModelState skyModel =
-          SkyModel::createSkyModelStateRGB(2.0f, 0.0f, elevation);
-      const float radianceFactor = World::_currentDayNightFactor * 0.05f;
+          SkyModel::createSkyModelStateRGB(
+              Core::Resources::PostEffectManager::_descSkyTurbidity(
+                  Core::Resources::PostEffectManager::_blendTargetRef),
+              Core::Resources::PostEffectManager::_descSkyAlbedo(
+                  Core::Resources::PostEffectManager::_blendTargetRef),
+              elevation);
+      const float radianceFactor =
+          World::_currentDayNightFactor *
+          Core::Resources::PostEffectManager::_descSkyLightIntensity(
+              Core::Resources::PostEffectManager::_blendTargetRef);
       skyModel.radiances[0] *= radianceFactor;
       skyModel.radiances[1] *= radianceFactor;
       skyModel.radiances[2] *= radianceFactor;

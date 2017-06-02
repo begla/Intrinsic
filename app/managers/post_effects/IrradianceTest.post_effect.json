@@ -9,7 +9,10 @@
             0.0,
             1.0
         ],
-        "ambientFactor": 1.0,
-        "dayNightFactor": 0.0
+        "dayNightFactor": 0.0,
+        "skyLightIntensity": 0.05000000074505806,
+        "skyTurbidity": 2.0,
+        "skyAlbedo": 0.0,
+        "sunIntensity": 0.0
     }
 }

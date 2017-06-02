@@ -433,10 +433,7 @@ void renderLighting(Resources::FramebufferRef p_FramebufferRef,
   {
     // Post effect data
     _perInstanceData.data0.x = TaskManager::_totalTimePassed;
-    _perInstanceData.data0.y =
-        Core::Resources::PostEffectManager::_descAmbientFactor(
-            Core::Resources::PostEffectManager::_blendTargetRef) *
-        Lighting::_globalAmbientFactor;
+    _perInstanceData.data0.y = Lighting::_globalAmbientFactor;
     _perInstanceData.data0.z = World::_currentDayNightFactor;
 
     const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
