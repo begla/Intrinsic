@@ -73,7 +73,7 @@ struct PostEffectManager
   {
     _descVolumetricLightingScattering(p_Ref) = 0.0f;
     _descSunOrientation(p_Ref) = glm::quat();
-    _descSunIntensity(p_Ref) = 10.0f;
+    _descSunIntensity(p_Ref) = 20.0f;
     _descDayNightFactor(p_Ref) = 1.0f;
     _descSkyTurbidity(p_Ref) = 2.0f;
     _descSkyAlbedo(p_Ref) = 0.0f;
