@@ -102,10 +102,7 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
         Core::Resources::PostEffectManager::_descVolumetricLightingScattering(
             Core::Resources::PostEffectManager::_blendTargetRef) *
         VolumetricLighting::_globalScatteringFactor;
-    _perInstanceData.data0.z =
-        Core::Resources::PostEffectManager::_descAmbientFactor(
-            Core::Resources::PostEffectManager::_blendTargetRef) *
-        Lighting::_globalAmbientFactor;
+    _perInstanceData.data0.z = Lighting::_globalAmbientFactor;
   }
 
   _perInstanceData.haltonSamples =

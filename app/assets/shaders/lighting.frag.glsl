@@ -143,7 +143,7 @@ void main()
   const float specLod = burleyToMipApprox(d.roughness);
   vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
 
-  outColor.rgb += uboPerInstance.data0.z * uboPerInstance.data0.y 
+  outColor.rgb += uboPerInstance.data0.y * uboPerInstance.data0.z * uboPerInstance.data0.y 
     * parameter0Sample.z * spec;
 
   // Emissive

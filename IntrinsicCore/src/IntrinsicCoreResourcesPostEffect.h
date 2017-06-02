@@ -32,8 +32,11 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
 
     descSunOrientation.resize(_INTR_MAX_POST_EFFECT_COUNT);
 
-    descAmbientFactor.resize(_INTR_MAX_POST_EFFECT_COUNT);
     descDayNightFactor.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descSunIntensity.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descSkyAlbedo.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descSkyLightIntensity.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descSkyTurbidity.resize(_INTR_MAX_POST_EFFECT_COUNT);
   }
 
   // <-
@@ -42,8 +45,11 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
 
   _INTR_ARRAY(glm::quat) descSunOrientation;
 
-  _INTR_ARRAY(float) descAmbientFactor;
   _INTR_ARRAY(float) descDayNightFactor;
+  _INTR_ARRAY(float) descSunIntensity;
+  _INTR_ARRAY(float) descSkyTurbidity;
+  _INTR_ARRAY(float) descSkyAlbedo;
+  _INTR_ARRAY(float) descSkyLightIntensity;
 };
 
 struct PostEffectManager
@@ -67,8 +73,11 @@ struct PostEffectManager
   {
     _descVolumetricLightingScattering(p_Ref) = 0.0f;
     _descSunOrientation(p_Ref) = glm::quat();
-    _descAmbientFactor(p_Ref) = 1.0f;
+    _descSunIntensity(p_Ref) = 10.0f;
     _descDayNightFactor(p_Ref) = 1.0f;
+    _descSkyTurbidity(p_Ref) = 2.0f;
+    _descSkyAlbedo(p_Ref) = 0.0f;
+    _descSkyLightIntensity(p_Ref) = 0.05f;
   }
 
   // <-
@@ -106,14 +115,29 @@ struct PostEffectManager
                                              false),
                            p_Document.GetAllocator());
     p_Properties.AddMember(
-        "ambientFactor",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
-                          _descAmbientFactor(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
         "dayNightFactor",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
                           _descDayNightFactor(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "skyLightIntensity",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descSkyLightIntensity(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "skyTurbidity",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descSkyTurbidity(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "skyAlbedo",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descSkyAlbedo(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "sunIntensity",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descSunIntensity(p_Ref), false, false),
         p_Document.GetAllocator());
   }
 
@@ -133,9 +157,18 @@ struct PostEffectManager
     if (p_Properties.HasMember("sunOrientation"))
       _descSunOrientation(p_Ref) =
           JsonHelper::readPropertyQuat(p_Properties["sunOrientation"]);
-    if (p_Properties.HasMember("ambientFactor"))
-      _descAmbientFactor(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["ambientFactor"]);
+    if (p_Properties.HasMember("sunIntensity"))
+      _descSunIntensity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["sunIntensity"]);
+    if (p_Properties.HasMember("skyTurbidity"))
+      _descSkyTurbidity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["skyTurbidity"]);
+    if (p_Properties.HasMember("skyAlbedo"))
+      _descSkyAlbedo(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["skyAlbedo"]);
+    if (p_Properties.HasMember("skyLightIntensity"))
+      _descSkyLightIntensity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["skyLightIntensity"]);
     if (p_Properties.HasMember("dayNightFactor"))
       _descDayNightFactor(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["dayNightFactor"]);
@@ -188,11 +221,18 @@ struct PostEffectManager
     _descSunOrientation(p_Target) =
         glm::slerp(_descSunOrientation(p_Left), _descSunOrientation(p_Right),
                    p_BlendFactor);
-    _descAmbientFactor(p_Target) = glm::mix(
-        _descAmbientFactor(p_Left), _descAmbientFactor(p_Right), p_BlendFactor);
     _descDayNightFactor(p_Target) =
         glm::mix(_descDayNightFactor(p_Left), _descDayNightFactor(p_Right),
                  p_BlendFactor);
+    _descSkyTurbidity(p_Target) = glm::mix(
+        _descSkyTurbidity(p_Left), _descSkyTurbidity(p_Right), p_BlendFactor);
+    _descSkyAlbedo(p_Target) = glm::mix(_descSkyAlbedo(p_Left),
+                                        _descSkyAlbedo(p_Right), p_BlendFactor);
+    _descSkyLightIntensity(p_Target) =
+        glm::mix(_descSkyLightIntensity(p_Left),
+                 _descSkyLightIntensity(p_Right), p_BlendFactor);
+    _descSunIntensity(p_Target) = glm::mix(
+        _descSunIntensity(p_Left), _descSunIntensity(p_Right), p_BlendFactor);
   }
 
   // <-
@@ -211,13 +251,25 @@ struct PostEffectManager
   {
     return _data.descSunOrientation[p_Ref._id];
   }
-  _INTR_INLINE static float& _descAmbientFactor(PostEffectRef p_Ref)
-  {
-    return _data.descAmbientFactor[p_Ref._id];
-  }
   _INTR_INLINE static float& _descDayNightFactor(PostEffectRef p_Ref)
   {
     return _data.descDayNightFactor[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descSkyLightIntensity(PostEffectRef p_Ref)
+  {
+    return _data.descSkyLightIntensity[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descSkyAlbedo(PostEffectRef p_Ref)
+  {
+    return _data.descSkyAlbedo[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descSkyTurbidity(PostEffectRef p_Ref)
+  {
+    return _data.descSkyTurbidity[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descSunIntensity(PostEffectRef p_Ref)
+  {
+    return _data.descSunIntensity[p_Ref._id];
   }
 
   // Static members
