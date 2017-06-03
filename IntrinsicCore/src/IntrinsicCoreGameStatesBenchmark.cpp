@@ -118,6 +118,7 @@ void Benchmark::assembleBenchmarkPaths(
     Path path;
     path.name = pathDesc["name"].GetString();
     path.camSpeed = pathDesc["camSpeed"].GetFloat();
+    path.currentTime = pathDesc["currentTime"].GetFloat();
 
     for (uint32_t j = 0u; j < nodeDescs.Size(); ++j)
     {
@@ -168,6 +169,8 @@ void Benchmark::update(float p_DeltaT)
   Components::NodeManager::_orientation(camNodeRef) =
       glm::quat_cast(glm::mat3(camRight, camUp, camForward));
   Components::NodeManager::updateTransforms(camNodeRef);
+
+  World::_currentTime = currentPath.currentTime;
 
   _pathPos += p_DeltaT * currentPath.camSpeed;
   data.meanFps = 1.0f / TaskManager::_lastActualFrameDuration;
