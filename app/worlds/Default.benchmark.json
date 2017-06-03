@@ -3,7 +3,7 @@
 		"name" : "TownDay",
 		"nodes" : ["PathA1", "PathA2", "PathA3", "PathA4", "PathA5", "PathA6", "PathA7", "PathA8"],
 		"camSpeed" : 0.05,
-		"currentTime": 0.1
+		"currentTime": 0.05
 	},
 	{
 		"name" : "TownNight",
