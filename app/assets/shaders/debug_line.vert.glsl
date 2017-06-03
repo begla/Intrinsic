@@ -31,12 +31,12 @@ layout (location = 1) out vec3 outColor;
 layout (binding = 0) uniform PerInstance
 {
   mat4 worldViewProjMatrix;
-  mat4 normalMatrix;
+  mat4 viewMatrix;
 } uboPerInstance;
 
 void main()
 {
   gl_Position = uboPerInstance.worldViewProjMatrix * vec4(inPosition.xyz, 1.0);
-  outNormal = (uboPerInstance.normalMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz;
+  outNormal = (uboPerInstance.viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz;
   outColor = inColor.xyz;
 }

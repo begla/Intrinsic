@@ -28,9 +28,10 @@ typedef _INTR_ARRAY(_INTR_ARRAY(Dod::Ref)) DrawCallArray;
 struct MeshPerInstanceDataVertex
 {
   glm::mat4 worldMatrix;
-  glm::mat4 normalMatrix;
   glm::mat4 worldViewProjMatrix;
   glm::mat4 worldViewMatrix;
+  glm::mat4 viewProjMatrix;
+  glm::mat4 viewMatrix;
 
   glm::vec4 data0;
 };

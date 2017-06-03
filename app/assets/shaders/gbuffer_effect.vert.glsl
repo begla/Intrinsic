@@ -37,12 +37,15 @@ layout (location = 5) out vec4 outPosition;
 
 void main()
 {
-  gl_Position = uboPerInstance.worldViewProjMatrix * vec4(inPosition.xyz + inNormal * 0.1, 1.0);
-  outPosition = gl_Position;
+  const vec3 worldNormal = (uboPerInstance.worldMatrix 
+    * vec4(inNormal.xyz, 0.0)).xyz;
+  const vec3 worldPos = (uboPerInstance.worldMatrix 
+    * vec4(inPosition.xyz, 1.0)).xyz + worldNormal * 0.1; // Offset the effect from the other passes
+  gl_Position = outPosition = uboPerInstance.viewProjMatrix * vec4(worldPos, 1.0);
 
   outColor = inColor.xyz;
-  outNormal = normalize(uboPerInstance.normalMatrix * vec4(inNormal, 0.0)).xyz;
-  outTangent = normalize(uboPerInstance.normalMatrix * vec4(inTangent, 0.0)).xyz;
-  outBinormal = normalize(uboPerInstance.normalMatrix * vec4(inBinormal, 0.0)).xyz;
+  outNormal = normalize(uboPerInstance.worldViewMatrix * vec4(inNormal, 0.0)).xyz;
+  outTangent = normalize(uboPerInstance.worldViewMatrix * vec4(inTangent, 0.0)).xyz;
+  outBinormal = normalize(uboPerInstance.worldViewMatrix * vec4(inBinormal, 0.0)).xyz;
   outUV0 = inUV0;
 }

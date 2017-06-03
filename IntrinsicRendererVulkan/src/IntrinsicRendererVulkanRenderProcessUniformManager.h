@@ -81,7 +81,6 @@ struct UniformManager
     glm::mat4 inverseProjectionMatrix;
     glm::mat4 inverseViewProjectionMatrix;
     glm::vec4 cameraWorldPosition;
-    glm::mat4 normalMatrix;
     glm::mat4 viewMatrix;
     glm::mat4 prevViewMatrix;
     glm::vec4 haltonSamples;

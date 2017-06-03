@@ -36,7 +36,7 @@ layout (binding = 0) uniform PerInstance
 {
   mat4 worldMatrix;
   mat4 worldViewProjMatrix;
-  mat4 normalMatrix;
+  mat4 viewMatrix;
 
   vec4 colorTintX;
   vec4 colorTintY;
@@ -73,5 +73,5 @@ void main()
   gl_Position = uboPerInstance.worldViewProjMatrix * vec4(localPos, 1.0);
   gl_Position.z *= 0.001;
 
-  outNormal = (uboPerInstance.normalMatrix * vec4(inNormal, 0.0)).xyz;
+  outNormal = (uboPerInstance.viewMatrix * vec4(inNormal, 0.0)).xyz;
 }

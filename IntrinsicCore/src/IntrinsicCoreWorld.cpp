@@ -511,7 +511,7 @@ void World::updateDayNightCycle(float p_DeltaT)
     currentPerc = nightPerc;
   }
 
-  float sunAngleRad =
+  const float sunAngleRad =
       glm::clamp(std::sin(_currentTime * glm::pi<float>()) * glm::pi<float>(),
                  glm::radians(2.5f), glm::radians(177.5f));
   _currentSunLightOrientation = glm::quat(glm::vec3(-sunAngleRad, 0.0f, 0.0f));

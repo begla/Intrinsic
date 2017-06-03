@@ -32,7 +32,7 @@ layout (binding = 1) uniform PerInstance
   mat4 invWorldRotMatrix;
   vec4 invWorldPos;
   mat4 viewProjMatrix;
-  mat4 normalMatrix;
+  mat4 viewMatrix;
 
   vec4 planeNormal;
 
@@ -111,7 +111,7 @@ void main()
   GBuffer gbuffer;
   {
     gbuffer.albedo = vec4(color, 1.0);
-    gbuffer.normal = normalize((uboPerInstance.normalMatrix * vec4(uboPerInstance.planeNormal.xyz, 0.0)).xyz);
+    gbuffer.normal = normalize((uboPerInstance.viewMatrix * vec4(uboPerInstance.planeNormal.xyz, 0.0)).xyz);
     gbuffer.metalMask = 0.0;
     gbuffer.specular = 0.5;
     gbuffer.roughness = 0.5;
