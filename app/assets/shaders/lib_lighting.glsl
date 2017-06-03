@@ -24,7 +24,7 @@
 #define ESM_EXPONENTS vec2(ESM_POSITIVE_EXPONENT, ESM_NEGATIVE_EXPONENT)
 
 const float translDistortion = 0.2;
-const float translPower = 12.0;
+const float translPower = 8.0;
 const float translScale = 1.0;
 const vec3 translAmbient = vec3(0.0);
 
