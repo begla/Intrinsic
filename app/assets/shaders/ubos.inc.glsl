@@ -12,6 +12,7 @@
 { \
   vec4 haltonSamples; \
   vec4 camParams; \
+  vec4 postParams0; \
 } uboPerInstance
 
 #define PER_INSTANCE_DATA_SSAO_TEMP_REPROJ layout (binding = 0) uniform PerInstance \

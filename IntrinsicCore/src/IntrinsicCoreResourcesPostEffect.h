@@ -37,6 +37,8 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
     descSkyAlbedo.resize(_INTR_MAX_POST_EFFECT_COUNT);
     descSkyLightIntensity.resize(_INTR_MAX_POST_EFFECT_COUNT);
     descSkyTurbidity.resize(_INTR_MAX_POST_EFFECT_COUNT);
+
+    descDoFStartDistance.resize(_INTR_MAX_POST_EFFECT_COUNT);
   }
 
   // <-
@@ -50,6 +52,8 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(float) descSkyTurbidity;
   _INTR_ARRAY(float) descSkyAlbedo;
   _INTR_ARRAY(float) descSkyLightIntensity;
+
+  _INTR_ARRAY(float) descDoFStartDistance;
 };
 
 struct PostEffectManager
@@ -78,6 +82,7 @@ struct PostEffectManager
     _descSkyTurbidity(p_Ref) = 2.0f;
     _descSkyAlbedo(p_Ref) = 0.0f;
     _descSkyLightIntensity(p_Ref) = 0.05f;
+    _descDoFStartDistance(p_Ref) = -1.0f;
   }
 
   // <-
@@ -139,6 +144,13 @@ struct PostEffectManager
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
                           _descSunIntensity(p_Ref), false, false),
         p_Document.GetAllocator());
+
+    p_Properties.AddMember("dofStartDistance",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(DepthOfField), _N(float),
+                                             _descDoFStartDistance(p_Ref),
+                                             false, false),
+                           p_Document.GetAllocator());
   }
 
   // <-
@@ -172,6 +184,10 @@ struct PostEffectManager
     if (p_Properties.HasMember("dayNightFactor"))
       _descDayNightFactor(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["dayNightFactor"]);
+
+    if (p_Properties.HasMember("dofStartDistance"))
+      _descDoFStartDistance(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["dofStartDistance"]);
   }
 
   // <-
@@ -233,6 +249,10 @@ struct PostEffectManager
                  _descSkyLightIntensity(p_Right), p_BlendFactor);
     _descSunIntensity(p_Target) = glm::mix(
         _descSunIntensity(p_Left), _descSunIntensity(p_Right), p_BlendFactor);
+
+    _descDoFStartDistance(p_Target) =
+        glm::mix(_descDoFStartDistance(p_Left), _descDoFStartDistance(p_Right),
+                 p_BlendFactor);
   }
 
   // <-
@@ -270,6 +290,11 @@ struct PostEffectManager
   _INTR_INLINE static float& _descSunIntensity(PostEffectRef p_Ref)
   {
     return _data.descSunIntensity[p_Ref._id];
+  }
+
+  _INTR_INLINE static float& _descDoFStartDistance(PostEffectRef p_Ref)
+  {
+    return _data.descDoFStartDistance[p_Ref._id];
   }
 
   // Static members

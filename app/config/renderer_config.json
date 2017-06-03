@@ -25,7 +25,8 @@
 			"name" : "PerInstanceDataPostCombine",
 			"entries" : [
 				"HaltonSamples",
-				"CameraParameters"
+				"CameraParameters",
+				"PostParams0"
 			]
 		},
 		{

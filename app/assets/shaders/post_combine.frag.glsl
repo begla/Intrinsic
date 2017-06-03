@@ -87,11 +87,16 @@ void main()
   const vec3 sceneBlurred = sampleColorOffsets(sceneBlurredTex, inUV0, colorOffsets, framebufferSize);
 
   const float depth = textureLod(depthBufferTex, inUV0, 0.0).r;
-  const float linDepth = linearizeDepth(depth, uboPerInstance.camParams.x, uboPerInstance.camParams.y) * uboPerInstance.camParams.y;
+  const float linDepth = linearizeDepth(depth, uboPerInstance.camParams.x, uboPerInstance.camParams.y) 
+    * uboPerInstance.camParams.y;
 
   // DoF fake
-  const float blurFactor = clamp((linDepth - 500.0) / 50.0, 0.0, 1.0);
-  scene = mix(scene, sceneBlurred, blurFactor);
+  const float dofStartDist = uboPerInstance.postParams0.z;
+  if (dofStartDist >= 0.0)
+  {
+    const float blurFactor = pow(clamp((linDepth - dofStartDist) / dofStartDist, 0.0, 1.0), 4.0);
+    scene = mix(scene, sceneBlurred, blurFactor);    
+  }
 
   const vec4 bloom = textureLod(bloomTex, inUV0, 0.0).rgba;
   const vec4 lensDirt = textureLod(lensDirtTex, inUV0, 0.0).rgba;
