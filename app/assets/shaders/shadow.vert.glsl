@@ -34,11 +34,19 @@ INPUT();
 // Output
 layout (location = 0) out vec2 outUV0;
 
+const float maxNormalLen = 200.0;
+
 void main()
 {
   const vec3 localPos = inPosition;
-  const vec3 worldNormal = (uboPerInstance.worldMatrix 
+  vec3 worldNormal = (uboPerInstance.worldMatrix 
     * vec4(inNormal.xyz, 0.0)).xyz;
+  const float worldNormalLen = length(worldNormal);
+
+  if (worldNormalLen > maxNormalLen)
+  {
+    worldNormal = worldNormal / worldNormalLen * maxNormalLen;
+  }
   const vec3 worldPos = (uboPerInstance.worldMatrix 
     * vec4(localPos.xyz, 1.0)).xyz - worldNormal * 0.05; // Shadow bias
   gl_Position = uboPerInstance.viewProjMatrix * vec4(worldPos, 1.0);
