@@ -48,7 +48,7 @@ void main()
     worldNormal = worldNormal / worldNormalLen * maxNormalLen;
   }
   const vec3 worldPos = (uboPerInstance.worldMatrix 
-    * vec4(localPos.xyz, 1.0)).xyz - worldNormal * 0.05; // Shadow bias
+    * vec4(localPos.xyz, 1.0)).xyz - worldNormal * 0.07; // Shadow bias
   gl_Position = uboPerInstance.viewProjMatrix * vec4(worldPos, 1.0);
   outUV0 = inUV0;
 }
