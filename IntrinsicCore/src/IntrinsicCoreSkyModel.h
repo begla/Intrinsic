@@ -308,7 +308,7 @@ project(const ArHosekSkyModelState& p_SkyModelState,
     weightSum += 1.0f;
   }
 
-  result *= glm::pi<float>() / weightSum;
+  result *= (4.0f * glm::pi<float>()) / weightSum;
   return result;
 }
 }
