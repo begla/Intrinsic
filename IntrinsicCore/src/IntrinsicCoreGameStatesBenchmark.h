@@ -27,6 +27,7 @@ struct Benchmark
     _INTR_STRING name;
     _INTR_ARRAY(glm::vec3) nodePositions;
     float camSpeed;
+    float currentTime;
   };
 
   struct Data
