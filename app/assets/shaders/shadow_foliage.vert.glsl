@@ -42,8 +42,9 @@ void main()
   vec3 localPos = inPosition;
   const vec3 initialWorldPos = (uboPerInstance.worldMatrix 
   	* vec4(inPosition.xyz, 1.0)).xyz;
-  const vec3 worldNormal = (uboPerInstance.worldMatrix 
+  const vec3 worldNormalUnorm = (uboPerInstance.worldMatrix 
   	* vec4(inNormal.xyz, 0.0)).xyz;
+  const vec3 worldNormal = normalize(worldNormalUnorm);
 
   const vec2 windStrength = calcWindStrength(uboPerInstance.data0.w);
   
@@ -56,7 +57,7 @@ void main()
 #endif // GRASS
 
   const vec3 worldPos = (uboPerInstance.worldMatrix 
-    * vec4(localPos.xyz, 1.0)).xyz - worldNormal.xyz * 0.03; // Shadow bias
+    * vec4(localPos.xyz, 1.0)).xyz - worldNormalUnorm.xyz * 0.03; // Shadow bias
   gl_Position = uboPerInstance.viewProjMatrix * vec4(worldPos, 1.0);
 
   outUV0 = inUV0; 
