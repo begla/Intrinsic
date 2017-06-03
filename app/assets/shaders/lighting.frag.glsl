@@ -161,13 +161,17 @@ void main()
   float shadowAttenuation = cloudShadows * calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
   outColor.rgb += shadowAttenuation * sunlightColor * calcLighting(d);
 
-  // Translucency
+  // Translucency for sunlight
   // TODO: Move this to a library
-  const float translThickness = matParams.translucencyThickness;
+  float translThickness = matParams.translucencyThickness;
   if (translThickness > EPSILON)
   {
+    // Fade transl. with the position of the sun
+    translThickness *= abs(uboPerFrame.sunLightDirWS.y);
+    
     const vec3 translLightVector = d.L + d.N * translDistortion;
-    const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
+    const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower 
+      - translPower) * translScale;
     const vec3 transl = (translDot + translAmbient) * translThickness;
     const vec3 translColor = d.diffuseColor * sunlightColor * transl;
 
