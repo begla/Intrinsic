@@ -43,7 +43,7 @@ layout (location = 5) in vec4 inPosition;
 OUTPUT
 
 const float edgeFadeDistance = 15.0;
-const float waterBaseAlpha = 0.7;
+const float waterBaseAlpha = 0.5;
 
 void main()
 { 
