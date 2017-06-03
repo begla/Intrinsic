@@ -40,9 +40,8 @@ layout (location = 3) out vec3 outUpVS;
 void main()
 {
   gl_Position = uboPerInstance.worldViewProjMatrix * vec4(inPosition.xyz, 1.0);
-  const vec4 viewPos = uboPerInstance.worldViewMatrix * vec4(inPosition.xyz, 1.0);
-  outUpVS = (uboPerInstance.normalMatrix * vec4(vec3(0.0, 1.0, 0.0), 0.0)).xyz;
-  outPosVS = viewPos.xyz;
+  outUpVS = (uboPerInstance.viewMatrix * vec4(vec3(0.0, 1.0, 0.0), 0.0)).xyz;
+  outPosVS = (uboPerInstance.worldViewMatrix * vec4(inPosition.xyz, 1.0)).xyz;
   outUV0 = inUV0;
   outNormal = inNormal;
 }

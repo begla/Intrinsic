@@ -80,7 +80,7 @@ struct PerInstanceDataGizmoVertex
 {
   glm::mat4 worldMatrix;
   glm::mat4 worldViewProjMatrix;
-  glm::mat4 normalMatrix;
+  glm::mat4 viewMatrix;
 
   glm::vec4 colorTintX;
   glm::vec4 colorTintY;
@@ -109,7 +109,7 @@ struct PerInstanceDataGridFragment
   glm::mat4 invWorldRotMatrix;
   glm::vec4 invWorldPos;
   glm::mat4 viewProjMatrix;
-  glm::mat4 normalMatrix;
+  glm::mat4 viewMatrix;
 
   glm::vec4 planeNormal;
 
@@ -310,10 +310,10 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
   else if (Input::System::getKeyStates()[Input::Key::kCtrl] ==
            Input::KeyState::kPressed)
   {
-    _orbitRadius = glm::max(_orbitRadius -
-                                Editing::_cameraSpeed *
+    _orbitRadius =
+        glm::max(_orbitRadius - Editing::_cameraSpeed *
                                     (_camAngVel.x - _camAngVel.y) * p_DeltaT,
-                            0.1f);
+                 0.1f);
   }
 
   camRot = glm::quat(_eulerAngles);
@@ -682,7 +682,7 @@ void Editing::updatePerInstanceData()
       perInstanceDataVertex.worldViewProjMatrix =
           Components::CameraManager::_viewProjectionMatrix(camRef) *
           perInstanceDataVertex.worldMatrix;
-      perInstanceDataVertex.normalMatrix =
+      perInstanceDataVertex.viewMatrix =
           Components::CameraManager::_viewMatrix(camRef);
 
       // Highlight gizmo axis
@@ -749,7 +749,7 @@ void Editing::updatePerInstanceData()
           glm::vec4(_translScalePlaneNormal, 0.0f);
       perInstanceDataFragment.viewProjMatrix =
           Components::CameraManager::_viewProjectionMatrix(camRef);
-      perInstanceDataFragment.normalMatrix =
+      perInstanceDataFragment.viewMatrix =
           Components::CameraManager::_viewMatrix(camRef);
       perInstanceDataFragment.gridSize = _gridSize;
       perInstanceDataFragment.fade = _gridFade;

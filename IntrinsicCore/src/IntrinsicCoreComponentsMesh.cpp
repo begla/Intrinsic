@@ -57,12 +57,12 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
       {
         perInstanceDataVertex.worldMatrix =
             Components::NodeManager::_worldMatrix(nodeRef);
-        perInstanceDataVertex.normalMatrix =
-            viewMatrix * Components::NodeManager::_normalMatrix(nodeRef);
+        perInstanceDataVertex.viewProjMatrix = viewProjectionMatrix;
         perInstanceDataVertex.worldViewProjMatrix =
             viewProjectionMatrix * perInstanceDataVertex.worldMatrix;
         perInstanceDataVertex.worldViewMatrix =
             viewMatrix * perInstanceDataVertex.worldMatrix;
+        perInstanceDataVertex.viewMatrix = viewMatrix;
         perInstanceDataVertex.data0.w = TaskManager::_totalTimePassed;
         perInstanceDataVertex.data0.y = distToCamera;
       }

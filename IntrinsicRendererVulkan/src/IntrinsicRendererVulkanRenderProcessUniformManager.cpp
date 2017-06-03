@@ -108,9 +108,6 @@ _uniformOffsetMapping = {
     {"PrevViewMatrix",
      UniformDataRef(&UniformManager::_uniformDataSource.prevViewMatrix,
                     sizeof(glm::mat4))},
-    {"NormalMatrix",
-     UniformDataRef(&UniformManager::_uniformDataSource.normalMatrix,
-                    sizeof(glm::mat4))},
     {"InverseProjectionMatrix",
      UniformDataRef(&UniformManager::_uniformDataSource.inverseProjectionMatrix,
                     sizeof(glm::mat4))},
@@ -223,8 +220,6 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
     UniformManager::_uniformDataSource.prevViewMatrix =
         Components::CameraManager::_prevViewMatrix(p_Camera);
     UniformManager::_uniformDataSource.viewMatrix =
-        Components::CameraManager::_viewMatrix(p_Camera);
-    UniformManager::_uniformDataSource.normalMatrix =
         Components::CameraManager::_viewMatrix(p_Camera);
     UniformManager::_uniformDataSource.inverseProjectionMatrix =
         Components::CameraManager::_inverseProjectionMatrix(p_Camera);

@@ -1,9 +1,10 @@
 #define PER_INSTANCE_UBO layout (binding = 0) uniform PerInstance \
 { \
   mat4 worldMatrix; \
-  mat4 normalMatrix; \
   mat4 worldViewProjMatrix; \
   mat4 worldViewMatrix; \
+  mat4 viewProjMatrix; \
+  mat4 viewMatrix; \
   vec4 data0; \
 } uboPerInstance
 

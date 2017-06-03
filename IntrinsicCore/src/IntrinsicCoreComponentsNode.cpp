@@ -101,7 +101,6 @@ void NodeManager::updateTransforms(const NodeRefArray& p_Nodes)
 
     _worldMatrix(nodeRef) = trans * rot * scale;
     _inverseWorldMatrix(nodeRef) = glm::inverse(_worldMatrix(nodeRef));
-    _normalMatrix(nodeRef) = rot;
 
     // Update AABB
     // TODO: Merge sub meshes

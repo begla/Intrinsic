@@ -66,11 +66,11 @@ void main()
   * vec4(localPos, 1.0);
 
   outColor = inColor.xyz;
-  outNormal = normalize(uboPerInstance.normalMatrix 
+  outNormal = normalize(uboPerInstance.worldViewMatrix 
     * vec4(inNormal, 0.0)).xyz;
-  outTangent = normalize(uboPerInstance.normalMatrix 
+  outTangent = normalize(uboPerInstance.worldViewMatrix 
     * vec4(inTangent, 0.0)).xyz;
-  outBinormal = normalize(uboPerInstance.normalMatrix 
+  outBinormal = normalize(uboPerInstance.worldViewMatrix 
     * vec4(inBinormal, 0.0)).xyz;
   outUV0 = inUV0;
 }

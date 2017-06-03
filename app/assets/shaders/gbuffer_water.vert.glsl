@@ -45,8 +45,8 @@ void main()
   outPosition = gl_Position;
 
   outColor = inColor.xyz;
-  outNormal = normalize(uboPerInstance.normalMatrix * vec4(inNormal, 0.0)).xyz;
-  outTangent = normalize(uboPerInstance.normalMatrix * vec4(inTangent, 0.0)).xyz;
-  outBinormal = normalize(uboPerInstance.normalMatrix * vec4(inBinormal, 0.0)).xyz;
+  outNormal = normalize(uboPerInstance.worldViewMatrix * vec4(inNormal, 0.0)).xyz;
+  outTangent = normalize(uboPerInstance.worldViewMatrix * vec4(inTangent, 0.0)).xyz;
+  outBinormal = normalize(uboPerInstance.worldViewMatrix * vec4(inBinormal, 0.0)).xyz;
   outUV0 = inUV0;
 }

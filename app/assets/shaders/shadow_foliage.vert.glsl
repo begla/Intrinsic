@@ -39,23 +39,25 @@ layout (location = 0) out vec2 outUV0;
 
 void main()
 {
-  vec3 localPos = inPosition.xyz;
-  const vec3 worldPos = (uboPerInstance.worldMatrix 
+  vec3 localPos = inPosition;
+  const vec3 initialWorldPos = (uboPerInstance.worldMatrix 
   	* vec4(inPosition.xyz, 1.0)).xyz;
-  const vec3 worldNormal = normalize((uboPerInstance.worldMatrix 
-  	* vec4(inNormal.xyz, 0.0)).xyz);
+  const vec3 worldNormal = (uboPerInstance.worldMatrix 
+  	* vec4(inNormal.xyz, 0.0)).xyz;
 
   const vec2 windStrength = calcWindStrength(uboPerInstance.data0.w);
   
 #if defined (GRASS)
-  applyGrassWind(localPos, worldPos,
+  applyGrassWind(localPos, initialWorldPos,
     uboPerInstance.data0.w, windStrength);
 #else
-  applyTreeWind(localPos, worldPos, worldNormal, inColor.r, 
+  applyTreeWind(localPos, initialWorldPos, worldNormal, inColor.r, 
     uboPerInstance.data0.w, windStrength);
 #endif // GRASS
 
-  gl_Position = uboPerInstance.worldViewProjMatrix * vec4(localPos, 1.0);
+  const vec3 worldPos = (uboPerInstance.worldMatrix 
+    * vec4(localPos.xyz, 1.0)).xyz - worldNormal.xyz * 0.03; // Shadow bias
+  gl_Position = uboPerInstance.viewProjMatrix * vec4(worldPos, 1.0);
 
   outUV0 = inUV0; 
 }

@@ -53,7 +53,6 @@ struct NodeData : Dod::Components::ComponentDataBase
     worldOrientation.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     worldSize.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     worldMatrix.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
-    normalMatrix.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     inverseWorldMatrix.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
 
     localAABB.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
@@ -78,7 +77,6 @@ struct NodeData : Dod::Components::ComponentDataBase
   _INTR_ARRAY(glm::quat) worldOrientation;
   _INTR_ARRAY(glm::vec3) worldSize;
   _INTR_ARRAY(glm::mat4x4) worldMatrix;
-  _INTR_ARRAY(glm::mat4x4) normalMatrix;
   _INTR_ARRAY(glm::mat4x4) inverseWorldMatrix;
 
   _INTR_ARRAY(Math::AABB) localAABB;
@@ -594,11 +592,6 @@ struct NodeManager
   _INTR_INLINE static glm::mat4& _worldMatrix(NodeRef p_Ref)
   {
     return _data.worldMatrix[p_Ref._id];
-  }
-  /// The normal matrix.
-  _INTR_INLINE static glm::mat4& _normalMatrix(NodeRef p_Ref)
-  {
-    return _data.normalMatrix[p_Ref._id];
   }
 
   /// The inverse of the world matrix.
