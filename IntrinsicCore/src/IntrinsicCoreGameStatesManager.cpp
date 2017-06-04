@@ -73,6 +73,8 @@ void Manager::deactivateGameState()
 
 void Manager::update(float p_DeltaT)
 {
+  _INTR_PROFILE_CPU("General", "Game State Manager");
+
   switch (_activeGameState)
   {
   case GameState::kEditing:

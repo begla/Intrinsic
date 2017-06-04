@@ -68,6 +68,8 @@ void TaskManager::executeTasks()
 
     // Events and input
     {
+      _INTR_PROFILE_CPU("TaskManager", "Pump Events");
+
       Input::System::reset();
       SystemEventProvider::SDL::pumpEvents();
     }
