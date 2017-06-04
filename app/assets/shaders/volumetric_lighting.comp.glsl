@@ -153,7 +153,6 @@ void main()
   }
 
   const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
-  clampGridPos(gridPos);
 
   // Sky light
   vec3 irrad = sampleSH(uboPerFrame.skyLightSH, rayWS) / MATH_PI;

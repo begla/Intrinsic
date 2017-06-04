@@ -101,7 +101,6 @@ void main()
 
   const uvec3 gridPos = calcGridPosForViewPos(d.posVS, uboPerInstance.nearFar, 
     uboPerInstance.nearFarWidthHeight);
-  clampGridPos(gridPos);
 
   // Ambient lighting
   const vec3 normalWS = (uboPerFrame.invViewMatrix * vec4(d.N, 0.0)).xyz;
