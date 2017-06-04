@@ -100,8 +100,11 @@ const float _gridDepthSliceScale =
 const float _gridDepthSliceScaleRcp = 1.0f / _gridDepthSliceScale;
 
 const uint32_t _totalClusterCount = _gridRes.x * _gridRes.y * _gridRes.z;
-const uint32_t _totalGridSize =
+
+const uint32_t _totalLightGridSize =
     _totalClusterCount * MAX_LIGHT_COUNT_PER_CLUSTER;
+const uint32_t _totalIrradGridSize =
+    _totalClusterCount * MAX_IRRAD_PROBES_PER_CLUSTER;
 
 // <-
 
@@ -187,6 +190,9 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
   {
     _INTR_PROFILE_CPU("Lighting", "Cull Lights And Probes For Depth Slice");
 
+    uint32_t tempIrradIdxBuffer[MAX_IRRAD_PROBES_PER_CLUSTER];
+    uint32_t tempLightIdxBuffer[MAX_LIGHT_COUNT_PER_CLUSTER];
+
     for (uint32_t y = p_Range.start; y < p_Range.end; ++y)
     {
       for (uint32_t x = 0u; x < _gridRes.x; ++x)
@@ -198,10 +204,12 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
                                _perInstanceData.nearFar);
 
         const uint32_t clusterIndex = calcClusterIndex(gridPos);
-        uint32_t& lightCount = _lightIndexBufferGpuMemory[clusterIndex];
-        lightCount = 0u;
 
-        for (uint32_t i = 0u; i < _availableLights.size(); ++i)
+        tempLightIdxBuffer[0] = 0u;
+        for (uint32_t i = 0u;
+             i < _availableLights.size() &&
+             tempLightIdxBuffer[0] < MAX_LIGHT_COUNT_PER_CLUSTER - 1u;
+             ++i)
         {
           uint32_t lidx = _availableLights[i];
           const Light& light = _lightBufferMemory[lidx];
@@ -209,17 +217,17 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
                   {glm::vec3(light.posAndRadius), light.posAndRadius.w},
                   clusterAABB))
           {
-            const uint32_t clusterLightIdx = clusterIndex + lightCount + 1u;
-            _lightIndexBufferGpuMemory[clusterLightIdx] = lidx;
-            ++lightCount;
+            const uint32_t idx = tempLightIdxBuffer[0] + 1u;
+            tempLightIdxBuffer[idx] = lidx;
+            ++tempLightIdxBuffer[0];
           }
         }
 
-        uint32_t& irradProbeCount =
-            _irradProbeIndexBufferGpuMemory[clusterIndex];
-        irradProbeCount = 0u;
-
-        for (uint32_t i = 0u; i < _availableIrradProbes.size(); ++i)
+        tempIrradIdxBuffer[0] = 0u;
+        for (uint32_t i = 0u;
+             i < _availableIrradProbes.size() &&
+             tempIrradIdxBuffer[0] < MAX_IRRAD_PROBES_PER_CLUSTER - 1u;
+             ++i)
         {
           uint32_t lidx = _availableIrradProbes[i];
           const IrradProbe& probe = _irradProbeBufferMemory[lidx];
@@ -227,11 +235,17 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
                   {glm::vec3(probe.posAndRadius), probe.posAndRadius.w},
                   clusterAABB))
           {
-            const uint32_t irradProbeIdx = clusterIndex + irradProbeCount + 1u;
-            _irradProbeIndexBufferGpuMemory[irradProbeIdx] = lidx;
-            ++irradProbeCount;
+            const uint32_t idx = tempIrradIdxBuffer[0] + 1u;
+            tempIrradIdxBuffer[idx] = lidx;
+            ++tempIrradIdxBuffer[0];
           }
         }
+
+        memcpy(&_irradProbeIndexBufferGpuMemory[clusterIndex],
+               tempIrradIdxBuffer,
+               sizeof(uint32_t) * (tempIrradIdxBuffer[0] + 1u));
+        memcpy(&_lightIndexBufferGpuMemory[clusterIndex], tempLightIdxBuffer,
+               sizeof(uint32_t) * (tempLightIdxBuffer[0] + 1u));
       }
     }
   }
@@ -388,7 +402,6 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
       else
       {
         // Reset counts
-        // TODO: Suboptimal
         for (uint32_t y = 0u; y < _gridRes.y; ++y)
         {
           for (uint32_t x = 0u; x < _gridRes.x; ++x)
@@ -561,7 +574,7 @@ void Lighting::init()
       BufferManager::_descMemoryPoolType(_lightIndexBuffer) =
           MemoryPoolType::kStaticStagingBuffers;
       BufferManager::_descSizeInBytes(_lightIndexBuffer) =
-          _totalGridSize * sizeof(uint32_t);
+          _totalLightGridSize * sizeof(uint32_t);
       buffersToCreate.push_back(_lightIndexBuffer);
     }
 
@@ -576,7 +589,7 @@ void Lighting::init()
           MemoryPoolType::kStaticStagingBuffers;
       BufferManager::_descSizeInBytes(_irradProbeBuffer) =
           MAX_IRRAD_PROBES_PER_CLUSTER * _gridRes.x * _gridRes.y * _gridRes.z *
-          sizeof(Light);
+          sizeof(IrradProbe);
       buffersToCreate.push_back(_irradProbeBuffer);
     }
 
@@ -593,7 +606,7 @@ void Lighting::init()
       BufferManager::_descMemoryPoolType(_irradProbeIndexBuffer) =
           MemoryPoolType::kStaticStagingBuffers;
       BufferManager::_descSizeInBytes(_irradProbeIndexBuffer) =
-          _totalGridSize * sizeof(uint32_t);
+          _totalIrradGridSize * sizeof(uint32_t);
       buffersToCreate.push_back(_irradProbeIndexBuffer);
     }
 
