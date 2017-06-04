@@ -12,6 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+void calcTransl(
+  in LightingData d, 
+  in MaterialParameters matParams, 
+  in float att, 
+  in vec4 lightColorAndIntensity, 
+  inout vec4 outColor)
+{
+  const float localTranslThickness = matParams.translucencyThickness;
+
+  if (localTranslThickness > EPSILON)
+  {
+    // Translucency
+    const vec3 translLightVector = d.L + d.N * translDistortion;
+    const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) 
+      * translPower - translPower) * translScale;
+    const vec3 transl = (translDot + translAmbient) * localTranslThickness;
+    const vec3 translColor = att * lightColorAndIntensity.w 
+      * lightColorAndIntensity.rgb * transl * d.diffuseColor;
+
+    outColor.rgb += translColor;
+  }
+}
+
 void calcPointLightLighting(
   in Light light, 
   in LightingData d, 
@@ -31,19 +54,6 @@ void calcPointLightLighting(
     * kelvinToRGB(light.temp.r, kelvinLutTex);
 
   outColor.rgb += calcLighting(d) * att * lightColor;
-
-  const float localTranslThickness = matParams.translucencyThickness;
-
-  if (localTranslThickness > EPSILON)
-  {
-    // Translucency
-    // TODO: Move this to a library
-    const vec3 translLightVector = d.L + d.N * translDistortion;
-    const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) 
-      * translPower - translPower) * translScale;
-    const vec3 transl = (translDot + translAmbient) * localTranslThickness;
-    const vec3 translColor = att * light.colorAndIntensity.w * lightColor * transl * d.diffuseColor;
-
-    outColor.rgb += translColor;
-  }
+  calcTransl(d, matParams, att, 
+    vec4(lightColor, light.colorAndIntensity.w), outColor);
 }
