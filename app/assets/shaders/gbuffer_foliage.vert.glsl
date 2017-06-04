@@ -45,20 +45,18 @@ layout (location = 5) out vec3 outWorldPosition;
 void main()
 { 
   vec3 localPos = inPosition.xyz;
-  applyMainBending(localPos, vec2(0.0, 0.0), 0.05);
-
   outWorldPosition = (uboPerInstance.worldMatrix 
     * vec4(inPosition.xyz, 1.0)).xyz;
   const vec3 worldNormal = normalize((uboPerInstance.worldMatrix 
     * vec4(inNormal.xyz, 0.0)).xyz);
-
   const vec2 windStrength = calcWindStrength(uboPerInstance.data0.w);
+  const vec3 pivotWS = vec3(uboPerInstance.worldMatrix[3]);
   
 #if defined (GRASS)
   applyGrassWind(localPos, outWorldPosition,
     uboPerInstance.data0.w, windStrength);
 #else
-  applyTreeWind(localPos, outWorldPosition, worldNormal, inColor.r, 
+  applyTreeWind(localPos, outWorldPosition, pivotWS, worldNormal, inColor.r, 
     uboPerInstance.data0.w, windStrength);
 #endif // GRASS
 
