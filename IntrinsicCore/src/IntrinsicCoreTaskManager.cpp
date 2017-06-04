@@ -47,6 +47,8 @@ void TaskManager::executeTasks()
 
   if (_frameCounter > 0u)
   {
+    _INTR_PROFILE_CPU("TaskManager", "Limit To Max FPS");
+
     _lastDeltaT = std::min(
         (TimingHelper::getMicroseconds() - _lastUpdate) * 0.000001f, 0.3f);
     _lastActualFrameDuration = _lastDeltaT;

@@ -33,6 +33,8 @@ const vec3 translAmbient = vec3(0.0);
 
 // Have to match the values on C++ side
 const uint maxLightCountPerCluster = 256;
+const uint maxIrradProbeCountPerCluster = 4;
+
 const float gridDepth = 10000.0f;
 const uvec3 gridRes = uvec3(16u, 8u, 24u);
 const float gridDepthExp = 3.0;
@@ -40,11 +42,11 @@ const float gridDepthSliceScale =
     gridDepth / pow(gridRes.z - 1.0, gridDepthExp);
 const float gridDepthSliceScaleRcp = 1.0f / gridDepthSliceScale;
 
-uint calcClusterIndex(uvec3 gridPos)
+uint calcClusterIndex(uvec3 gridPos, uint clusterSize)
 {
-  return gridPos.x * maxLightCountPerCluster +
-         gridPos.y * gridRes.x * maxLightCountPerCluster +
-         gridPos.z * gridRes.y * gridRes.x * maxLightCountPerCluster;
+  return gridPos.x * clusterSize +
+         gridPos.y * gridRes.x * clusterSize +
+         gridPos.z * gridRes.y * gridRes.x * clusterSize;
 }
 
 float calcGridDepthSlice(uint depthSliceIdx)
@@ -128,6 +130,7 @@ struct LightingData
   vec3 V;
   vec3 N;
   vec3 energy;
+  vec3 posVS;
 
   vec3 baseColor;
   float metalMask;
@@ -218,9 +221,15 @@ float burleyToMipApprox(float perceptualRoughness)
 vec3 shDotProduct(in SH9 a, in SH9 b)
 {
   vec3 result = vec3(0.0);
-
-  for(uint i = 0; i < 9; ++i)
-    result += a.L[i] * b.L[i];
+  result += a.L[0] * b.L[0];
+  result += a.L[1] * b.L[1];
+  result += a.L[2] * b.L[2];
+  result += a.L[3] * b.L[3];
+  result += a.L[4] * b.L[4];
+  result += a.L[5] * b.L[5];
+  result += a.L[6] * b.L[6];
+  result += a.L[7] * b.L[7];
+  result += a.L[8] * b.L[8];
 
   return result;
 }
@@ -270,6 +279,7 @@ void initLightingDataFromGBuffer(inout LightingData d)
 
 void calculateLightingData(inout LightingData d)
 {
+  d.V = -normalize(d.posVS); 
   d.H = normalize(d.L + d.V);
   d.NdL = clamp(dot(d.N, d.L), 0.0, 1.0); 
   d.NdV = clamp(abs(dot(d.N, d.V)) + 1.0e-5, 0.0, 1.0);

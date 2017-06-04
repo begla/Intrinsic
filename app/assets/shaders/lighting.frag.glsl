@@ -66,6 +66,8 @@ layout (binding = 15) uniform sampler2D noiseTex;
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
 
+#include "lighting.inc.glsl"
+
 void main()
 {
   const vec4 albedoSample = textureLod(albedoTex, inUV0, 0.0);
@@ -80,8 +82,6 @@ void main()
 
   outColor.rgba = vec4(0.0);
 
-  const vec3 posVS = unproject(inUV0, depth, uboPerFrame.invProjMatrix);
-
   const vec4 ssaoSample = textureLod(ssaoTex, inUV0, 0.0);
   const vec4 normalSample = textureLod(normalTex, inUV0, 0.0);
   const vec4 parameter0Sample = textureLod(parameter0Tex, inUV0, 0.0);
@@ -93,15 +93,13 @@ void main()
   d.specular = normalSample.b;
   d.roughness = normalSample.a;
   initLightingDataFromGBuffer(d);
-
+  d.posVS = unproject(inUV0, depth, uboPerFrame.invProjMatrix);
   d.N = normalize(decodeNormal(normalSample.rg));  
   d.L = uboPerFrame.sunLightDirVS.xyz;
-  d.V = -normalize(posVS); 
   d.energy = vec3(uboPerFrame.sunLightColorAndIntensity.w * 0.5);
   calculateLightingData(d);
 
-  const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
-  const uint clusterIdx = calcClusterIndex(gridPos);
+  const uvec3 gridPos = calcGridPosForViewPos(d.posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
   const bool gridPosValid = isGridPosValid(gridPos);
 
   // Ambient lighting
@@ -116,13 +114,14 @@ void main()
 
   if (gridPosValid)
   {
+    const uint clusterIdx = calcClusterIndex(gridPos, maxIrradProbeCountPerCluster);
     const uint irradProbeCount = irradProbeIndices[clusterIdx];
 
     for (uint pi=0; pi<irradProbeCount; ++pi)
     {
       IrradProbe probe = irradProbes[irradProbeIndices[clusterIdx + pi + 1]];
 
-      const float distToProbe = distance(posVS, probe.posAndRadius.xyz);
+      const float distToProbe = distance(d.posVS, probe.posAndRadius.xyz);
       if (distToProbe < probe.posAndRadius.w)
       {
         const float fadeRange = probe.posAndRadius.w * probe.data0.x;
@@ -150,7 +149,7 @@ void main()
   outColor.rgb += parameter0Sample.w * matParams.emissiveIntensity * d.baseColor;
 
   // Cloud shadows
-  const vec4 posWS = uboPerFrame.invViewMatrix * vec4(posVS, 1.0);
+  const vec4 posWS = uboPerFrame.invViewMatrix * vec4(d.posVS, 1.0);
   const float cloudShadows = clamp(texture(noiseTex, 
     clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0 
     + uboPerInstance.data0.x * 0.025).r * 3.0 - 0.5, 0.1, 1.0);
@@ -158,7 +157,7 @@ void main()
   // Sunlight
   const vec3 sunlightColor = uboPerFrame.sunLightColorAndIntensity.xyz;
 
-  float shadowAttenuation = cloudShadows * calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
+  float shadowAttenuation = cloudShadows * calcShadowAttenuation(d.posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
   outColor.rgb += shadowAttenuation * sunlightColor * calcLighting(d);
 
   // Translucency for sunlight
@@ -168,7 +167,7 @@ void main()
   {
     // Fade transl. with the position of the sun
     translThickness *= abs(uboPerFrame.sunLightDirWS.y);
-    
+
     const vec3 translLightVector = d.L + d.N * translDistortion;
     const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower 
       - translPower) * translScale;
@@ -178,9 +177,10 @@ void main()
     outColor.rgb += translColor;    
   }
 
+  // Point lights
   if (gridPosValid)
   {
-    // Point lights
+    const uint clusterIdx = calcClusterIndex(gridPos, maxLightCountPerCluster);
     const uint lightCount = lightIndices[clusterIdx];
 
     // DEBUG: Visualize clusters
@@ -190,38 +190,10 @@ void main()
       return;
     }*/
 
-    for (uint li=0; li<lightCount; ++li)
+    for (uint li=0; li<lightCount; li++)
     {
-      Light light = lights[lightIndices[clusterIdx + li + 1]];
-
-      const vec3 lightDistVec = light.posAndRadius.xyz - posVS;
-      const float dist = length(lightDistVec);
-      const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
-      if (att * light.colorAndIntensity.w < MIN_FALLOFF) continue;
-
-      d.L = lightDistVec / dist;
-      d.energy = vec3(light.colorAndIntensity.a);
-      calculateLightingData(d);
-
-      const vec3 lightColor = light.colorAndIntensity.rgb 
-        * kelvinToRGB(light.temp.r, kelvinLutTex);
-
-      outColor.rgb += calcLighting(d) * att * lightColor;
-
-      const float localTranslThickness = matParams.translucencyThickness;
-
-      if (localTranslThickness > EPSILON)
-      {
-        // Translucency
-        // TODO: Move this to a library
-        const vec3 translLightVector = d.L + d.N * translDistortion;
-        const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
-        const vec3 transl = (translDot + translAmbient) * localTranslThickness;
-        const vec3 translColor = att * light.colorAndIntensity.w * lightColor * transl * d.diffuseColor;
-
-        outColor.rgb += translColor;
-      }
+      calcPointLightLighting(lights[lightIndices[clusterIdx + li + 1]], 
+        d, matParams, outColor);
     }
   }
 }
-  

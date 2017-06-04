@@ -108,11 +108,12 @@ const uint32_t _totalIrradGridSize =
 
 // <-
 
-_INTR_INLINE uint32_t calcClusterIndex(glm::uvec3 p_GridPos)
+_INTR_INLINE uint32_t calcClusterIndex(glm::uvec3 p_GridPos,
+                                       uint32_t p_ClusterSize)
 {
-  return p_GridPos.x * MAX_LIGHT_COUNT_PER_CLUSTER +
-         p_GridPos.y * _gridRes.x * MAX_LIGHT_COUNT_PER_CLUSTER +
-         p_GridPos.z * _gridRes.y * _gridRes.x * MAX_LIGHT_COUNT_PER_CLUSTER;
+  return p_GridPos.x * p_ClusterSize +
+         p_GridPos.y * _gridRes.x * p_ClusterSize +
+         p_GridPos.z * _gridRes.y * _gridRes.x * p_ClusterSize;
 }
 
 _INTR_INLINE float calcGridDepthSlice(uint32_t p_DepthSliceIdx)
@@ -203,7 +204,10 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
             calcAABBForGridPos(gridPos, _perInstanceData.nearFarWidthHeight,
                                _perInstanceData.nearFar);
 
-        const uint32_t clusterIndex = calcClusterIndex(gridPos);
+        const uint32_t lightClusterIndex =
+            calcClusterIndex(gridPos, MAX_LIGHT_COUNT_PER_CLUSTER);
+        const uint32_t probeClusterIndex =
+            calcClusterIndex(gridPos, MAX_IRRAD_PROBES_PER_CLUSTER);
 
         tempLightIdxBuffer[0] = 0u;
         for (uint32_t i = 0u;
@@ -241,10 +245,11 @@ struct LightCullingParallelTaskSet : enki::ITaskSet
           }
         }
 
-        memcpy(&_irradProbeIndexBufferGpuMemory[clusterIndex],
+        memcpy(&_irradProbeIndexBufferGpuMemory[probeClusterIndex],
                tempIrradIdxBuffer,
                sizeof(uint32_t) * (tempIrradIdxBuffer[0] + 1u));
-        memcpy(&_lightIndexBufferGpuMemory[clusterIndex], tempLightIdxBuffer,
+        memcpy(&_lightIndexBufferGpuMemory[lightClusterIndex],
+               tempLightIdxBuffer,
                sizeof(uint32_t) * (tempLightIdxBuffer[0] + 1u));
       }
     }
@@ -406,10 +411,13 @@ _INTR_INLINE void cullLightsAndWriteBuffers(Components::CameraRef p_CameraRef)
         {
           for (uint32_t x = 0u; x < _gridRes.x; ++x)
           {
-            const glm::uint32_t clusterIdx =
-                calcClusterIndex(glm::uvec3(x, y, z));
-            _lightIndexBufferGpuMemory[clusterIdx] = 0u;
-            _irradProbeIndexBufferGpuMemory[clusterIdx] = 0u;
+            const glm::uint32_t lightClusterIdx = calcClusterIndex(
+                glm::uvec3(x, y, z), MAX_LIGHT_COUNT_PER_CLUSTER);
+            const glm::uint32_t probeClusterIdx = calcClusterIndex(
+                glm::uvec3(x, y, z), MAX_IRRAD_PROBES_PER_CLUSTER);
+
+            _lightIndexBufferGpuMemory[lightClusterIdx] = 0u;
+            _irradProbeIndexBufferGpuMemory[probeClusterIdx] = 0u;
           }
         }
       }
