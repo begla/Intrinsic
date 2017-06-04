@@ -153,7 +153,6 @@ void main()
   }
 
   const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
-  const uint clusterIdx = calcClusterIndex(gridPos);
   const bool gridPosValid = isGridPosValid(gridPos);
 
   // Sky light
@@ -163,6 +162,7 @@ void main()
   if (gridPosValid
     && density > EPSILON)
   {
+    const uint clusterIdx = calcClusterIndex(gridPos, maxIrradProbeCountPerCluster);
     const uint irradProbeCount = irradProbeIndices[clusterIdx];
 
     for (uint pi=0; pi<irradProbeCount; ++pi)
@@ -188,7 +188,9 @@ void main()
   if (gridPosValid
     && density > EPSILON)
   {
+    const uint clusterIdx = calcClusterIndex(gridPos, maxLightCountPerCluster);
     uint lightCount = lightIndices[clusterIdx];
+
     for (uint li=0; li<lightCount; ++li)
     {
       Light light = lights[lightIndices[clusterIdx + li + 1]];
