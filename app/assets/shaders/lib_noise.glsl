@@ -132,6 +132,7 @@ vec2 calcWindStrength(float time)
 void applyTreeWind(
   inout vec3 localPos, 
   vec3 worldPos,
+  vec3 pivotWS,
   vec3 worldNormal,
   float intensity,
   float time,
@@ -139,7 +140,7 @@ void applyTreeWind(
 {
   const vec2 wind = foliageIntensFact
     * windStrength
-    * clamp(vec2(smoothTriangleWave(time * foliageFreq)) * 0.4 + 0.6, 0.0, 1.0);
+    * clamp(vec2(smoothTriangleWave((pivotWS.x + pivotWS.z) * 0.2 + time * foliageFreq)) * 0.4 + 0.6, 0.0, 1.0);
   const float windS = clamp(length(windStrength), 0.0, 1.0);
 
   applyDetailBending(localPos, worldNormal, worldPos,

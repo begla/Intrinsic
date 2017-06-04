@@ -45,14 +45,14 @@ void main()
   const vec3 worldNormalUnorm = (uboPerInstance.worldMatrix 
   	* vec4(inNormal.xyz, 0.0)).xyz;
   const vec3 worldNormal = normalize(worldNormalUnorm);
-
   const vec2 windStrength = calcWindStrength(uboPerInstance.data0.w);
+  const vec3 pivotWS = vec3(uboPerInstance.worldMatrix[3]);
   
 #if defined (GRASS)
   applyGrassWind(localPos, initialWorldPos,
     uboPerInstance.data0.w, windStrength);
 #else
-  applyTreeWind(localPos, initialWorldPos, worldNormal, inColor.r, 
+  applyTreeWind(localPos, initialWorldPos, pivotWS, worldNormal, inColor.r, 
     uboPerInstance.data0.w, windStrength);
 #endif // GRASS
 
