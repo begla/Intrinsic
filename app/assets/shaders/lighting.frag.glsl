@@ -109,9 +109,8 @@ void main()
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
   const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
-  // Sky
+  // Irradiance
   vec3 irrad = d.diffuseColor * sampleSH(uboPerFrame.skyLightSH, normalWS) / MATH_PI;
-
   if (gridPosValid)
   {
     const uint clusterIdx = calcClusterIndex(gridPos, maxIrradProbeCountPerCluster);
@@ -138,12 +137,12 @@ void main()
   outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, parameter0Sample.z) * irrad;
 
   // Specular
-  //const float specLod = burleyToMip(d.roughness, dot(normalWS, R0));
-  const float specLod = burleyToMipApprox(d.roughness);
-  vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
-
-  outColor.rgb += uboPerInstance.data0.y * uboPerInstance.data0.z * uboPerInstance.data0.y 
-    * parameter0Sample.z * spec;
+  {
+    const float specLod = burleyToMipApprox(d.roughness);
+    const vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
+    outColor.rgb += uboPerInstance.data0.y * uboPerInstance.data0.z * uboPerInstance.data0.y 
+      * parameter0Sample.z * spec;    
+  }
 
   // Emissive
   outColor.rgb += parameter0Sample.w * matParams.emissiveIntensity * d.baseColor;
@@ -155,26 +154,13 @@ void main()
     + uboPerInstance.data0.x * 0.025).r * 3.0 - 0.5, 0.1, 1.0);
 
   // Sunlight
-  const vec3 sunlightColor = uboPerFrame.sunLightColorAndIntensity.xyz;
-
-  float shadowAttenuation = cloudShadows * calcShadowAttenuation(d.posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
-  outColor.rgb += shadowAttenuation * sunlightColor * calcLighting(d);
-
-  // Translucency for sunlight
-  // TODO: Move this to a library
-  float translThickness = matParams.translucencyThickness;
-  if (translThickness > EPSILON)
   {
-    // Fade transl. with the position of the sun
-    translThickness *= abs(uboPerFrame.sunLightDirWS.y);
-
-    const vec3 translLightVector = d.L + d.N * translDistortion;
-    const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower 
-      - translPower) * translScale;
-    const vec3 transl = (translDot + translAmbient) * translThickness;
-    const vec3 translColor = d.diffuseColor * sunlightColor * transl;
-
-    outColor.rgb += translColor;    
+   const vec4 sunLightColorAndIntensity = uboPerFrame.sunLightColorAndIntensity;
+    float shadowAttenuation = cloudShadows * calcShadowAttenuation(d.posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
+    outColor.rgb += shadowAttenuation * sunLightColorAndIntensity.rgb * calcLighting(d);
+    calcTransl(d, matParams, 
+      abs(uboPerFrame.sunLightDirWS.y), // Dim for low sun
+      sunLightColorAndIntensity, outColor);   
   }
 
   // Point lights
@@ -183,14 +169,16 @@ void main()
     const uint clusterIdx = calcClusterIndex(gridPos, maxLightCountPerCluster);
     const uint lightCount = lightIndices[clusterIdx];
 
-    // DEBUG: Visualize clusters
-    /*if (lightCount > 0)
+//#define DEBUG_VIS_CLUSTERS
+#if defined (DEBUG_VIS_CLUSTERS)
+    if (lightCount > 0)
     {
       outColor = vec4(gridPos / vec3(gridRes) * lightCount / 64.0, 0.0);
       return;
-    }*/
+    }
+#endif // DEBUG_VIS_CLUSTERS
 
-    for (uint li=0; li<lightCount; li++)
+    for (uint li=0; li<lightCount; ++li)
     {
       calcPointLightLighting(lights[lightIndices[clusterIdx + li + 1]], 
         d, matParams, outColor);
