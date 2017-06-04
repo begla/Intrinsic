@@ -59,6 +59,11 @@ uint calcGridDepthIndex(float depthVS)
   return uint(pow(depthVS * gridDepthSliceScaleRcp, 1.0 / gridDepthExp));
 }
 
+uvec3 clampGridPos(in uvec3 gridPos)
+{
+  return clamp(gridPos, uvec3(0), gridRes - 1u);
+}
+
 uvec3 calcGridPosForViewPos(vec3 posVS, vec4 nearFar, vec4 nearFarWidthHeight)
 {
   const uint gridDepthIdx = calcGridDepthIndex(-posVS.z);
@@ -69,12 +74,8 @@ uvec3 calcGridPosForViewPos(vec3 posVS, vec4 nearFar, vec4 nearFarWidthHeight)
   const vec2 gridHalfWidthHeight = mix(nearFarWidthHeight.xy, nearFarWidthHeight.zw, rayPos) * 0.5;
 
   const vec2 localPos = posVS.xy / gridHalfWidthHeight.xy;
-  return uvec3(uvec2((localPos.xy * 0.5 + 0.5) * gridRes.xy), gridDepthIdx);
-}
-
-void clampGridPos(inout uvec3 gridPos)
-{
-  gridPos = clamp(gridPos, uvec3(0), gridRes - 1u);
+  const uvec3 gridPos = uvec3(uvec2((localPos.xy * 0.5 + 0.5) * gridRes.xy), gridDepthIdx);
+  return clampGridPos(gridPos);
 }
 
 // <-
