@@ -20,19 +20,14 @@ void calcTransl(
   inout vec4 outColor)
 {
   const float localTranslThickness = matParams.translucencyThickness;
+  const vec3 translLightVector = d.L + d.N * translDistortion;
+  const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) 
+    * translPower - translPower) * translScale;
+  const vec3 transl = (translDot + translAmbient) * localTranslThickness;
+  const vec3 translColor = att * lightColorAndIntensity.w 
+    * lightColorAndIntensity.rgb * transl * d.diffuseColor;
 
-  if (localTranslThickness > EPSILON)
-  {
-    // Translucency
-    const vec3 translLightVector = d.L + d.N * translDistortion;
-    const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) 
-      * translPower - translPower) * translScale;
-    const vec3 transl = (translDot + translAmbient) * localTranslThickness;
-    const vec3 translColor = att * lightColorAndIntensity.w 
-      * lightColorAndIntensity.rgb * transl * d.diffuseColor;
-
-    outColor.rgb += translColor;
-  }
+  outColor.rgb += translColor;
 }
 
 void calcPointLightLighting(

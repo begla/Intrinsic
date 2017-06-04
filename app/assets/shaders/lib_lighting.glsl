@@ -72,10 +72,9 @@ uvec3 calcGridPosForViewPos(vec3 posVS, vec4 nearFar, vec4 nearFarWidthHeight)
   return uvec3(uvec2((localPos.xy * 0.5 + 0.5) * gridRes.xy), gridDepthIdx);
 }
 
-bool isGridPosValid(uvec3 gridPos)
+void clampGridPos(inout uvec3 gridPos)
 {
-  return all(lessThan(gridPos, gridRes))
-    && all(greaterThanEqual(gridPos, uvec3(0)));
+  gridPos = clamp(gridPos, uvec3(0), gridRes - 1u);
 }
 
 // <-

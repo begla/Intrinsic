@@ -99,8 +99,9 @@ void main()
   d.energy = vec3(uboPerFrame.sunLightColorAndIntensity.w * 0.5);
   calculateLightingData(d);
 
-  const uvec3 gridPos = calcGridPosForViewPos(d.posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
-  const bool gridPosValid = isGridPosValid(gridPos);
+  const uvec3 gridPos = calcGridPosForViewPos(d.posVS, uboPerInstance.nearFar, 
+    uboPerInstance.nearFarWidthHeight);
+  clampGridPos(gridPos);
 
   // Ambient lighting
   const vec3 normalWS = (uboPerFrame.invViewMatrix * vec4(d.N, 0.0)).xyz;
@@ -111,7 +112,6 @@ void main()
 
   // Irradiance
   vec3 irrad = d.diffuseColor * sampleSH(uboPerFrame.skyLightSH, normalWS) / MATH_PI;
-  if (gridPosValid)
   {
     const uint clusterIdx = calcClusterIndex(gridPos, maxIrradProbeCountPerCluster);
     const uint irradProbeCount = irradProbeIndices[clusterIdx];
@@ -164,7 +164,6 @@ void main()
   }
 
   // Point lights
-  if (gridPosValid)
   {
     const uint clusterIdx = calcClusterIndex(gridPos, maxLightCountPerCluster);
     const uint lightCount = lightIndices[clusterIdx];
@@ -185,3 +184,4 @@ void main()
     }
   }
 }
+ 
