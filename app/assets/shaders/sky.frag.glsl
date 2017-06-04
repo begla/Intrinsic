@@ -82,7 +82,7 @@ void main()
   // Apply sky model
   albedo.rgb += clamp(calculateSkyModelRadiance(vec3(theta), vec3(gamma)) 
   	* uboPerFrame.skyModelRadiances.rgb, 0.0, 100.0);
-  //albedo.rgb += sampleSH(uboPerFrame.skyLightSH, inNormal);
+  //albedo.rgb = sampleSH(uboPerFrame.skyLightSH, inNormal) / MATH_PI;
 
   // Sun/Moon
   albedo.rgb += uboPerFrame.sunLightColorAndIntensity.xyz * uboPerFrame.sunLightColorAndIntensity.w 

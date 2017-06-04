@@ -290,7 +290,6 @@ project(const ArHosekSkyModelState& p_SkyModelState,
   }
 
   Irradiance::SH9 result;
-  float weightSum = 0.0f;
   for (uint32_t i = 0u; i < p_SampleCount; ++i)
   {
     const glm::vec3 randomRaySample = randomRaySamples[i];
@@ -305,10 +304,9 @@ project(const ArHosekSkyModelState& p_SkyModelState,
         glm::vec3(p_SkyModelState.radiances[0], p_SkyModelState.radiances[1],
                   p_SkyModelState.radiances[2]);
     result += Irradiance::project(randomRaySample, sample);
-    weightSum += 1.0f;
   }
 
-  result *= (4.0f * glm::pi<float>()) / weightSum;
+  result *= (4.0f * glm::pi<float>()) / p_SampleCount;
   return result;
 }
 }
