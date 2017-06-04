@@ -659,7 +659,7 @@ _INTR_INLINE void setupLightingDrawCall(Resources::DrawCallRef p_DrawCallRef,
   DrawCallManager::bindBuffer(
       p_DrawCallRef, _N(PerFrame), GpuProgramType::kFragment,
       UniformManager::_perFrameUniformBuffer, UboType::kPerFrameFragment,
-      sizeof(PerInstanceData));
+      sizeof(RenderProcess::PerFrameDataFrament));
   DrawCallManager::bindImage(
       p_DrawCallRef, _N(albedoTex), GpuProgramType::kFragment,
       ImageManager::getResourceByName(

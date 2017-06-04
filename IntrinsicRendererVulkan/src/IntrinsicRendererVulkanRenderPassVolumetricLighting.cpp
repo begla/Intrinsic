@@ -199,7 +199,7 @@ createComputeCallAccumulation(glm::vec3 p_Dim,
     ComputeCallManager::bindBuffer(
         computeCallRef, _N(PerFrame), GpuProgramType::kCompute,
         UniformManager::_perFrameUniformBuffer, UboType::kPerFrameFragment,
-        sizeof(PerInstanceData));
+        sizeof(RenderProcess::PerFrameDataFrament));
     ComputeCallManager::bindImage(
         computeCallRef, _N(shadowBufferTex), GpuProgramType::kCompute,
         ImageManager::getResourceByName(_N(ShadowBuffer)), Samplers::kShadow);
