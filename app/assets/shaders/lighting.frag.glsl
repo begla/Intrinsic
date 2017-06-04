@@ -44,19 +44,19 @@ layout (binding = 6) uniform sampler2D ssaoTex;
 layout (binding = 7) uniform samplerCube specularTex;
 layout (binding = 8) uniform sampler2DArrayShadow shadowBufferTex;
 layout (binding = 9) MATERIAL_BUFFER;
-layout (binding = 10) buffer LightBuffer
+layout (std430, binding = 10) buffer readonly LightBuffer
 {
   Light lights[];
 };
-layout (binding = 11) buffer LightIndexBuffer
+layout (std430, binding = 11) buffer readonly LightIndexBuffer
 {
   uint lightIndices[];
 };
-layout (binding = 12) buffer IrradProbeBuffer
+layout (std430, binding = 12) buffer readonly IrradProbeBuffer
 {
   IrradProbe irradProbes[];
 };
-layout (binding = 13) buffer IrradProbeIndexBuffer
+layout (std430, binding = 13) buffer readonly IrradProbeIndexBuffer
 {
   uint irradProbeIndices[];
 };
