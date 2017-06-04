@@ -5,7 +5,7 @@
         "materialPassMask": [
             "GBufferWater"
         ],
-        "albedoTextureName": "water",
+        "albedoTextureName": "white",
         "emissiveTextureName": "white",
         "uvOffsetScale": [
             0.0,

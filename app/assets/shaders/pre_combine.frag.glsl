@@ -48,8 +48,8 @@ const float fogDensity = 0.001;
 const float fogStart = 1200.0;
 const float fogSunScatteringIntens = 0.0;
 
-const float waterFogDensity = 90.0;
-const float waterFogMaxBlendFactor = 0.95;
+const float waterFogDensity = 20.0;
+const float waterFogMaxBlendFactor = 0.85;
 const float waterFogDecayExp = 16.0;
 const vec3 waterFogColor0 = vec3(0.0, 1.0, 1.0);
 const vec3 waterFogColor1 = vec3(0.0, 0.2, 0.2);
@@ -69,7 +69,7 @@ void main()
 
   const vec3 lighting = textureLod(lightBufferTex, inUV0, 0.0).rgb;
 
-  if (albedoTransparents.a > 0.0) 
+  if (albedoTransparents.a > EPSILON) 
   {
     const vec3 normTranspVS = decodeNormal(textureLod(normTranspTex, inUV0, 0.0).rg);
     const float depthTransp = textureLod(depthBufferTranspTex, inUV0, 0.0).r;
@@ -77,7 +77,7 @@ void main()
     // Fresnel
     const vec3 posVS = unproject(inUV0, depthTransp, uboPerInstance.invProjMatrix);
     const vec3 V = -normalize(posVS);
-    albedoTransparents.a = F_Schlick(albedoTransparents.a, clamp(dot(V, normTranspVS), 0.0, 1.0));
+    const float F = F_Schlick(albedoTransparents.a, clamp(dot(V, normTranspVS), 0.0, 1.0));
 
     const vec4 param0Transp = textureLod(param0TranspTex, inUV0, 0.0).rgba;
     const uint matBufferEntryIdxTransp = uint(param0Transp.y);
@@ -116,12 +116,10 @@ void main()
 
     const float waterFog = min(1.0 - exp(-(linDepthOpaque - linDepthTransp) * waterFogDensity), 
       waterFogMaxBlendFactor);
-    const float waterFogDecay = clamp(pow(waterFog, waterFogDecayExp), 0.0, 1.0);
 
-    opaque.rgb = mix(opaque.rgb, fogIrrad * mix(waterFogColor0, waterFogColor1, waterFogDecay), 
-      albedoTransparents.a * waterFog);
-    const vec3 transp = lightingTransp;
-    outColor.rgb = mix(opaque, transp, albedoTransparents.a);
+    opaque.rgb = mix(opaque.rgb, fogIrrad * mix(waterFogColor0, waterFogColor1, F), 
+      waterFog);
+    outColor.rgb = mix(opaque, lightingTransp, albedoTransparents.a);
   }
   else
   {
