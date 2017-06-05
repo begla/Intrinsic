@@ -96,8 +96,8 @@
    </property>
    <property name="iconSize">
     <size>
-     <width>32</width>
-     <height>32</height>
+     <width>24</width>
+     <height>24</height>
     </size>
    </property>
    <property name="toolButtonStyle">
@@ -180,8 +180,8 @@
    </property>
    <property name="iconSize">
     <size>
-     <width>32</width>
-     <height>32</height>
+     <width>24</width>
+     <height>24</height>
     </size>
    </property>
    <property name="toolButtonStyle">
@@ -208,8 +208,8 @@
    </property>
    <property name="iconSize">
     <size>
-     <width>32</width>
-     <height>32</height>
+     <width>24</width>
+     <height>24</height>
     </size>
    </property>
    <property name="toolButtonStyle">
