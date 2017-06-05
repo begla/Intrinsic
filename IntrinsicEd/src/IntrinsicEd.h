@@ -60,8 +60,10 @@ public slots:
   void onLoadEditorSettings();
   void onExit();
   void onLoadWorld();
+  void onReloadWorld();
   void onReloadSettingsAndRendererConfig();
   void onSaveWorld();
+  void onSaveWorldAs();
   void onFullscreen();
   void onEndFullscreen();
   void onEditingModeDefault();

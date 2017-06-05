@@ -46,7 +46,9 @@
      <string>File</string>
     </property>
     <addaction name="actionLoad_World"/>
+    <addaction name="actionReload_World"/>
     <addaction name="actionSave_World"/>
+    <addaction name="actionSave_World_As"/>
     <addaction name="separator"/>
     <addaction name="actionLoad_Editor_Settings"/>
     <addaction name="actionSave_Editor_Settings"/>
@@ -108,6 +110,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionLoad_World"/>
+   <addaction name="actionReload_World"/>
    <addaction name="actionSave_World"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -685,6 +688,30 @@
    </property>
    <property name="toolTip">
     <string>Create Light</string>
+   </property>
+  </action>
+  <action name="actionSave_World_As">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/cc/white/png/save_icon&amp;48.png</normaloff>:/Icons/icons/cc/white/png/save_icon&amp;48.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save World As...</string>
+   </property>
+   <property name="toolTip">
+    <string>Save World As...</string>
+   </property>
+  </action>
+  <action name="actionReload_World">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/cc/white/png/playback_reload_icon&amp;48.png</normaloff>:/Icons/icons/cc/white/png/playback_reload_icon&amp;48.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reload World</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload World</string>
    </property>
   </action>
  </widget>
