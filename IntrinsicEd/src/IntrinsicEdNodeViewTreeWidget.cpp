@@ -106,7 +106,7 @@ void IntrinsicEdNodeViewTreeWidget::onPopulateNodeTree()
       item = new QTreeWidgetItem(this);
       _nodeToItemMap[nodeRef] = item;
 
-      item->setIcon(0, QIcon(":/Icons/icons/cad/circle-2.png"));
+      item->setIcon(0, IntrinsicEd::getIcon("RootNode"));
     }
     else
     {
@@ -118,7 +118,7 @@ void IntrinsicEdNodeViewTreeWidget::onPopulateNodeTree()
       _nodeToItemMap[nodeRef] = item;
 
       // Use the first component found as an icon
-      QIcon iconToUse = QIcon(":/Icons/icons/cad/cube-1.png");
+      QIcon iconToUse = IntrinsicEd::getIcon("Node");
       for (auto it = Application::_componentManagerMapping.begin();
            it != Application::_componentManagerMapping.end(); ++it)
       {
@@ -131,7 +131,7 @@ void IntrinsicEdNodeViewTreeWidget::onPopulateNodeTree()
         Dod::Components::ComponentManagerEntry& entry = it->second;
         if (entry.getComponentForEntityFunction(entityRef).isValid())
         {
-          iconToUse = IntrinsicEd::_stringToIconMapping[compName.getString()];
+          iconToUse = IntrinsicEd::getIcon(compName.getString());
           break;
         }
       }
@@ -187,9 +187,9 @@ void IntrinsicEdNodeViewTreeWidget::createAddComponentContextMenu(QMenu* p_Menu)
 
       if (!entry.getComponentForEntityFunction(entity).isValid())
       {
-        QAction* createComp = new QAction(
-            IntrinsicEd::_stringToIconMapping[compName.toStdString().c_str()],
-            compName.toStdString().c_str(), p_Menu);
+        QAction* createComp =
+            new QAction(IntrinsicEd::getIcon(compName.toStdString().c_str()),
+                        compName.toStdString().c_str(), p_Menu);
         p_Menu->addAction(createComp);
 
         QObject::connect(createComp, SIGNAL(triggered()), this,
@@ -231,14 +231,13 @@ void IntrinsicEdNodeViewTreeWidget::createRemoveComponentContextMenu(
 
       if (entry.getComponentForEntityFunction(entity).isValid())
       {
-        QAction* removeComp = new QAction(
-            IntrinsicEd::_stringToIconMapping[compName.toStdString().c_str()],
-            compName.toStdString().c_str(), p_Menu);
+        QAction* removeComp =
+            new QAction(IntrinsicEd::getIcon(compName.toStdString().c_str()),
+                        compName.toStdString().c_str(), p_Menu);
         p_Menu->addAction(removeComp);
 
         QObject::connect(removeComp, SIGNAL(triggered()), this,
                          SLOT(onDestroyComponent()));
-        ;
       }
     }
   }

@@ -137,11 +137,9 @@ QFrame* IntrinsicEdPropertyView::createCategoryHeaderWidget(const char* p_Title,
                    SLOT(onCategoryHeaderClicked()));
 
   // Create icon (if mapping is available)
-  auto iconToUse = IntrinsicEd::_stringToPixmapMapping.find(p_Title);
-  if (iconToUse != IntrinsicEd::_stringToPixmapMapping.end())
   {
     QLabel* iconLabel = new QLabel();
-    iconLabel->setPixmap(iconToUse->second);
+    iconLabel->setPixmap(IntrinsicEd::getPixmap(p_Title));
     frame->layout()->addWidget(iconLabel);
   }
 

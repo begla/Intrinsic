@@ -27,8 +27,10 @@ IntrinsicEdViewport* IntrinsicEd::_viewport = nullptr;
 
 QDockWidget* _editingView = nullptr;
 
-_INTR_HASH_MAP(_INTR_STRING, QIcon) IntrinsicEd::_stringToIconMapping;
-_INTR_HASH_MAP(_INTR_STRING, QPixmap) IntrinsicEd::_stringToPixmapMapping;
+_INTR_ARRAY(QIcon) IntrinsicEd::_icons;
+_INTR_ARRAY(QPixmap) IntrinsicEd::_pixmaps;
+_INTR_HASH_MAP(_INTR_STRING, uint32_t) IntrinsicEd::_stringToIconMapping;
+_INTR_HASH_MAP(_INTR_STRING, uint32_t) IntrinsicEd::_stringToPixmapMapping;
 
 SDL_Window* _sdlMainWindow = nullptr;
 SDL_Window* _sdlViewport = nullptr;
@@ -124,6 +126,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     stringToIconPathMapping["Swarm"] = ":Icons/icons/birds/bird-2.png";
     stringToIconPathMapping["Player"] =
         ":Icons/icons/tech/game-controller-5.png";
+    stringToIconPathMapping["RootNode"] = ":/Icons/icons/cad/circle-1.png";
     stringToIconPathMapping["Node"] = ":/Icons/icons/cad/cube-1.png";
     stringToIconPathMapping["Mesh"] = ":/Icons/icons/cad/cone.png";
     stringToIconPathMapping["Script"] =
@@ -165,14 +168,15 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     for (auto it = stringToIconPathMapping.begin();
          it != stringToIconPathMapping.end(); ++it)
     {
-      _stringToIconMapping[it->first] = QIcon(it->second.c_str());
+      _icons.push_back(QIcon(it->second.c_str()));
+      _stringToIconMapping[it->first] = (uint32_t)_icons.size() - 1u;
     }
     for (auto it = stringToIconPathMapping.begin();
          it != stringToIconPathMapping.end(); ++it)
     {
-      QPixmap pixmap = QPixmap(it->second.c_str());
-      _stringToPixmapMapping[it->first] =
-          pixmap.scaledToWidth(20u, Qt::SmoothTransformation);
+      const QPixmap pixmap = QPixmap(it->second.c_str());
+      _pixmaps.push_back(pixmap.scaledToWidth(20u, Qt::SmoothTransformation));
+      _stringToPixmapMapping[it->first] = (uint32_t)_pixmaps.size() - 1u;
     }
   }
 
