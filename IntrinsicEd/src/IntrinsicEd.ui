@@ -163,7 +163,7 @@
     <enum>Qt::ToolButtonTextUnderIcon</enum>
    </property>
    <attribute name="toolBarArea">
-    <enum>LeftToolBarArea</enum>
+    <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
@@ -171,10 +171,10 @@
    <addaction name="actionCreateCube"/>
    <addaction name="actionCreateRigidBody"/>
    <addaction name="actionCreateSphere"/>
+   <addaction name="actionCreateRigidBody_Sphere"/>
    <addaction name="separator"/>
    <addaction name="actionCreateLight"/>
    <addaction name="separator"/>
-   <addaction name="actionShow_Create_Context_Menu"/>
   </widget>
   <widget class="QToolBar" name="devToolBar">
    <property name="enabled">
@@ -524,37 +524,13 @@
     <string>Main Game State</string>
    </property>
   </action>
-  <action name="actionShow_Create_Context_Menu">
-   <property name="icon">
-    <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/icons/cad/star.png</normaloff>:/Icons/icons/cad/star.png</iconset>
-   </property>
-   <property name="text">
-    <string>All</string>
-   </property>
-   <property name="toolTip">
-    <string>Show Create Context Menu</string>
-   </property>
-  </action>
-  <action name="actionShow_Debug_Context_Menu">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/Icons/icons/cc/white/png/lightbulb_icon&amp;48.png</normaloff>:/Icons/icons/cc/white/png/lightbulb_icon&amp;48.png</iconset>
-   </property>
-   <property name="text">
-    <string>Debugging</string>
-   </property>
-   <property name="toolTip">
-    <string>Show Debug Context Menu</string>
-   </property>
-  </action>
   <action name="actionCreateRigidBody_Sphere">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/icons/cad/circle-2.png</normaloff>:/Icons/icons/cad/circle-2.png</iconset>
+     <normaloff>:/Icons/icons/cad/circle-1.png</normaloff>:/Icons/icons/cad/circle-1.png</iconset>
    </property>
    <property name="text">
-    <string>R. Sphere</string>
+    <string>Rigid Sphere</string>
    </property>
    <property name="toolTip">
     <string>Create Rigid Body (Dyn. Sphere)</string>
