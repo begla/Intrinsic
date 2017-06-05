@@ -155,11 +155,15 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   QObject::connect(_ui.actionExit, SIGNAL(triggered()), this, SLOT(onExit()));
   QObject::connect(_ui.actionLoad_World, SIGNAL(triggered()), this,
                    SLOT(onLoadWorld()));
+  QObject::connect(_ui.actionReload_World, SIGNAL(triggered()), this,
+                   SLOT(onReloadWorld()));
   QObject::connect(_ui.actionReload_Settings_And_Renderer_Config,
                    SIGNAL(triggered()), this,
                    SLOT(onReloadSettingsAndRendererConfig()));
   QObject::connect(_ui.actionSave_World, SIGNAL(triggered()), this,
                    SLOT(onSaveWorld()));
+  QObject::connect(_ui.actionSave_World_As, SIGNAL(triggered()), this,
+                   SLOT(onSaveWorldAs()));
   QObject::connect(_ui.actionSave_Editor_Settings, SIGNAL(triggered()), this,
                    SLOT(onSaveEditorSettings()));
   QObject::connect(_ui.actionLoad_Editor_Settings, SIGNAL(triggered()), this,
@@ -419,13 +423,22 @@ void IntrinsicEd::onLoadWorld()
   }
 }
 
+void IntrinsicEd::onReloadWorld()
+{
+  World::load(World::_filePath);
+  GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
+  _nodeView->populateNodeTree();
+}
+
 void IntrinsicEd::onReloadSettingsAndRendererConfig()
 {
   Settings::Manager::loadSettings();
   Vulkan::RenderSystem::onViewportChanged();
 }
 
-void IntrinsicEd::onSaveWorld()
+void IntrinsicEd::onSaveWorld() { World::save(World::_filePath); }
+
+void IntrinsicEd::onSaveWorldAs()
 {
   const QString fileName =
       QFileDialog::getSaveFileName(this, tr("Save World"), QString("worlds"),
