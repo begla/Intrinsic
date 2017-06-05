@@ -52,17 +52,10 @@
          </property>
          <property name="icon">
           <iconset resource="../IntrinsicEd.qrc">
-           <normaloff>:/Icons/refresh</normaloff>:/Icons/refresh</iconset>
+           <normaloff>:/Icons/icons/arrows/redo.png</normaloff>:/Icons/icons/arrows/redo.png</iconset>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Line" name="line">
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+         <property name="autoRaise">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -76,7 +69,10 @@
          </property>
          <property name="icon">
           <iconset resource="../IntrinsicEd.qrc">
-           <normaloff>:/Icons/globe</normaloff>:/Icons/globe</iconset>
+           <normaloff>:/Icons/icons/cad/circle-2.png</normaloff>:/Icons/icons/cad/circle-2.png</iconset>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -90,7 +86,10 @@
          </property>
          <property name="icon">
           <iconset resource="../IntrinsicEd.qrc">
-           <normaloff>:/Icons/target</normaloff>:/Icons/target</iconset>
+           <normaloff>:/Icons/icons/cad/cube-1.png</normaloff>:/Icons/icons/cad/cube-1.png</iconset>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -98,6 +97,9 @@
         <widget class="QLabel" name="nodeCountLabel">
          <property name="text">
           <string>42 Nodes</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
        </item>

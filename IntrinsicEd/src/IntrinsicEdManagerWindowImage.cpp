@@ -23,7 +23,6 @@ IntrinsicEdManagerWindowImage::IntrinsicEdManagerWindowImage(QWidget* parent)
   _propertyCompilerEntry =
       Application::_resourcePropertyCompilerMapping[_N(Image)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(Image)];
-  _resourceIcon = QIcon(":/Icons/picture");
   _managerPath = "managers/images/";
   _managerExtension = ".image.json";
   _resourceName = "Image";

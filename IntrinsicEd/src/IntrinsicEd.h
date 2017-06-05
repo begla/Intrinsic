@@ -52,8 +52,8 @@ public:
   static IntrinsicEdManagerWindowPostEffect* _managerWindowPostEffect;
   static IntrinsicEdViewport* _viewport;
 
-  static _INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) _categoryToIconMapping;
-  static _INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) _componentToIconMapping;
+  static _INTR_HASH_MAP(_INTR_STRING, QIcon) _stringToIconMapping;
+  static _INTR_HASH_MAP(_INTR_STRING, QPixmap) _stringToPixmapMapping;
 
 public slots:
   void onSaveEditorSettings();

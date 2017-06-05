@@ -74,7 +74,8 @@ Intrinsic uses the following proprietary libraries:
 * Cloc (see http://cloc.sourceforge.net)
 * 7za (see http://www.7-zip.org/download.html)
 
-Assets sourced from:
+Assets and icons sourced from:
 
 * https://cloud.blender.org/
 * http://www.hdrlabs.com/sibl/archive.html
+* http://www.flaticon.com

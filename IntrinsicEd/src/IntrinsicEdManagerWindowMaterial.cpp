@@ -24,7 +24,6 @@ IntrinsicEdManagerWindowMaterial::IntrinsicEdManagerWindowMaterial(
   _propertyCompilerEntry =
       Application::_resourcePropertyCompilerMapping[_N(Material)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(Material)];
-  _resourceIcon = QIcon(":/Icons/brush");
   _managerPath = "managers/materials/";
   _managerExtension = ".material.json";
   _resourceName = "Material";

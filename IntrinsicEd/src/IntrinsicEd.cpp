@@ -27,8 +27,8 @@ IntrinsicEdViewport* IntrinsicEd::_viewport = nullptr;
 
 QDockWidget* _editingView = nullptr;
 
-_INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) IntrinsicEd::_categoryToIconMapping;
-_INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) IntrinsicEd::_componentToIconMapping;
+_INTR_HASH_MAP(_INTR_STRING, QIcon) IntrinsicEd::_stringToIconMapping;
+_INTR_HASH_MAP(_INTR_STRING, QPixmap) IntrinsicEd::_stringToPixmapMapping;
 
 SDL_Window* _sdlMainWindow = nullptr;
 SDL_Window* _sdlViewport = nullptr;
@@ -113,43 +113,67 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
   // Setup category/component mappings
   {
-    _categoryToIconMapping["NodeLocalTransform"] = ":Icons/drawArrow";
-    _categoryToIconMapping["NodeWorldTransform"] = ":Icons/globe";
-    _categoryToIconMapping["Entity"] = ":Icons/lightbulb";
-    _categoryToIconMapping["Mesh"] = ":Icons/user";
-    _categoryToIconMapping["GpuProgram"] = ":Icons/calendar";
-    _categoryToIconMapping["Resource"] = ":Icons/case";
-    _categoryToIconMapping["PBR"] = ":Icons/lightbulb";
-    _categoryToIconMapping["Emissive"] = ":Icons/lightbulb";
-    _categoryToIconMapping["Textures"] = ":Icons/picture";
-    _categoryToIconMapping["Translucency"] = ":Icons/picture";
-    _categoryToIconMapping["UV"] = ":Icons/picture";
-    _categoryToIconMapping["Transparency"] = ":Icons/picture";
-    _categoryToIconMapping["Material"] = ":Icons/brush";
-    _categoryToIconMapping["Camera"] = ":Icons/film";
-    _categoryToIconMapping["CameraController"] = ":Icons/film";
-    _categoryToIconMapping["CharacterController"] = ":Icons/user";
-    _categoryToIconMapping["Swarm"] = ":Icons/users";
-    _categoryToIconMapping["Player"] = ":Icons/user";
-    _categoryToIconMapping["RigidBody"] = ":Icons/cube";
-    _categoryToIconMapping["PostEffectVolume"] = ":Icons/picture";
-    _categoryToIconMapping["Light"] = ":Icons/lightbulb";
-    _categoryToIconMapping["IrradianceProbe"] = ":Icons/lightbulb";
-  }
+    _INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) stringToIconPathMapping;
 
-  {
-    _componentToIconMapping["Camera"] = ":Icons/film";
-    _componentToIconMapping["CameraController"] = ":Icons/film";
-    _componentToIconMapping["CharacterController"] = ":Icons/user";
-    _componentToIconMapping["Swarm"] = ":Icons/users";
-    _componentToIconMapping["Player"] = ":Icons/user";
-    _componentToIconMapping["Node"] = ":Icons/target";
-    _componentToIconMapping["Mesh"] = ":Icons/user";
-    _componentToIconMapping["Script"] = ":Icons/script";
-    _componentToIconMapping["RigidBody"] = ":Icons/cube";
-    _componentToIconMapping["PostEffectVolume"] = ":Icons/picture";
-    _componentToIconMapping["Light"] = ":Icons/lightbulb";
-    _componentToIconMapping["IrradianceProbe"] = ":Icons/lightbulb";
+    stringToIconPathMapping["Camera"] =
+        ":Icons/icons/essential/photo-camera-1.png";
+    stringToIconPathMapping["CameraController"] =
+        ":Icons/icons/essential/controls-1.png";
+    stringToIconPathMapping["CharacterController"] =
+        ":Icons/icons/cad/cylinder.png";
+    stringToIconPathMapping["Swarm"] = ":Icons/icons/birds/bird-2.png";
+    stringToIconPathMapping["Player"] =
+        ":Icons/icons/tech/game-controller-5.png";
+    stringToIconPathMapping["Node"] = ":/Icons/icons/cad/cube-1.png";
+    stringToIconPathMapping["Mesh"] = ":/Icons/icons/cad/cone.png";
+    stringToIconPathMapping["Script"] =
+        ":/Icons/icons/business/051-certificate.png";
+    stringToIconPathMapping["RigidBody"] = ":/Icons/icons/cad/corner.png";
+    stringToIconPathMapping["PostEffectVolume"] =
+        ":/Icons/icons/weather/rainbow-2.png";
+    stringToIconPathMapping["PostEffect"] =
+        ":/Icons/icons/weather/rainbow-2.png";
+    stringToIconPathMapping["Light"] = ":Icons/icons/various/idea.png";
+    stringToIconPathMapping["IrradianceProbe"] =
+        ":/Icons/icons/weather/clouds-and-sun.png";
+    stringToIconPathMapping["NodeLocalTransform"] =
+        ":/Icons/icons/cad/rotate-1.png";
+    stringToIconPathMapping["NodeWorldTransform"] =
+        ":/Icons/icons/cad/rotate-1.png";
+    stringToIconPathMapping["Entity"] = ":/Icons/icons/essential/archive.png";
+    stringToIconPathMapping["Mesh"] = ":/Icons/icons/cad/cone.png";
+    stringToIconPathMapping["GpuProgram"] =
+        ":/Icons/icons/business/051-coding-1.png";
+    stringToIconPathMapping["Resource"] = ":/Icons/icons/essential/archive.png";
+    stringToIconPathMapping["Asset"] = ":/Icons/icons/essential/archive-3.png";
+    stringToIconPathMapping["PBR"] = ":Icons/icons/various/idea.png";
+    stringToIconPathMapping["Emissive"] = ":Icons/icons/various/idea.png";
+    stringToIconPathMapping["Textures"] = ":/Icons/icons/essential/picture.png";
+    stringToIconPathMapping["Texture"] = ":/Icons/icons/essential/picture.png";
+    stringToIconPathMapping["Image"] = ":/Icons/icons/essential/picture.png";
+    stringToIconPathMapping["Translucency"] = ":Icons/icons/various/idea.png";
+    stringToIconPathMapping["UV"] = ":/Icons/icons/essential/picture.png";
+    stringToIconPathMapping["Transparency"] = ":/Icons/icons/geometry/cube.png";
+    stringToIconPathMapping["Material"] = ":/Icons/icons/essential/layers.png";
+    stringToIconPathMapping["Lighting"] = ":Icons/icons/various/idea.png";
+    stringToIconPathMapping["VolumetricLighting"] =
+        ":/Icons/icons/weather/clouds.png";
+    stringToIconPathMapping["Water"] = ":/Icons/icons/weather/raindrops.png";
+    stringToIconPathMapping["DepthOfField"] =
+        ":Icons/icons/essential/photo-camera-1.png";
+
+    for (auto it = stringToIconPathMapping.begin();
+         it != stringToIconPathMapping.end(); ++it)
+    {
+      _stringToIconMapping[it->first] = QIcon(it->second.c_str());
+    }
+    for (auto it = stringToIconPathMapping.begin();
+         it != stringToIconPathMapping.end(); ++it)
+    {
+      QPixmap pixmap = QPixmap(it->second.c_str());
+      _stringToPixmapMapping[it->first] =
+          pixmap.scaledToWidth(20u, Qt::SmoothTransformation);
+    }
   }
 
   QObject::connect(_ui.actionExit, SIGNAL(triggered()), this, SLOT(onExit()));

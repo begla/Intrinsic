@@ -95,8 +95,8 @@ void IntrinsicEdNodeViewTreeWidget::onPopulateNodeTree()
          Components::NodeFlags::Flags::kSpawned) > 0u)
       continue;
 
-    const Name& name =
-        Entity::EntityManager::_name(Components::NodeManager::_entity(nodeRef));
+    Entity::EntityRef entityRef = Components::NodeManager::_entity(nodeRef);
+    const Name& name = Entity::EntityManager::_name(entityRef);
 
     QTreeWidgetItem* item = nullptr;
     QString nodeTitle = name.getString().c_str();
@@ -106,7 +106,7 @@ void IntrinsicEdNodeViewTreeWidget::onPopulateNodeTree()
       item = new QTreeWidgetItem(this);
       _nodeToItemMap[nodeRef] = item;
 
-      item->setIcon(0, QIcon(":/Icons/globe"));
+      item->setIcon(0, QIcon(":/Icons/icons/cad/circle-2.png"));
     }
     else
     {
@@ -116,7 +116,27 @@ void IntrinsicEdNodeViewTreeWidget::onPopulateNodeTree()
 
       item = new QTreeWidgetItem(parentItem);
       _nodeToItemMap[nodeRef] = item;
-      item->setIcon(0, QIcon(":/Icons/target"));
+
+      // Use the first component found as an icon
+      QIcon iconToUse = QIcon(":/Icons/icons/cad/cube-1.png");
+      for (auto it = Application::_componentManagerMapping.begin();
+           it != Application::_componentManagerMapping.end(); ++it)
+      {
+        const Name& compName = it->first;
+
+        // Don't count nodes
+        if (compName == "Node")
+          continue;
+
+        Dod::Components::ComponentManagerEntry& entry = it->second;
+        if (entry.getComponentForEntityFunction(entityRef).isValid())
+        {
+          iconToUse = IntrinsicEd::_stringToIconMapping[compName.getString()];
+          break;
+        }
+      }
+
+      item->setIcon(0, iconToUse);
     }
 
     if (i == 0u)
@@ -150,18 +170,26 @@ void IntrinsicEdNodeViewTreeWidget::createAddComponentContextMenu(QMenu* p_Menu)
     Components::NodeRef currentNode = _itemToNodeMap[currIt];
     Entity::EntityRef entity = Components::NodeManager::_entity(currentNode);
 
+    QMap<QString, Dod::Components::ComponentManagerEntry*> sortedComponents;
+
     for (auto it = Application::_componentManagerMapping.begin();
          it != Application::_componentManagerMapping.end(); ++it)
     {
       const _INTR_STRING& compName = it->first.getString();
-      Dod::Components::ComponentManagerEntry& entry =
-          Application::_componentManagerMapping[compName];
+      Dod::Components::ComponentManagerEntry& entry = it->second;
+      sortedComponents[compName.c_str()] = &entry;
+    }
+
+    for (auto it = sortedComponents.begin(); it != sortedComponents.end(); ++it)
+    {
+      const QString& compName = it.key();
+      Dod::Components::ComponentManagerEntry& entry = *it.value();
 
       if (!entry.getComponentForEntityFunction(entity).isValid())
       {
         QAction* createComp = new QAction(
-            QIcon(IntrinsicEd::_componentToIconMapping[compName].c_str()),
-            compName.c_str(), p_Menu);
+            IntrinsicEd::_stringToIconMapping[compName.toStdString().c_str()],
+            compName.toStdString().c_str(), p_Menu);
         p_Menu->addAction(createComp);
 
         QObject::connect(createComp, SIGNAL(triggered()), this,
@@ -181,22 +209,36 @@ void IntrinsicEdNodeViewTreeWidget::createRemoveComponentContextMenu(
     Components::NodeRef currentNode = _itemToNodeMap[currIt];
     Entity::EntityRef entity = Components::NodeManager::_entity(currentNode);
 
+    QMap<QString, Dod::Components::ComponentManagerEntry*> sortedComponents;
+
     for (auto it = Application::_componentManagerMapping.begin();
          it != Application::_componentManagerMapping.end(); ++it)
     {
       const _INTR_STRING& compName = it->first.getString();
-      Dod::Components::ComponentManagerEntry& entry =
-          Application::_componentManagerMapping[compName];
+      Dod::Components::ComponentManagerEntry& entry = it->second;
+      sortedComponents[compName.c_str()] = &entry;
+    }
+
+    for (auto it = sortedComponents.begin(); it != sortedComponents.end(); ++it)
+    {
+      const QString& compName = it.key();
+
+      // Nodes can't be deleted
+      if (compName == "Node")
+        continue;
+
+      Dod::Components::ComponentManagerEntry& entry = *it.value();
 
       if (entry.getComponentForEntityFunction(entity).isValid())
       {
         QAction* removeComp = new QAction(
-            QIcon(IntrinsicEd::_componentToIconMapping[compName].c_str()),
-            compName.c_str(), p_Menu);
+            IntrinsicEd::_stringToIconMapping[compName.toStdString().c_str()],
+            compName.toStdString().c_str(), p_Menu);
         p_Menu->addAction(removeComp);
 
         QObject::connect(removeComp, SIGNAL(triggered()), this,
                          SLOT(onDestroyComponent()));
+        ;
       }
     }
   }
@@ -271,8 +313,8 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
 {
   QMenu* contextMenu = new QMenu(this);
 
-  QAction* createNode =
-      new QAction(QIcon(":/Icons/plus"), "Create (Child) Node", this);
+  QAction* createNode = new QAction(QIcon(":/Icons/icons/essential/plus.png"),
+                                    "Create (Child) Node", this);
   contextMenu->addAction(createNode);
 
   QObject::connect(createNode, SIGNAL(triggered()), this, SLOT(onCreateNode()));
@@ -291,14 +333,16 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
     {
       contextMenu->addSeparator();
 
-      QAction* captureProbe = new QAction(QIcon(":/Icons/lightbulb"),
-                                          "Capture Irradiance Probe", this);
+      QAction* captureProbe =
+          new QAction(QIcon(":/Icons/icons/various/idea.png"),
+                      "Capture Irradiance Probe", this);
       contextMenu->addAction(captureProbe);
       QObject::connect(captureProbe, SIGNAL(triggered()), this,
                        SLOT(onCaptureIrradianceProbe()));
 
-      QAction* captureAllProbes = new QAction(
-          QIcon(":/Icons/lightbulb"), "Capture ALL Irradiance Probes", this);
+      QAction* captureAllProbes =
+          new QAction(QIcon(":/Icons/icons/various/idea.png"),
+                      "Capture ALL Irradiance Probes", this);
       contextMenu->addAction(captureAllProbes);
       QObject::connect(captureAllProbes, SIGNAL(triggered()), this,
                        SLOT(onCaptureAllIrradianceProbes()));
@@ -310,22 +354,22 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
     if (World::getRootNode() != currentNode)
     {
       QAction* cloneNode =
-          new QAction(QIcon(":/Icons/plus"), "Clone Node", this);
+          new QAction(QIcon(":/Icons/icons/cad/layer.png"), "Clone Node", this);
       contextMenu->addAction(cloneNode);
       QObject::connect(cloneNode, SIGNAL(triggered()), this,
                        SLOT(onCloneNode()));
 
-      QAction* deleteNode =
-          new QAction(QIcon(":/Icons/minus"), "Delete Node", this);
+      QAction* deleteNode = new QAction(
+          QIcon(":/Icons/icons/essential/minus.png"), "Delete Node", this);
       contextMenu->addAction(deleteNode);
       QObject::connect(deleteNode, SIGNAL(triggered()), this,
                        SLOT(onDeleteNode()));
     }
 
     QMenu* addComponentMenu = new QMenu("Add Component", this);
-    addComponentMenu->setIcon(QIcon(":/Icons/plus"));
+    addComponentMenu->setIcon(QIcon(":/Icons/icons/essential/plus.png"));
     QMenu* removeComponentMenu = new QMenu("Remove Component", this);
-    removeComponentMenu->setIcon(QIcon(":/Icons/minus"));
+    removeComponentMenu->setIcon(QIcon(":/Icons/icons/essential/minus.png"));
 
     createAddComponentContextMenu(addComponentMenu);
     createRemoveComponentContextMenu(removeComponentMenu);
