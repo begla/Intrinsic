@@ -239,10 +239,6 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   QObject::connect(_ui.actionWireframe_Rendering, SIGNAL(triggered()), this,
                    SLOT(onDebugGeometryChanged()));
 
-  QObject::connect(_ui.actionShow_Create_Context_Menu, SIGNAL(triggered()),
-                   this, SLOT(onShowCreateContextMenu()));
-  QObject::connect(_ui.actionShow_Debug_Context_Menu, SIGNAL(triggered()), this,
-                   SLOT(onShowDebugContextMenu()));
   QObject::connect(_ui.actionShow_Debug_Geometry_Context_Menu,
                    SIGNAL(triggered()), this,
                    SLOT(onShowDebugGeometryContextMenu()));
@@ -396,14 +392,6 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
   // Context menus
   {
-    _createContextMenu.addAction(_ui.actionCreateCube);
-    _createContextMenu.addAction(_ui.actionCreateSphere);
-    _createContextMenu.addSeparator();
-    _createContextMenu.addAction(_ui.actionCreateLight);
-    _createContextMenu.addSeparator();
-    _createContextMenu.addAction(_ui.actionCreateRigidBody);
-    _createContextMenu.addAction(_ui.actionCreateRigidBody_Sphere);
-
     _debugGeometryContextMenu.addAction(_ui.actionWireframe_Rendering);
     _debugGeometryContextMenu.addAction(_ui.actionShow_World_Bounding_Spheres);
     _debugGeometryContextMenu.addAction(_ui.actionShow_Benchmark_Paths);
@@ -826,19 +814,9 @@ void IntrinsicEd::closeEvent(QCloseEvent*)
   Application::shutdown();
 }
 
-void IntrinsicEd::onShowDebugContextMenu()
-{
-  _debugContextMenu.popup(QCursor::pos());
-}
-
 void IntrinsicEd::onShowDebugGeometryContextMenu()
 {
   _debugGeometryContextMenu.popup(QCursor::pos());
-}
-
-void IntrinsicEd::onShowCreateContextMenu()
-{
-  _createContextMenu.popup(QCursor::pos());
 }
 
 void IntrinsicEd::onDebugGeometryChanged()

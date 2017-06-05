@@ -91,9 +91,7 @@ public slots:
   void onCreateRigidBodySphere();
   void onCreateLight();
   void onCreateSphere();
-  void onShowDebugContextMenu();
   void onShowDebugGeometryContextMenu();
-  void onShowCreateContextMenu();
   void onDebugGeometryChanged();
   void onOpenMicroprofile();
   void onCompileShaders();
@@ -104,8 +102,6 @@ private:
   void updateSettingsChangeWatch();
   void updateUI();
 
-  QMenu _createContextMenu;
-  QMenu _debugContextMenu;
   QMenu _debugGeometryContextMenu;
 
   QSlider* _dayNightSlider;
