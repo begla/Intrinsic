@@ -220,6 +220,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    SLOT(onRecompileShaders()));
 
   _editingView = new QDockWidget();
+  _editingView->setObjectName("editingView");
   addDockWidget(Qt::RightDockWidgetArea, _editingView);
 
   _propertyView = new IntrinsicEdPropertyView();
