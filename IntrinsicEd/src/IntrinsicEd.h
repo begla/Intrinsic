@@ -52,8 +52,15 @@ public:
   static IntrinsicEdManagerWindowPostEffect* _managerWindowPostEffect;
   static IntrinsicEdViewport* _viewport;
 
-  static _INTR_HASH_MAP(_INTR_STRING, QIcon) _stringToIconMapping;
-  static _INTR_HASH_MAP(_INTR_STRING, QPixmap) _stringToPixmapMapping;
+  static const QIcon& getIcon(const _INTR_STRING& p_String)
+  {
+    return _icons[_stringToIconMapping[p_String]];
+  }
+
+  static const QPixmap& getPixmap(const _INTR_STRING& p_Pixmap)
+  {
+    return _pixmaps[_stringToPixmapMapping[p_Pixmap]];
+  }
 
 public slots:
   void onSaveEditorSettings();
@@ -104,6 +111,11 @@ private:
   QSlider* _dayNightSlider;
   QFileSystemWatcher* _settingsChangeWatch;
   bool _settingsUpdatePending;
+
+  static _INTR_ARRAY(QIcon) _icons;
+  static _INTR_ARRAY(QPixmap) _pixmaps;
+  static _INTR_HASH_MAP(_INTR_STRING, uint32_t) _stringToIconMapping;
+  static _INTR_HASH_MAP(_INTR_STRING, uint32_t) _stringToPixmapMapping;
 
   Ui::IntrinsicEdClass _ui;
 };

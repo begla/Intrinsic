@@ -81,9 +81,7 @@ void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
 
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0, properties["name"]["value"].GetString());
-    item->setIcon(
-        0,
-        IntrinsicEd::_stringToIconMapping[_resourceName.toStdString().c_str()]);
+    item->setIcon(0, IntrinsicEd::getIcon(_resourceName.toStdString().c_str()));
     item->setFlags(item->flags() | Qt::ItemIsEditable);
 
     _itemToResourceMapping[item] = resource;
