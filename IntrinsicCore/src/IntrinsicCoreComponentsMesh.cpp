@@ -93,7 +93,7 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
         {
           perInstanceDataFragment.colorTint = glm::mix(
               perInstanceDataFragment.colorTint,
-              glm::vec4(1.0f, 0.6f, 0.0f, 1.0f),
+              glm::vec4(51.0f / 255.0f, 187.0f / 255.0f, 1.0f, 1.0f),
               glm::clamp(abs(sin(TaskManager::_totalTimePassed * 4.0f)) * 0.5f +
                              0.5f,
                          0.0f, 1.0f));

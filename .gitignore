@@ -1,6 +1,7 @@
 *.dir
 x64
 
+app/IntrinsicEd.ini
 app/Intrinsic
 app/*.exe
 app/*.lib

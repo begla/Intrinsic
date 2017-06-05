@@ -56,12 +56,12 @@ int _main(int argc, char* argv[])
     darkPalette.setColor(QPalette::Button, QColor(53, 53, 53));
     darkPalette.setColor(QPalette::ButtonText, Qt::white);
     darkPalette.setColor(QPalette::BrightText, Qt::red);
-    darkPalette.setColor(QPalette::Link, QColor(236, 112, 0));
-    darkPalette.setColor(QPalette::Highlight, QColor(236, 112, 0));
+    darkPalette.setColor(QPalette::Link, QColor(0, 170, 255));
+    darkPalette.setColor(QPalette::Highlight, QColor(0, 170, 255));
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
 
-    a.setStyleSheet("QToolTip { color: #ffffff; background-color: #202428; "
-                    "border: 1px solid #EC7000; } QToolBar { border: 0px }");
+    a.setStyleSheet("QToolTip { color: #ffffff; background-color: #00aaff; "
+                    "border: 1px solid #ffffff; } QToolBar { border: 0px }");
     a.setPalette(darkPalette);
 
     int id = QFontDatabase::addApplicationFont(":/Fonts/fira");

@@ -25,6 +25,8 @@ IntrinsicEdManagerWindowPostEffect* IntrinsicEd::_managerWindowPostEffect =
 IntrinsicEd* IntrinsicEd::_mainWindow = nullptr;
 IntrinsicEdViewport* IntrinsicEd::_viewport = nullptr;
 
+QDockWidget* _editingView = nullptr;
+
 _INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) IntrinsicEd::_categoryToIconMapping;
 _INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) IntrinsicEd::_componentToIconMapping;
 
@@ -217,11 +219,14 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   QObject::connect(_ui.actionRecompile_Shaders, SIGNAL(triggered()), this,
                    SLOT(onRecompileShaders()));
 
+  _editingView = new QDockWidget();
+  addDockWidget(Qt::RightDockWidgetArea, _editingView);
+
   _propertyView = new IntrinsicEdPropertyView();
-  addDockWidget(Qt::RightDockWidgetArea, _propertyView);
+  tabifyDockWidget(_editingView, _propertyView);
 
   _nodeView = new IntrinsicEdNodeView();
-  addDockWidget(Qt::LeftDockWidgetArea, _nodeView);
+  tabifyDockWidget(_propertyView, _nodeView);
 
   _managerWindowGpuProgram = new IntrinsicEdManagerWindowGpuProgram(nullptr);
   _managerWindowScript = new IntrinsicEdManagerWindowScript(nullptr);
@@ -250,105 +255,108 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   QObject::connect(_ui.actionPostEffects, SIGNAL(triggered()),
                    _managerWindowPostEffect, SLOT(show()));
 
-  // Editing toolbar
+  // Setup editing view
   {
-    QLabel* label = new QLabel("Grid Size:");
-    label->setMargin(3);
-    label->setStyleSheet("font: 8pt");
+    QGridLayout* editingViewLayout = new QGridLayout();
+    QWidget* editingViewContainer = new QWidget();
+    _editingView->setWidget(editingViewContainer);
 
-    QDoubleSpinBox* gridSizeSpinBox = new QDoubleSpinBox();
-    gridSizeSpinBox->setMinimum(0.01f);
-    gridSizeSpinBox->setSingleStep(0.5f);
-    gridSizeSpinBox->setToolTip("Grid Size");
+    editingViewContainer->setLayout(editingViewLayout);
+    _editingView->setWindowTitle("Editing View");
 
-    gridSizeSpinBox->setValue(GameStates::Editing::_gridSize);
+    {
+      QLabel* label = new QLabel("Grid Size:");
+      label->setMargin(3);
 
-    _ui.gridToolBar->addWidget(label);
-    _ui.gridToolBar->addWidget(gridSizeSpinBox);
+      QDoubleSpinBox* gridSizeSpinBox = new QDoubleSpinBox();
+      gridSizeSpinBox->setMinimum(0.01f);
+      gridSizeSpinBox->setSingleStep(0.5f);
+      gridSizeSpinBox->setToolTip("Grid Size");
 
-    QObject::connect(gridSizeSpinBox, SIGNAL(valueChanged(double)), this,
-                     SLOT(onGridSizeChanged(double)));
-  }
+      gridSizeSpinBox->setValue(GameStates::Editing::_gridSize);
 
-  {
-    QLabel* label = new QLabel("Gizmo Size:");
-    label->setMargin(3);
-    label->setStyleSheet("font: 8pt");
+      editingViewLayout->addWidget(label, 0, 0);
+      editingViewLayout->addWidget(gridSizeSpinBox, 0, 1);
 
-    QDoubleSpinBox* gizmoSizeSpinBox = new QDoubleSpinBox();
-    gizmoSizeSpinBox->setMinimum(0.05f);
-    gizmoSizeSpinBox->setSingleStep(0.05f);
-    gizmoSizeSpinBox->setToolTip("Gizmo Size");
+      QObject::connect(gridSizeSpinBox, SIGNAL(valueChanged(double)), this,
+                       SLOT(onGridSizeChanged(double)));
+    }
 
-    gizmoSizeSpinBox->setValue(GameStates::Editing::_gizmoSize);
+    {
+      QLabel* label = new QLabel("Gizmo Size:");
+      label->setMargin(3);
 
-    _ui.gridToolBar->addWidget(label);
-    _ui.gridToolBar->addWidget(gizmoSizeSpinBox);
+      QDoubleSpinBox* gizmoSizeSpinBox = new QDoubleSpinBox();
+      gizmoSizeSpinBox->setMinimum(0.05f);
+      gizmoSizeSpinBox->setSingleStep(0.05f);
+      gizmoSizeSpinBox->setToolTip("Gizmo Size");
 
-    QObject::connect(gizmoSizeSpinBox, SIGNAL(valueChanged(double)), this,
-                     SLOT(onGizmoSizeChanged(double)));
-  }
+      gizmoSizeSpinBox->setValue(GameStates::Editing::_gizmoSize);
 
-  {
-    QLabel* label = new QLabel("Camera Speed:");
-    label->setMargin(3);
-    label->setStyleSheet("font: 8pt");
+      editingViewLayout->addWidget(label, 1, 0);
+      editingViewLayout->addWidget(gizmoSizeSpinBox, 1, 1);
 
-    QDoubleSpinBox* cameraSpeedSpinBox = new QDoubleSpinBox();
-    cameraSpeedSpinBox->setMinimum(0.05f);
-    cameraSpeedSpinBox->setMaximum(1000.0f);
-    cameraSpeedSpinBox->setSingleStep(0.05f);
-    cameraSpeedSpinBox->setToolTip("Camera Speed");
+      QObject::connect(gizmoSizeSpinBox, SIGNAL(valueChanged(double)), this,
+                       SLOT(onGizmoSizeChanged(double)));
+    }
 
-    cameraSpeedSpinBox->setValue(GameStates::Editing::_cameraSpeed);
+    {
+      QLabel* label = new QLabel("Camera Speed:");
+      label->setMargin(3);
 
-    _ui.gridToolBar->addWidget(label);
-    _ui.gridToolBar->addWidget(cameraSpeedSpinBox);
+      QDoubleSpinBox* cameraSpeedSpinBox = new QDoubleSpinBox();
+      cameraSpeedSpinBox->setMinimum(0.05f);
+      cameraSpeedSpinBox->setMaximum(1000.0f);
+      cameraSpeedSpinBox->setSingleStep(0.05f);
+      cameraSpeedSpinBox->setToolTip("Camera Speed");
 
-    QObject::connect(cameraSpeedSpinBox, SIGNAL(valueChanged(double)), this,
-                     SLOT(onCameraSpeedChanged(double)));
-  }
+      cameraSpeedSpinBox->setValue(GameStates::Editing::_cameraSpeed);
 
-  {
-    QLabel* label = new QLabel("Day/Night:");
-    label->setMargin(3);
-    label->setStyleSheet("font: 8pt");
+      editingViewLayout->addWidget(label, 2, 0);
+      editingViewLayout->addWidget(cameraSpeedSpinBox, 2, 1);
 
-    _dayNightSlider = new QSlider(Qt::Horizontal);
-    _dayNightSlider->setMinimum(0);
-    _dayNightSlider->setMaximum(100);
-    _dayNightSlider->setSingleStep(1);
-    _dayNightSlider->setToolTip("Day/Night");
-    _dayNightSlider->setValue(World::_currentTime);
+      QObject::connect(cameraSpeedSpinBox, SIGNAL(valueChanged(double)), this,
+                       SLOT(onCameraSpeedChanged(double)));
+    }
 
-    _ui.gridToolBar->addWidget(label);
-    _ui.gridToolBar->addWidget(_dayNightSlider);
+    {
+      QLabel* label = new QLabel("Day/Night:");
+      label->setMargin(3);
 
-    QObject::connect(_dayNightSlider, SIGNAL(valueChanged(int)), this,
-                     SLOT(onDayNightSliderChanged(int)));
-  }
+      _dayNightSlider = new QSlider(Qt::Horizontal);
+      _dayNightSlider->setMinimum(0);
+      _dayNightSlider->setMaximum(100);
+      _dayNightSlider->setSingleStep(1);
+      _dayNightSlider->setToolTip("Day/Night");
+      _dayNightSlider->setValue(World::_currentTime);
 
-  _ui.gridToolBar->addSeparator();
+      editingViewLayout->addWidget(label, 3, 0);
+      editingViewLayout->addWidget(_dayNightSlider, 3, 1);
 
-  {
+      QObject::connect(_dayNightSlider, SIGNAL(valueChanged(int)), this,
+                       SLOT(onDayNightSliderChanged(int)));
+    }
 
-    QLabel* label = new QLabel("Time Mod.:");
-    label->setMargin(3);
-    label->setStyleSheet("font: 8pt");
+    {
+      QLabel* label = new QLabel("Time Mod.:");
+      label->setMargin(3);
 
-    QDoubleSpinBox* timeModSpinBox = new QDoubleSpinBox();
-    timeModSpinBox->setMinimum(0.0f);
-    timeModSpinBox->setMaximum(999.0f);
-    timeModSpinBox->setSingleStep(0.1f);
-    timeModSpinBox->setToolTip("Time Modulator");
+      QDoubleSpinBox* timeModSpinBox = new QDoubleSpinBox();
+      timeModSpinBox->setMinimum(0.0f);
+      timeModSpinBox->setMaximum(999.0f);
+      timeModSpinBox->setSingleStep(0.1f);
+      timeModSpinBox->setToolTip("Time Modulator");
 
-    timeModSpinBox->setValue(TaskManager::_timeModulator);
+      timeModSpinBox->setValue(TaskManager::_timeModulator);
 
-    _ui.gridToolBar->addWidget(label);
-    _ui.gridToolBar->addWidget(timeModSpinBox);
+      editingViewLayout->addWidget(label, 4, 0);
+      editingViewLayout->addWidget(timeModSpinBox, 4, 1);
 
-    QObject::connect(timeModSpinBox, SIGNAL(valueChanged(double)), this,
-                     SLOT(onTimeModChanged(double)));
+      QObject::connect(timeModSpinBox, SIGNAL(valueChanged(double)), this,
+                       SLOT(onTimeModChanged(double)));
+    }
+
+    editingViewLayout->setRowStretch(5, 1);
   }
 
   // Context menus
@@ -382,16 +390,16 @@ IntrinsicEd::~IntrinsicEd() {}
 
 void IntrinsicEd::onSaveEditorSettings()
 {
-  QSettings settings;
-  settings.setValue("mainWindowGeometry", saveGeometry());
-  settings.setValue("mainWindowState", saveState());
+  QSettings* settings = new QSettings("IntrinsicEd.ini", QSettings::IniFormat);
+  settings->setValue("mainWindowGeometry", saveGeometry());
+  settings->setValue("mainWindowState", saveState());
 }
 
 void IntrinsicEd::onLoadEditorSettings()
 {
-  QSettings settings;
-  restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-  restoreState(settings.value("mainWindowState").toByteArray());
+  QSettings* settings = new QSettings("IntrinsicEd.ini", QSettings::IniFormat);
+  restoreGeometry(settings->value("mainWindowGeometry").toByteArray());
+  restoreState(settings->value("mainWindowState").toByteArray());
 }
 
 void IntrinsicEd::onExit() { exit(0); }
