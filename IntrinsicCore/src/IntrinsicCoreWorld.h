@@ -54,6 +54,8 @@ struct World
   static glm::quat _currentSunLightOrientation;
   static glm::vec4 _currentSunLightColorAndIntensity;
 
+  static _INTR_STRING _filePath;
+
 protected:
   static Components::NodeRef _rootNode;
   static Components::CameraRef _activeCamera;

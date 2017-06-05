@@ -76,13 +76,14 @@ void Benchmark::deativate() {}
 
 void Benchmark::parseBenchmark(rapidjson::Document& p_BenchmarkDesc)
 {
+  const _INTR_STRING& worldFilePath = World::_filePath;
+
+  _INTR_STRING worldFileName, worldFileExtension;
+  StringUtil::extractFileNameAndExtension(worldFilePath, worldFileName,
+                                          worldFileExtension);
+
   // Parse benchmark
-  _INTR_STRING filePath =
-      "worlds/" +
-      Entity::EntityManager::_name(
-          Components::NodeManager::_entity(World::getRootNode()))
-          .getString() +
-      ".benchmark.json";
+  _INTR_STRING filePath = "worlds/" + worldFileName + ".benchmark.json";
 
   {
     FILE* fp = fopen(filePath.c_str(), "rb");

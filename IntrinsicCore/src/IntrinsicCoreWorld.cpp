@@ -25,6 +25,7 @@ float World::_currentTime = 0.1f;
 glm::quat World::_currentSunLightOrientation = glm::quat();
 glm::vec4 World::_currentSunLightColorAndIntensity = glm::vec4();
 float World::_currentDayNightFactor = 0.0f;
+_INTR_STRING World::_filePath;
 
 uint32_t calcOffsetToParent(const Components::NodeRefArray& p_Nodes,
                             Components::NodeRef p_Parent,
@@ -452,6 +453,8 @@ void World::load(const _INTR_STRING& p_FilePath)
       Components::NodeManager::_entity(_rootNode);
   Resources::EventManager::queueEventIfNotExisting(
       _N(CurrentlySelectedEntityChanged));
+
+  _filePath = p_FilePath;
 }
 
 void World::updateDayNightCycle(float p_DeltaT)
