@@ -178,9 +178,9 @@ void main()
 
     for (uint li=0; li<lightCount; ++li)
     {
-      calcPointLightLighting(lights[lightIndices[clusterIdx + li + 1]], 
+      Light light = lights[lightIndices[clusterIdx + li + 1]];
+      calcPointLightLighting(light, 
         d, matParams, outColor);
     }
   }
 }
- 
