@@ -3,6 +3,7 @@
     "properties": {
         "name": "water",
         "materialPassMask": [
+            "GBufferWireframe",
             "GBufferWater"
         ],
         "albedoTextureName": "white",

@@ -193,8 +193,9 @@ void Debug::init()
     PipelineLayoutManager::resetToDefault(_debugLinePipelineLayout);
 
     GpuProgramManager::reflectPipelineLayout(
-        8u, {Resources::GpuProgramManager::getResourceByName("debug_line.vert"),
-             GpuProgramManager::getResourceByName("debug_line.frag")},
+        8u,
+        {Resources::GpuProgramManager::getResourceByName("debug_line.vert"),
+         GpuProgramManager::getResourceByName("debug_line.frag")},
         _debugLinePipelineLayout);
 
     pipelineLayoutsToCreate.push_back(_debugLinePipelineLayout);
@@ -446,7 +447,10 @@ void Debug::render(float p_DeltaT, Components::CameraRef p_CameraRef)
   _INTR_PROFILE_CPU("Render Pass", "Render Debug Geometry");
   _INTR_PROFILE_GPU("Render Debug Geometry");
 
-  DrawCallRefArray visibleDrawCalls;
+  static DrawCallRefArray visibleDrawCalls;
+  static DrawCallRefArray visibleMeshDrawCalls;
+  visibleMeshDrawCalls.clear();
+  visibleDrawCalls.clear();
 
   if (GameStates::Manager::getActiveGameState() !=
       GameStates::GameState::kEditing)
@@ -502,6 +506,38 @@ void Debug::render(float p_DeltaT, Components::CameraRef p_CameraRef)
     }
 
     visibleDrawCalls.push_back(_debugLineDrawCallRef);
+  }
+
+  if ((_activeDebugStageFlags & DebugStageFlags::kWireframeRendering) > 0u ||
+      GameStates::Editing::_currentlySelectedEntity.isValid())
+  {
+    RenderProcess::Default::getVisibleDrawCalls(
+        p_CameraRef, 0u,
+        MaterialManager::getMaterialPassId(_N(GBufferWireframe)))
+        .copy(visibleMeshDrawCalls);
+    // Update per mesh uniform data
+    Core::Components::MeshManager::updateUniformData(visibleMeshDrawCalls);
+
+    if ((_activeDebugStageFlags & DebugStageFlags::kWireframeRendering) > 0u)
+    {
+      visibleDrawCalls.insert(visibleDrawCalls.end(),
+                              visibleMeshDrawCalls.begin(),
+                              visibleMeshDrawCalls.end());
+    }
+    else
+    {
+      for (uint32_t i = 0u; i < visibleMeshDrawCalls.size(); ++i)
+      {
+        DrawCallRef dcRef = visibleMeshDrawCalls[i];
+        Entity::EntityRef dcEntity = Components::MeshManager::_entity(
+            DrawCallManager::_descMeshComponent(dcRef));
+
+        if (dcEntity == GameStates::Editing::_currentlySelectedEntity)
+        {
+          visibleDrawCalls.push_back(dcRef);
+        }
+      }
+    }
   }
 
   RenderSystem::beginRenderPass(_renderPassRef, _framebufferRef,

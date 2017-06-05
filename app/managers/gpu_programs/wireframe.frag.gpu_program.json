@@ -1,0 +1,10 @@
+{
+    "name": "wireframe.frag",
+    "properties": {
+        "name": "wireframe.frag",
+        "gpuProgramName": "wireframe.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

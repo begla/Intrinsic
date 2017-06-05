@@ -3,6 +3,7 @@
     "properties": {
         "name": "grass_01",
         "materialPassMask": [
+            "GBufferWireframe",
             "GBufferGrass",
             "ShadowGrass",
             "PerPixelPicking",

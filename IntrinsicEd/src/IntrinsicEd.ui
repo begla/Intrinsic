@@ -731,6 +731,21 @@
     <string>Reload World</string>
    </property>
   </action>
+  <action name="actionWireframe_Rendering">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/geometry/tetrahedron.png</normaloff>:/Icons/icons/geometry/tetrahedron.png</iconset>
+   </property>
+   <property name="text">
+    <string>Wireframe Rendering</string>
+   </property>
+   <property name="toolTip">
+    <string>Wireframe Rendering</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

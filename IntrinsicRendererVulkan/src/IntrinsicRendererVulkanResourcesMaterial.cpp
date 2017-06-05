@@ -447,6 +447,11 @@ void MaterialManager::loadMaterialPassConfig()
               PipelineManager::_descRasterizationState(pipelineRef) =
                   RasterizationStates::kDoubleSided;
             }
+            else if (materialPassDesc["rasterizationState"] == "Wireframe")
+            {
+              PipelineManager::_descRasterizationState(pipelineRef) =
+                  RasterizationStates::kWireframe;
+            }
           }
 
           if (materialPassDesc.HasMember("depthStencilState"))

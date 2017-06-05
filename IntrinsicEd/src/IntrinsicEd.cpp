@@ -236,6 +236,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    this, SLOT(onDebugGeometryChanged()));
   QObject::connect(_ui.actionShow_Benchmark_Paths, SIGNAL(triggered()), this,
                    SLOT(onDebugGeometryChanged()));
+  QObject::connect(_ui.actionWireframe_Rendering, SIGNAL(triggered()), this,
+                   SLOT(onDebugGeometryChanged()));
 
   QObject::connect(_ui.actionShow_Create_Context_Menu, SIGNAL(triggered()),
                    this, SLOT(onShowCreateContextMenu()));
@@ -402,6 +404,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     _createContextMenu.addAction(_ui.actionCreateRigidBody);
     _createContextMenu.addAction(_ui.actionCreateRigidBody_Sphere);
 
+    _debugGeometryContextMenu.addAction(_ui.actionWireframe_Rendering);
     _debugGeometryContextMenu.addAction(_ui.actionShow_World_Bounding_Spheres);
     _debugGeometryContextMenu.addAction(_ui.actionShow_Benchmark_Paths);
     _debugGeometryContextMenu.addSeparator();
@@ -874,6 +877,19 @@ void IntrinsicEd::onDebugGeometryChanged()
     Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags &=
         ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
             kBenchmarkPaths;
+  }
+
+  if (_ui.actionWireframe_Rendering->isChecked())
+  {
+    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags |=
+        Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
+            kWireframeRendering;
+  }
+  else
+  {
+    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags &=
+        ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
+            kWireframeRendering;
   }
 }
 

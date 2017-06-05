@@ -28,8 +28,8 @@ struct DebugStageFlags
   {
     kWorldBoundingSpheres = 0x01u,
     kBenchmarkPaths = 0x02u,
-
-    kSelectedObject = 0x04u
+    kSelectedObject = 0x04u,
+    kWireframeRendering = 0x08u
   };
 };
 

@@ -4,6 +4,7 @@
         "name": "default_metal",
         "materialPassMask": [
             "GBufferDefault",
+            "GBufferWireframe",
             "Shadow",
             "PerPixelPicking"
         ],

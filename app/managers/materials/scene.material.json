@@ -4,6 +4,7 @@
         "name": "scene",
         "materialPassMask": [
             "GBufferDefault",
+            "GBufferWireframe",
             "Shadow",
             "PerPixelPicking"
         ],

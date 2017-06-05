@@ -4,6 +4,7 @@
         "name": "Prop_Atlas_01",
         "materialPassMask": [
             "GBufferDefault",
+            "GBufferWireframe",
             "Shadow",
             "PerPixelPicking"
         ],

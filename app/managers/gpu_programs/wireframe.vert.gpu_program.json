@@ -1,0 +1,10 @@
+{
+    "name": "wireframe.vert",
+    "properties": {
+        "name": "wireframe.vert",
+        "gpuProgramName": "wireframe.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 0
+    }
+}
