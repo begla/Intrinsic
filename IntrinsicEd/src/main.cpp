@@ -65,8 +65,13 @@ int _main(int argc, char* argv[])
     darkPalette.setColor(QPalette::Highlight, accentColor);
     darkPalette.setColor(QPalette::HighlightedText, Qt::white);
 
-    a.setStyleSheet("QToolTip { color: #ffffff; background-color: #25272c; "
-                    "border: 1px solid #ffffff; } QToolBar { border: 0px }");
+    a.setStyleSheet(
+        "QToolTip { color: #ffffff; background-color: #25272c; "
+        "border: 1px solid #ffffff; } QToolBar { border: 0px }"
+        "QDockWidget {"
+        "titlebar-close-icon: url(:/Icons/icons/essential/error.png);"
+        "titlebar-normal-icon: url(:/Icons/icons/arrows/expand.png);"
+        "}");
     a.setPalette(darkPalette);
 
     int id = QFontDatabase::addApplicationFont(":/Fonts/fira");
