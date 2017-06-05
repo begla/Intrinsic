@@ -85,19 +85,6 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
         perInstanceDataFragment.data0.w = TaskManager::_totalTimePassed;
         perInstanceDataFragment.colorTint =
             Components::MeshManager::_descColorTint(meshCompRef);
-
-        // Modulate tint when entity is selected
-        if (GameStates::Manager::getActiveGameState() ==
-                GameStates::GameState::kEditing &&
-            GameStates::Editing::_currentlySelectedEntity == entityRef)
-        {
-          perInstanceDataFragment.colorTint = glm::mix(
-              perInstanceDataFragment.colorTint,
-              glm::vec4(51.0f / 255.0f, 187.0f / 255.0f, 1.0f, 1.0f),
-              glm::clamp(abs(sin(TaskManager::_totalTimePassed * 4.0f)) * 0.5f +
-                             0.5f,
-                         0.0f, 1.0f));
-        }
       }
     }
   };

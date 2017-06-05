@@ -38,6 +38,7 @@ enum Enum
   kDefault,
   kInvertedCulling,
   kDoubleSided,
+  kWireframe,
 
   kCount
 };

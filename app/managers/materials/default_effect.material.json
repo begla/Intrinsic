@@ -5,6 +5,7 @@
         "materialPassMask": [
             "GBufferEffect",
             "GBufferDefault",
+            "GBufferDefaultWireframe",
             "Shadow",
             "PerPixelPicking"
         ],

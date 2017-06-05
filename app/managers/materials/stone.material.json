@@ -4,6 +4,7 @@
         "name": "stone",
         "materialPassMask": [
             "GBufferDefault",
+            "GBufferWireframe",
             "PerPixelPicking"
         ],
         "albedoTextureName": "stones",

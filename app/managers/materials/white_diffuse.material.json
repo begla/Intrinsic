@@ -4,6 +4,7 @@
         "name": "white_diffuse",
         "materialPassMask": [
             "GBufferDefault",
+            "GBufferWireframe",
             "Shadow",
             "PerPixelPicking"
         ],

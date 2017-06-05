@@ -3,10 +3,11 @@
     "properties": {
         "name": "Tree_Atlas_01",
         "materialPassMask": [
+            "GBufferWireframe",
             "GBufferFoliage",
             "ShadowFoliage",
-            "GBufferFoliagePrePass",
-            "PerPixelPicking"
+            "PerPixelPicking",
+            "GBufferFoliagePrePass"
         ],
         "albedoTextureName": "Tree_Atlas_01",
         "emissiveTextureName": "white",

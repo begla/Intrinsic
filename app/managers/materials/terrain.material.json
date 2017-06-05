@@ -3,8 +3,9 @@
     "properties": {
         "name": "terrain",
         "materialPassMask": [
-            "GBufferTerrain",
+            "GBufferWireframe",
             "Shadow",
+            "GBufferTerrain",
             "PerPixelPicking"
         ],
         "albedoTextureName": "grassleaves_01",
