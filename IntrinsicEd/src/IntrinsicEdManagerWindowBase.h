@@ -45,7 +45,6 @@ protected:
   Ui::IntrinsicEdManagerWindowClass _ui;
   Dod::Resources::ResourceManagerEntry _resourceManagerEntry;
   Dod::PropertyCompilerEntry _propertyCompilerEntry;
-  QIcon _resourceIcon;
   QString _managerFilePath;
   QString _managerPath;
   QString _managerExtension;

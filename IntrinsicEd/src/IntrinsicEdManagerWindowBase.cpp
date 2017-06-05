@@ -60,12 +60,14 @@ void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
 
   QTreeWidgetItem* volatileResourcesItem = new QTreeWidgetItem();
   volatileResourcesItem->setText(0, "Volatile");
-  volatileResourcesItem->setIcon(0, QIcon(":/Icons/folder"));
+  volatileResourcesItem->setIcon(0,
+                                 QIcon(":/Icons/icons/essential/folder-5.png"));
   _ui.resourceView->addTopLevelItem(volatileResourcesItem);
 
   QTreeWidgetItem* storedResourcesItem = new QTreeWidgetItem();
   storedResourcesItem->setText(0, "Stored");
-  storedResourcesItem->setIcon(0, QIcon(":/Icons/folder"));
+  storedResourcesItem->setIcon(0,
+                               QIcon(":/Icons/icons/essential/folder-5.png"));
   _ui.resourceView->addTopLevelItem(storedResourcesItem);
 
   for (uint32_t i = 0u; i < resourceCount; ++i)
@@ -79,7 +81,9 @@ void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
 
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0, properties["name"]["value"].GetString());
-    item->setIcon(0, _resourceIcon);
+    item->setIcon(
+        0,
+        IntrinsicEd::_stringToIconMapping[_resourceName.toStdString().c_str()]);
     item->setFlags(item->flags() | Qt::ItemIsEditable);
 
     _itemToResourceMapping[item] = resource;
@@ -258,7 +262,8 @@ void IntrinsicEdManagerWindowBase::onSaveManager()
 void IntrinsicEdManagerWindowBase::initContextMenu(QMenu* p_ContextMenu)
 {
   QAction* createResource =
-      new QAction(QIcon(":/Icons/plus"), "Create " + _resourceName, this);
+      new QAction(QIcon(":/Icons/icons/essential/plus.png"),
+                  "Create " + _resourceName, this);
   p_ContextMenu->addAction(createResource);
   QObject::connect(createResource, SIGNAL(triggered()), this,
                    SLOT(onCreateResource()));
@@ -269,15 +274,16 @@ void IntrinsicEdManagerWindowBase::initContextMenu(QMenu* p_ContextMenu)
   if (resRef.isValid())
   {
     QAction* destroyResource =
-        new QAction(QIcon(":/Icons/minus"), "Delete " + _resourceName, this);
+        new QAction(QIcon(":/Icons/icons/essential/minus.png"),
+                    "Delete " + _resourceName, this);
     p_ContextMenu->addAction(destroyResource);
     QObject::connect(destroyResource, SIGNAL(triggered()), this,
                      SLOT(onDestroyResource()));
 
     p_ContextMenu->addSeparator();
 
-    QAction* cloneResource =
-        new QAction(QIcon(":/Icons/plus"), "Clone " + _resourceName, this);
+    QAction* cloneResource = new QAction(QIcon(":/Icons/icons/cad/layer.png"),
+                                         "Clone " + _resourceName, this);
     p_ContextMenu->addAction(cloneResource);
     QObject::connect(cloneResource, SIGNAL(triggered()), this,
                      SLOT(onCloneResource()));

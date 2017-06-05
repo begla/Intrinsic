@@ -121,11 +121,11 @@ QFrame* IntrinsicEdPropertyView::createCategoryHeaderWidget(const char* p_Title,
 
   if (p_Collapsed)
   {
-    button->setIcon(QIcon(":/Icons/roundRight"));
+    button->setIcon(QIcon(":/Icons/icons/arrows/shrink.png"));
   }
   else
   {
-    button->setIcon(QIcon(":/Icons/roundDown"));
+    button->setIcon(QIcon(":/Icons/icons/arrows/expand.png"));
   }
 
   button->setStyleSheet(
@@ -137,12 +137,11 @@ QFrame* IntrinsicEdPropertyView::createCategoryHeaderWidget(const char* p_Title,
                    SLOT(onCategoryHeaderClicked()));
 
   // Create icon (if mapping is available)
-  auto iconToUse = IntrinsicEd::_categoryToIconMapping.find(p_Title);
-  if (iconToUse != IntrinsicEd::_categoryToIconMapping.end())
+  auto iconToUse = IntrinsicEd::_stringToPixmapMapping.find(p_Title);
+  if (iconToUse != IntrinsicEd::_stringToPixmapMapping.end())
   {
-    QPixmap* icon = new QPixmap(iconToUse->second.c_str());
     QLabel* iconLabel = new QLabel();
-    iconLabel->setPixmap(*icon);
+    iconLabel->setPixmap(iconToUse->second);
     frame->layout()->addWidget(iconLabel);
   }
 

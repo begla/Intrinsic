@@ -24,7 +24,6 @@ IntrinsicEdManagerWindowPostEffect::IntrinsicEdManagerWindowPostEffect(
   _propertyCompilerEntry =
       Application::_resourcePropertyCompilerMapping[_N(PostEffect)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(PostEffect)];
-  _resourceIcon = QIcon(":/Icons/calendar");
   _managerPath = "managers/post_effects/";
   _managerExtension = ".post_effect.json";
   _resourceName = "PostEffect";

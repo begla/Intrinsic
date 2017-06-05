@@ -27,7 +27,6 @@ IntrinsicEdManagerWindowAsset::IntrinsicEdManagerWindowAsset(QWidget* parent)
   _propertyCompilerEntry =
       Application::_resourcePropertyCompilerMapping[_N(Asset)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(Asset)];
-  _resourceIcon = QIcon(":/Icons/asset");
   _resourceName = "Asset";
   _managerPath = "managers/assets/";
   _managerExtension = ".asset.json";
@@ -59,21 +58,21 @@ void IntrinsicEdManagerWindowAsset::onPopulateResourceTree()
   QTreeWidgetItem* textures = new QTreeWidgetItem();
   {
     textures->setText(0, "Textures");
-    textures->setIcon(0, QIcon(":/Icons/picture"));
+    textures->setIcon(0, IntrinsicEd::_stringToIconMapping["Texture"]);
     _ui.resourceView->addTopLevelItem(textures);
   }
 
   QTreeWidgetItem* meshes = new QTreeWidgetItem();
   {
     meshes->setText(0, "Meshes");
-    meshes->setIcon(0, QIcon(":/Icons/user"));
+    meshes->setIcon(0, IntrinsicEd::_stringToIconMapping["Mesh"]);
     _ui.resourceView->addTopLevelItem(meshes);
   }
 
   QTreeWidgetItem* generalAssets = new QTreeWidgetItem();
   {
     generalAssets->setText(0, "General");
-    generalAssets->setIcon(0, QIcon(":/Icons/asset"));
+    generalAssets->setIcon(0, IntrinsicEd::_stringToIconMapping["Asset"]);
     _ui.resourceView->addTopLevelItem(generalAssets);
   }
 
@@ -87,7 +86,9 @@ void IntrinsicEdManagerWindowAsset::onPopulateResourceTree()
 
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0, properties["name"]["value"].GetString());
-    item->setIcon(0, _resourceIcon);
+    item->setIcon(
+        0,
+        IntrinsicEd::_stringToIconMapping[_resourceName.toStdString().c_str()]);
     item->setFlags(item->flags() | Qt::ItemIsEditable);
 
     _itemToResourceMapping[item] = assetEntry;
@@ -130,7 +131,8 @@ void IntrinsicEdManagerWindowAsset::initContextMenu(QMenu* p_ContextMenu)
     p_ContextMenu->addSeparator();
 
     QAction* compileAsset =
-        new QAction(QIcon(":/Icons/asset"), "Compile " + _resourceName, this);
+        new QAction(IntrinsicEd::_stringToIconMapping["Asset"],
+                    "Compile " + _resourceName, this);
     p_ContextMenu->addAction(compileAsset);
     QObject::connect(compileAsset, SIGNAL(triggered()), this,
                      SLOT(onCompileAsset()));
@@ -140,7 +142,8 @@ void IntrinsicEdManagerWindowAsset::initContextMenu(QMenu* p_ContextMenu)
     p_ContextMenu->addSeparator();
 
     QAction* compileAsset =
-        new QAction(QIcon(":/Icons/asset"), "Compile All Textures", this);
+        new QAction(IntrinsicEd::_stringToIconMapping["Texture"],
+                    "Compile All Textures", this);
     p_ContextMenu->addAction(compileAsset);
     QObject::connect(compileAsset, SIGNAL(triggered()), this,
                      SLOT(onCompileAllTextures()));
@@ -149,8 +152,8 @@ void IntrinsicEdManagerWindowAsset::initContextMenu(QMenu* p_ContextMenu)
   {
     p_ContextMenu->addSeparator();
 
-    QAction* compileAsset =
-        new QAction(QIcon(":/Icons/asset"), "Compile All Meshes", this);
+    QAction* compileAsset = new QAction(
+        IntrinsicEd::_stringToIconMapping["Mesh"], "Compile All Meshes", this);
     p_ContextMenu->addAction(compileAsset);
     QObject::connect(compileAsset, SIGNAL(triggered()), this,
                      SLOT(onCompileAllMeshes()));

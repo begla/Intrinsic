@@ -23,7 +23,6 @@ IntrinsicEdManagerWindowMesh::IntrinsicEdManagerWindowMesh(QWidget* parent)
   _propertyCompilerEntry =
       Application::_resourcePropertyCompilerMapping[_N(Mesh)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(Mesh)];
-  _resourceIcon = QIcon(":/Icons/truck");
   _managerPath = "managers/meshes/";
   _managerExtension = ".mesh.json";
 

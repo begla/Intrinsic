@@ -44,11 +44,16 @@ int _main(int argc, char* argv[])
   {
     qApp->setStyle(QStyleFactory::create("Fusion"));
 
+    const QColor baseColor = QColor(37, 39, 44);
+    const QColor accentColor = QColor(0, 139, 190);
+
     QPalette darkPalette;
-    darkPalette.setColor(QPalette::Window, QColor(37, 41, 45));
+    darkPalette.setColor(QPalette::Window, baseColor);
     darkPalette.setColor(QPalette::WindowText, Qt::white);
-    darkPalette.setColor(QPalette::Base, QColor(42, 46, 50));
-    darkPalette.setColor(QPalette::AlternateBase, QColor(42, 46, 50));
+    darkPalette.setColor(QPalette::Base, baseColor);
+    darkPalette.setColor(QPalette::AlternateBase,
+                         QColor(baseColor.red() + 10, baseColor.green() + 10,
+                                baseColor.blue() + 10));
 
     darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
     darkPalette.setColor(QPalette::ToolTipText, Qt::white);
@@ -56,11 +61,11 @@ int _main(int argc, char* argv[])
     darkPalette.setColor(QPalette::Button, QColor(53, 53, 53));
     darkPalette.setColor(QPalette::ButtonText, Qt::white);
     darkPalette.setColor(QPalette::BrightText, Qt::red);
-    darkPalette.setColor(QPalette::Link, QColor(0, 170, 255));
-    darkPalette.setColor(QPalette::Highlight, QColor(0, 170, 255));
-    darkPalette.setColor(QPalette::HighlightedText, Qt::black);
+    darkPalette.setColor(QPalette::Link, accentColor);
+    darkPalette.setColor(QPalette::Highlight, accentColor);
+    darkPalette.setColor(QPalette::HighlightedText, Qt::white);
 
-    a.setStyleSheet("QToolTip { color: #ffffff; background-color: #00aaff; "
+    a.setStyleSheet("QToolTip { color: #ffffff; background-color: #25272c; "
                     "border: 1px solid #ffffff; } QToolBar { border: 0px }");
     a.setPalette(darkPalette);
 
