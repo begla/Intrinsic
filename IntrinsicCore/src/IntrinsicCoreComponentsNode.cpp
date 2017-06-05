@@ -130,6 +130,12 @@ void NodeManager::updateTransforms(const NodeRefArray& p_Nodes)
         }
       }
     }
+    else
+    {
+      _worldAABB(nodeRef) =
+          Math::AABB(_worldPosition(nodeRef) - glm::vec3(0.5f),
+                     _worldPosition(nodeRef) + glm::vec3(0.5f));
+    }
   }
 }
 }
