@@ -92,7 +92,7 @@ void main()
 
   // DoF fake
   const float dofStartDist = uboPerInstance.postParams0.z;
-  if (dofStartDist >= 0.0)
+  if (dofStartDist < 10000.0)
   {
     const float blurFactor = pow(clamp((linDepth - dofStartDist) / dofStartDist, 0.0, 1.0), 4.0);
     scene = mix(scene, sceneBlurred, blurFactor);    

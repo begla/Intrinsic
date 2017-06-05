@@ -82,7 +82,7 @@ struct PostEffectManager
     _descSkyTurbidity(p_Ref) = 2.0f;
     _descSkyAlbedo(p_Ref) = 0.0f;
     _descSkyLightIntensity(p_Ref) = 0.05f;
-    _descDoFStartDistance(p_Ref) = -1.0f;
+    _descDoFStartDistance(p_Ref) = 10000.0f;
   }
 
   // <-
