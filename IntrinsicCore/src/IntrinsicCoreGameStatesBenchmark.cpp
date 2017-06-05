@@ -45,7 +45,12 @@ void Benchmark::activate()
 {
   Entity::EntityRef entityRef =
       Entity::EntityManager::getEntityByName(_N(BenchmarkCamera));
-  _INTR_ASSERT(entityRef.isValid());
+  if (!entityRef.isValid())
+  {
+    _INTR_LOG_ERROR("'BenchmarkCamera' not available...");
+    return;
+  }
+
   Components::CameraRef cameraRef =
       Components::CameraManager::getComponentForEntity(entityRef);
   _INTR_ASSERT(cameraRef.isValid());
