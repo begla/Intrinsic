@@ -98,6 +98,8 @@ void initInputAssemblyStates()
 
 void initRasterizationStates()
 {
+  static const float lineWidth = 3.0f;
+
   {
     VkPipelineRasterizationStateCreateInfo& rs =
         RenderStates::rasterizationStates[RasterizationStates::kDefault];
@@ -113,7 +115,7 @@ void initRasterizationStates()
     rs.depthBiasConstantFactor = 0.0f;
     rs.depthBiasClamp = 0.0f;
     rs.depthBiasSlopeFactor = 0.0f;
-    rs.lineWidth = 1.0f;
+    rs.lineWidth = lineWidth;
   }
 
   {
@@ -131,7 +133,7 @@ void initRasterizationStates()
     rs.depthBiasConstantFactor = 0.0f;
     rs.depthBiasClamp = 0.0f;
     rs.depthBiasSlopeFactor = 0.0f;
-    rs.lineWidth = 1.0f;
+    rs.lineWidth = lineWidth;
   }
 
   {
@@ -149,7 +151,7 @@ void initRasterizationStates()
     rs.depthBiasConstantFactor = 0.0f;
     rs.depthBiasClamp = 0.0f;
     rs.depthBiasSlopeFactor = 0.0f;
-    rs.lineWidth = 1.0f;
+    rs.lineWidth = lineWidth;
   }
 
   {
@@ -167,7 +169,7 @@ void initRasterizationStates()
     rs.depthBiasConstantFactor = -2.0f;
     rs.depthBiasClamp = 0.0f;
     rs.depthBiasSlopeFactor = 0.0f;
-    rs.lineWidth = 3.0f;
+    rs.lineWidth = lineWidth;
   }
 }
 
