@@ -87,10 +87,12 @@ public slots:
   void onTimeModChanged(double p_Value);
   void onDayNightSliderChanged(int p_Value);
   void onCreateCube();
+  void onCreateSphere();
   void onCreateRigidBody();
   void onCreateRigidBodySphere();
   void onCreateLight();
-  void onCreateSphere();
+  void onCreateIrradProbe();
+  void onCreateDecal();
   void onShowDebugGeometryContextMenu();
   void onDebugGeometryChanged();
   void onOpenMicroprofile();

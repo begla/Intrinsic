@@ -164,6 +164,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     stringToIconPathMapping["Water"] = ":/Icons/icons/weather/raindrops.png";
     stringToIconPathMapping["DepthOfField"] =
         ":Icons/icons/essential/photo-camera-1.png";
+    stringToIconPathMapping["Decal"] = ":Icons/icons/essential/picture-2.png";
 
     for (auto it = stringToIconPathMapping.begin();
          it != stringToIconPathMapping.end(); ++it)
@@ -227,6 +228,10 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    SLOT(onCreateSphere()));
   QObject::connect(_ui.actionCreateLight, SIGNAL(triggered()), this,
                    SLOT(onCreateLight()));
+  QObject::connect(_ui.actionCreateIrradProbe, SIGNAL(triggered()), this,
+                   SLOT(onCreateIrradProbe()));
+  QObject::connect(_ui.actionCreateDecal, SIGNAL(triggered()), this,
+                   SLOT(onCreateDecal()));
 
   QObject::connect(_ui.actionShow_PhysX_Debug_Geometry, SIGNAL(triggered()),
                    this, SLOT(onDebugGeometryChanged()));
@@ -567,177 +572,118 @@ void IntrinsicEd::onBenchmarkGameState()
   SDL_SetRelativeMouseMode(SDL_FALSE);
 }
 
+namespace
+{
+_INTR_INLINE Entity::EntityRef spawnDefaultEntity(const Name& p_Name)
+{
+  Entity::EntityRef entityRef = Entity::EntityManager::createEntity(p_Name);
+  {
+
+    Components::NodeRef nodeRef =
+        Components::NodeManager::createNode(entityRef);
+    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
+
+    Components::CameraRef activeCamera = World::getActiveCamera();
+    Components::NodeRef cameraNode =
+        Components::NodeManager::getComponentForEntity(
+            Components::CameraManager::_entity(activeCamera));
+
+    Components::NodeManager::_position(nodeRef) =
+        Components::NodeManager::_worldPosition(cameraNode) +
+        Components::CameraManager::_forward(activeCamera) * 10.0f;
+    GameStates::Editing::_currentlySelectedEntity = entityRef;
+  }
+
+  return entityRef;
+}
+
+_INTR_INLINE Dod::Ref addComponentToEntity(Entity::EntityRef p_EntityRef,
+                                           const Name& p_ComponentName)
+{
+  Dod::Components::ComponentManagerEntry& entry =
+      Application::_componentManagerMapping[p_ComponentName];
+
+  _INTR_ASSERT(entry.createFunction);
+  Dod::Ref compRef = entry.createFunction(p_EntityRef);
+
+  if (entry.resetToDefaultFunction)
+  {
+    entry.resetToDefaultFunction(compRef);
+  }
+
+  return compRef;
+}
+}
+
 void IntrinsicEd::onCreateCube()
 {
-  Components::MeshRefArray meshComponentsToCreate;
-
-  {
-    Entity::EntityRef entityRef = Entity::EntityManager::createEntity(_N(Cube));
-    Components::NodeRef nodeRef =
-        Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
-    Components::MeshRef meshRef =
-        Components::MeshManager::createMesh(entityRef);
-    meshComponentsToCreate.push_back(meshRef);
-    Components::MeshManager::resetToDefault(meshRef);
-
-    Components::MeshManager::_descMeshName(meshRef) = _N(cube);
-
-    Components::CameraRef activeCamera = World::getActiveCamera();
-    Components::NodeRef cameraNode =
-        Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCamera));
-
-    Components::NodeManager::_position(nodeRef) =
-        Components::NodeManager::_worldPosition(cameraNode) +
-        Components::CameraManager::_forward(activeCamera) * 10.0f;
-    GameStates::Editing::_currentlySelectedEntity = entityRef;
-  }
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(Cube));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(Mesh));
+  Components::MeshManager::_descMeshName(compRef) = _N(cube);
 
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
-  Components::MeshManager::createResources(meshComponentsToCreate);
-}
-
-void IntrinsicEd::onCreateRigidBody()
-{
-  Components::MeshRefArray meshComponentsToCreate;
-  Components::RigidBodyRefArray rigidBodyComponentsToCreate;
-
-  {
-    Entity::EntityRef entityRef =
-        Entity::EntityManager::createEntity(_N(RigidBody));
-    Components::NodeRef nodeRef =
-        Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
-    Components::MeshRef meshRef =
-        Components::MeshManager::createMesh(entityRef);
-    meshComponentsToCreate.push_back(meshRef);
-    Components::MeshManager::resetToDefault(meshRef);
-    Components::MeshManager::_descMeshName(meshRef) = _N(cube);
-
-    Components::RigidBodyRef rigidBodyRef =
-        Components::RigidBodyManager::createRigidBody(entityRef);
-    rigidBodyComponentsToCreate.push_back(rigidBodyRef);
-    Components::RigidBodyManager::resetToDefault(rigidBodyRef);
-    Components::RigidBodyManager::_descRigidBodyType(rigidBodyRef) =
-        Components::RigidBodyType::kBoxDynamic;
-
-    Components::CameraRef activeCamera = World::getActiveCamera();
-    Components::NodeRef cameraNode =
-        Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCamera));
-
-    Components::NodeManager::_position(nodeRef) =
-        Components::NodeManager::_worldPosition(cameraNode) +
-        Components::CameraManager::_forward(activeCamera) * 10.0f;
-    GameStates::Editing::_currentlySelectedEntity = entityRef;
-  }
-
-  Components::NodeManager::rebuildTreeAndUpdateTransforms();
-
-  Components::MeshManager::createResources(meshComponentsToCreate);
-  Components::RigidBodyManager::createResources(rigidBodyComponentsToCreate);
-}
-
-void IntrinsicEd::onCreateRigidBodySphere()
-{
-  Components::MeshRefArray meshComponentsToCreate;
-  Components::RigidBodyRefArray rigidBodyComponentsToCreate;
-
-  {
-    Entity::EntityRef entityRef =
-        Entity::EntityManager::createEntity(_N(RigidBody));
-    Components::NodeRef nodeRef =
-        Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
-    Components::MeshRef meshRef =
-        Components::MeshManager::createMesh(entityRef);
-    meshComponentsToCreate.push_back(meshRef);
-    Components::MeshManager::resetToDefault(meshRef);
-    Components::MeshManager::_descMeshName(meshRef) = _N(sphere);
-
-    Components::RigidBodyRef rigidBodyRef =
-        Components::RigidBodyManager::createRigidBody(entityRef);
-    rigidBodyComponentsToCreate.push_back(rigidBodyRef);
-    Components::RigidBodyManager::resetToDefault(rigidBodyRef);
-    Components::RigidBodyManager::_descRigidBodyType(rigidBodyRef) =
-        Components::RigidBodyType::kSphereDynamic;
-
-    Components::CameraRef activeCamera = World::getActiveCamera();
-    Components::NodeRef cameraNode =
-        Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCamera));
-
-    Components::NodeManager::_position(nodeRef) =
-        Components::NodeManager::_worldPosition(cameraNode) +
-        Components::CameraManager::_forward(activeCamera) * 10.0f;
-    GameStates::Editing::_currentlySelectedEntity = entityRef;
-  }
-
-  Components::NodeManager::rebuildTreeAndUpdateTransforms();
-
-  Components::MeshManager::createResources(meshComponentsToCreate);
-  Components::RigidBodyManager::createResources(rigidBodyComponentsToCreate);
+  Components::MeshManager::createResources(compRef);
 }
 
 void IntrinsicEd::onCreateSphere()
 {
-  Components::MeshRefArray meshComponentsToCreate;
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(Sphere));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(Mesh));
 
-  {
-    Entity::EntityRef entityRef =
-        Entity::EntityManager::createEntity(_N(Sphere));
-    Components::NodeRef nodeRef =
-        Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
-    Components::MeshRef meshRef =
-        Components::MeshManager::createMesh(entityRef);
-    meshComponentsToCreate.push_back(meshRef);
-    Components::MeshManager::resetToDefault(meshRef);
-
-    Components::MeshManager::_descMeshName(meshRef) = _N(sphere);
-
-    Components::CameraRef activeCamera = World::getActiveCamera();
-    Components::NodeRef cameraNode =
-        Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCamera));
-
-    Components::NodeManager::_position(nodeRef) =
-        Components::NodeManager::_worldPosition(cameraNode) +
-        Components::CameraManager::_forward(activeCamera) * 10.0f;
-    GameStates::Editing::_currentlySelectedEntity = entityRef;
-  }
+  Components::MeshManager::_descMeshName(compRef) = _N(sphere);
 
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
-  Components::MeshManager::createResources(meshComponentsToCreate);
+  Components::MeshManager::createResources(compRef);
+}
+
+void IntrinsicEd::onCreateRigidBody()
+{
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(RigidCube));
+  Dod::Ref meshCompRef = addComponentToEntity(entityRef, _N(Mesh));
+  Dod::Ref rigidBodyRef = addComponentToEntity(entityRef, _N(RigidBody));
+
+  Components::MeshManager::_descMeshName(meshCompRef) = _N(cube);
+  Components::RigidBodyManager::_descRigidBodyType(rigidBodyRef) =
+      Components::RigidBodyType::kBoxDynamic;
+
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+  Components::MeshManager::createResources(meshCompRef);
+  Components::RigidBodyManager::createResources(rigidBodyRef);
+}
+
+void IntrinsicEd::onCreateRigidBodySphere()
+{
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(RigidSphere));
+  Dod::Ref meshCompRef = addComponentToEntity(entityRef, _N(Mesh));
+  Dod::Ref rigidBodyRef = addComponentToEntity(entityRef, _N(RigidBody));
+
+  Components::MeshManager::_descMeshName(meshCompRef) = _N(sphere);
+  Components::RigidBodyManager::_descRigidBodyType(rigidBodyRef) =
+      Components::RigidBodyType::kSphereDynamic;
+
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+  Components::MeshManager::createResources(meshCompRef);
+  Components::RigidBodyManager::createResources(rigidBodyRef);
 }
 
 void IntrinsicEd::onCreateLight()
 {
-  Components::LightRefArray lightComponentsToCreate;
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(Light));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(Light));
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+}
 
-  {
-    Entity::EntityRef entityRef =
-        Entity::EntityManager::createEntity(_N(Light));
-    Components::NodeRef nodeRef =
-        Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
-    Components::LightRef lightRef =
-        Components::LightManager::createLight(entityRef);
-    lightComponentsToCreate.push_back(lightRef);
-    Components::LightManager::resetToDefault(lightRef);
+void IntrinsicEd::onCreateIrradProbe()
+{
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(IrradianceProbe));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(IrradianceProbe));
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+}
 
-    Components::CameraRef activeCamera = World::getActiveCamera();
-    Components::NodeRef cameraNode =
-        Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCamera));
-
-    Components::NodeManager::_position(nodeRef) =
-        Components::NodeManager::_worldPosition(cameraNode) +
-        Components::CameraManager::_forward(activeCamera) * 10.0f;
-    GameStates::Editing::_currentlySelectedEntity = entityRef;
-  }
-
+void IntrinsicEd::onCreateDecal()
+{
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(Decal));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(Decal));
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
 }
 

@@ -121,6 +121,7 @@ void Application::initManagers()
     Components::PlayerManager::init();
     Components::LightManager::init();
     Components::IrradianceProbeManager::init();
+    Components::DecalManager::init();
   }
 
   // Init resource managers
