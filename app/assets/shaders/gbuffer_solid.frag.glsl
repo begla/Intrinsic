@@ -25,10 +25,6 @@
 PER_MATERIAL_UBO;
 PER_INSTANCE_UBO;
 
-// Bindings
-BINDINGS_GBUFFER;
-layout (binding = 6) uniform sampler2D emissiveTex;
-
 // Output
 OUTPUT
 
