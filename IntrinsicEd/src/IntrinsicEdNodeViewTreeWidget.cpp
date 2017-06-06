@@ -312,11 +312,13 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
 {
   QMenu* contextMenu = new QMenu(this);
 
-  QAction* createNode = new QAction(QIcon(":/Icons/icons/essential/plus.png"),
-                                    "Create (Child) Node", this);
-  contextMenu->addAction(createNode);
-
-  QObject::connect(createNode, SIGNAL(triggered()), this, SLOT(onCreateNode()));
+  {
+    QAction* createNode = new QAction(QIcon(":/Icons/icons/essential/plus.png"),
+                                      "Create (Child) Node", this);
+    contextMenu->addAction(createNode);
+    QObject::connect(createNode, SIGNAL(triggered()), this,
+                     SLOT(onCreateNode()));
+  }
 
   QTreeWidgetItem* currIt = currentItem();
   if (currIt)
@@ -324,30 +326,6 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
     Components::NodeRef currentNode = _itemToNodeMap[currIt];
     Entity::EntityRef currentEntity =
         Components::NodeManager::_entity(currentNode);
-
-    Components::IrradianceProbeRef irradProbeRef =
-        Components::IrradianceProbeManager::getComponentForEntity(
-            currentEntity);
-    if (irradProbeRef.isValid())
-    {
-      contextMenu->addSeparator();
-
-      QAction* captureProbe =
-          new QAction(QIcon(":/Icons/icons/various/idea.png"),
-                      "Capture Irradiance Probe", this);
-      contextMenu->addAction(captureProbe);
-      QObject::connect(captureProbe, SIGNAL(triggered()), this,
-                       SLOT(onCaptureIrradianceProbe()));
-
-      QAction* captureAllProbes =
-          new QAction(QIcon(":/Icons/icons/various/idea.png"),
-                      "Capture ALL Irradiance Probes", this);
-      contextMenu->addAction(captureAllProbes);
-      QObject::connect(captureAllProbes, SIGNAL(triggered()), this,
-                       SLOT(onCaptureAllIrradianceProbes()));
-
-      contextMenu->addSeparator();
-    }
 
     // Don't allow deleting the main node
     if (World::getRootNode() != currentNode)
@@ -376,6 +354,30 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
     contextMenu->addSeparator();
     contextMenu->addMenu(addComponentMenu);
     contextMenu->addMenu(removeComponentMenu);
+
+    Components::IrradianceProbeRef irradProbeRef =
+        Components::IrradianceProbeManager::getComponentForEntity(
+            currentEntity);
+    if (irradProbeRef.isValid())
+    {
+      contextMenu->addSeparator();
+
+      QAction* captureProbe =
+          new QAction(QIcon(":/Icons/icons/various/idea.png"),
+                      "Capture Irradiance Probe", this);
+      contextMenu->addAction(captureProbe);
+      QObject::connect(captureProbe, SIGNAL(triggered()), this,
+                       SLOT(onCaptureIrradianceProbe()));
+
+      QAction* captureAllProbes =
+          new QAction(QIcon(":/Icons/icons/various/idea.png"),
+                      "Capture ALL Irradiance Probes", this);
+      contextMenu->addAction(captureAllProbes);
+      QObject::connect(captureAllProbes, SIGNAL(triggered()), this,
+                       SLOT(onCaptureAllIrradianceProbes()));
+
+      contextMenu->addSeparator();
+    }
   }
 
   contextMenu->popup(viewport()->mapToGlobal(p_Pos));
