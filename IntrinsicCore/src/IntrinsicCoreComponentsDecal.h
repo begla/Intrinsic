@@ -28,10 +28,10 @@ struct DecalData : Dod::Components::ComponentDataBase
   DecalData()
       : Dod::Components::ComponentDataBase(_INTR_MAX_DECAL_COMPONENT_COUNT)
   {
-    descExtent.resize(_INTR_MAX_DECAL_COMPONENT_COUNT);
+    descHalfExtent.resize(_INTR_MAX_DECAL_COMPONENT_COUNT);
   }
 
-  _INTR_ARRAY(glm::vec3) descExtent;
+  _INTR_ARRAY(glm::vec3) descHalfExtent;
 };
 
 struct DecalManager
@@ -54,7 +54,7 @@ struct DecalManager
 
   _INTR_INLINE static void resetToDefault(MeshRef p_Ref)
   {
-    _descExtent(p_Ref) = glm::vec3(2.0f, 2.0f, 2.0f);
+    _descHalfExtent(p_Ref) = glm::vec3(2.0f, 2.0f, 2.0f);
   }
 
   // <-
@@ -72,11 +72,11 @@ struct DecalManager
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember("extent",
-                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(Decal), _N(float),
-                                             _descExtent(p_Ref), false, false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "halfExtent",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Decal), _N(vec3),
+                          _descHalfExtent(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   // <-
@@ -84,8 +84,9 @@ struct DecalManager
   _INTR_INLINE static void initFromDescriptor(DecalRef p_Ref,
                                               rapidjson::Value& p_Properties)
   {
-    if (p_Properties.HasMember("extent"))
-      _descExtent(p_Ref) = JsonHelper::readPropertyVec3(p_Properties["extent"]);
+    if (p_Properties.HasMember("halfExtent"))
+      _descHalfExtent(p_Ref) =
+          JsonHelper::readPropertyVec3(p_Properties["halfExtent"]);
   }
 
   // <-
@@ -94,9 +95,9 @@ struct DecalManager
   // ->
 
   // Description
-  _INTR_INLINE static glm::vec3& _descExtent(DecalRef p_Ref)
+  _INTR_INLINE static glm::vec3& _descHalfExtent(DecalRef p_Ref)
   {
-    return _data.descExtent[p_Ref._id];
+    return _data.descHalfExtent[p_Ref._id];
   }
 };
 }
