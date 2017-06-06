@@ -129,8 +129,8 @@
     },
     {
       "name" : "GBufferWireframe",
-      "baseVertexGpuProgram" : "wireframe.vert",
-      "baseFragmentGpuProgram" : "wireframe.frag",
+      "baseVertexGpuProgram" : "position_only.vert",
+      "baseFragmentGpuProgram" : "gbuffer_solid.frag",
       "renderPass" : "GBuffer",
       "blendStates" : ["Default", "Default", "Default"],
       "boundResources" : "GBuffer",
