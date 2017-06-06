@@ -934,7 +934,9 @@ void Editing::update(float p_DeltaT)
         Entity::EntityRef entityToSelect =
             Components::NodeManager::_entity(pickedNode);
 
-        if (entityToSelect != _currentlySelectedEntity)
+        if ((Components::NodeManager::_flags(pickedNode) &
+             Components::NodeFlags::Flags::kSpawned) == 0u &&
+            entityToSelect != _currentlySelectedEntity)
         {
           _currentlySelectedEntity = entityToSelect;
           Resources::EventManager::queueEventIfNotExisting(
