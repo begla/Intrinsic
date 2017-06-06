@@ -178,7 +178,7 @@ void displayDebugLineGeometryForSelectedObject()
 
     if (decalRef.isValid())
     {
-      // TODO
+      Debug::renderDecal(decalRef);
     }
   }
 }
@@ -445,6 +445,47 @@ void Debug::renderSphere(const glm::vec3& p_Center, float p_Radius,
     renderLine(p_Center + p_Radius * glm::vec3(x0, 0.0f, y0),
                p_Center + p_Radius * glm::vec3(x1, 0.0f, y1), p_Color, p_Color);
   }
+}
+
+// <-
+
+void Debug::renderDecal(Dod::Ref p_Decal)
+{
+  const glm::vec3 halfExtent =
+      Components::DecalManager::_descHalfExtent(p_Decal);
+  const Components::NodeRef nodeRef =
+      Components::NodeManager::getComponentForEntity(
+          Components::DecalManager::_entity(p_Decal));
+
+  const glm::quat orient = Components::NodeManager::_worldOrientation(nodeRef);
+  const glm::vec3 right = orient * glm::vec3(halfExtent.x, 0.0f, 0.0f);
+  const glm::vec3 forward =
+      orient * glm::vec3(0.0f, 0.0f, -halfExtent.z * 2.0f);
+  const glm::vec3 up = orient * glm::vec3(0.0f, halfExtent.y, 0.0f);
+
+  glm::vec3 verts[8] = {
+      forward + right + up,   forward + right - up, forward - (right + up),
+      forward - (right - up), right + up,           right - up,
+      -(right + up),          -(right - up)};
+
+  for (uint32_t i = 0u; i < 8u; ++i)
+  {
+    verts[i] += Components::NodeManager::_worldPosition(nodeRef);
+  }
+
+  const glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
+
+  // Back
+  for (uint32_t i = 0u; i < 4u; ++i)
+    renderLine(verts[i], verts[(i + 1u) % 4u], color, color);
+
+  // Front
+  for (uint32_t i = 0u; i < 4u; ++i)
+    renderLine(verts[4u + i], verts[4u + (i + 1u) % 4u], color, color);
+
+  // Front-Back connections
+  for (uint32_t i = 0u; i < 4u; ++i)
+    renderLine(verts[i], verts[i + 4u], color, color);
 }
 
 // <-
