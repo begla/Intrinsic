@@ -475,17 +475,15 @@ void Debug::renderDecal(Dod::Ref p_Decal)
 
   const glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
 
-  // Back
   for (uint32_t i = 0u; i < 4u; ++i)
+  {
+    // Front
     renderLine(verts[i], verts[(i + 1u) % 4u], color, color);
-
-  // Front
-  for (uint32_t i = 0u; i < 4u; ++i)
+    // Back
     renderLine(verts[4u + i], verts[4u + (i + 1u) % 4u], color, color);
-
-  // Front-Back connections
-  for (uint32_t i = 0u; i < 4u; ++i)
+    // Front-Back connections
     renderLine(verts[i], verts[i + 4u], color, color);
+  }
 }
 
 // <-
