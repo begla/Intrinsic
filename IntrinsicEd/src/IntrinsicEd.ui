@@ -166,7 +166,7 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>false</bool>
+    <bool>true</bool>
    </attribute>
    <addaction name="actionCreateCube"/>
    <addaction name="actionCreateRigidBody"/>
@@ -174,7 +174,8 @@
    <addaction name="actionCreateRigidBody_Sphere"/>
    <addaction name="separator"/>
    <addaction name="actionCreateLight"/>
-   <addaction name="separator"/>
+   <addaction name="actionCreateDecal"/>
+   <addaction name="actionCreateIrradProbe"/>
   </widget>
   <widget class="QToolBar" name="devToolBar">
    <property name="enabled">
@@ -720,6 +721,30 @@
    </property>
    <property name="toolTip">
     <string>Wireframe Rendering</string>
+   </property>
+  </action>
+  <action name="actionCreateDecal">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/essential/picture-2.png</normaloff>:/Icons/icons/essential/picture-2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Decal</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Decal</string>
+   </property>
+  </action>
+  <action name="actionCreateIrradProbe">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/weather/clouds-and-sun.png</normaloff>:/Icons/icons/weather/clouds-and-sun.png</iconset>
+   </property>
+   <property name="text">
+    <string>Irrad. Probe</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Irradiance Probe</string>
    </property>
   </action>
  </widget>

@@ -171,6 +171,15 @@ void displayDebugLineGeometryForSelectedObject()
           Components::IrradianceProbeManager::_descRadius(irradProbeRef),
           glm::vec3(1.0f, 0.0f, 0.0f));
     }
+
+    Components::DecalRef decalRef =
+        Components::DecalManager::getComponentForEntity(
+            GameStates::Editing::_currentlySelectedEntity);
+
+    if (decalRef.isValid())
+    {
+      // TODO
+    }
   }
 }
 }
