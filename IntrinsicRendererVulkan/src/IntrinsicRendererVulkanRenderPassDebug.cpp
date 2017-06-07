@@ -468,13 +468,11 @@ void Debug::renderDecal(Dod::Ref p_Decal)
       forward - (right - up), right + up,           right - up,
       -(right + up),          -(right - up)};
 
+  // Move to world space
   for (uint32_t i = 0u; i < 8u; ++i)
-  {
     verts[i] += Components::NodeManager::_worldPosition(nodeRef);
-  }
 
-  const glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
-
+  static const glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
   for (uint32_t i = 0u; i < 4u; ++i)
   {
     // Front
