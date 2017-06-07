@@ -34,6 +34,7 @@ struct PipelineLayoutData : Dod::Resources::ResourceDataBase
 
     vkPipelineLayout.resize(_INTR_MAX_PIPELINE_LAYOUT_COUNT);
     vkDescriptorSetLayout.resize(_INTR_MAX_PIPELINE_LAYOUT_COUNT);
+    vkGlobalDescriptorSetLayout.resize(_INTR_MAX_PIPELINE_LAYOUT_COUNT);
     vkDescriptorPool.resize(_INTR_MAX_PIPELINE_LAYOUT_COUNT);
   }
 
@@ -41,6 +42,7 @@ struct PipelineLayoutData : Dod::Resources::ResourceDataBase
 
   _INTR_ARRAY(VkPipelineLayout) vkPipelineLayout;
   _INTR_ARRAY(VkDescriptorSetLayout) vkDescriptorSetLayout;
+  _INTR_ARRAY(VkDescriptorSetLayout) vkGlobalDescriptorSetLayout;
   _INTR_ARRAY(VkDescriptorPool) vkDescriptorPool;
 };
 
@@ -160,6 +162,11 @@ struct PipelineLayoutManager
   _vkDescriptorSetLayout(PipelineLayoutRef p_Ref)
   {
     return _data.vkDescriptorSetLayout[p_Ref._id];
+  }
+  _INTR_INLINE static VkDescriptorSetLayout&
+  _vkGlobalDescriptorSetLayout(PipelineLayoutRef p_Ref)
+  {
+    return _data.vkGlobalDescriptorSetLayout[p_Ref._id];
   }
   _INTR_INLINE static VkDescriptorPool&
   _vkDescriptorPool(PipelineLayoutRef p_Ref)
