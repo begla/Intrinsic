@@ -23,78 +23,12 @@
 #define ESM_NEGATIVE_EXPONENT 20.0
 #define ESM_EXPONENTS vec2(ESM_POSITIVE_EXPONENT, ESM_NEGATIVE_EXPONENT)
 
+// <-
+
 const float translDistortion = 0.2;
 const float translPower = 8.0;
 const float translScale = 1.0;
 const vec3 translAmbient = vec3(0.0);
-
-// Clustered lighting
-// ->
-
-// Have to match the values on C++ side
-const uint maxLightCountPerCluster = 256;
-const uint maxIrradProbeCountPerCluster = 4;
-
-const float gridDepth = 10000.0f;
-const uvec3 gridRes = uvec3(16u, 8u, 24u);
-const float gridDepthExp = 3.0;
-const float gridDepthSliceScale =
-    gridDepth / pow(gridRes.z - 1.0, gridDepthExp);
-const float gridDepthSliceScaleRcp = 1.0f / gridDepthSliceScale;
-
-uint calcClusterIndex(uvec3 gridPos, uint clusterSize)
-{
-  return gridPos.x * clusterSize +
-         gridPos.y * gridRes.x * clusterSize +
-         gridPos.z * gridRes.y * gridRes.x * clusterSize;
-}
-
-float calcGridDepthSlice(uint depthSliceIdx)
-{
-  return pow(depthSliceIdx, gridDepthExp) * gridDepthSliceScale;
-}
-
-uint calcGridDepthIndex(float depthVS)
-{
-  return uint(pow(depthVS * gridDepthSliceScaleRcp, 1.0 / gridDepthExp));
-}
-
-uvec3 clampGridPos(in uvec3 gridPos)
-{
-  return clamp(gridPos, uvec3(0), gridRes - 1u);
-}
-
-uvec3 calcGridPosForViewPos(vec3 posVS, vec4 nearFar, vec4 nearFarWidthHeight)
-{
-  const uint gridDepthIdx = calcGridDepthIndex(-posVS.z);
-  const float gridStartDepth = calcGridDepthSlice(gridDepthIdx);
-  const float gridEndDepth = calcGridDepthSlice(gridDepthIdx + 1);
-
-  const float rayPos = (gridEndDepth - nearFar.x) / (nearFar.y - nearFar.x);
-  const vec2 gridHalfWidthHeight = mix(nearFarWidthHeight.xy, nearFarWidthHeight.zw, rayPos) * 0.5;
-
-  const vec2 localPos = posVS.xy / gridHalfWidthHeight.xy;
-  const uvec3 gridPos = uvec3(uvec2((localPos.xy * 0.5 + 0.5) * gridRes.xy), gridDepthIdx);
-  return clampGridPos(gridPos);
-}
-
-// <-
-
-struct Light
-{
-  vec4 posAndRadius;
-  vec4 colorAndIntensity;
-  vec4 temp;
-};
-
-// <-
-
-struct IrradProbe
-{
-  vec4 posAndRadius;
-  vec4 data0;
-  vec4 data[7];
-};
 
 // <-
 

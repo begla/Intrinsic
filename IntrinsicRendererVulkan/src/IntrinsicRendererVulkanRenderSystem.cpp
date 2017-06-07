@@ -156,7 +156,7 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
     RenderPass::Shadow::init();
 
-    RenderPass::Lighting::init();
+    RenderPass::Clustering::init();
     RenderPass::VolumetricLighting::init();
 
     RenderPass::Bloom::init();

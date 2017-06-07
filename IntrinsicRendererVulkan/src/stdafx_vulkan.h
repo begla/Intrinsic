@@ -64,7 +64,7 @@
 #include "IntrinsicRendererVulkanRenderPassGenericMesh.h"
 #include "IntrinsicRendererVulkanRenderPassGenericBlur.h"
 #include "IntrinsicRendererVulkanRenderPassVolumetricLighting.h"
-#include "IntrinsicRendererVulkanRenderPassLighting.h"
+#include "IntrinsicRendererVulkanRenderPassClustering.h"
 #include "IntrinsicRendererVulkanRenderPassBloom.h"
 #include "IntrinsicRendererVulkanRenderPassPerPixelPicking.h"
 #include "IntrinsicRendererVulkanDrawCallDispatcher.h"

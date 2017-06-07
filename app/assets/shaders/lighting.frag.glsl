@@ -22,6 +22,7 @@
 #include "lib_noise.glsl"
 #include "lib_lighting.glsl"
 #include "lib_buffers.glsl"
+#include "lib_clustering.glsl"
 #include "ubos.inc.glsl"
 
 layout (binding = 0) uniform PerInstance
@@ -128,7 +129,7 @@ void main()
           / fadeRange, probe.data0.y);
         
         irrad = mix(irrad, d.diffuseColor 
-          * sampleSH(probe.data, normalWS) / MATH_PI, fade);
+          * sampleSH(probe.shData, normalWS) / MATH_PI, fade);
       }
     }
   }
@@ -155,10 +156,11 @@ void main()
   // Sunlight
   {
    const vec4 sunLightColorAndIntensity = uboPerFrame.sunLightColorAndIntensity;
-    float shadowAttenuation = cloudShadows * calcShadowAttenuation(d.posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
+    float shadowAttenuation = cloudShadows 
+      * calcShadowAttenuation(d.posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
     outColor.rgb += shadowAttenuation * sunLightColorAndIntensity.rgb * calcLighting(d);
     calcTransl(d, matParams, 
-      abs(uboPerFrame.sunLightDirWS.y), // Dim for low sun
+      clamp(uboPerFrame.sunLightDirWS.y - 0.3, 0.0, 1.0), // Dim for low sun
       sunLightColorAndIntensity, outColor);   
   }
 
