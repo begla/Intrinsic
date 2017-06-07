@@ -1,0 +1,10 @@
+{
+    "name": "decals.frag",
+    "properties": {
+        "name": "decals.frag",
+        "gpuProgramName": "decals.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

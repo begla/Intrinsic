@@ -22,7 +22,7 @@ namespace Vulkan
 {
 namespace RenderPass
 {
-struct Lighting
+struct Clustering
 {
   static void init();
   static void onReinitRendering();

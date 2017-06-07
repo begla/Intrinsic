@@ -43,7 +43,7 @@ enum Enum
   kRenderPassDebug,
   kRenderPassPerPixelPicking,
   kRenderPassShadow,
-  kRenderPassLighting,
+  kRenderPassClustering,
   kRenderPassVolumetricLighting,
   kRenderPassBloom
 };
@@ -54,7 +54,7 @@ _renderStepTypeMapping = {
     {"RenderPassDebug", RenderStepType::kRenderPassDebug},
     {"RenderPassPerPixelPicking", RenderStepType::kRenderPassPerPixelPicking},
     {"RenderPassShadow", RenderStepType::kRenderPassShadow},
-    {"RenderPassLighting", RenderStepType::kRenderPassLighting},
+    {"RenderPassClustering", RenderStepType::kRenderPassClustering},
     {"RenderPassVolumetricLighting",
      RenderStepType::kRenderPassVolumetricLighting},
     {"RenderPassBloom", RenderStepType::kRenderPassBloom}};
@@ -74,8 +74,9 @@ _renderStepFunctionMapping = {
       RenderPass::PerPixelPicking::onReinitRendering}},
     {RenderStepType::kRenderPassShadow,
      {RenderPass::Shadow::render, RenderPass::Shadow::onReinitRendering}},
-    {RenderStepType::kRenderPassLighting,
-     {RenderPass::Lighting::render, RenderPass::Lighting::onReinitRendering}},
+    {RenderStepType::kRenderPassClustering,
+     {RenderPass::Clustering::render,
+      RenderPass::Clustering::onReinitRendering}},
     {RenderStepType::kRenderPassVolumetricLighting,
      {RenderPass::VolumetricLighting::render,
       RenderPass::VolumetricLighting::onReinitRendering}},

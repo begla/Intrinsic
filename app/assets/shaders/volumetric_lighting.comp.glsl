@@ -22,6 +22,7 @@
 #include "lib_lighting.glsl"
 #include "lib_vol_lighting.glsl"
 #include "lib_noise.glsl"
+#include "lib_clustering.glsl"
 #include "ubos.inc.glsl"
 
 layout (binding = 0) uniform PerInstance
@@ -174,7 +175,7 @@ void main()
         const float fade = pow(1.0 - max(distToProbe - fadeStart, 0.0) 
           / fadeRange, probe.data0.y);
         
-        irrad = mix(irrad, sampleSH(probe.data, rayWS) / MATH_PI, fade);
+        irrad = mix(irrad, sampleSH(probe.shData, rayWS) / MATH_PI, fade);
       }
     }
   }

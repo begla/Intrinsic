@@ -201,7 +201,7 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
   // Uniforms for the render passes
   {
     UniformManager::_uniformDataSource.postParams0.x =
-        RenderPass::Lighting::_globalAmbientFactor;
+        RenderPass::Clustering::_globalAmbientFactor;
     UniformManager::_uniformDataSource.postParams0.y =
         World::_currentDayNightFactor;
     UniformManager::_uniformDataSource.postParams0.z =

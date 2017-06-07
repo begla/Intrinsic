@@ -762,7 +762,7 @@ void captureIrradProbe(
 
   uint32_t prevDebugStageFlags = RenderPass::Debug::_activeDebugStageFlags;
   RenderPass::Debug::_activeDebugStageFlags = 0u;
-  RenderPass::Lighting::_globalAmbientFactor = 0.0f;
+  RenderPass::Clustering::_globalAmbientFactor = 0.0f;
   RenderPass::VolumetricLighting::_globalScatteringFactor = 0.0f;
   float prevTime = World::_currentTime;
   World::_currentTime = p_Time;
@@ -930,7 +930,7 @@ void captureIrradProbe(
 
   Settings::Manager::_targetFrameRate = prevMaxFps;
   World::_currentTime = prevTime;
-  RenderPass::Lighting::_globalAmbientFactor = 1.0f;
+  RenderPass::Clustering::_globalAmbientFactor = 1.0f;
   RenderPass::VolumetricLighting::_globalScatteringFactor = 1.0f;
   RenderPass::Debug::_activeDebugStageFlags = prevDebugStageFlags;
   World::setActiveCamera(prevCamera);
