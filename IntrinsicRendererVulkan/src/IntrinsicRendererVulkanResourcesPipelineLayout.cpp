@@ -33,12 +33,17 @@ void PipelineLayoutManager::createResources(
     PipelineLayoutRef ref = p_PipelineLayouts[pplLayoutIdx];
 
     VkDescriptorSetLayout& descriptorSetLayout = _vkDescriptorSetLayout(ref);
+    VkDescriptorSetLayout& globalDescriptorSetLayout =
+        _vkGlobalDescriptorSetLayout(ref);
     VkPipelineLayout& pipelineLayout = _vkPipelineLayout(ref);
     VkDescriptorPool& pool = _vkDescriptorPool(ref);
     _INTR_ARRAY(BindingDescription)& bindingInfos = _descBindingDescs(ref);
 
     _INTR_ARRAY(VkDescriptorSetLayoutBinding) layoutBindings;
     layoutBindings.resize(bindingInfos.size());
+
+    _INTR_ARRAY(VkDescriptorSetLayout) layouts;
+    layouts.reserve(2u);
 
     for (uint32_t biIdx = 0u; biIdx < bindingInfos.size(); ++biIdx)
     {
@@ -65,6 +70,35 @@ void PipelineLayoutManager::createResources(
       VkResult result = vkCreateDescriptorSetLayout(
           RenderSystem::_vkDevice, &descLayout, nullptr, &descriptorSetLayout);
       _INTR_VK_CHECK_RESULT(result);
+      layouts.push_back(descriptorSetLayout);
+    }
+
+    // Global layout
+    {
+      VkDescriptorSetLayoutBinding globalImageBinding = {};
+      {
+        globalImageBinding.binding = 0u;
+        globalImageBinding.descriptorType =
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        globalImageBinding.descriptorCount = 4096u;
+        globalImageBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        globalImageBinding.pImmutableSamplers = nullptr;
+      }
+
+      VkDescriptorSetLayoutCreateInfo descGlobalLayout = {};
+      {
+        descGlobalLayout.sType =
+            VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        descGlobalLayout.pNext = nullptr;
+        descGlobalLayout.bindingCount = 1u;
+        descGlobalLayout.pBindings = &globalImageBinding;
+
+        VkResult result = vkCreateDescriptorSetLayout(
+            RenderSystem::_vkDevice, &descGlobalLayout, nullptr,
+            &globalDescriptorSetLayout);
+        _INTR_VK_CHECK_RESULT(result);
+        layouts.push_back(globalDescriptorSetLayout);
+      }
     }
 
     {
@@ -74,8 +108,8 @@ void PipelineLayoutManager::createResources(
       pPipelineLayoutCreateInfo.pNext = nullptr;
       pPipelineLayoutCreateInfo.pushConstantRangeCount = 0;
       pPipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
-      pPipelineLayoutCreateInfo.setLayoutCount = 1u;
-      pPipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
+      pPipelineLayoutCreateInfo.setLayoutCount = (uint32_t)layouts.size();
+      pPipelineLayoutCreateInfo.pSetLayouts = layouts.data();
 
       VkResult result = vkCreatePipelineLayout(RenderSystem::_vkDevice,
                                                &pPipelineLayoutCreateInfo,
@@ -95,7 +129,7 @@ void PipelineLayoutManager::createResources(
 
         poolSizes[i].type = Helper::mapBindingTypeToVkDescriptorType(
             (BindingType::Enum)info.bindingType);
-        poolSizes[i].descriptorCount = info.poolCount;
+        poolSizes[i].descriptorCount = 1u;
         maxPoolCount = std::max(maxPoolCount, info.poolCount);
       }
 
@@ -131,6 +165,13 @@ void PipelineLayoutManager::destroyResources(
     }
 
     VkDescriptorSetLayout& descSetLayout = _vkDescriptorSetLayout(ref);
+    if (descSetLayout != VK_NULL_HANDLE)
+    {
+      vkDestroyDescriptorSetLayout(RenderSystem::_vkDevice, descSetLayout,
+                                   nullptr);
+      descSetLayout = VK_NULL_HANDLE;
+    }
+    descSetLayout = _vkGlobalDescriptorSetLayout(ref);
     if (descSetLayout != VK_NULL_HANDLE)
     {
       vkDestroyDescriptorSetLayout(RenderSystem::_vkDevice, descSetLayout,
