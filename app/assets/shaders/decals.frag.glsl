@@ -96,7 +96,7 @@ void main()
     }
   }
 
-  if (albedo.a < 0.5)
+  if (albedo.a < 0.2)
   {
     discard;
   }

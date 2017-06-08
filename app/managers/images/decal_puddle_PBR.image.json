@@ -1,0 +1,10 @@
+{
+    "name": "decal_puddle_PBR",
+    "properties": {
+        "name": "decal_puddle_PBR",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "decal_puddle_PBR.dds",
+        "avgNormLength": 1.0
+    }
+}

@@ -79,3 +79,4 @@ Assets and icons sourced from:
 * https://cloud.blender.org/
 * http://www.hdrlabs.com/sibl/archive.html
 * http://www.flaticon.com
+* http://www.gametextures.com
