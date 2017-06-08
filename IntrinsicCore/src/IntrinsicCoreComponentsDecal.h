@@ -28,8 +28,16 @@ struct DecalData : Dod::Components::ComponentDataBase
   DecalData()
       : Dod::Components::ComponentDataBase(_INTR_MAX_DECAL_COMPONENT_COUNT)
   {
+    descAlbedoTextureName.resize(_INTR_MAX_DECAL_COMPONENT_COUNT);
+    descNormalTextureName.resize(_INTR_MAX_DECAL_COMPONENT_COUNT);
+    descPBRTextureName.resize(_INTR_MAX_DECAL_COMPONENT_COUNT);
+
     descHalfExtent.resize(_INTR_MAX_DECAL_COMPONENT_COUNT);
   }
+
+  _INTR_ARRAY(Name) descAlbedoTextureName;
+  _INTR_ARRAY(Name) descNormalTextureName;
+  _INTR_ARRAY(Name) descPBRTextureName;
 
   _INTR_ARRAY(glm::vec3) descHalfExtent;
 };
@@ -52,8 +60,12 @@ struct DecalManager
 
   // <-
 
-  _INTR_INLINE static void resetToDefault(MeshRef p_Ref)
+  _INTR_INLINE static void resetToDefault(DecalRef p_Ref)
   {
+    _descAlbedoTextureName(p_Ref) = _N(checkerboard);
+    _descNormalTextureName(p_Ref) = _N(default_NRM);
+    _descPBRTextureName(p_Ref) = _N(checkerboard_PBR);
+
     _descHalfExtent(p_Ref) = glm::vec3(2.0f, 2.0f, 2.0f);
   }
 
@@ -73,6 +85,22 @@ struct DecalManager
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember(
+        "albedoTextureName",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Decal), _N(string),
+                          _descAlbedoTextureName(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "normalTextureName",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Decal), _N(string),
+                          _descNormalTextureName(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "pbrTextureName",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Decal), _N(string),
+                          _descPBRTextureName(p_Ref), false, false),
+        p_Document.GetAllocator());
+
+    p_Properties.AddMember(
         "halfExtent",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Decal), _N(vec3),
                           _descHalfExtent(p_Ref), false, false),
@@ -84,6 +112,16 @@ struct DecalManager
   _INTR_INLINE static void initFromDescriptor(DecalRef p_Ref,
                                               rapidjson::Value& p_Properties)
   {
+    if (p_Properties.HasMember("albedoTextureName"))
+      _descAlbedoTextureName(p_Ref) =
+          JsonHelper::readPropertyName(p_Properties["albedoTextureName"]);
+    if (p_Properties.HasMember("normalTextureName"))
+      _descNormalTextureName(p_Ref) =
+          JsonHelper::readPropertyName(p_Properties["normalTextureName"]);
+    if (p_Properties.HasMember("pbrTextureName"))
+      _descPBRTextureName(p_Ref) =
+          JsonHelper::readPropertyName(p_Properties["pbrTextureName"]);
+
     if (p_Properties.HasMember("halfExtent"))
       _descHalfExtent(p_Ref) =
           JsonHelper::readPropertyVec3(p_Properties["halfExtent"]);
@@ -95,6 +133,19 @@ struct DecalManager
   // ->
 
   // Description
+  _INTR_INLINE static Name& _descAlbedoTextureName(DecalRef p_Ref)
+  {
+    return _data.descAlbedoTextureName[p_Ref._id];
+  }
+  _INTR_INLINE static Name& _descNormalTextureName(DecalRef p_Ref)
+  {
+    return _data.descNormalTextureName[p_Ref._id];
+  }
+  _INTR_INLINE static Name& _descPBRTextureName(DecalRef p_Ref)
+  {
+    return _data.descPBRTextureName[p_Ref._id];
+  }
+
   _INTR_INLINE static glm::vec3& _descHalfExtent(DecalRef p_Ref)
   {
     return _data.descHalfExtent[p_Ref._id];

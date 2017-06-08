@@ -231,6 +231,9 @@ void GpuProgramManager::reflectPipelineLayout(
     {
       spirv_cross::Resource& res = resources.uniform_buffers[i];
 
+      if (glsl.get_decoration(res.id, spv::DecorationDescriptorSet) != 0u)
+        continue;
+
       const bool isDynamic = res.name == "PerInstance" ||
                              res.name == "PerMaterial" ||
                              res.name == "PerFrame";
@@ -253,6 +256,9 @@ void GpuProgramManager::reflectPipelineLayout(
     {
       spirv_cross::Resource& res = resources.sampled_images[i];
 
+      if (glsl.get_decoration(res.id, spv::DecorationDescriptorSet) != 0u)
+        continue;
+
       BindingDescription bd;
       {
         bd.name = res.name.c_str();
@@ -270,6 +276,9 @@ void GpuProgramManager::reflectPipelineLayout(
     {
       spirv_cross::Resource& res = resources.storage_images[i];
 
+      if (glsl.get_decoration(res.id, spv::DecorationDescriptorSet) != 0u)
+        continue;
+
       BindingDescription bd;
       {
         bd.name = res.name.c_str();
@@ -286,6 +295,9 @@ void GpuProgramManager::reflectPipelineLayout(
     for (uint32_t i = 0u; i < resources.storage_buffers.size(); ++i)
     {
       spirv_cross::Resource& res = resources.storage_buffers[i];
+
+      if (glsl.get_decoration(res.id, spv::DecorationDescriptorSet) != 0u)
+        continue;
 
       BindingDescription bd;
       {

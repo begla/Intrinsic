@@ -90,6 +90,24 @@ enum Enum
 };
 }
 
+namespace ImageTextureType
+{
+enum Enum
+{
+  kUnknown,
+
+  k1D,
+  k1DArray,
+  k2D,
+  k2DArray,
+  k3D,
+  k3DArray,
+
+  kCube,
+  kCubeArray
+};
+}
+
 namespace ImageFlags
 {
 enum Flags

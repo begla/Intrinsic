@@ -39,6 +39,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
     descFileName.resize(_INTR_MAX_IMAGE_COUNT);
     descMemoryPoolType.resize(_INTR_MAX_IMAGE_COUNT);
     descAvgNormLength.resize(_INTR_MAX_IMAGE_COUNT);
+    imageTextureType.resize(_INTR_MAX_IMAGE_COUNT);
 
     vkImage.resize(_INTR_MAX_IMAGE_COUNT);
     vkImageView.resize(_INTR_MAX_IMAGE_COUNT);
@@ -66,6 +67,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(VkImageView) vkImageViewGamma;
   _INTR_ARRAY(ImageViewArray) vkSubResourceImageViews;
   _INTR_ARRAY(GpuMemoryAllocationInfo) memoryAllocationInfo;
+  _INTR_ARRAY(ImageTextureType::Enum) imageTextureType;
 };
 
 struct ImageManager
@@ -258,8 +260,14 @@ struct ImageManager
     for (uint32_t i = 0u; i < p_Images.size(); ++i)
     {
       destroyImage(p_Images[i]);
+      _imageTextureType(p_Images[i]) = ImageTextureType::kUnknown;
     }
   }
+
+  // <-
+
+  static VkDescriptorSetLayout getGlobalDescriptorSetLayout();
+  static VkDescriptorSet getGlobalDescriptorSet();
 
   // <-
 
@@ -317,6 +325,21 @@ struct ImageManager
     Helper::insertImageMemoryBarrier(
         RenderSystem::getPrimaryCommandBuffer(), _vkImage(p_ImageRef),
         p_SrcImageLayout, p_DstImageLayout, range, p_SrcStages, p_DstStages);
+  }
+
+  // <-
+
+  static void updateGlobalDescriptorSet();
+
+  // <-
+
+  static _INTR_INLINE uint32_t getTextureId(ImageRef p_ImageRef)
+  {
+    auto mapping = _globalTextureIdMapping.find(p_ImageRef);
+    if (mapping == _globalTextureIdMapping.end())
+      return (uint32_t)-1;
+
+    return mapping->second;
   }
 
   // <-
@@ -408,6 +431,14 @@ struct ImageManager
   {
     return _data.memoryAllocationInfo[p_Ref._id];
   }
+  _INTR_INLINE static ImageTextureType::Enum& _imageTextureType(ImageRef p_Ref)
+  {
+    return _data.imageTextureType[p_Ref._id];
+  }
+
+  // ->
+
+  static _INTR_HASH_MAP(Dod::Ref, uint32_t) _globalTextureIdMapping;
 };
 }
 }

@@ -112,11 +112,13 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
     {
       _INTR_PROFILE_AUTO("Compile Shaders");
+
       GpuProgramManager::compileAllShaders();
     }
 
     {
       _INTR_PROFILE_AUTO("Create GPU Program Resources");
+
       GpuProgramManager::createAllResources();
     }
 
@@ -124,7 +126,9 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
     {
       _INTR_PROFILE_AUTO("Create Image Resources");
+
       ImageManager::createAllResources();
+      ImageManager::updateGlobalDescriptorSet();
     }
 
     VertexLayoutManager::createAllResources();
@@ -303,13 +307,16 @@ void RenderSystem::dispatchDrawCall(Dod::Ref p_DrawCall,
   vkCmdBindPipeline(p_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     newPipeline);
 
+  VkDescriptorSet descSets[2] = {
+      Resources::DrawCallManager::_vkDescriptorSet(p_DrawCall),
+      Resources::ImageManager::getGlobalDescriptorSet()};
+
   if (DrawCallManager::_vkDescriptorSet(p_DrawCall))
   {
     vkCmdBindDescriptorSets(
         p_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-        PipelineLayoutManager::_vkPipelineLayout(pipelineLayoutRef), 0u, 1u,
-        &DrawCallManager::_vkDescriptorSet(p_DrawCall),
-        (uint32_t)DrawCallManager::_dynamicOffsets(p_DrawCall).size(),
+        PipelineLayoutManager::_vkPipelineLayout(pipelineLayoutRef), 0u, 2u,
+        descSets, (uint32_t)DrawCallManager::_dynamicOffsets(p_DrawCall).size(),
         DrawCallManager::_dynamicOffsets(p_DrawCall).data());
   }
 
