@@ -75,14 +75,14 @@ const float filmGrainQuantStepsRcp = 1.0 / (64.0 - 1.0);
 const float filmGrainBlackLimit = 0.5 * pow(filmGrainQuantStepsRcp, 2.0);
 const float filmGrainAmount = 0.75 * (pow(1.0 + filmGrainQuantStepsRcp, 2.0) - 1.0);
 const float lensFlareFactor = 3.0;
-const float chromaticAbbFactor = 0.0;
+const float chromaticAbFactor = 0.0;
 
 void main()
 {
   const vec2 framebufferSize = vec2(textureSize(sceneTex, 0));
 
-  // Chromatic abberation
-  const vec3 colorOffsets = chromaticAbbFactor * vec3(1.0, 2.0, 3.0);
+  // Chromatic aberration
+  const vec3 colorOffsets = chromaticAbFactor * vec3(1.0, 2.0, 3.0);
   vec3 scene = sampleColorOffsets(sceneTex, inUV0, colorOffsets, framebufferSize);
   const vec3 sceneBlurred = sampleColorOffsets(sceneBlurredTex, inUV0, colorOffsets, framebufferSize);
 
