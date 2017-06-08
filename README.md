@@ -15,8 +15,7 @@ You can find some simple build and setup instructions in `GETTING_STARTED.md`.
 * Easily configurable benchmarking system
 * Scripting via LUA (_work in progress_ - scripting interface far from complete)
 * PhysX integration supporting simple rigid bodies and character controllers
-* Micrprofile integration
-  * See https://github.com/jonasmr/microprofile
+* Easy CPU and GPU profiling using Microprofile
 
 # Rendering Features
 * Physically based rendering pipeline
@@ -30,7 +29,9 @@ You can find some simple build and setup instructions in `GETTING_STARTED.md`.
 * Global irradiance (skylight) using the approximated irradiance from the skylight model
 * Volumetric fog considering all lighting parameters (sunlight, irradiance, lights, ...)
   * Based on https://bartwronski.files.wordpress.com/2014/08/bwronski_volumetric_fog_siggraph2014.pdf
-* Volume based post effect system supporting various post effects (fake DoF, vignette, chromatic aberration, bleach bypass, film grain, ...)
+* Volume based post effect system supporting various effects (fake DoF, vignette, chromatic aberration, bleach bypass, film grain, ...)
+* Automated roughness adjustment to fight specular aliasing
+  * Based on http://blog.selfshadow.com/publications/s2013-shading-course/rad/s2013_pbs_rad_notes.pdf
 * Antialiasing: SMAA
   * See http://www.iryoku.com/smaa/
 * HDR rendering with compute based bloom, luminance based eye adaption and filmic tonemapping
@@ -40,11 +41,8 @@ You can find some simple build and setup instructions in `GETTING_STARTED.md`.
 # Screenshots
 
 ![Intrinsic](media/screenshot_0.jpg)
-
 ![IntrinsicEd](media/screenshot_1.jpg)
-
 ![IntrinsicEd](media/screenshot_3.jpg)
-
 ![IntrinsicEd](media/screenshot_2.jpg)
 
 # Build Status
