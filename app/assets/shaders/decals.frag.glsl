@@ -42,7 +42,7 @@ layout (std430, binding = 4) buffer readonly DecalIndexBuffer
 {
   uint decalIndices[];
 };
-layout (set = 1, binding = 0) uniform sampler2D textures0[4095];
+layout (set = 1, binding = 0) uniform sampler2D globalTextures[4095];
 
 layout (location = 0) in vec2 inUV0;
 
@@ -85,9 +85,9 @@ void main()
       vec2 decalUV = posDecalSS.xy * vec2(0.5, 0.5) + 0.5;
       decalUV = decalUV * decal.uvTransform.xy + decal.uvTransform.zw;
 
-      albedo = texture(textures0[decal.textureIds.x], decalUV);
-      normal = normalize(TBN * (texture(textures0[decal.textureIds.y], decalUV).xyz * 2.0 - 1.0));
-      pbr = texture(textures0[decal.textureIds.z], decalUV);
+      albedo = texture(globalTextures[decal.textureIds.x], decalUV);
+      normal = normalize(TBN * (texture(globalTextures[decal.textureIds.y], decalUV).xyz * 2.0 - 1.0));
+      pbr = texture(globalTextures[decal.textureIds.z], decalUV);
     }
   }
 
