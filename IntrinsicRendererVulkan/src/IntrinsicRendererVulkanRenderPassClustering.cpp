@@ -80,7 +80,13 @@ struct Decal
 {
   glm::mat4 viewProjMatrix;
   glm::vec4 posAndRadiusVS;
+
   glm::uvec4 textureIds;
+
+  glm::vec4 uvTransform;
+  glm::vec4 normalVS;
+  glm::vec4 tangentVS;
+  glm::vec4 binormalVS;
 };
 
 _INTR_ARRAY(TestLight) _testLights;
@@ -380,6 +386,22 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
         decal.posAndRadiusVS =
             Components::CameraManager::_viewMatrix(p_CameraRef) *
             glm::vec4(Math::calcAABBCenter(decalAABB), 1.0);
+
+        decal.normalVS = glm::normalize(
+            Components::CameraManager::_viewMatrix(p_CameraRef) *
+            glm::vec4(decalWorldOrientation * glm::vec3(0.0f, 0.0f, 1.0f),
+                      0.0));
+        decal.tangentVS = glm::normalize(
+            Components::CameraManager::_viewMatrix(p_CameraRef) *
+            glm::vec4(decalWorldOrientation * glm::vec3(0.0f, 1.0f, 0.0f),
+                      0.0));
+        decal.binormalVS = glm::normalize(
+            Components::CameraManager::_viewMatrix(p_CameraRef) *
+            glm::vec4(decalWorldOrientation * glm::vec3(1.0f, 0.0f, 0.0f),
+                      0.0));
+
+        decal.uvTransform =
+            Components::DecalManager::_descUVTransform(decalRef);
         decal.posAndRadiusVS.w =
             glm::length(Math::calcAABBHalfExtent(decalAABB));
         decal.viewProjMatrix =

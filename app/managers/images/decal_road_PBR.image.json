@@ -1,0 +1,10 @@
+{
+    "name": "decal_road_PBR",
+    "properties": {
+        "name": "decal_road_PBR",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "decal_road_PBR.dds",
+        "avgNormLength": 1.0
+    }
+}

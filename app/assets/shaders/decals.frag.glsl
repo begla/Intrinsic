@@ -70,15 +70,6 @@ void main()
   const uint clusterIdx = calcClusterIndex(gridPos, maxDecalCountPerCluster);
   const uint decalCount = decalIndices[clusterIdx];
 
-  vec3 ddxPosVS = dFdx(posVS);
-  vec3 ddyPosVS = -dFdy(posVS);
-  //albedo = vec4(normalize(cross(ddxPosVS, ddyPosVS)), 1.00);
-
-  const vec3 normVS = normalize(cross(ddxPosVS, ddyPosVS));
-  const vec3 binormVS = normalize(ddxPosVS);
-  const vec3 tangentVS = normalize(ddyPosVS);
-  const mat3 TBN = mat3(tangentVS, binormVS, normVS);
-
   for (uint di=0; di<decalCount; ++di)
   {
     Decal decal = decals[decalIndices[clusterIdx + di + 1]];
@@ -89,9 +80,13 @@ void main()
     if (all(lessThanEqual(posDecalSS.xyz, vec3(1.0, 1.0, 1.0)))
       && all(greaterThanEqual(posDecalSS.xyz, vec3(-1.0, -1.0, 0.0))))
     {
-      const vec2 decalUV = posDecalSS.xy * 0.5 + 0.5;
+      const mat3 TBN = mat3(-decal.tangentVS.xyz, decal.binormalVS.xyz, decal.normalVS.xyz);
+
+      vec2 decalUV = posDecalSS.xy * vec2(0.5, 0.5) + 0.5;
+      decalUV = decalUV * decal.uvTransform.xy + decal.uvTransform.zw;
+
       albedo = texture(textures0[decal.textureIds.x], decalUV);
-      normal = texture(textures0[decal.textureIds.y], decalUV).xyz * 2.0 - 1.0;
+      normal = normalize(TBN * (texture(textures0[decal.textureIds.y], decalUV).xyz * 2.0 - 1.0));
       pbr = texture(textures0[decal.textureIds.z], decalUV);
     }
   }
@@ -104,9 +99,9 @@ void main()
   GBuffer gbuffer;
   {
     gbuffer.albedo = albedo;
-    gbuffer.normal = normalize(TBN * normal);
+    gbuffer.normal = normal;
     gbuffer.metalMask = pbr.r;
-    gbuffer.specular = pbr.g;
+    gbuffer.specular = pbr.g; 
     gbuffer.roughness = pbr.b;
     gbuffer.materialBufferIdx = 0u;
     gbuffer.emissive = 0.0;

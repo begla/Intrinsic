@@ -1,0 +1,10 @@
+{
+    "name": "decal_road_NRM",
+    "properties": {
+        "name": "decal_road_NRM",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "decal_road_NRM.dds",
+        "avgNormLength": 0.9586690068244934
+    }
+}
