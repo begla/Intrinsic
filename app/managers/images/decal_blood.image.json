@@ -1,0 +1,10 @@
+{
+    "name": "decal_blood",
+    "properties": {
+        "name": "decal_blood",
+        "imageType": 1,
+        "imageFormat": 10,
+        "fileName": "decal_blood.dds",
+        "avgNormLength": 1.0
+    }
+}
