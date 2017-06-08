@@ -80,6 +80,7 @@ struct Decal
 {
   glm::mat4 viewProjMatrix;
   glm::vec4 posAndRadiusVS;
+  glm::uvec4 textureIds;
 };
 
 _INTR_ARRAY(TestLight) _testLights;
@@ -384,6 +385,19 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
         decal.viewProjMatrix =
             (decalProjectionMatrix * decalViewMatrix) *
             Components::CameraManager::_inverseViewMatrix(p_CameraRef);
+        decal.textureIds = glm::uvec4(
+            Resources::ImageManager::getTextureId(
+                Resources::ImageManager::getResourceByName(
+                    Components::DecalManager::_descAlbedoTextureName(
+                        decalRef))),
+            Resources::ImageManager::getTextureId(
+                Resources::ImageManager::getResourceByName(
+                    Components::DecalManager::_descNormalTextureName(
+                        decalRef))),
+            Resources::ImageManager::getTextureId(
+                Resources::ImageManager::getResourceByName(
+                    Components::DecalManager::_descPBRTextureName(decalRef))),
+            0u);
       }
       _decalBufferMemory[_currentDecalCount] = decal;
 
@@ -638,9 +652,19 @@ _INTR_INLINE void renderDecals(Components::CameraRef p_CameraRef)
 
   const ImageRef gbufferAlbedoRef =
       ImageManager::getResourceByName(_N(GBufferAlbedo));
+  const ImageRef gbufferNormalRef =
+      ImageManager::getResourceByName(_N(GBufferNormal));
+  const ImageRef gbufferParameter0 =
+      ImageManager::getResourceByName(_N(GBufferParameter0));
 
   ImageManager::insertImageMemoryBarrier(
       gbufferAlbedoRef, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+  ImageManager::insertImageMemoryBarrier(
+      gbufferNormalRef, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+  ImageManager::insertImageMemoryBarrier(
+      gbufferParameter0, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
       VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
   RenderSystem::beginRenderPass(_renderPassDecalsRef, _framebufferDecalsRef,
@@ -652,6 +676,12 @@ _INTR_INLINE void renderDecals(Components::CameraRef p_CameraRef)
 
   ImageManager::insertImageMemoryBarrier(
       gbufferAlbedoRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+  ImageManager::insertImageMemoryBarrier(
+      gbufferNormalRef, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+  ImageManager::insertImageMemoryBarrier(
+      gbufferParameter0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 }
@@ -713,6 +743,10 @@ void Clustering::init()
 
     RenderPassManager::_descAttachments(_renderPassDecalsRef)
         .push_back(colorAttachment);
+    RenderPassManager::_descAttachments(_renderPassDecalsRef)
+        .push_back(colorAttachment);
+    RenderPassManager::_descAttachments(_renderPassDecalsRef)
+        .push_back(colorAttachment);
   }
   renderpassesToCreate.push_back(_renderPassDecalsRef);
 
@@ -746,10 +780,10 @@ void Clustering::init()
     PipelineManager::_descVertexLayout(_pipelineDecalsRef) = Dod::Ref();
     PipelineManager::_descDepthStencilState(_pipelineDecalsRef) =
         DepthStencilStates::kDefaultNoDepthTestAndWrite;
-
-    PipelineManager::_descBlendStates(_pipelineDecalsRef).clear();
     PipelineManager::_descBlendStates(_pipelineDecalsRef)
-        .push_back(BlendStates::kAlphaBlend);
+        .push_back(BlendStates::kDefault);
+    PipelineManager::_descBlendStates(_pipelineDecalsRef)
+        .push_back(BlendStates::kDefault);
   }
   pipelinesToCreate.push_back(_pipelineLightingRef);
 
@@ -979,10 +1013,6 @@ _INTR_INLINE void setupDecalsDrawCall(Resources::DrawCallRef p_DrawCallRef)
                              GpuProgramType::kFragment,
                              ImageManager::getResourceByName(_N(GBufferDepth)),
                              Samplers::kNearestClamp);
-  DrawCallManager::bindImage(
-      p_DrawCallRef, _N(testTex), GpuProgramType::kFragment,
-      ImageManager::getResourceByName(_N(foam)), Samplers::kLinearClamp);
-
   DrawCallManager::bindBuffer(
       p_DrawCallRef, _N(DecalBuffer), GpuProgramType::kFragment, _decalBuffer,
       UboType::kInvalidUbo, BufferManager::_descSizeInBytes(_decalBuffer));
@@ -1117,6 +1147,10 @@ void Clustering::onReinitRendering()
 
     FramebufferManager::_descAttachedImages(_framebufferDecalsRef)
         .push_back(ImageManager::getResourceByName(_N(GBufferAlbedo)));
+    FramebufferManager::_descAttachedImages(_framebufferDecalsRef)
+        .push_back(ImageManager::getResourceByName(_N(GBufferNormal)));
+    FramebufferManager::_descAttachedImages(_framebufferDecalsRef)
+        .push_back(ImageManager::getResourceByName(_N(GBufferParameter0)));
 
     FramebufferManager::_descDimensions(_framebufferDecalsRef) =
         glm::uvec2(RenderSystem::_backbufferDimensions.x,

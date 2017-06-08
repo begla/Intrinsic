@@ -436,6 +436,33 @@ enum TOperator {
     EOpConstructDMat4x2,
     EOpConstructDMat4x3,
     EOpConstructDMat4x4,
+    EOpConstructIMat2x2,
+    EOpConstructIMat2x3,
+    EOpConstructIMat2x4,
+    EOpConstructIMat3x2,
+    EOpConstructIMat3x3,
+    EOpConstructIMat3x4,
+    EOpConstructIMat4x2,
+    EOpConstructIMat4x3,
+    EOpConstructIMat4x4,
+    EOpConstructUMat2x2,
+    EOpConstructUMat2x3,
+    EOpConstructUMat2x4,
+    EOpConstructUMat3x2,
+    EOpConstructUMat3x3,
+    EOpConstructUMat3x4,
+    EOpConstructUMat4x2,
+    EOpConstructUMat4x3,
+    EOpConstructUMat4x4,
+    EOpConstructBMat2x2,
+    EOpConstructBMat2x3,
+    EOpConstructBMat2x4,
+    EOpConstructBMat3x2,
+    EOpConstructBMat3x3,
+    EOpConstructBMat3x4,
+    EOpConstructBMat4x2,
+    EOpConstructBMat4x3,
+    EOpConstructBMat4x4,
 #ifdef AMD_EXTENSIONS
     EOpConstructFloat16,
     EOpConstructF16Vec2,
@@ -540,6 +567,11 @@ enum TOperator {
     EOpTextureOffsetClamp,
     EOpTextureGradClamp,
     EOpTextureGradOffsetClamp,
+#ifdef AMD_EXTENSIONS
+    EOpTextureGatherLod,
+    EOpTextureGatherLodOffset,
+    EOpTextureGatherLodOffsets,
+#endif
 
     EOpSparseTextureGuardBegin,
 
@@ -559,6 +591,11 @@ enum TOperator {
     EOpSparseTextureOffsetClamp,
     EOpSparseTextureGradClamp,
     EOpSparseTextureGradOffsetClamp,
+#ifdef AMD_EXTENSIONS
+    EOpSparseTextureGatherLod,
+    EOpSparseTextureGatherLodOffset,
+    EOpSparseTextureGatherLodOffsets,
+#endif
 
     EOpSparseTextureGuardEnd,
     EOpSamplingGuardEnd,
@@ -1048,6 +1085,25 @@ public:
             cracked.gather = true;
             cracked.offsets = true;
             break;
+#ifdef AMD_EXTENSIONS
+        case EOpTextureGatherLod:
+        case EOpSparseTextureGatherLod:
+            cracked.gather = true;
+            cracked.lod    = true;
+            break;
+        case EOpTextureGatherLodOffset:
+        case EOpSparseTextureGatherLodOffset:
+            cracked.gather = true;
+            cracked.offset = true;
+            cracked.lod    = true;
+            break;
+        case EOpTextureGatherLodOffsets:
+        case EOpSparseTextureGatherLodOffsets:
+            cracked.gather  = true;
+            cracked.offsets = true;
+            cracked.lod     = true;
+            break;
+#endif
         case EOpSubpassLoad:
         case EOpSubpassLoadMS:
             cracked.subpass = true;

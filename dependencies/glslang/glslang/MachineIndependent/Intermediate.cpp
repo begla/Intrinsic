@@ -1220,21 +1220,79 @@ TOperator TIntermediate::mapTypeToConstructorOp(const TType& type) const
         break;
 #endif
     case EbtInt:
-        switch(type.getVectorSize()) {
-        case 1: op = EOpConstructInt;   break;
-        case 2: op = EOpConstructIVec2; break;
-        case 3: op = EOpConstructIVec3; break;
-        case 4: op = EOpConstructIVec4; break;
-        default: break; // some compilers want this
+        if (type.getMatrixCols()) {
+            switch (type.getMatrixCols()) {
+            case 2:
+                switch (type.getMatrixRows()) {
+                case 2: op = EOpConstructIMat2x2; break;
+                case 3: op = EOpConstructIMat2x3; break;
+                case 4: op = EOpConstructIMat2x4; break;
+                default: break; // some compilers want this
+                }
+                break;
+            case 3:
+                switch (type.getMatrixRows()) {
+                case 2: op = EOpConstructIMat3x2; break;
+                case 3: op = EOpConstructIMat3x3; break;
+                case 4: op = EOpConstructIMat3x4; break;
+                default: break; // some compilers want this
+                }
+                break;
+            case 4:
+                switch (type.getMatrixRows()) {
+                case 2: op = EOpConstructIMat4x2; break;
+                case 3: op = EOpConstructIMat4x3; break;
+                case 4: op = EOpConstructIMat4x4; break;
+                default: break; // some compilers want this
+                }
+                break;
+            }
+        } else {
+            switch(type.getVectorSize()) {
+            case 1: op = EOpConstructInt;   break;
+            case 2: op = EOpConstructIVec2; break;
+            case 3: op = EOpConstructIVec3; break;
+            case 4: op = EOpConstructIVec4; break;
+            default: break; // some compilers want this
+            }
         }
         break;
     case EbtUint:
-        switch(type.getVectorSize()) {
-        case 1: op = EOpConstructUint;  break;
-        case 2: op = EOpConstructUVec2; break;
-        case 3: op = EOpConstructUVec3; break;
-        case 4: op = EOpConstructUVec4; break;
-        default: break; // some compilers want this
+        if (type.getMatrixCols()) {
+            switch (type.getMatrixCols()) {
+            case 2:
+                switch (type.getMatrixRows()) {
+                case 2: op = EOpConstructUMat2x2; break;
+                case 3: op = EOpConstructUMat2x3; break;
+                case 4: op = EOpConstructUMat2x4; break;
+                default: break; // some compilers want this
+                }
+                break;
+            case 3:
+                switch (type.getMatrixRows()) {
+                case 2: op = EOpConstructUMat3x2; break;
+                case 3: op = EOpConstructUMat3x3; break;
+                case 4: op = EOpConstructUMat3x4; break;
+                default: break; // some compilers want this
+                }
+                break;
+            case 4:
+                switch (type.getMatrixRows()) {
+                case 2: op = EOpConstructUMat4x2; break;
+                case 3: op = EOpConstructUMat4x3; break;
+                case 4: op = EOpConstructUMat4x4; break;
+                default: break; // some compilers want this
+                }
+                break;
+            }
+        } else {
+            switch(type.getVectorSize()) {
+            case 1: op = EOpConstructUint;  break;
+            case 2: op = EOpConstructUVec2; break;
+            case 3: op = EOpConstructUVec3; break;
+            case 4: op = EOpConstructUVec4; break;
+            default: break; // some compilers want this
+            }
         }
         break;
     case EbtInt64:
@@ -1256,12 +1314,41 @@ TOperator TIntermediate::mapTypeToConstructorOp(const TType& type) const
         }
         break;
     case EbtBool:
-        switch(type.getVectorSize()) {
-        case 1:  op = EOpConstructBool;  break;
-        case 2:  op = EOpConstructBVec2; break;
-        case 3:  op = EOpConstructBVec3; break;
-        case 4:  op = EOpConstructBVec4; break;
-        default: break; // some compilers want this
+        if (type.getMatrixCols()) {
+            switch (type.getMatrixCols()) {
+            case 2:
+                switch (type.getMatrixRows()) {
+                case 2: op = EOpConstructBMat2x2; break;
+                case 3: op = EOpConstructBMat2x3; break;
+                case 4: op = EOpConstructBMat2x4; break;
+                default: break; // some compilers want this
+                }
+                break;
+            case 3:
+                switch (type.getMatrixRows()) {
+                case 2: op = EOpConstructBMat3x2; break;
+                case 3: op = EOpConstructBMat3x3; break;
+                case 4: op = EOpConstructBMat3x4; break;
+                default: break; // some compilers want this
+                }
+                break;
+            case 4:
+                switch (type.getMatrixRows()) {
+                case 2: op = EOpConstructBMat4x2; break;
+                case 3: op = EOpConstructBMat4x3; break;
+                case 4: op = EOpConstructBMat4x4; break;
+                default: break; // some compilers want this
+                }
+                break;
+            }
+        } else {
+            switch(type.getVectorSize()) {
+            case 1:  op = EOpConstructBool;  break;
+            case 2:  op = EOpConstructBVec2; break;
+            case 3:  op = EOpConstructBVec3; break;
+            case 4:  op = EOpConstructBVec4; break;
+            default: break; // some compilers want this
+            }
         }
         break;
     default:
@@ -1648,8 +1735,13 @@ TIntermAggregate* TIntermediate::addForLoop(TIntermNode* body, TIntermNode* init
     node->setLoc(loc);
     node->setLoopControl(control);
 
-    // make a sequence of the initializer and statement
-    TIntermAggregate* loopSequence = makeAggregate(initializer, loc);
+    // make a sequence of the initializer and statement, but try to reuse the
+    // aggregate already created for whatever is in the initializer, if there is one
+    TIntermAggregate* loopSequence = (initializer == nullptr ||
+                                      initializer->getAsAggregate() == nullptr) ? makeAggregate(initializer, loc)
+                                                                                : initializer->getAsAggregate();
+    if (loopSequence != nullptr && loopSequence->getOp() == EOpSequence)
+        loopSequence->setOp(EOpNull);
     loopSequence = growAggregate(loopSequence, node);
     loopSequence->setOperator(EOpSequence);
 
@@ -1688,6 +1780,14 @@ bool TIntermediate::postProcess(TIntermNode* root, EShLanguage /*language*/)
 
     // Propagate 'noContraction' label in backward from 'precise' variables.
     glslang::PropagateNoContraction(*this);
+
+    switch (textureSamplerTransformMode) {
+    case EShTexSampTransKeep:
+        break;
+    case EShTexSampTransUpgradeTextureRemoveSampler:
+        performTextureUpgradeAndSamplerRemovalTransformation(root);
+        break;
+    }
 
     return true;
 }
@@ -2854,6 +2954,43 @@ bool TIntermediate::specConstantPropagates(const TIntermTyped& node1, const TInt
 {
     return (node1.getType().getQualifier().isSpecConstant() && node2.getType().getQualifier().isConstant()) ||
            (node2.getType().getQualifier().isSpecConstant() && node1.getType().getQualifier().isConstant());
+}
+
+struct TextureUpgradeAndSamplerRemovalTransform : public TIntermTraverser {
+    bool visitAggregate(TVisit, TIntermAggregate* ag) override {
+        using namespace std;
+        TIntermSequence& seq = ag->getSequence();
+        // remove pure sampler variables
+        TIntermSequence::iterator newEnd = remove_if(seq.begin(), seq.end(), [](TIntermNode* node) {
+            TIntermSymbol* symbol = node->getAsSymbolNode();
+            if (!symbol)
+                return false;
+
+            return (symbol->getBasicType() == EbtSampler && symbol->getType().getSampler().isPureSampler());
+        });
+        seq.erase(newEnd, seq.end());
+        // replace constructors with sampler/textures
+        // update textures into sampled textures
+        for_each(seq.begin(), seq.end(), [](TIntermNode*& node) {
+            TIntermSymbol* symbol = node->getAsSymbolNode();
+            if (!symbol) {
+                TIntermAggregate *constructor = node->getAsAggregate();
+                if (constructor && constructor->getOp() == EOpConstructTextureSampler) {
+                    if (!constructor->getSequence().empty())
+                        node = constructor->getSequence()[0];
+                }
+            } else if (symbol->getBasicType() == EbtSampler && symbol->getType().getSampler().isTexture()) {
+                symbol->getWritableType().getSampler().combined = true;
+            }
+        });
+        return true;
+    }
+};
+
+void TIntermediate::performTextureUpgradeAndSamplerRemovalTransformation(TIntermNode* root)
+{
+    TextureUpgradeAndSamplerRemovalTransform transform;
+    root->traverse(&transform);
 }
 
 } // end namespace glslang

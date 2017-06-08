@@ -59,12 +59,16 @@ struct DrawCallParallelTaskSet : enki::ITaskSet
         currentPipeline = newPipeline;
       }
 
+      VkDescriptorSet descSets[2] = {
+          Resources::DrawCallManager::_vkDescriptorSet(drawCallRef),
+          Resources::ImageManager::getGlobalDescriptorSet()};
+
       _INTR_ASSERT(Resources::DrawCallManager::_vkDescriptorSet(drawCallRef));
       vkCmdBindDescriptorSets(
           secondCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
           Resources::PipelineLayoutManager::_vkPipelineLayout(
               pipelineLayoutRef),
-          0u, 1u, &Resources::DrawCallManager::_vkDescriptorSet(drawCallRef),
+          0u, 2u, descSets,
           (uint32_t)Resources::DrawCallManager::_dynamicOffsets(drawCallRef)
               .size(),
           Resources::DrawCallManager::_dynamicOffsets(drawCallRef).data());

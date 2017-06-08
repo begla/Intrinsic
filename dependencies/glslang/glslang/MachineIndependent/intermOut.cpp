@@ -390,6 +390,8 @@ bool TOutputTraverser::visitUnary(TVisit /* visit */, TIntermUnary* node)
     case EOpRcp:                    out.debug << "rcp";                   break;
     case EOpSaturate:               out.debug << "saturate";              break;
 
+    case EOpSparseTexelsResident:   out.debug << "sparseTexelsResident";  break;
+
 #ifdef AMD_EXTENSIONS
     case EOpMinInvocations:             out.debug << "minInvocations";              break;
     case EOpMaxInvocations:             out.debug << "maxInvocations";              break;
@@ -505,6 +507,33 @@ bool TOutputTraverser::visitAggregate(TVisit /* visit */, TIntermAggregate* node
     case EOpConstructDMat4x2: out.debug << "Construct dmat4x2"; break;
     case EOpConstructDMat4x3: out.debug << "Construct dmat4x3"; break;
     case EOpConstructDMat4x4: out.debug << "Construct dmat4";   break;
+    case EOpConstructIMat2x2: out.debug << "Construct imat2";   break;
+    case EOpConstructIMat2x3: out.debug << "Construct imat2x3"; break;
+    case EOpConstructIMat2x4: out.debug << "Construct imat2x4"; break;
+    case EOpConstructIMat3x2: out.debug << "Construct imat3x2"; break;
+    case EOpConstructIMat3x3: out.debug << "Construct imat3";   break;
+    case EOpConstructIMat3x4: out.debug << "Construct imat3x4"; break;
+    case EOpConstructIMat4x2: out.debug << "Construct imat4x2"; break;
+    case EOpConstructIMat4x3: out.debug << "Construct imat4x3"; break;
+    case EOpConstructIMat4x4: out.debug << "Construct imat4";   break;
+    case EOpConstructUMat2x2: out.debug << "Construct umat2";   break;
+    case EOpConstructUMat2x3: out.debug << "Construct umat2x3"; break;
+    case EOpConstructUMat2x4: out.debug << "Construct umat2x4"; break;
+    case EOpConstructUMat3x2: out.debug << "Construct umat3x2"; break;
+    case EOpConstructUMat3x3: out.debug << "Construct umat3";   break;
+    case EOpConstructUMat3x4: out.debug << "Construct umat3x4"; break;
+    case EOpConstructUMat4x2: out.debug << "Construct umat4x2"; break;
+    case EOpConstructUMat4x3: out.debug << "Construct umat4x3"; break;
+    case EOpConstructUMat4x4: out.debug << "Construct umat4";   break;
+    case EOpConstructBMat2x2: out.debug << "Construct bmat2";   break;
+    case EOpConstructBMat2x3: out.debug << "Construct bmat2x3"; break;
+    case EOpConstructBMat2x4: out.debug << "Construct bmat2x4"; break;
+    case EOpConstructBMat3x2: out.debug << "Construct bmat3x2"; break;
+    case EOpConstructBMat3x3: out.debug << "Construct bmat3";   break;
+    case EOpConstructBMat3x4: out.debug << "Construct bmat3x4"; break;
+    case EOpConstructBMat4x2: out.debug << "Construct bmat4x2"; break;
+    case EOpConstructBMat4x3: out.debug << "Construct bmat4x3"; break;
+    case EOpConstructBMat4x4: out.debug << "Construct bmat4";   break;
 #ifdef AMD_EXTENSIONS
     case EOpConstructFloat16:   out.debug << "Construct float16_t"; break;
     case EOpConstructF16Vec2:   out.debug << "Construct f16vec2";   break;
@@ -620,6 +649,37 @@ bool TOutputTraverser::visitAggregate(TVisit /* visit */, TIntermAggregate* node
     case EOpTextureGather:              out.debug << "textureGather";         break;
     case EOpTextureGatherOffset:        out.debug << "textureGatherOffset";   break;
     case EOpTextureGatherOffsets:       out.debug << "textureGatherOffsets";  break;
+    case EOpTextureClamp:               out.debug << "textureClamp";          break;
+    case EOpTextureOffsetClamp:         out.debug << "textureOffsetClamp";    break;
+    case EOpTextureGradClamp:           out.debug << "textureGradClamp";      break;
+    case EOpTextureGradOffsetClamp:     out.debug << "textureGradOffsetClamp";  break;
+#ifdef AMD_EXTENSIONS
+    case EOpTextureGatherLod:           out.debug << "textureGatherLod";        break;
+    case EOpTextureGatherLodOffset:     out.debug << "textureGatherLodOffset";  break;
+    case EOpTextureGatherLodOffsets:    out.debug << "textureGatherLodOffsets"; break;
+#endif
+
+    case EOpSparseTexture:                  out.debug << "sparseTexture";                   break;
+    case EOpSparseTextureOffset:            out.debug << "sparseTextureOffset";             break;
+    case EOpSparseTextureLod:               out.debug << "sparseTextureLod";                break;
+    case EOpSparseTextureLodOffset:         out.debug << "sparseTextureLodOffset";          break;
+    case EOpSparseTextureFetch:             out.debug << "sparseTexelFetch";                break;
+    case EOpSparseTextureFetchOffset:       out.debug << "sparseTexelFetchOffset";          break;
+    case EOpSparseTextureGrad:              out.debug << "sparseTextureGrad";               break;
+    case EOpSparseTextureGradOffset:        out.debug << "sparseTextureGradOffset";         break;
+    case EOpSparseTextureGather:            out.debug << "sparseTextureGather";             break;
+    case EOpSparseTextureGatherOffset:      out.debug << "sparseTextureGatherOffset";       break;
+    case EOpSparseTextureGatherOffsets:     out.debug << "sparseTextureGatherOffsets";      break;
+    case EOpSparseImageLoad:                out.debug << "sparseImageLoad";                 break;
+    case EOpSparseTextureClamp:             out.debug << "sparseTextureClamp";              break;
+    case EOpSparseTextureOffsetClamp:       out.debug << "sparseTextureOffsetClamp";        break;
+    case EOpSparseTextureGradClamp:         out.debug << "sparseTextureGradClamp";          break;
+    case EOpSparseTextureGradOffsetClamp:   out.debug << "sparseTextureGradOffsetClam";     break;
+#ifdef AMD_EXTENSIONS
+    case EOpSparseTextureGatherLod:         out.debug << "sparseTextureGatherLod";          break;
+    case EOpSparseTextureGatherLodOffset:   out.debug << "sparseTextureGatherLodOffset";    break;
+    case EOpSparseTextureGatherLodOffsets:  out.debug << "sparseTextureGatherLodOffsets";   break;
+#endif
 
     case EOpAddCarry:                   out.debug << "addCarry";              break;
     case EOpSubBorrow:                  out.debug << "subBorrow";             break;

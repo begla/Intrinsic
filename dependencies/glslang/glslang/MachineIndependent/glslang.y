@@ -1260,25 +1260,25 @@ storage_qualifier
     | SUBROUTINE {
         parseContext.spvRemoved($1.loc, "subroutine");
         parseContext.globalCheck($1.loc, "subroutine");
+        parseContext.unimplemented($1.loc, "subroutine");
         $$.init($1.loc);
-        $$.qualifier.storage = EvqUniform;
     }
     | SUBROUTINE LEFT_PAREN type_name_list RIGHT_PAREN {
         parseContext.spvRemoved($1.loc, "subroutine");
         parseContext.globalCheck($1.loc, "subroutine");
+        parseContext.unimplemented($1.loc, "subroutine");
         $$.init($1.loc);
-        $$.qualifier.storage = EvqUniform;
-        // TODO: 4.0 semantics: subroutines
-        // 1) make sure each identifier is a type declared earlier with SUBROUTINE
-        // 2) save all of the identifiers for future comparison with the declared function
     }
     ;
 
 type_name_list
-    : TYPE_NAME {
-        // TODO: 4.0 functionality: subroutine type to list
+    : IDENTIFIER {
+        // TODO
     }
-    | type_name_list COMMA TYPE_NAME {
+    | type_name_list COMMA IDENTIFIER {
+        // TODO: 4.0 semantics: subroutines
+        // 1) make sure each identifier is a type declared earlier with SUBROUTINE
+        // 2) save all of the identifiers for future comparison with the declared function
     }
     ;
 
@@ -2777,7 +2777,7 @@ jump_statement
         if (parseContext.currentFunctionType->getBasicType() != EbtVoid)
             parseContext.error($1.loc, "non-void function must return a value", "return", "");
         if (parseContext.inMain)
-            parseContext.postMainReturn = true;
+            parseContext.postEntryPointReturn = true;
     }
     | RETURN expression SEMICOLON {
         $$ = parseContext.handleReturnValue($1.loc, $2);

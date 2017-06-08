@@ -29,6 +29,7 @@ struct Decal
 {
   mat4 viewProjMatrix;
   vec4 posAndRadiusVS;
+  uvec4 textureIds;
 };
 
 // Have to match the values on C++ side
