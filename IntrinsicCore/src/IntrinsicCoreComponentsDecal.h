@@ -32,6 +32,7 @@ struct DecalData : Dod::Components::ComponentDataBase
     descNormalTextureName.resize(_INTR_MAX_DECAL_COMPONENT_COUNT);
     descPBRTextureName.resize(_INTR_MAX_DECAL_COMPONENT_COUNT);
 
+    descUVTransform.resize(_INTR_MAX_DECAL_COMPONENT_COUNT);
     descHalfExtent.resize(_INTR_MAX_DECAL_COMPONENT_COUNT);
   }
 
@@ -39,6 +40,7 @@ struct DecalData : Dod::Components::ComponentDataBase
   _INTR_ARRAY(Name) descNormalTextureName;
   _INTR_ARRAY(Name) descPBRTextureName;
 
+  _INTR_ARRAY(glm::vec4) descUVTransform;
   _INTR_ARRAY(glm::vec3) descHalfExtent;
 };
 
@@ -66,6 +68,7 @@ struct DecalManager
     _descNormalTextureName(p_Ref) = _N(default_NRM);
     _descPBRTextureName(p_Ref) = _N(checkerboard_PBR);
 
+    _descUVTransform(p_Ref) = glm::vec4(1.0f, 1.0f, 0.0f, 0.0f);
     _descHalfExtent(p_Ref) = glm::vec3(2.0f, 2.0f, 2.0f);
   }
 
@@ -101,6 +104,11 @@ struct DecalManager
         p_Document.GetAllocator());
 
     p_Properties.AddMember(
+        "uvTransform",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Decal), _N(vec4),
+                          _descUVTransform(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
         "halfExtent",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Decal), _N(vec3),
                           _descHalfExtent(p_Ref), false, false),
@@ -122,6 +130,9 @@ struct DecalManager
       _descPBRTextureName(p_Ref) =
           JsonHelper::readPropertyName(p_Properties["pbrTextureName"]);
 
+    if (p_Properties.HasMember("uvTransform"))
+      _descUVTransform(p_Ref) =
+          JsonHelper::readPropertyVec4(p_Properties["uvTransform"]);
     if (p_Properties.HasMember("halfExtent"))
       _descHalfExtent(p_Ref) =
           JsonHelper::readPropertyVec3(p_Properties["halfExtent"]);
@@ -146,6 +157,10 @@ struct DecalManager
     return _data.descPBRTextureName[p_Ref._id];
   }
 
+  _INTR_INLINE static glm::vec4& _descUVTransform(DecalRef p_Ref)
+  {
+    return _data.descUVTransform[p_Ref._id];
+  }
   _INTR_INLINE static glm::vec3& _descHalfExtent(DecalRef p_Ref)
   {
     return _data.descHalfExtent[p_Ref._id];
