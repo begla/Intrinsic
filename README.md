@@ -10,6 +10,7 @@ You can find some simple build and setup instructions in `GETTING_STARTED.md`.
 * Fully multihreaded renderer and engine core
 * Data oriented engine design and data driven rendering process
   * Inspired by the great blog posts of the Bitsquid/Stingray team, see http://bitsquid.blogspot.de/
+* Hot reloading of textures, meshes, shaders and various configuration files
 * Capable WYSIWYG editor IntrinsicEd
 * Asset importer supporting various texture formats and FBX files for meshes
 * Easily configurable benchmarking system
