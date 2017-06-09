@@ -1,0 +1,10 @@
+{
+    "name": "terrain_grass_01",
+    "properties": {
+        "name": "terrain_grass_01",
+        "imageType": 1,
+        "imageFormat": 10,
+        "fileName": "terrain_grass_01.dds",
+        "avgNormLength": 1.0
+    }
+}

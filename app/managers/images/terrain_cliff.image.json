@@ -1,0 +1,10 @@
+{
+    "name": "terrain_cliff",
+    "properties": {
+        "name": "terrain_cliff",
+        "imageType": 1,
+        "imageFormat": 10,
+        "fileName": "terrain_cliff.dds",
+        "avgNormLength": 1.0
+    }
+}

@@ -40,7 +40,7 @@ OUTPUT
 
 vec3 blend(vec3 grass0, vec3 stone0, vec3 stone1, vec3 blendMask, float noise)
 {
-  return mix(grass0, mix(stone0, stone1, 1.0 -noise), clamp(blendMask.b * 3.0, 0.0, 1.0));
+  return mix(grass0, mix(stone0, stone1, 1.0 - noise), clamp(blendMask.b * 3.0, 0.0, 1.0));
 }
 
 vec3 contrast(vec3 color, float contrast)
@@ -64,12 +64,12 @@ void main()
   const vec4 normal0 = texture(normalTex0, uv0);
   const vec4 pbr0 = texture(pbrTex0, uv0);
 
-  const vec4 albedo1 = texture(albedoTex1, uv0);
-  const vec4 normal1 = texture(normalTex1, uv0);
-  const vec4 pbr1 = texture(pbrTex1, uv0);
+  const vec4 albedo1 = texture(albedoTex1, uv0 * 0.5);
+  const vec4 normal1 = texture(normalTex1, uv0 * 0.5);
+  const vec4 pbr1 = texture(pbrTex1, uv0 * 0.1);
   
-  const vec4 albedo2 = texture(albedoTex2, uv0 * 0.1);
-  const vec4 normal2 = texture(normalTex2, uv0 * 0.1);
+  const vec4 albedo2 = texture(albedoTex2, uv0 * 0.25);
+  const vec4 normal2 = texture(normalTex2, uv0 * 0.25);
   const vec4 pbr2 = texture(pbrTex2, uv0 * 0.1);
 
   float noise = clamp(texture(noiseTex, uv0Raw * 10.0).r, 0.0, 1.0);
@@ -81,7 +81,7 @@ void main()
 
   float occlusion = clamp(mix(clamp(noise * 5.0, 0.0, 1.0) * blendMask.b, 1.0 - blendMask.r, 
   clamp((1.0 - blendMask.g) * 2.0 - 0.9, 0.0, 1.0)) * 2.0 + 0.2, 0.0, 1.0);
-  albedo *= clamp(occlusion , 0.0, 1.0);
+  albedo *= occlusion;
 
   GBuffer gbuffer;
   {
@@ -91,7 +91,7 @@ void main()
     gbuffer.specular = pbr.g + uboPerMaterial.pbrBias.g;
     gbuffer.roughness = pbr.b + uboPerMaterial.pbrBias.b;
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
-    gbuffer.occlusion = occlusion;
+    gbuffer.occlusion = 1.0;
     gbuffer.emissive = 0.0;
   }
   writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
