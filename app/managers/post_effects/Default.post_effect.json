@@ -2,7 +2,10 @@
     "name": "Default",
     "properties": {
         "name": "Default",
-        "scattering": 0.0,
+        "scatteringDayNight": [
+            0.0,
+            0.0
+        ],
         "sunOrientation": [
             0.0,
             0.0,

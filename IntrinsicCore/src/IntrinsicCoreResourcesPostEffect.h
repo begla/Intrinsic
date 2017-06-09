@@ -28,7 +28,8 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
   PostEffectData()
       : Dod::Resources::ResourceDataBase(_INTR_MAX_POST_EFFECT_COUNT)
   {
-    descVolumetricLightingScattering.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descVolumetricLightingScatteringDayNight.resize(
+        _INTR_MAX_POST_EFFECT_COUNT);
 
     descSunOrientation.resize(_INTR_MAX_POST_EFFECT_COUNT);
 
@@ -43,7 +44,7 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
 
   // <-
 
-  _INTR_ARRAY(float) descVolumetricLightingScattering;
+  _INTR_ARRAY(glm::vec2) descVolumetricLightingScatteringDayNight;
 
   _INTR_ARRAY(glm::quat) descSunOrientation;
 
@@ -75,7 +76,7 @@ struct PostEffectManager
 
   _INTR_INLINE static void resetToDefault(PostEffectRef p_Ref)
   {
-    _descVolumetricLightingScattering(p_Ref) = 0.0f;
+    _descVolumetricLightingScatteringDayNight(p_Ref) = glm::vec2(0.0f);
     _descSunOrientation(p_Ref) = glm::quat();
     _descSunIntensity(p_Ref) = 20.0f;
     _descDayNightFactor(p_Ref) = 1.0f;
@@ -107,10 +108,10 @@ struct PostEffectManager
                                                          p_Document);
 
     p_Properties.AddMember(
-        "scattering",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(VolumetricLighting),
-                          _N(float), _descVolumetricLightingScattering(p_Ref),
-                          false, false),
+        "scatteringDayNight",
+        _INTR_CREATE_PROP(
+            p_Document, p_GenerateDesc, _N(VolumetricLighting), _N(vec2),
+            _descVolumetricLightingScatteringDayNight(p_Ref), false, false),
         p_Document.GetAllocator());
 
     p_Properties.AddMember("sunOrientation",
@@ -162,9 +163,9 @@ struct PostEffectManager
         PostEffectData,
         _INTR_MAX_POST_EFFECT_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
 
-    if (p_Properties.HasMember("scattering"))
-      _descVolumetricLightingScattering(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["scattering"]);
+    if (p_Properties.HasMember("scatteringDayNight"))
+      _descVolumetricLightingScatteringDayNight(p_Ref) =
+          JsonHelper::readPropertyVec2(p_Properties["scatteringDayNight"]);
 
     if (p_Properties.HasMember("sunOrientation"))
       _descSunOrientation(p_Ref) =
@@ -230,9 +231,9 @@ struct PostEffectManager
                                            Dod::Ref p_Right,
                                            float p_BlendFactor)
   {
-    _descVolumetricLightingScattering(p_Target) =
-        glm::mix(_descVolumetricLightingScattering(p_Left),
-                 _descVolumetricLightingScattering(p_Right), p_BlendFactor);
+    _descVolumetricLightingScatteringDayNight(p_Target) = glm::mix(
+        _descVolumetricLightingScatteringDayNight(p_Left),
+        _descVolumetricLightingScatteringDayNight(p_Right), p_BlendFactor);
 
     _descSunOrientation(p_Target) =
         glm::slerp(_descSunOrientation(p_Left), _descSunOrientation(p_Right),
@@ -261,10 +262,10 @@ struct PostEffectManager
   // ->
 
   // Description
-  _INTR_INLINE static float&
-  _descVolumetricLightingScattering(PostEffectRef p_Ref)
+  _INTR_INLINE static glm::vec2&
+  _descVolumetricLightingScatteringDayNight(PostEffectRef p_Ref)
   {
-    return _data.descVolumetricLightingScattering[p_Ref._id];
+    return _data.descVolumetricLightingScatteringDayNight[p_Ref._id];
   }
 
   _INTR_INLINE static glm::quat& _descSunOrientation(PostEffectRef p_Ref)
