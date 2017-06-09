@@ -3,8 +3,8 @@
     "properties": {
         "name": "LightingTest",
         "scatteringDayNight": [
-            0.0,
-            0.0
+            0.004999999888241291,
+            0.004999999888241291
         ],
         "sunOrientation": [
             0.0,
