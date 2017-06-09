@@ -595,8 +595,7 @@ spawnDefaultEntity(const Name& p_Name,
 
     // Spawn the object close to the ground
     physx::PxRaycastHit hit;
-    if (PhysxHelper::raycast(worldRay, hit, 1000.0f,
-                             physx::PxQueryFlag::eSTATIC))
+    if (PhysxHelper::raycast(worldRay, hit, 50.0f, physx::PxQueryFlag::eSTATIC))
     {
       Components::NodeManager::_position(nodeRef) =
           Components::NodeManager::_worldPosition(cameraNode) +
