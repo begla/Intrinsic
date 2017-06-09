@@ -479,39 +479,20 @@ void World::updateDayNightCycle(float p_DeltaT)
   }
 
   static const float dayNightCycleDurationInS = 20.0f * 60.0f;
-  static const float dayNightFadeInPerc = 0.1f;
+  static const float dayNightFadeInPerc = 0.05f;
   static const float nightLightIntens = 0.05f;
 
   _currentTime += p_DeltaT / dayNightCycleDurationInS;
-  _currentTime = glm::mod(_currentTime, 1.0f);
+  _currentTime = glm::mod(_currentTime, 0.99f);
 
   float currentDayNightFactor = 0.0f;
-  float currentPerc = 0.0f;
   if (_currentTime < 0.5f)
   {
-    const float dayPerc = _currentTime / 0.5f;
-    currentPerc = dayPerc;
-
-    if (_currentTime < dayNightFadeInPerc)
-    {
-      currentDayNightFactor = _currentTime / dayNightFadeInPerc;
-    }
-    else if (_currentTime > 0.5f - dayNightFadeInPerc)
-    {
-      currentDayNightFactor =
-          1.0f -
-          (_currentTime - (0.5f - dayNightFadeInPerc)) / dayNightFadeInPerc;
-    }
-    else
-    {
-      currentDayNightFactor = 1.0f;
-    }
-  }
-  else
-  {
-    const float nightPerc = (_currentTime - 0.5f) / 0.5f;
-    currentDayNightFactor = 0.0f;
-    currentPerc = nightPerc;
+    const float perc = _currentTime / 0.5f;
+    currentDayNightFactor =
+        1.0f - glm::smoothstep<float>(1.0f - dayNightFadeInPerc, 1.0f, perc);
+    currentDayNightFactor *=
+        glm::smoothstep<float>(0.0f, dayNightFadeInPerc, perc);
   }
 
   const float sunAngleRad =

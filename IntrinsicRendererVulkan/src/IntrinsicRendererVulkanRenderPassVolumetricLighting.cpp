@@ -98,9 +98,12 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
 
   // Post effect data
   {
+    const glm::vec2 scattering = Core::Resources::PostEffectManager::
+        _descVolumetricLightingScatteringDayNight(
+            Core::Resources::PostEffectManager::_blendTargetRef);
+
     _perInstanceData.data0.x =
-        Core::Resources::PostEffectManager::_descVolumetricLightingScattering(
-            Core::Resources::PostEffectManager::_blendTargetRef) *
+        glm::mix(scattering.y, scattering.x, World::_currentDayNightFactor) *
         VolumetricLighting::_globalScatteringFactor;
     _perInstanceData.data0.z = Clustering::_globalAmbientFactor;
   }

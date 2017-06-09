@@ -121,23 +121,24 @@ void main()
   vec3 finalHeightPos = heightRefPosWS;
 
   // Noise
-#if 1
+#if 0
   float noiseAccum = 1.0;
-  noiseAccum *= noise(posWS * clamp(5.0 / linDepth, 0.005, 0.08) + uboPerInstance.eyeWSVectorX.w * 0.5);
-  noiseAccum *= noise(posWS * clamp(10.0 / linDepth, 0.005, 0.08) + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.382871);
-  density *= clamp(noiseAccum, 0.0, 1.0);
-  //finalHeightPos.y -= noise(posWS * clamp(10.0 / linDepth, 0.005, 0.08) + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.75827618) * 50.0;
+  noiseAccum *= noise(posWS * clamp(5.0 / linDepth, 0.005, 0.08) 
+    + uboPerInstance.eyeWSVectorX.w * 0.5);
+  noiseAccum *= noise(posWS * clamp(10.0 / linDepth, 0.005, 0.08) 
+    + uboPerInstance.eyeWSVectorX.w * 0.75 + 0.382871);
+  density *= clamp(noiseAccum * 0.5 + 0.5, 0.0, 1.0);
 #endif
 
-  const float heightAttenuation = 1.0 - clamp(exp(-(finalHeightPos.y - posWS.y) * heightAttenuationFactor), 0.0, 1.0);
+  const float heightAttenuation = 1.0 - 
+    clamp(exp(-(finalHeightPos.y - posWS.y) * heightAttenuationFactor), 0.0, 1.0);
   density *= heightAttenuation;  
 
   // Lighting
   vec3 lighting = vec3(0.0);
 
-  if (density > EPSILON)
+  // Sunlight
   {
-    // Sunlight
     vec4 posLS;
     uint shadowMapIdx = findBestFittingSplit(posVS.xyz, posLS, uboPerInstance.shadowViewProjMatrix);
 
@@ -149,7 +150,8 @@ void main()
       shadowAttenuation = clamp(calculateShadowESM(shadowSample, posLS.z)*1.1 - 0.1, 0.0, 1.0);
     }
 
-    const vec3 lightColor = uboPerFrame.sunLightColorAndIntensity.xyz * uboPerFrame.sunLightColorAndIntensity.w;
+    const vec3 lightColor = uboPerFrame.sunLightColorAndIntensity.xyz 
+      * uboPerFrame.sunLightColorAndIntensity.w;
     lighting += shadowAttenuation * lightColor;
   }
 
