@@ -1,5 +1,5 @@
 <p align="center">
-![Intrinsic](IntrinsicEd/media/logo_small.png)
+<img src="IntrinsicEd/media/logo_small.png"/>
 </p>
 
 # Intrinsic
