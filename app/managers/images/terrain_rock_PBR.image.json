@@ -1,0 +1,10 @@
+{
+    "name": "terrain_rock_PBR",
+    "properties": {
+        "name": "terrain_rock_PBR",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "terrain_rock_PBR.dds",
+        "avgNormLength": 1.0
+    }
+}

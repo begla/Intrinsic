@@ -1,0 +1,10 @@
+{
+    "name": "terrain_grass_PBR",
+    "properties": {
+        "name": "terrain_grass_PBR",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "terrain_grass_PBR.dds",
+        "avgNormLength": 1.0
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "name": "terrain_cliff_NRM",
+    "properties": {
+        "name": "terrain_cliff_NRM",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "terrain_cliff_NRM.dds",
+        "avgNormLength": 0.9077306389808655
+    }
+}
