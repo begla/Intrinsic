@@ -574,7 +574,9 @@ void IntrinsicEd::onBenchmarkGameState()
 
 namespace
 {
-_INTR_INLINE Entity::EntityRef spawnDefaultEntity(const Name& p_Name)
+_INTR_INLINE Entity::EntityRef
+spawnDefaultEntity(const Name& p_Name,
+                   const glm::quat& p_InitialOrientation = glm::quat())
 {
   Entity::EntityRef entityRef = Entity::EntityManager::createEntity(p_Name);
   {
@@ -591,6 +593,7 @@ _INTR_INLINE Entity::EntityRef spawnDefaultEntity(const Name& p_Name)
     Components::NodeManager::_position(nodeRef) =
         Components::NodeManager::_worldPosition(cameraNode) +
         Components::CameraManager::_forward(activeCamera) * 10.0f;
+    Components::NodeManager::_orientation(nodeRef) = p_InitialOrientation;
     GameStates::Editing::_currentlySelectedEntity = entityRef;
   }
 
@@ -682,7 +685,8 @@ void IntrinsicEd::onCreateIrradProbe()
 
 void IntrinsicEd::onCreateDecal()
 {
-  Entity::EntityRef entityRef = spawnDefaultEntity(_N(Decal));
+  Entity::EntityRef entityRef = spawnDefaultEntity(
+      _N(Decal), glm::quat(glm::vec3(-glm::half_pi<float>(), 0.0f, 0.0f)));
   Dod::Ref compRef = addComponentToEntity(entityRef, _N(Decal));
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
 }
