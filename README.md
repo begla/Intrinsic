@@ -7,7 +7,7 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 You can find some simple build and setup instructions in `GETTING_STARTED.md`.
 
 # Features
-* Fully multihreaded renderer and engine core
+* Fully multithreaded renderer and engine core
 * Data oriented engine design and data driven rendering process
   * Inspired by the great blog posts of the Bitsquid/Stingray team, see http://bitsquid.blogspot.de/
 * Hot reloading of textures, meshes, shaders and various configuration files
