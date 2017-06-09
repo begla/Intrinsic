@@ -6,38 +6,7 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 
 You can find some simple build and setup instructions in `GETTING_STARTED.md`.
 
-# Features
-* Fully multithreaded renderer and engine core
-* Data oriented engine design and data driven rendering process
-  * Inspired by the great blog posts of the Bitsquid/Stingray team, see http://bitsquid.blogspot.de/
-* Hot reloading of textures, meshes, shaders and various configuration files
-* Capable WYSIWYG editor IntrinsicEd
-* Asset importer supporting various texture formats and FBX files for meshes
-* Easily configurable benchmarking system
-* Scripting via LUA (_work in progress_ - scripting interface far from complete)
-* PhysX integration supporting simple rigid bodies and character controllers
-* Easy CPU and GPU profiling using Microprofile
-
-# Rendering Features
-* Physically based rendering pipeline
-  * Based on http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
-  * and https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-* Procedural sky radiance model
-  * Based on http://cgg.mff.cuni.cz/projects/SkylightModelling/HosekWilkie_SkylightModel_SIGGRAPH2012_Preprint_lowres.pdf
-* (Clustered) Deferred opaque and transparent lighting (_only point lights supported at the moment_)
-* (Clustered bindless) Deferred decals
-* (Clustered) Local irradiance volumes supporting dynamic day and night changes
-* Global irradiance (skylight) using the approximated irradiance from the skylight model
-* Volumetric fog considering all lighting parameters (sunlight, irradiance, lights, ...)
-  * Based on https://bartwronski.files.wordpress.com/2014/08/bwronski_volumetric_fog_siggraph2014.pdf
-* Volume based post effect system supporting various effects (fake DoF, vignette, chromatic aberration, bleach bypass, film grain, ...)
-* Automated roughness adjustment to fight specular aliasing
-  * Based on http://blog.selfshadow.com/publications/s2013-shading-course/rad/s2013_pbs_rad_notes.pdf
-* Antialiasing: SMAA
-  * See http://www.iryoku.com/smaa/
-* HDR rendering with compute based bloom, luminance based eye adaption and filmic tonemapping
-* Simple procedural lensflares and lensghosts
-* Various material shaders for water, animated foliage and grass, opaque materials, terrain, ...
+Further details are available on the project homepage (see http://www.intrinsic-engine.com). The Intrinsic repository is hosted on GitHub (see http://www.github.com/begla/Intrinsic).
 
 # Screenshots
 
