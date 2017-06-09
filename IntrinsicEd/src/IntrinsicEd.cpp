@@ -590,9 +590,26 @@ spawnDefaultEntity(const Name& p_Name,
         Components::NodeManager::getComponentForEntity(
             Components::CameraManager::_entity(activeCamera));
 
-    Components::NodeManager::_position(nodeRef) =
-        Components::NodeManager::_worldPosition(cameraNode) +
-        Components::CameraManager::_forward(activeCamera) * 10.0f;
+    Math::Ray worldRay = {Components::NodeManager::_worldPosition(cameraNode),
+                          Components::CameraManager::_forward(activeCamera)};
+
+    // Spawn the object close to the ground
+    physx::PxRaycastHit hit;
+    if (PhysxHelper::raycast(worldRay, hit, 1000.0f,
+                             physx::PxQueryFlag::eSTATIC))
+    {
+      Components::NodeManager::_position(nodeRef) =
+          Components::NodeManager::_worldPosition(cameraNode) +
+          Components::CameraManager::_forward(activeCamera) * hit.distance *
+              0.9f;
+    }
+    else
+    {
+      Components::NodeManager::_position(nodeRef) =
+          Components::NodeManager::_worldPosition(cameraNode) +
+          Components::CameraManager::_forward(activeCamera) * 10.0f;
+    }
+
     Components::NodeManager::_orientation(nodeRef) = p_InitialOrientation;
     GameStates::Editing::_currentlySelectedEntity = entityRef;
   }
