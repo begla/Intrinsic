@@ -18,6 +18,7 @@
 #include "stdafx_assets.h"
 
 using namespace AssetManagement::Resources;
+using namespace RVResources;
 
 IntrinsicEdManagerWindowAsset::IntrinsicEdManagerWindowAsset(QWidget* parent)
     : IntrinsicEdManagerWindowBase(parent)
@@ -262,16 +263,11 @@ void IntrinsicEdManagerWindowAsset::onCompileQueuedAssets()
   if (!_assetsToRecompile.empty())
   {
     // TODO: Update only the assets which are affected by a changed asset
-    RVResources::DrawCallManager::destroyResources(
-        RVResources::DrawCallManager::_activeRefs);
-    RVResources::DrawCallManager::createResources(
-        RVResources::DrawCallManager::_activeRefs);
-    RVResources::ComputeCallManager::destroyResources(
-        RVResources::ComputeCallManager::_activeRefs);
-    RVResources::ComputeCallManager::createResources(
-        RVResources::ComputeCallManager::_activeRefs);
-    RVResources::MaterialManager::createResources(
-        RVResources::MaterialManager::_activeRefs);
+    DrawCallManager::destroyResources(DrawCallManager::_activeRefs);
+    DrawCallManager::createResources(DrawCallManager::_activeRefs);
+    ComputeCallManager::destroyResources(ComputeCallManager::_activeRefs);
+    ComputeCallManager::createResources(ComputeCallManager::_activeRefs);
+    MaterialManager::createResources(MaterialManager::_activeRefs);
 
     _assetsToRecompile.clear();
   }

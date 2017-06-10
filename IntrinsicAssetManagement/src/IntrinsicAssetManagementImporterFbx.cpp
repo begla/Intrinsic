@@ -24,6 +24,9 @@
 // Helper
 #include "IntrinsicAssetManagementHelperFbx.h"
 
+using namespace RVResources;
+using namespace CResources;
+
 namespace Intrinsic
 {
 namespace AssetManagement
@@ -35,8 +38,7 @@ FbxManager* _fbxManager = nullptr;
 void stripDuplicateVertices(Dod::Ref p_MeshRef)
 {
   const uint32_t subMeshCount =
-      (uint32_t)CResources::MeshManager::_descIndicesPerSubMesh(p_MeshRef)
-          .size();
+      (uint32_t)MeshManager::_descIndicesPerSubMesh(p_MeshRef).size();
 
   _INTR_LOG_INFO("Stripping duplicate vertices for %u sub meshes...",
                  subMeshCount);
@@ -46,8 +48,7 @@ void stripDuplicateVertices(Dod::Ref p_MeshRef)
     _INTR_HASH_MAP(uint32_t, uint32_t) indexMap;
 
     const uint32_t indexCount =
-        (uint32_t)CResources::MeshManager::_descIndicesPerSubMesh(
-            p_MeshRef)[subMeshIdx]
+        (uint32_t)MeshManager::_descIndicesPerSubMesh(p_MeshRef)[subMeshIdx]
             .size();
 
     _INTR_ARRAY(glm::vec3) strippedPositions;
@@ -73,8 +74,8 @@ void stripDuplicateVertices(Dod::Ref p_MeshRef)
 
     for (uint32_t idxId = 0u; idxId < indexCount; ++idxId)
     {
-      const uint32_t idx = CResources::MeshManager::_descIndicesPerSubMesh(
-          p_MeshRef)[subMeshIdx][idxId];
+      const uint32_t idx =
+          MeshManager::_descIndicesPerSubMesh(p_MeshRef)[subMeshIdx][idxId];
 
       struct Vertex
       {
@@ -86,18 +87,17 @@ void stripDuplicateVertices(Dod::Ref p_MeshRef)
         glm::vec4 vtxColor;
       } vtx;
 
-      vtx.position = CResources::MeshManager::_descPositionsPerSubMesh(
-          p_MeshRef)[subMeshIdx][idx];
-      vtx.uv0 = CResources::MeshManager::_descUV0sPerSubMesh(
-          p_MeshRef)[subMeshIdx][idx];
-      vtx.normal = CResources::MeshManager::_descNormalsPerSubMesh(
-          p_MeshRef)[subMeshIdx][idx];
-      vtx.tangent = CResources::MeshManager::_descTangentsPerSubMesh(
-          p_MeshRef)[subMeshIdx][idx];
-      vtx.binormal = CResources::MeshManager::_descBinormalsPerSubMesh(
-          p_MeshRef)[subMeshIdx][idx];
-      vtx.vtxColor = CResources::MeshManager::_descVertexColorsPerSubMesh(
-          p_MeshRef)[subMeshIdx][idx];
+      vtx.position =
+          MeshManager::_descPositionsPerSubMesh(p_MeshRef)[subMeshIdx][idx];
+      vtx.uv0 = MeshManager::_descUV0sPerSubMesh(p_MeshRef)[subMeshIdx][idx];
+      vtx.normal =
+          MeshManager::_descNormalsPerSubMesh(p_MeshRef)[subMeshIdx][idx];
+      vtx.tangent =
+          MeshManager::_descTangentsPerSubMesh(p_MeshRef)[subMeshIdx][idx];
+      vtx.binormal =
+          MeshManager::_descBinormalsPerSubMesh(p_MeshRef)[subMeshIdx][idx];
+      vtx.vtxColor =
+          MeshManager::_descVertexColorsPerSubMesh(p_MeshRef)[subMeshIdx][idx];
 
       const uint32_t vertexHash = Math::hash((const char*)&vtx, sizeof(vtx));
 
@@ -121,12 +121,12 @@ void stripDuplicateVertices(Dod::Ref p_MeshRef)
       }
     }
 
-    _INTR_LOG_INFO("Stripped %u duplicate vertices from sub mesh #%u",
-                   (uint32_t)CResources::MeshManager::_descPositionsPerSubMesh(
-                       p_MeshRef)[subMeshIdx]
-                           .size() -
-                       (uint32_t)strippedPositions.size(),
-                   subMeshIdx);
+    _INTR_LOG_INFO(
+        "Stripped %u duplicate vertices from sub mesh #%u",
+        (uint32_t)MeshManager::_descPositionsPerSubMesh(p_MeshRef)[subMeshIdx]
+                .size() -
+            (uint32_t)strippedPositions.size(),
+        subMeshIdx);
 
     _INTR_ARRAY(uint32_t) optimizedIndices;
     optimizedIndices.resize(strippedIndices.size());
@@ -136,25 +136,23 @@ void stripDuplicateVertices(Dod::Ref p_MeshRef)
         strippedIndices.data(), (uint32_t)strippedIndices.size(),
         (uint32_t)strippedPositions.size(), optimizedIndices.data(), 32u);
 
-    CResources::MeshManager::_descPositionsPerSubMesh(p_MeshRef)[subMeshIdx] =
+    MeshManager::_descPositionsPerSubMesh(p_MeshRef)[subMeshIdx] =
         strippedPositions;
-    CResources::MeshManager::_descUV0sPerSubMesh(p_MeshRef)[subMeshIdx] =
-        strippedUv0s;
-    CResources::MeshManager::_descNormalsPerSubMesh(p_MeshRef)[subMeshIdx] =
+    MeshManager::_descUV0sPerSubMesh(p_MeshRef)[subMeshIdx] = strippedUv0s;
+    MeshManager::_descNormalsPerSubMesh(p_MeshRef)[subMeshIdx] =
         stripepdNormals;
-    CResources::MeshManager::_descTangentsPerSubMesh(p_MeshRef)[subMeshIdx] =
+    MeshManager::_descTangentsPerSubMesh(p_MeshRef)[subMeshIdx] =
         strippedTangents;
-    CResources::MeshManager::_descBinormalsPerSubMesh(p_MeshRef)[subMeshIdx] =
+    MeshManager::_descBinormalsPerSubMesh(p_MeshRef)[subMeshIdx] =
         strippedBinormals;
-    CResources::MeshManager::_descVertexColorsPerSubMesh(
-        p_MeshRef)[subMeshIdx] = strippedVertexColors;
-    CResources::MeshManager::_descIndicesPerSubMesh(p_MeshRef)[subMeshIdx] =
+    MeshManager::_descVertexColorsPerSubMesh(p_MeshRef)[subMeshIdx] =
+        strippedVertexColors;
+    MeshManager::_descIndicesPerSubMesh(p_MeshRef)[subMeshIdx] =
         optimizedIndices;
   }
 }
 
-void importMesh(FbxMesh* p_Mesh,
-                _INTR_ARRAY(CResources::MeshRef) & p_ImportedMeshes)
+void importMesh(FbxMesh* p_Mesh, _INTR_ARRAY(MeshRef) & p_ImportedMeshes)
 {
   const char* meshName = p_Mesh->GetNode()->GetName();
   FbxAMatrix nodeTransform = p_Mesh->GetNode()->EvaluateGlobalTransform();
@@ -194,40 +192,38 @@ void importMesh(FbxMesh* p_Mesh,
 
   // Create or update existing mesh resource
   bool newMesh = false;
-  CResources::MeshRef meshRef = CResources::MeshManager::_getResourceByName(
-      triangleMesh->GetNode()->GetName());
+  MeshRef meshRef =
+      MeshManager::_getResourceByName(triangleMesh->GetNode()->GetName());
 
   if (!meshRef.isValid())
   {
-    meshRef =
-        CResources::MeshManager::createMesh(triangleMesh->GetNode()->GetName());
+    meshRef = MeshManager::createMesh(triangleMesh->GetNode()->GetName());
     newMesh = true;
   }
   else
   {
-    CResources::MeshRefArray meshesToDestroy;
+    MeshRefArray meshesToDestroy;
     meshesToDestroy.push_back(meshRef);
 
-    CResources::MeshManager::destroyResources(meshesToDestroy);
+    MeshManager::destroyResources(meshesToDestroy);
   }
-  CResources::MeshManager::resetToDefault(meshRef);
+  MeshManager::resetToDefault(meshRef);
 
-  CResources::PositionsPerSubMeshArray& posArray =
-      CResources::MeshManager::_descPositionsPerSubMesh(meshRef);
-  CResources::IndicesPerSubMeshArray& indexArray =
-      CResources::MeshManager::_descIndicesPerSubMesh(meshRef);
-  CResources::NormalsPerSubMeshArray& normalArray =
-      CResources::MeshManager::_descNormalsPerSubMesh(meshRef);
-  CResources::TangentsPerSubMeshArray& tangentArray =
-      CResources::MeshManager::_descTangentsPerSubMesh(meshRef);
-  CResources::BinormalsPerSubMeshArray& binormalArray =
-      CResources::MeshManager::_descBinormalsPerSubMesh(meshRef);
-  CResources::UVsPerSubMeshArray& uv0Array =
-      CResources::MeshManager::_descUV0sPerSubMesh(meshRef);
-  CResources::VertexColorsPerSubMeshArray& vertexColorArray =
-      CResources::MeshManager::_descVertexColorsPerSubMesh(meshRef);
-  CResources::MaterialNamesPerSubMeshArray& materialArray =
-      CResources::MeshManager::_descMaterialNamesPerSubMesh(meshRef);
+  PositionsPerSubMeshArray& posArray =
+      MeshManager::_descPositionsPerSubMesh(meshRef);
+  IndicesPerSubMeshArray& indexArray =
+      MeshManager::_descIndicesPerSubMesh(meshRef);
+  NormalsPerSubMeshArray& normalArray =
+      MeshManager::_descNormalsPerSubMesh(meshRef);
+  TangentsPerSubMeshArray& tangentArray =
+      MeshManager::_descTangentsPerSubMesh(meshRef);
+  BinormalsPerSubMeshArray& binormalArray =
+      MeshManager::_descBinormalsPerSubMesh(meshRef);
+  UVsPerSubMeshArray& uv0Array = MeshManager::_descUV0sPerSubMesh(meshRef);
+  VertexColorsPerSubMeshArray& vertexColorArray =
+      MeshManager::_descVertexColorsPerSubMesh(meshRef);
+  MaterialNamesPerSubMeshArray& materialArray =
+      MeshManager::_descMaterialNamesPerSubMesh(meshRef);
   uint32_t subMeshCount = 0u;
 
   FbxGeometryElementMaterial* elementMat = triangleMesh->GetElementMaterial();
@@ -266,23 +262,22 @@ void importMesh(FbxMesh* p_Mesh,
   }
 
   // Create dummy materials
-  RVResources::MaterialRefArray materialsToCreate;
+  MaterialRefArray materialsToCreate;
 
   for (uint32_t i = 0u; i < subMeshCount; ++i)
   {
     const char* materialName = p_Mesh->GetNode()->GetMaterial(i)->GetName();
-    RVResources::MaterialRef materialRef =
-        RVResources::MaterialManager::_getResourceByName(materialName);
+    MaterialRef materialRef = MaterialManager::_getResourceByName(materialName);
 
     if (!materialRef.isValid())
     {
-      materialRef = RVResources::MaterialManager::createMaterial(materialName);
-      RVResources::MaterialManager::resetToDefault(materialRef);
+      materialRef = MaterialManager::createMaterial(materialName);
+      MaterialManager::resetToDefault(materialRef);
 
       materialsToCreate.push_back(materialRef);
     }
   }
-  RVResources::MaterialManager::createResources(materialsToCreate);
+  MaterialManager::createResources(materialsToCreate);
 
   posArray.resize(subMeshCount);
   indexArray.resize(subMeshCount);
@@ -430,9 +425,9 @@ void importMesh(FbxMesh* p_Mesh,
   stripDuplicateVertices(meshRef);
 
   // Create mesh resource
-  CResources::MeshRefArray meshesToCreate;
+  MeshRefArray meshesToCreate;
   meshesToCreate.push_back(meshRef);
-  CResources::MeshManager::createResources(meshesToCreate);
+  MeshManager::createResources(meshesToCreate);
   p_ImportedMeshes.insert(p_ImportedMeshes.begin(), meshesToCreate.begin(),
                           meshesToCreate.end());
 
@@ -448,7 +443,7 @@ void importMesh(FbxMesh* p_Mesh,
           CComponents::MeshManager::getActiveResourceAtIndex(i);
 
       if (CComponents::MeshManager::_descMeshName(meshCompRef) ==
-          CResources::MeshManager::_name(meshRef))
+          MeshManager::_name(meshRef))
       {
         componentsToRecreate.push_back(meshCompRef);
       }
@@ -462,8 +457,7 @@ void importMesh(FbxMesh* p_Mesh,
 // <-
 
 _INTR_INLINE void importMeshesFromNode(FbxNode* p_Node,
-                                       _INTR_ARRAY(CResources::MeshRef) &
-                                           p_ImportedMeshes)
+                                       _INTR_ARRAY(MeshRef) & p_ImportedMeshes)
 {
   _INTR_ASSERT(p_Node);
 
@@ -511,8 +505,7 @@ void ImporterFbx::destroy()
 // <-
 
 bool ImporterFbx::importMeshesFromFile(const _INTR_STRING& p_FilePath,
-                                       _INTR_ARRAY(CResources::MeshRef) &
-                                           p_ImportedMeshes)
+                                       _INTR_ARRAY(MeshRef) & p_ImportedMeshes)
 {
   FbxImporter* importer = FbxImporter::Create(_fbxManager, "");
 

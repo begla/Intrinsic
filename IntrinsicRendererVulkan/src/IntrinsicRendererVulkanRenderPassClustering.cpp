@@ -24,6 +24,7 @@
 #define GRID_SIZE_Y 8u
 
 using namespace RVResources;
+using namespace CResources;
 
 namespace Intrinsic
 {
@@ -610,16 +611,16 @@ _INTR_INLINE void renderLighting(FramebufferRef p_FramebufferRef,
     _lightingPerInstanceData.data0.y = Clustering::_globalAmbientFactor;
     _lightingPerInstanceData.data0.z = World::_currentDayNightFactor;
 
-    const _INTR_ARRAY(CResources::FrustumRef)& shadowFrustums =
+    const _INTR_ARRAY(FrustumRef)& shadowFrustums =
         RenderProcess::Default::_shadowFrustums[p_CameraRef];
 
     for (uint32_t i = 0u; i < shadowFrustums.size(); ++i)
     {
-      CResources::FrustumRef shadowFrustumRef = shadowFrustums[i];
+      FrustumRef shadowFrustumRef = shadowFrustums[i];
 
       // Transform from camera view space => light proj. space
       _lightingPerInstanceData.shadowViewProjMatrix[i] =
-          CResources::FrustumManager::_viewProjectionMatrix(shadowFrustumRef) *
+          FrustumManager::_viewProjectionMatrix(shadowFrustumRef) *
           Components::CameraManager::_inverseViewMatrix(p_CameraRef);
     }
 

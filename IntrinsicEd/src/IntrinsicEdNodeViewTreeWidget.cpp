@@ -16,6 +16,8 @@
 #include "stdafx_editor.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+
 // Helpers
 void expandAllParents(QTreeWidgetItem* p_Item)
 {
@@ -738,21 +740,20 @@ void captureIrradProbe(
   World::setActiveCamera(camRef);
 
   // Setup buffer for readback
-  RVResources::BufferRef readBackBufferRef =
-      RVResources::BufferManager::createBuffer(_N(IrradianceProbeReadBack));
+  BufferRef readBackBufferRef =
+      BufferManager::createBuffer(_N(IrradianceProbeReadBack));
   {
-    RVResources::BufferManager::resetToDefault(readBackBufferRef);
-    RVResources::BufferManager::addResourceFlags(
+    BufferManager::resetToDefault(readBackBufferRef);
+    BufferManager::addResourceFlags(
         readBackBufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
-    RVResources::BufferManager::_descMemoryPoolType(readBackBufferRef) =
+    BufferManager::_descMemoryPoolType(readBackBufferRef) =
         RV::MemoryPoolType::kVolatileStagingBuffers;
 
-    RVResources::BufferManager::_descBufferType(readBackBufferRef) =
+    BufferManager::_descBufferType(readBackBufferRef) =
         RV::BufferType::kStorage;
-    RVResources::BufferManager::_descSizeInBytes(readBackBufferRef) =
-        faceSizeInBytes;
+    BufferManager::_descSizeInBytes(readBackBufferRef) = faceSizeInBytes;
 
-    RVResources::BufferManager::createResources({readBackBufferRef});
+    BufferManager::createResources({readBackBufferRef});
   }
 
   uint32_t prevDebugStageFlags = RenderPass::Debug::_activeDebugStageFlags;
@@ -821,10 +822,9 @@ void captureIrradProbe(
         // Copy image to host visible memory
         VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
 
-        RVResources::ImageRef sceneImageRef =
-            RVResources::ImageManager::getResourceByName(_N(Scene));
+        ImageRef sceneImageRef = ImageManager::getResourceByName(_N(Scene));
 
-        RVResources::ImageManager::insertImageMemoryBarrier(
+        ImageManager::insertImageMemoryBarrier(
             copyCmd, sceneImageRef, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
@@ -845,16 +845,15 @@ void captureIrradProbe(
         }
 
         // Read back face
-        vkCmdCopyImageToBuffer(
-            copyCmd, RVResources::ImageManager::_vkImage(sceneImageRef),
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            RVResources::BufferManager::_vkBuffer(readBackBufferRef), 1u,
-            &bufferImageCopy);
+        vkCmdCopyImageToBuffer(copyCmd, ImageManager::_vkImage(sceneImageRef),
+                               VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                               BufferManager::_vkBuffer(readBackBufferRef), 1u,
+                               &bufferImageCopy);
 
         RenderSystem::flushTemporaryCommandBuffer();
 
         const uint8_t* sceneMemory =
-            RVResources::BufferManager::getGpuMemory(readBackBufferRef);
+            BufferManager::getGpuMemory(readBackBufferRef);
 
         memcpy(texCube.data(0u, atlasIndexToFaceIdx[atlasIdx], 0u), sceneMemory,
                faceSizeInBytes);
@@ -911,8 +910,8 @@ void captureIrradProbe(
   }
 
   // Cleanup and restore
-  RVResources::BufferManager::destroyResources({readBackBufferRef});
-  RVResources::BufferManager::destroyBuffer(readBackBufferRef);
+  BufferManager::destroyResources({readBackBufferRef});
+  BufferManager::destroyBuffer(readBackBufferRef);
   GpuMemoryManager::resetPool(MemoryPoolType::kVolatileStagingBuffers);
 
   Settings::Manager::_targetFrameRate = prevMaxFps;

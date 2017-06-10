@@ -22,6 +22,8 @@
 #include "PxScene.h"
 #include "extensions/PxJoint.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Core
@@ -119,8 +121,8 @@ struct PerInstanceDataGridFragment
 
 // <-
 
-RVResources::DrawCallRef _drawCallRefGizmo;
-RVResources::DrawCallRef _drawCallRefGrid;
+DrawCallRef _drawCallRefGizmo;
+DrawCallRef _drawCallRefGrid;
 
 // <-
 
@@ -570,35 +572,33 @@ void Editing::onReinitRendering()
   Resources::MeshRef meshRefGrid =
       Resources::MeshManager::getResourceByName(_N(plane));
 
-  RVResources::DrawCallRefArray drawCallsToDestroy;
+  DrawCallRefArray drawCallsToDestroy;
   if (_drawCallRefGizmo.isValid())
     drawCallsToDestroy.push_back(_drawCallRefGizmo);
   if (_drawCallRefGrid.isValid())
     drawCallsToDestroy.push_back(_drawCallRefGrid);
 
-  RVResources::DrawCallManager::destroyDrawCallsAndResources(
-      drawCallsToDestroy);
+  DrawCallManager::destroyDrawCallsAndResources(drawCallsToDestroy);
 
   // Draw calls
-  RVResources::DrawCallRefArray drawCallsToCreate;
+  DrawCallRefArray drawCallsToCreate;
   {
-    _drawCallRefGizmo = RVResources::DrawCallManager::createDrawCallForMesh(
+    _drawCallRefGizmo = DrawCallManager::createDrawCallForMesh(
         _N(gizmo_translate), meshRefGizmo,
-        RVResources::MaterialManager::getResourceByName(_N(gizmo)),
-        RVResources::MaterialManager::getMaterialPassId(_N(DebugGizmo)),
+        MaterialManager::getResourceByName(_N(gizmo)),
+        MaterialManager::getMaterialPassId(_N(DebugGizmo)),
         sizeof(PerInstanceDataGizmoVertex),
         sizeof(PerInstanceDataGizmoFragment));
     drawCallsToCreate.push_back(_drawCallRefGizmo);
 
-    _drawCallRefGrid = RVResources::DrawCallManager::createDrawCallForMesh(
-        _N(Grid), meshRefGrid,
-        RVResources::MaterialManager::getResourceByName(_N(grid)),
-        RVResources::MaterialManager::getMaterialPassId(_N(DebugGrid)),
+    _drawCallRefGrid = DrawCallManager::createDrawCallForMesh(
+        _N(Grid), meshRefGrid, MaterialManager::getResourceByName(_N(grid)),
+        MaterialManager::getMaterialPassId(_N(DebugGrid)),
         sizeof(PerInstanceDataGridVertex), sizeof(PerInstanceDataGridFragment));
     drawCallsToCreate.push_back(_drawCallRefGrid);
   }
 
-  RVResources::DrawCallManager::createResources(drawCallsToCreate);
+  DrawCallManager::createResources(drawCallsToCreate);
 }
 
 // <-
@@ -706,8 +706,8 @@ void Editing::updatePerInstanceData()
     }
 
     // Write to GPU memory
-    RVResources::DrawCallRefArray dcsToUpdate = {_drawCallRefGizmo};
-    RVResources::DrawCallManager::allocateAndUpdateUniformMemory(
+    DrawCallRefArray dcsToUpdate = {_drawCallRefGizmo};
+    DrawCallManager::allocateAndUpdateUniformMemory(
         dcsToUpdate, &perInstanceDataVertex, sizeof(PerInstanceDataGizmoVertex),
         &perInstanceDataFragment, sizeof(PerInstanceDataGizmoFragment));
   }
@@ -745,8 +745,8 @@ void Editing::updatePerInstanceData()
     }
 
     // Write to GPU memory
-    RVResources::DrawCallRefArray dcsToUpdate = {_drawCallRefGrid};
-    RVResources::DrawCallManager::allocateAndUpdateUniformMemory(
+    DrawCallRefArray dcsToUpdate = {_drawCallRefGrid};
+    DrawCallManager::allocateAndUpdateUniformMemory(
         dcsToUpdate, &perInstanceDataVertex, sizeof(PerInstanceDataGridVertex),
         &perInstanceDataFragment, sizeof(PerInstanceDataGridFragment));
   }

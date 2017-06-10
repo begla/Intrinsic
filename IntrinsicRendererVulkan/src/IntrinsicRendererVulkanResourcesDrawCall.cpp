@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace CResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -192,20 +194,17 @@ DrawCallRef DrawCallManager::createDrawCallForMesh(
     _descPipeline(drawCallMesh) = MaterialManager::_materialPassPipelines
         [MaterialManager::_materialPasses[p_MaterialPass].pipelineIdx];
 
-    _INTR_ASSERT(RVResources::PipelineManager::_vkPipeline(
-        _descPipeline(drawCallMesh)));
+    _INTR_ASSERT(PipelineManager::_vkPipeline(_descPipeline(drawCallMesh)));
 
     _descVertexBuffers(drawCallMesh) =
-        CResources::MeshManager::_vertexBuffersPerSubMesh(p_Mesh)[p_SubMeshIdx];
+        MeshManager::_vertexBuffersPerSubMesh(p_Mesh)[p_SubMeshIdx];
     _descIndexBuffer(drawCallMesh) =
-        CResources::MeshManager::_indexBufferPerSubMesh(p_Mesh)[p_SubMeshIdx];
+        MeshManager::_indexBufferPerSubMesh(p_Mesh)[p_SubMeshIdx];
     _descVertexCount(drawCallMesh) =
-        (uint32_t)CResources::MeshManager::_descPositionsPerSubMesh(
-            p_Mesh)[p_SubMeshIdx]
+        (uint32_t)MeshManager::_descPositionsPerSubMesh(p_Mesh)[p_SubMeshIdx]
             .size();
     _descIndexCount(drawCallMesh) =
-        (uint32_t)CResources::MeshManager::_descIndicesPerSubMesh(
-            p_Mesh)[p_SubMeshIdx]
+        (uint32_t)MeshManager::_descIndicesPerSubMesh(p_Mesh)[p_SubMeshIdx]
             .size();
     _descMaterial(drawCallMesh) = p_Material;
     _descMaterialPass(drawCallMesh) = p_MaterialPass;

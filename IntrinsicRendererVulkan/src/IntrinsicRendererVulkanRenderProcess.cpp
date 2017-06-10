@@ -17,6 +17,7 @@
 #include "stdafx.h"
 
 using namespace RVResources;
+using namespace CResources;
 
 namespace Intrinsic
 {
@@ -399,16 +400,14 @@ void Default::renderFrame(float p_DeltaT)
       {
         Components::CameraRef camRef = _cameras[i];
 
-        CResources::FrustumRef frustumRef =
-            Components::CameraManager::_frustum(camRef);
+        FrustumRef frustumRef = Components::CameraManager::_frustum(camRef);
         _cameraToIdMapping[camRef] = (uint8_t)_activeFrustums.size();
         _activeFrustums.push_back(frustumRef);
 
         // Only allow shadows for the main view
         if (_cameraNames[i] == _N(ActiveCamera))
         {
-          _INTR_ARRAY(CResources::FrustumRef)& shadowFrustums =
-              _shadowFrustums[camRef];
+          _INTR_ARRAY(FrustumRef)& shadowFrustums = _shadowFrustums[camRef];
           RenderPass::Shadow::prepareFrustums(camRef, shadowFrustums);
           _activeFrustums.insert(RenderProcess::Default::_activeFrustums.end(),
                                  shadowFrustums.begin(), shadowFrustums.end());
@@ -417,11 +416,9 @@ void Default::renderFrame(float p_DeltaT)
 
       Components::CameraManager::updateFrustums(
           Components::CameraManager::_activeRefs);
-      CResources::FrustumManager::prepareForRendering(
-          CResources::FrustumManager::_activeRefs);
+      FrustumManager::prepareForRendering(FrustumManager::_activeRefs);
 
-      CResources::FrustumManager::cullNodes(
-          RenderProcess::Default::_activeFrustums);
+      FrustumManager::cullNodes(RenderProcess::Default::_activeFrustums);
 
       // Collect visible draw calls and mesh components
       Components::MeshManager::collectDrawCallsAndMeshComponents();

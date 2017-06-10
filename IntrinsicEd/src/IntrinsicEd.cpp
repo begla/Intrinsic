@@ -11,6 +11,8 @@
 // Ui
 #include "ui_IntrinsicEd.h"
 
+using namespace RVResources;
+
 IntrinsicEdNodeView* IntrinsicEd::_nodeView = nullptr;
 IntrinsicEdPropertyView* IntrinsicEd::_propertyView = nullptr;
 IntrinsicEdManagerWindowGpuProgram* IntrinsicEd::_managerWindowGpuProgram =
@@ -831,14 +833,11 @@ void IntrinsicEd::onDebugGeometryChanged()
   }
 }
 
-void IntrinsicEd::onCompileShaders()
-{
-  RVResources::GpuProgramManager::compileAllShaders();
-}
+void IntrinsicEd::onCompileShaders() { GpuProgramManager::compileAllShaders(); }
 
 void IntrinsicEd::onRecompileShaders()
 {
-  RVResources::GpuProgramManager::compileAllShaders(true);
+  GpuProgramManager::compileAllShaders(true);
 }
 
 void IntrinsicEd::onSettingsFileChanged(const QString&)

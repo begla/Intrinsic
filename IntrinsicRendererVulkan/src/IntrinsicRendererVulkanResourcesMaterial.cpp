@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace CResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -170,11 +172,11 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
     {
       Components::MeshRef meshCompRef =
           Components::MeshManager::getActiveResourceAtIndex(i);
-      CResources::MeshRef meshRef = CResources::MeshManager::getResourceByName(
+      MeshRef meshRef = MeshManager::getResourceByName(
           Components::MeshManager::_descMeshName(meshCompRef));
 
-      CResources::MaterialNamesPerSubMeshArray& materialNamesPerSubMesh =
-          CResources::MeshManager::_descMaterialNamesPerSubMesh(meshRef);
+      MaterialNamesPerSubMeshArray& materialNamesPerSubMesh =
+          MeshManager::_descMaterialNamesPerSubMesh(meshRef);
       const uint32_t subMeshCount = (uint32_t)materialNamesPerSubMesh.size();
 
       for (uint32_t i = 0u; i < subMeshCount; ++i)
