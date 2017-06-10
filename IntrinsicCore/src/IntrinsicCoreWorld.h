@@ -29,7 +29,13 @@ struct World
   static Components::NodeRef cloneNodeFull(Components::NodeRef p_Ref);
 
   static void save(const _INTR_STRING& p_FilePath);
+
   static void load(const _INTR_STRING& p_FilePath);
+
+  static void saveNodeHierarchy(const _INTR_STRING& p_FilePath,
+                                Components::NodeRef p_RootNodeRef);
+  static Components::NodeRef loadNodeHierarchy(const _INTR_STRING& p_FilePath);
+  static void loadNodeResources(Components::NodeRef p_RootNodeRef);
 
   static void updateDayNightCycle(float p_DeltaT);
 

@@ -27,6 +27,8 @@ glm::vec4 World::_currentSunLightColorAndIntensity = glm::vec4();
 float World::_currentDayNightFactor = 0.0f;
 _INTR_STRING World::_filePath;
 
+namespace
+{
 uint32_t calcOffsetToParent(const Components::NodeRefArray& p_Nodes,
                             Components::NodeRef p_Parent,
                             uint32_t p_CurrentIndex)
@@ -44,6 +46,9 @@ uint32_t calcOffsetToParent(const Components::NodeRefArray& p_Nodes,
 
   return offsetToParent;
 }
+}
+
+// <-
 
 void World::init()
 {
@@ -143,35 +148,12 @@ Components::NodeRef World::cloneNodeFull(Components::NodeRef p_Ref)
   }
 
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
-
-  // Load resources in order
-  {
-    for (uint32_t i = 0u; i < clonedNodes.size(); ++i)
-    {
-      const Components::NodeRef nodeRef = clonedNodes[i];
-      const Entity::EntityRef entityRef =
-          Components::NodeManager::_entity(nodeRef);
-
-      for (uint32_t managerIdx = 0u;
-           managerIdx < Application::_orderedComponentManagers.size();
-           ++managerIdx)
-      {
-        Dod::Components::ComponentManagerEntry& managerEntry =
-            Application::_orderedComponentManagers[managerIdx];
-        Dod::Ref compRef =
-            managerEntry.getComponentForEntityFunction(entityRef);
-
-        if (compRef.isValid() && managerEntry.createResourcesFunction)
-        {
-          Dod::RefArray componentsToInit = {compRef};
-          managerEntry.createResourcesFunction(componentsToInit);
-        }
-      }
-    }
-  }
+  loadNodeResources(clonedNodes[0]);
 
   return clonedNodes[0];
 }
+
+// <-
 
 void World::destroyNodeFull(Components::NodeRef p_Ref)
 {
@@ -193,6 +175,8 @@ void World::destroyNodeFull(Components::NodeRef p_Ref)
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
 }
 
+// <-
+
 void World::destroy()
 {
   Components::NodeRef currentRootNode = _rootNode;
@@ -200,17 +184,29 @@ void World::destroy()
   destroyNodeFull(currentRootNode);
 }
 
+// <-
+
 void World::save(const _INTR_STRING& p_FilePath)
 {
   _INTR_LOG_INFO("Saving world to file '%s'...", p_FilePath.c_str());
 
-  rapidjson::Document worldDesc = rapidjson::Document(rapidjson::kArrayType);
+  saveNodeHierarchy(p_FilePath, _rootNode);
+}
+
+// <-
+
+void World::saveNodeHierarchy(const _INTR_STRING& p_FilePath,
+                              Components::NodeRef p_RootNodeRef)
+{
+  _INTR_ASSERT(p_RootNodeRef.isValid() && "Invalid node provided");
+
+  rapidjson::Document saveDesc = rapidjson::Document(rapidjson::kArrayType);
 
   _INTR_ARRAY(Components::NodeRef) storedNodes;
 
   Components::NodeRef nodeStack[64];
   uint32_t nodeStackCount = 1u;
-  nodeStack[0] = _rootNode;
+  nodeStack[0] = p_RootNodeRef;
 
   while (nodeStackCount > 0u)
   {
@@ -234,7 +230,7 @@ void World::save(const _INTR_STRING& p_FilePath)
       nodeStack[nodeStackCount] = firstChild;
       ++nodeStackCount;
     }
-    if (_rootNode != currentNodeRef && nextSibling.isValid())
+    if (p_RootNodeRef != currentNodeRef && nextSibling.isValid())
     {
       nodeStack[nodeStackCount] = nextSibling;
       ++nodeStackCount;
@@ -247,16 +243,15 @@ void World::save(const _INTR_STRING& p_FilePath)
       rapidjson::Value node = rapidjson::Value(rapidjson::kObjectType);
       rapidjson::Value name = rapidjson::Value(
           Entity::EntityManager::_name(entityRef).getString().c_str(),
-          worldDesc.GetAllocator());
+          saveDesc.GetAllocator());
 
-      node.AddMember("name", name, worldDesc.GetAllocator());
+      node.AddMember("name", name, saveDesc.GetAllocator());
 
       const int32_t offsetToParent =
           parent.isValid() ? calcOffsetToParent(storedNodes, parent,
                                                 (uint32_t)storedNodes.size())
                            : 0;
-      node.AddMember("offsetToParent", offsetToParent,
-                     worldDesc.GetAllocator());
+      node.AddMember("offsetToParent", offsetToParent, saveDesc.GetAllocator());
 
       rapidjson::Value propertyEntries =
           rapidjson::Value(rapidjson::kArrayType);
@@ -267,7 +262,7 @@ void World::save(const _INTR_STRING& p_FilePath)
            ++propCompIt)
       {
         rapidjson::Value componentType = rapidjson::Value(
-            propCompIt->first.getString().c_str(), worldDesc.GetAllocator());
+            propCompIt->first.getString().c_str(), saveDesc.GetAllocator());
 
         auto compManagerEntryIt = Application::_componentManagerMapping.find(
             componentType.GetString());
@@ -284,22 +279,22 @@ void World::save(const _INTR_STRING& p_FilePath)
                 rapidjson::Value(rapidjson::kObjectType);
             propCompIt->second.compileFunction(
                 managerEntry.getComponentForEntityFunction(entityRef), false,
-                properties, worldDesc);
+                properties, saveDesc);
 
             rapidjson::Value propertyEntry =
                 rapidjson::Value(rapidjson::kObjectType);
             propertyEntry.AddMember("type", componentType,
-                                    worldDesc.GetAllocator());
+                                    saveDesc.GetAllocator());
             propertyEntry.AddMember("properties", properties,
-                                    worldDesc.GetAllocator());
-            propertyEntries.PushBack(propertyEntry, worldDesc.GetAllocator());
+                                    saveDesc.GetAllocator());
+            propertyEntries.PushBack(propertyEntry, saveDesc.GetAllocator());
           }
         }
       }
 
       node.AddMember("propertyEntries", propertyEntries,
-                     worldDesc.GetAllocator());
-      worldDesc.PushBack(node, worldDesc.GetAllocator());
+                     saveDesc.GetAllocator());
+      saveDesc.PushBack(node, saveDesc.GetAllocator());
       storedNodes.push_back(currentNodeRef);
     }
   }
@@ -308,7 +303,8 @@ void World::save(const _INTR_STRING& p_FilePath)
 
   if (fp == nullptr)
   {
-    _INTR_LOG_ERROR("Failed to save world to file '%s'...", p_FilePath.c_str());
+    _INTR_LOG_ERROR("Failed to save node hierarchy to file '%s'...",
+                    p_FilePath.c_str());
     return;
   }
 
@@ -316,46 +312,43 @@ void World::save(const _INTR_STRING& p_FilePath)
   {
     rapidjson::FileWriteStream os(fp, writeBuffer, 65536u);
     rapidjson::PrettyWriter<rapidjson::FileWriteStream> writer(os);
-    worldDesc.Accept(writer);
+    saveDesc.Accept(writer);
     fclose(fp);
   }
   Tlsf::MainAllocator::free(writeBuffer);
 }
 
-void World::load(const _INTR_STRING& p_FilePath)
-{
-  _INTR_LOG_INFO("Loading world from file '%s'...", p_FilePath.c_str());
+// <-
 
-  // Parse world
-  rapidjson::Document worldDesc;
+Components::NodeRef World::loadNodeHierarchy(const _INTR_STRING& p_FilePath)
+{
+  rapidjson::Document saveDesc;
   {
     FILE* fp = fopen(p_FilePath.c_str(), "rb");
 
     if (fp == nullptr)
     {
-      _INTR_LOG_ERROR("Failed to load world from file '%s'...",
+      _INTR_LOG_ERROR("Failed to load node hierarchy from file '%s'...",
                       p_FilePath.c_str());
-      return;
+      return Components::NodeRef();
     }
 
     char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
     {
       rapidjson::FileReadStream is(fp, readBuffer, 65536u);
-      worldDesc.ParseStream(is);
+      saveDesc.ParseStream(is);
       fclose(fp);
     }
     Tlsf::MainAllocator::free(readBuffer);
   }
 
-  destroy();
-
-  _INTR_ARRAY(Components::NodeRef) worldNodes;
+  _INTR_ARRAY(Components::NodeRef) loadedNodes;
 
   // Init. nodes
   {
-    for (uint32_t i = 0u; i < worldDesc.Size(); ++i)
+    for (uint32_t i = 0u; i < saveDesc.Size(); ++i)
     {
-      rapidjson::Value& node = worldDesc[i];
+      rapidjson::Value& node = saveDesc[i];
       Entity::EntityRef entityRef =
           Entity::EntityManager::createEntity(node["name"].GetString());
       rapidjson::Value& propertyEntries = node["propertyEntries"];
@@ -384,7 +377,7 @@ void World::load(const _INTR_STRING& p_FilePath)
 
           if (strcmp(componentType.GetString(), "Node") == 0u)
           {
-            worldNodes.push_back(componentRef);
+            loadedNodes.push_back(componentRef);
           }
         }
         else
@@ -399,35 +392,36 @@ void World::load(const _INTR_STRING& p_FilePath)
 
   // Restore hierarchy
   {
-    for (uint32_t i = 0u; i < worldNodes.size(); ++i)
+    for (uint32_t i = 0u; i < loadedNodes.size(); ++i)
     {
-      const Components::NodeRef nodeRef = worldNodes[i];
-      rapidjson::Value& node = worldDesc[i];
+      const Components::NodeRef nodeRef = loadedNodes[i];
+      rapidjson::Value& node = saveDesc[i];
 
       const int32_t offsetToParent = node["offsetToParent"].GetInt();
 
       if (offsetToParent != 0)
       {
         Components::NodeManager::attachChildIgnoreParent(
-            worldNodes[i + offsetToParent], nodeRef);
+            loadedNodes[i + offsetToParent], nodeRef);
       }
     }
   }
-  Components::NodeManager::rebuildTreeAndUpdateTransforms();
 
-  // Finally set the root node
-  _rootNode = worldNodes[0];
+  return loadedNodes[0];
+}
 
-  // Set default camera
-  _activeCamera = Components::CameraManager::getComponentForEntity(
-      Entity::EntityManager::getEntityByName(_N(MainCamera)));
-  _currentTime = 0.1f;
+// <-
+
+void World::loadNodeResources(Components::NodeRef p_RootNodeRef)
+{
+  Components::NodeRefArray nodeRefs;
+  Components::NodeManager::collectNodes(p_RootNodeRef, nodeRefs);
 
   // Load component resources in order
   {
-    for (uint32_t i = 0u; i < worldNodes.size(); ++i)
+    for (uint32_t i = 0u; i < nodeRefs.size(); ++i)
     {
-      const Components::NodeRef nodeRef = worldNodes[i];
+      const Components::NodeRef nodeRef = nodeRefs[i];
       const Entity::EntityRef entityRef =
           Components::NodeManager::_entity(nodeRef);
 
@@ -448,14 +442,35 @@ void World::load(const _INTR_STRING& p_FilePath)
       }
     }
   }
+}
+
+// <-
+
+void World::load(const _INTR_STRING& p_FilePath)
+{
+  _INTR_LOG_INFO("Loading world from file '%s'...", p_FilePath.c_str());
+
+  // Destroy the current world
+  destroy();
+
+  // Load world and set root node
+  _rootNode = loadNodeHierarchy(p_FilePath);
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+  loadNodeResources(_rootNode);
+
+  // Set default camera
+  _activeCamera = Components::CameraManager::getComponentForEntity(
+      Entity::EntityManager::getEntityByName(_N(MainCamera)));
+  _currentTime = 0.1f;
+  _filePath = p_FilePath;
 
   GameStates::Editing::_currentlySelectedEntity =
       Components::NodeManager::_entity(_rootNode);
   Resources::EventManager::queueEventIfNotExisting(
       _N(CurrentlySelectedEntityChanged));
-
-  _filePath = p_FilePath;
 }
+
+// <-
 
 void World::updateDayNightCycle(float p_DeltaT)
 {
