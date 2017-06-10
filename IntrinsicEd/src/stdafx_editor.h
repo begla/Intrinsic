@@ -24,6 +24,8 @@
 // ->Ed related includes
 #include "IntrinsicEdViewport.h"
 #include "IntrinsicEd.h"
+#include "IntrinsicEdPrefabsView.h"
+#include "IntrinsicEdPrefabsBrowser.h"
 #include "IntrinsicEdNodeViewTreeWidget.h"
 #include "IntrinsicEdNodeView.h"
 #include "IntrinsicEdPropertyEditorBase.h"

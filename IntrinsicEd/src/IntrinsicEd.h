@@ -28,6 +28,7 @@ class IntrinsicEdManagerWindowMaterial;
 class IntrinsicEdManagerWindowImage;
 class IntrinsicEdManagerWindowPostEffect;
 class IntrinsicEdViewport;
+class IntrinsicEdPrefabsBrowser;
 
 class IntrinsicEd : public QMainWindow
 {
@@ -43,6 +44,7 @@ public:
   static IntrinsicEd* _mainWindow;
   static IntrinsicEdNodeView* _nodeView;
   static IntrinsicEdPropertyView* _propertyView;
+  static IntrinsicEdPrefabsBrowser* _prefabsBrowser;
   static IntrinsicEdManagerWindowGpuProgram* _managerWindowGpuProgram;
   static IntrinsicEdManagerWindowScript* _managerWindowScript;
   static IntrinsicEdManagerWindowAsset* _managerWindowAsset;

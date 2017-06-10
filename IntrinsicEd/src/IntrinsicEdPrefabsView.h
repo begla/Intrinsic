@@ -14,20 +14,21 @@
 
 #pragma once
 
-class IntrinsicEdViewport : public QWidget
+class IntrinsicEdPrefabModel : public QFileSystemModel
+{
+  QStringList mimeTypes() const;
+  QMimeData* mimeData(const QModelIndexList& indexes) const;
+  QVariant data(const QModelIndex& index, int role) const;
+};
+
+class IntrinsicEdPrefabsView : public QTreeView
 {
   Q_OBJECT
 
 public:
-  IntrinsicEdViewport(QWidget* parent = nullptr);
-  ~IntrinsicEdViewport();
-  void dropEvent(QDropEvent* event) override;
-  void dragEnterEvent(QDragEnterEvent* event) override;
+  IntrinsicEdPrefabsView(QWidget* parent = 0);
+  ~IntrinsicEdPrefabsView();
 
-  void spawnPrefab(const _INTR_STRING& p_PrefabFilePath);
-
-  void onKeyPressed(Resources::EventRef p_EventRef);
-  void onKeyReleased(Resources::EventRef p_EventRef);
-  void onAxisChanged(Resources::EventRef p_EventRef);
-  void onMouseMoved(Resources::EventRef p_EventRef);
+private:
+  QFileSystemModel* _model;
 };
