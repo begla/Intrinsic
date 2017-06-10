@@ -68,7 +68,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     {
       ImporterFbx::init();
 
-      _INTR_ARRAY(Core::Resources::MeshRef) importedMeshes;
+      _INTR_ARRAY(CResources::MeshRef) importedMeshes;
       ImporterFbx::importMeshesFromFile(Settings::Manager::_assetMeshPath +
                                             "/" + _descAssetFileName(assetRef),
                                         importedMeshes);
@@ -76,7 +76,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
 
       for (uint32_t i = 0u; i < importedMeshes.size(); ++i)
       {
-        Core::Resources::MeshManager::saveToMultipleFilesSingleResource(
+        CResources::MeshManager::saveToMultipleFilesSingleResource(
             importedMeshes[i], "managers/meshes/", ".mesh.json");
       }
 

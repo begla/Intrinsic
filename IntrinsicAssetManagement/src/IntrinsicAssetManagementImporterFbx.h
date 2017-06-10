@@ -24,7 +24,7 @@ struct ImporterFbx
   static void destroy();
 
   static bool importMeshesFromFile(const _INTR_STRING& p_FilePath,
-                                   _INTR_ARRAY(Core::Resources::MeshRef) &
+                                   _INTR_ARRAY(CResources::MeshRef) &
                                        p_ImportedMeshes);
 };
 }
