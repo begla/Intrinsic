@@ -267,6 +267,7 @@ void IntrinsicEdManagerWindowAsset::onCompileQueuedAssets()
     DrawCallManager::createResources(DrawCallManager::_activeRefs);
     ComputeCallManager::destroyResources(ComputeCallManager::_activeRefs);
     ComputeCallManager::createResources(ComputeCallManager::_activeRefs);
+    MaterialManager::destroyResources(MaterialManager::_activeRefs);
     MaterialManager::createResources(MaterialManager::_activeRefs);
 
     _assetsToRecompile.clear();
