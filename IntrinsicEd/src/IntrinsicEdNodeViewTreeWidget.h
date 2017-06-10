@@ -56,6 +56,7 @@ public slots:
   void onCreateRootNode();
   void onCloneNode();
   void onDeleteNode();
+  void onSaveNodeAsPrefab();
   void onCreateComponent();
   void onDestroyComponent();
   void onItemDoubleClicked(QTreeWidgetItem* item, int column);

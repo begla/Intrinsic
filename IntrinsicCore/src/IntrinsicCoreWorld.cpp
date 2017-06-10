@@ -42,8 +42,6 @@ uint32_t calcOffsetToParent(const Components::NodeRefArray& p_Nodes,
       break;
     }
   }
-  _INTR_ASSERT(offsetToParent != 0);
-
   return offsetToParent;
 }
 }

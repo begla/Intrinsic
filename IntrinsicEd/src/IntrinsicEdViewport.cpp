@@ -16,10 +16,13 @@
 #include "stdafx_editor.h"
 #include "stdafx.h"
 
+using namespace CComponents;
+
 IntrinsicEdViewport::IntrinsicEdViewport(QWidget* parent) : QWidget(parent)
 {
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
+  setAcceptDrops(true);
 
   Resources::EventManager::connect(_N(MouseMoved),
                                    std::bind(&IntrinsicEdViewport::onMouseMoved,
@@ -78,6 +81,63 @@ void IntrinsicEdViewport::onKeyPressed(Resources::EventRef p_EventRef)
     IntrinsicEd::_mainWindow->onEditingModeScale();
     break;
   }
+}
+
+void IntrinsicEdViewport::dragEnterEvent(QDragEnterEvent* event)
+{
+  event->accept();
+}
+
+void IntrinsicEdViewport::dropEvent(QDropEvent* event)
+{
+  const QMimeData* mimeData = event->mimeData();
+
+  if (mimeData->hasFormat("PrefabFilePath"))
+  {
+    QByteArray encodedData = mimeData->data("PrefabFilePath");
+    QDataStream stream(&encodedData, QIODevice::ReadOnly);
+    QString prefabName;
+    stream >> prefabName;
+
+    spawnPrefab(prefabName.toStdString().c_str());
+  }
+}
+
+void IntrinsicEdViewport::spawnPrefab(const _INTR_STRING& p_PrefabFilePath)
+{
+  NodeRef nodeRef = World::loadNodeHierarchy(p_PrefabFilePath);
+  Entity::EntityRef entityRef = NodeManager::_entity(nodeRef);
+  NodeManager::attachChild(World::getRootNode(), nodeRef);
+
+  CameraRef camRef = World::getActiveCamera();
+  NodeRef camNodeRef =
+      NodeManager::getComponentForEntity(CameraManager::_entity(camRef));
+
+  QPoint mousePos = mapFromGlobal(QCursor::pos());
+  const glm::vec2 mousePosRel =
+      glm::vec2((float)mousePos.x() / geometry().width(),
+                (float)mousePos.y() / geometry().height());
+
+  const Math::Ray worldRay = Math::calcMouseRay(
+      NodeManager::_worldPosition(camNodeRef), mousePosRel,
+      Components::CameraManager::_inverseViewProjectionMatrix(camRef));
+
+  // Spawn the object close to the ground
+  physx::PxRaycastHit hit;
+  if (PhysxHelper::raycast(worldRay, hit, 50000.0f,
+                           physx::PxQueryFlag::eSTATIC))
+  {
+    NodeManager::_position(nodeRef) = worldRay.o + worldRay.d * hit.distance;
+  }
+  else
+  {
+    NodeManager::_position(nodeRef) = worldRay.o + worldRay.d * 10.0f;
+  }
+
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+  World::loadNodeResources(nodeRef);
+
+  GameStates::Editing::_currentlySelectedEntity = entityRef;
 }
 
 void IntrinsicEdViewport::onKeyReleased(Resources::EventRef p_EventRef) {}

@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
+// Precompiled header file
+#include "stdafx.h"
+#include "stdafx_editor.h"
 
-class IntrinsicEdViewport : public QWidget
+// Ui
+#include "ui_IntrinsicEdPrefabsBrowser.h"
+
+IntrinsicEdPrefabsBrowser::IntrinsicEdPrefabsBrowser(QWidget* parent)
+    : QDockWidget(parent)
 {
-  Q_OBJECT
+  _ui.setupUi(this);
+}
 
-public:
-  IntrinsicEdViewport(QWidget* parent = nullptr);
-  ~IntrinsicEdViewport();
-  void dropEvent(QDropEvent* event) override;
-  void dragEnterEvent(QDragEnterEvent* event) override;
-
-  void spawnPrefab(const _INTR_STRING& p_PrefabFilePath);
-
-  void onKeyPressed(Resources::EventRef p_EventRef);
-  void onKeyReleased(Resources::EventRef p_EventRef);
-  void onAxisChanged(Resources::EventRef p_EventRef);
-  void onMouseMoved(Resources::EventRef p_EventRef);
-};
+IntrinsicEdPrefabsBrowser::~IntrinsicEdPrefabsBrowser() {}

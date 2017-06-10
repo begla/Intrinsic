@@ -15,6 +15,7 @@ using namespace RVResources;
 
 IntrinsicEdNodeView* IntrinsicEd::_nodeView = nullptr;
 IntrinsicEdPropertyView* IntrinsicEd::_propertyView = nullptr;
+IntrinsicEdPrefabsBrowser* IntrinsicEd::_prefabsBrowser = nullptr;
 IntrinsicEdManagerWindowGpuProgram* IntrinsicEd::_managerWindowGpuProgram =
     nullptr;
 IntrinsicEdManagerWindowScript* IntrinsicEd::_managerWindowScript = nullptr;
@@ -167,6 +168,9 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     stringToIconPathMapping["DepthOfField"] =
         ":Icons/icons/essential/photo-camera-1.png";
     stringToIconPathMapping["Decal"] = ":Icons/icons/essential/picture-2.png";
+    stringToIconPathMapping["Folder"] = ":Icons/icons/essential/folder-8.png";
+    stringToIconPathMapping["File"] = ":Icons/icons/essential/file.png";
+    stringToIconPathMapping["Prefab"] = ":/Icons/icons/essential/compose.png";
 
     for (auto it = stringToIconPathMapping.begin();
          it != stringToIconPathMapping.end(); ++it)
@@ -263,8 +267,11 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   _propertyView = new IntrinsicEdPropertyView();
   tabifyDockWidget(_editingView, _propertyView);
 
+  _prefabsBrowser = new IntrinsicEdPrefabsBrowser();
+  tabifyDockWidget(_propertyView, _prefabsBrowser);
+
   _nodeView = new IntrinsicEdNodeView();
-  tabifyDockWidget(_propertyView, _nodeView);
+  tabifyDockWidget(_prefabsBrowser, _nodeView);
 
   _managerWindowGpuProgram = new IntrinsicEdManagerWindowGpuProgram(nullptr);
   _managerWindowScript = new IntrinsicEdManagerWindowScript(nullptr);

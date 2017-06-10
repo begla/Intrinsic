@@ -354,6 +354,7 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
     createRemoveComponentContextMenu(removeComponentMenu);
 
     contextMenu->addSeparator();
+
     contextMenu->addMenu(addComponentMenu);
     contextMenu->addMenu(removeComponentMenu);
 
@@ -377,9 +378,15 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
       contextMenu->addAction(captureAllProbes);
       QObject::connect(captureAllProbes, SIGNAL(triggered()), this,
                        SLOT(onCaptureAllIrradianceProbes()));
-
-      contextMenu->addSeparator();
     }
+
+    contextMenu->addSeparator();
+
+    QAction* savePrefab =
+        new QAction(IntrinsicEd::getIcon("Prefab"), "Save As Prefab", this);
+    contextMenu->addAction(savePrefab);
+    QObject::connect(savePrefab, SIGNAL(triggered()), this,
+                     SLOT(onSaveNodeAsPrefab()));
   }
 
   contextMenu->popup(viewport()->mapToGlobal(p_Pos));
@@ -481,6 +488,24 @@ void IntrinsicEdNodeViewTreeWidget::onDeleteNode()
   World::destroyNodeFull(currentNode);
 }
 
+void IntrinsicEdNodeViewTreeWidget::onSaveNodeAsPrefab()
+{
+  QTreeWidgetItem* currIt = currentItem();
+  Components::NodeRef currentNode = _itemToNodeMap[currIt];
+  Entity::EntityRef currentEntity =
+      Components::NodeManager::_entity(currentNode);
+
+  const _INTR_STRING fileName =
+      "media/prefabs/" +
+      Entity::EntityManager::_name(currentEntity).getString() + ".prefab.json";
+
+  const QString filePath =
+      QFileDialog::getSaveFileName(this, tr("Save Prefab"), fileName.c_str(),
+                                   tr("Prefab File (*.prefab.json)"));
+
+  World::saveNodeHierarchy(filePath.toStdString().c_str(), currentNode);
+}
+
 void IntrinsicEdNodeViewTreeWidget::dragEnterEvent(QDragEnterEvent* event)
 {
   event->acceptProposedAction();
@@ -488,8 +513,7 @@ void IntrinsicEdNodeViewTreeWidget::dragEnterEvent(QDragEnterEvent* event)
 
 QStringList IntrinsicEdNodeViewTreeWidget::mimeTypes() const
 {
-  QStringList forms = {"SingleNodeMimeData"};
-  return forms;
+  return {"SingleNodeMimeData"};
 }
 
 QMimeData* IntrinsicEdNodeViewTreeWidget::mimeData(
