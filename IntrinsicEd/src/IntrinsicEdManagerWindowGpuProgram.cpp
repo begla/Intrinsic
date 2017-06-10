@@ -47,16 +47,14 @@ void IntrinsicEdManagerWindowGpuProgram::onShaderChanged(
 {
   // Recompile shaders
   for (uint32_t i = 0u;
-       i < RendererV::Resources::GpuProgramManager::getActiveResourceCount();
-       ++i)
+       i < RVResources::GpuProgramManager::getActiveResourceCount(); ++i)
   {
-    RendererV::Resources::GpuProgramRef ref =
-        RendererV::Resources::GpuProgramManager::getActiveResourceAtIndex(i);
+    RVResources::GpuProgramRef ref =
+        RVResources::GpuProgramManager::getActiveResourceAtIndex(i);
     if (strcmp(
             p_FileName.toStdString().c_str(),
             (_shaderAssetPath +
-             RendererV::Resources::GpuProgramManager::_descGpuProgramName(ref)
-                 .c_str())
+             RVResources::GpuProgramManager::_descGpuProgramName(ref).c_str())
                 .toStdString()
                 .c_str()) == 0u)
     {
@@ -79,21 +77,19 @@ void IntrinsicEdManagerWindowGpuProgram::onResourceTreePopulated()
     _shaderChangeWatch->removePaths(files);
 
   for (uint32_t i = 0u;
-       i < RendererV::Resources::GpuProgramManager::getActiveResourceCount();
-       ++i)
+       i < RVResources::GpuProgramManager::getActiveResourceCount(); ++i)
   {
-    RendererV::Resources::GpuProgramRef ref =
-        RendererV::Resources::GpuProgramManager::getActiveResourceAtIndex(i);
+    RVResources::GpuProgramRef ref =
+        RVResources::GpuProgramManager::getActiveResourceAtIndex(i);
     _shaderChangeWatch->addPath(
         _shaderAssetPath +
-        RendererV::Resources::GpuProgramManager::_descGpuProgramName(ref)
-            .c_str());
+        RVResources::GpuProgramManager::_descGpuProgramName(ref).c_str());
   }
 }
 
 void IntrinsicEdManagerWindowGpuProgram::onCompileQueuedShaders()
 {
-  RendererV::Resources::GpuProgramManager::compileShaders(_shadersToRecompile);
+  RVResources::GpuProgramManager::compileShaders(_shadersToRecompile);
   _shadersToRecompile.clear();
 
   onResourceTreePopulated();

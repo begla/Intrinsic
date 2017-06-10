@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -112,15 +114,13 @@ _INTR_ARRAY(RenderPass::GenericFullscreen) _renderPassesGenericFullScreen;
 _INTR_ARRAY(RenderPass::GenericBlur) _renderPassesGenericBlur;
 _INTR_ARRAY(RenderPass::GenericMesh) _renderPassesGenericMesh;
 _INTR_ARRAY(RenderStep) _renderSteps;
-_INTR_ARRAY(Resources::ImageRef) _images;
+_INTR_ARRAY(ImageRef) _images;
 
 _INTR_ARRAY(Name) _cameraNames;
 _INTR_ARRAY(Components::CameraRef) _cameras;
 
 _INTR_INLINE void executeRenderSteps(float p_DeltaT)
 {
-  using namespace Resources;
-
   Components::CameraRef activeCamera = World::getActiveCamera();
   Components::CameraRef currentActiveCamera = Components::CameraRef();
 
@@ -197,8 +197,6 @@ LockFreeStack<Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT> RenderProcess::Default::
 
 void Default::loadRendererConfig()
 {
-  using namespace Resources;
-
   // Destroy render passes and images
   {
     for (uint32_t i = 0u; i < _renderPassesGenericFullScreen.size(); ++i)
@@ -401,7 +399,7 @@ void Default::renderFrame(float p_DeltaT)
       {
         Components::CameraRef camRef = _cameras[i];
 
-        CoreResources::FrustumRef frustumRef =
+        CResources::FrustumRef frustumRef =
             Components::CameraManager::_frustum(camRef);
         _cameraToIdMapping[camRef] = (uint8_t)_activeFrustums.size();
         _activeFrustums.push_back(frustumRef);
@@ -409,7 +407,7 @@ void Default::renderFrame(float p_DeltaT)
         // Only allow shadows for the main view
         if (_cameraNames[i] == _N(ActiveCamera))
         {
-          _INTR_ARRAY(CoreResources::FrustumRef)& shadowFrustums =
+          _INTR_ARRAY(CResources::FrustumRef)& shadowFrustums =
               _shadowFrustums[camRef];
           RenderPass::Shadow::prepareFrustums(camRef, shadowFrustums);
           _activeFrustums.insert(RenderProcess::Default::_activeFrustums.end(),
@@ -419,10 +417,10 @@ void Default::renderFrame(float p_DeltaT)
 
       Components::CameraManager::updateFrustums(
           Components::CameraManager::_activeRefs);
-      CoreResources::FrustumManager::prepareForRendering(
-          CoreResources::FrustumManager::_activeRefs);
+      CResources::FrustumManager::prepareForRendering(
+          CResources::FrustumManager::_activeRefs);
 
-      CoreResources::FrustumManager::cullNodes(
+      CResources::FrustumManager::cullNodes(
           RenderProcess::Default::_activeFrustums);
 
       // Collect visible draw calls and mesh components

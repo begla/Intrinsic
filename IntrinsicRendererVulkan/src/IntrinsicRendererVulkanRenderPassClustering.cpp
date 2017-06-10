@@ -23,6 +23,8 @@
 #define GRID_DEPTH_SLICE_COUNT 24u
 #define GRID_SIZE_Y 8u
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -33,28 +35,28 @@ namespace RenderPass
 {
 namespace
 {
-Resources::ImageRef _lightingBufferImageRef;
-Resources::ImageRef _lightingBufferTransparentsImageRef;
+ImageRef _lightingBufferImageRef;
+ImageRef _lightingBufferTransparentsImageRef;
 
-Resources::FramebufferRef _framebufferLightingRef;
-Resources::FramebufferRef _framebufferLightingTransparentsRef;
-Resources::FramebufferRef _framebufferDecalsRef;
+FramebufferRef _framebufferLightingRef;
+FramebufferRef _framebufferLightingTransparentsRef;
+FramebufferRef _framebufferDecalsRef;
 
-Resources::RenderPassRef _renderPassLightingRef;
-Resources::RenderPassRef _renderPassDecalsRef;
-Resources::PipelineRef _pipelineLightingRef;
-Resources::PipelineRef _pipelineDecalsRef;
+RenderPassRef _renderPassLightingRef;
+RenderPassRef _renderPassDecalsRef;
+PipelineRef _pipelineLightingRef;
+PipelineRef _pipelineDecalsRef;
 
-Resources::DrawCallRef _drawCallLightingRef;
-Resources::DrawCallRef _drawCallLightingTransparentsRef;
-Resources::DrawCallRef _drawCallDecalsRef;
+DrawCallRef _drawCallLightingRef;
+DrawCallRef _drawCallLightingTransparentsRef;
+DrawCallRef _drawCallDecalsRef;
 
-Resources::BufferRef _lightBuffer;
-Resources::BufferRef _lightIndexBuffer;
-Resources::BufferRef _irradProbeBuffer;
-Resources::BufferRef _irradProbeIndexBuffer;
-Resources::BufferRef _decalBuffer;
-Resources::BufferRef _decalIndexBuffer;
+BufferRef _lightBuffer;
+BufferRef _lightIndexBuffer;
+BufferRef _irradProbeBuffer;
+BufferRef _irradProbeIndexBuffer;
+BufferRef _decalBuffer;
+BufferRef _decalIndexBuffer;
 
 struct Light
 {
@@ -408,17 +410,12 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
             (decalProjectionMatrix * decalViewMatrix) *
             Components::CameraManager::_inverseViewMatrix(p_CameraRef);
         decal.textureIds = glm::uvec4(
-            Resources::ImageManager::getTextureId(
-                Resources::ImageManager::getResourceByName(
-                    Components::DecalManager::_descAlbedoTextureName(
-                        decalRef))),
-            Resources::ImageManager::getTextureId(
-                Resources::ImageManager::getResourceByName(
-                    Components::DecalManager::_descNormalTextureName(
-                        decalRef))),
-            Resources::ImageManager::getTextureId(
-                Resources::ImageManager::getResourceByName(
-                    Components::DecalManager::_descPBRTextureName(decalRef))),
+            ImageManager::getTextureId(ImageManager::getResourceByName(
+                Components::DecalManager::_descAlbedoTextureName(decalRef))),
+            ImageManager::getTextureId(ImageManager::getResourceByName(
+                Components::DecalManager::_descNormalTextureName(decalRef))),
+            ImageManager::getTextureId(ImageManager::getResourceByName(
+                Components::DecalManager::_descPBRTextureName(decalRef))),
             0u);
       }
       _decalBufferMemory[_currentDecalCount] = decal;
@@ -601,13 +598,11 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
 
 // <-
 
-_INTR_INLINE void renderLighting(Resources::FramebufferRef p_FramebufferRef,
-                                 Resources::DrawCallRef p_DrawCall,
-                                 Resources::ImageRef p_LightingBufferRef,
+_INTR_INLINE void renderLighting(FramebufferRef p_FramebufferRef,
+                                 DrawCallRef p_DrawCall,
+                                 ImageRef p_LightingBufferRef,
                                  Components::CameraRef p_CameraRef)
 {
-  using namespace Resources;
-
   // Update per instance data
   {
     // Post effect data
@@ -615,17 +610,16 @@ _INTR_INLINE void renderLighting(Resources::FramebufferRef p_FramebufferRef,
     _lightingPerInstanceData.data0.y = Clustering::_globalAmbientFactor;
     _lightingPerInstanceData.data0.z = World::_currentDayNightFactor;
 
-    const _INTR_ARRAY(CoreResources::FrustumRef)& shadowFrustums =
+    const _INTR_ARRAY(CResources::FrustumRef)& shadowFrustums =
         RenderProcess::Default::_shadowFrustums[p_CameraRef];
 
     for (uint32_t i = 0u; i < shadowFrustums.size(); ++i)
     {
-      CoreResources::FrustumRef shadowFrustumRef = shadowFrustums[i];
+      CResources::FrustumRef shadowFrustumRef = shadowFrustums[i];
 
       // Transform from camera view space => light proj. space
       _lightingPerInstanceData.shadowViewProjMatrix[i] =
-          CoreResources::FrustumManager::_viewProjectionMatrix(
-              shadowFrustumRef) *
+          CResources::FrustumManager::_viewProjectionMatrix(shadowFrustumRef) *
           Components::CameraManager::_inverseViewMatrix(p_CameraRef);
     }
 
@@ -657,8 +651,6 @@ _INTR_INLINE void renderLighting(Resources::FramebufferRef p_FramebufferRef,
 
 _INTR_INLINE void renderDecals(Components::CameraRef p_CameraRef)
 {
-  using namespace Resources;
-
   // Update per instance data
   {
     _decalsPerInstanceData.nearFar = _lightingPerInstanceData.nearFar;
@@ -716,8 +708,6 @@ float Clustering::_globalAmbientFactor = 1.0f;
 
 void Clustering::init()
 {
-  using namespace Resources;
-
   PipelineRefArray pipelinesToCreate;
   PipelineLayoutRefArray pipelineLayoutsToCreate;
   RenderPassRefArray renderpassesToCreate;
@@ -729,7 +719,7 @@ void Clustering::init()
     PipelineLayoutManager::resetToDefault(plLighting);
 
     GpuProgramManager::reflectPipelineLayout(
-        8u, {Resources::GpuProgramManager::getResourceByName("lighting.frag")},
+        8u, {GpuProgramManager::getResourceByName("lighting.frag")},
         plLighting);
   }
   pipelineLayoutsToCreate.push_back(plLighting);
@@ -740,8 +730,7 @@ void Clustering::init()
     PipelineLayoutManager::resetToDefault(plDecals);
 
     GpuProgramManager::reflectPipelineLayout(
-        8u, {Resources::GpuProgramManager::getResourceByName("decals.frag")},
-        plDecals);
+        8u, {GpuProgramManager::getResourceByName("decals.frag")}, plDecals);
   }
   pipelineLayoutsToCreate.push_back(plDecals);
 
@@ -813,7 +802,7 @@ void Clustering::init()
   RenderPassManager::createResources(renderpassesToCreate);
   PipelineManager::createResources(pipelinesToCreate);
 
-  _INTR_ARRAY(Resources::BufferRef) buffersToCreate;
+  _INTR_ARRAY(BufferRef) buffersToCreate;
 
   // Buffers
   {
@@ -905,34 +894,30 @@ void Clustering::init()
       buffersToCreate.push_back(_decalIndexBuffer);
     }
 
-    Resources::BufferManager::createResources(buffersToCreate);
+    BufferManager::createResources(buffersToCreate);
 
     {
-      _lightBufferGpuMemory =
-          (Light*)Resources::BufferManager::getGpuMemory(_lightBuffer);
+      _lightBufferGpuMemory = (Light*)BufferManager::getGpuMemory(_lightBuffer);
       _lightIndexBufferGpuMemory =
-          (uint32_t*)Resources::BufferManager::getGpuMemory(_lightIndexBuffer);
+          (uint32_t*)BufferManager::getGpuMemory(_lightIndexBuffer);
 
       _lightBufferMemory = (Light*)malloc(_totalLightGridSize * sizeof(Light));
     }
 
     {
       _irradProbeBufferGpuMemory =
-          (IrradProbe*)Resources::BufferManager::getGpuMemory(
-              _irradProbeBuffer);
+          (IrradProbe*)BufferManager::getGpuMemory(_irradProbeBuffer);
       _irradProbeIndexBufferGpuMemory =
-          (uint32_t*)Resources::BufferManager::getGpuMemory(
-              _irradProbeIndexBuffer);
+          (uint32_t*)BufferManager::getGpuMemory(_irradProbeIndexBuffer);
 
       _irradProbeBufferMemory =
           (IrradProbe*)malloc(_totalIrradGridSize * sizeof(IrradProbe));
     }
 
     {
-      _decalBufferGpuMemory =
-          (Decal*)Resources::BufferManager::getGpuMemory(_decalBuffer);
+      _decalBufferGpuMemory = (Decal*)BufferManager::getGpuMemory(_decalBuffer);
       _decalIndexBufferGpuMemory =
-          (uint32_t*)Resources::BufferManager::getGpuMemory(_decalIndexBuffer);
+          (uint32_t*)BufferManager::getGpuMemory(_decalIndexBuffer);
 
       _decalBufferMemory = (Decal*)malloc(_totalDecalGridSize * sizeof(Decal));
     }
@@ -943,11 +928,9 @@ void Clustering::init()
 
 namespace
 {
-_INTR_INLINE void setupLightingDrawCall(Resources::DrawCallRef p_DrawCallRef,
+_INTR_INLINE void setupLightingDrawCall(DrawCallRef p_DrawCallRef,
                                         bool p_Transparents)
 {
-  using namespace Resources;
-
   DrawCallManager::_descVertexCount(p_DrawCallRef) = 3u;
 
   DrawCallManager::bindBuffer(
@@ -1017,10 +1000,8 @@ _INTR_INLINE void setupLightingDrawCall(Resources::DrawCallRef p_DrawCallRef,
       BufferManager::_descSizeInBytes(_irradProbeIndexBuffer));
 }
 
-_INTR_INLINE void setupDecalsDrawCall(Resources::DrawCallRef p_DrawCallRef)
+_INTR_INLINE void setupDecalsDrawCall(DrawCallRef p_DrawCallRef)
 {
-  using namespace Resources;
-
   DrawCallManager::_descVertexCount(p_DrawCallRef) = 3u;
 
   DrawCallManager::bindBuffer(
@@ -1047,8 +1028,6 @@ _INTR_INLINE void setupDecalsDrawCall(Resources::DrawCallRef p_DrawCallRef)
 
 void Clustering::onReinitRendering()
 {
-  using namespace Resources;
-
   ImageRefArray imgsToDestroy;
   ImageRefArray imgsToCreate;
   FramebufferRefArray framebuffersToDestroy;

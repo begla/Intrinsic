@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -23,9 +25,9 @@ namespace Renderer
 namespace Vulkan
 {
 // Static members
-Resources::BufferRef _perInstanceUniformBuffer;
-Resources::BufferRef _perMaterialUniformBuffer;
-Resources::BufferRef _perFrameUniformBuffer;
+BufferRef _perInstanceUniformBuffer;
+BufferRef _perMaterialUniformBuffer;
+BufferRef _perFrameUniformBuffer;
 
 uint8_t* UniformManager::_perInstanceMemory = nullptr;
 uint8_t* UniformManager::_perFrameMemory = nullptr;
@@ -43,17 +45,15 @@ LockFreeFixedBlockAllocator<_INTR_VK_PER_MATERIAL_BLOCK_COUNT,
                             _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES>
     UniformManager::_perMaterialAllocator;
 
-Resources::BufferRef UniformManager::_perInstanceUniformBuffer;
-Resources::BufferRef UniformManager::_perFrameUniformBuffer;
-Resources::BufferRef UniformManager::_perMaterialUniformBuffer;
-Resources::BufferRef UniformManager::_perMaterialStagingUniformBuffer;
+BufferRef UniformManager::_perInstanceUniformBuffer;
+BufferRef UniformManager::_perFrameUniformBuffer;
+BufferRef UniformManager::_perMaterialUniformBuffer;
+BufferRef UniformManager::_perMaterialStagingUniformBuffer;
 
 // <-
 
 void UniformManager::init()
 {
-  using namespace Resources;
-
   _INTR_LOG_INFO("Initializing Uniform Manager...");
   _INTR_LOG_PUSH();
 

@@ -146,9 +146,11 @@ namespace Resources
 }
 
 // Namespace aliases
-namespace RendererV = Intrinsic::Renderer::Vulkan;
-namespace CoreResources = Intrinsic::Core::Resources;
-namespace CoreComponents = Intrinsic::Core::Components;
+namespace RV = Intrinsic::Renderer::Vulkan;
+namespace RVResources = RV::Resources;
+
+namespace CResources = Intrinsic::Core::Resources;
+namespace CComponents = Intrinsic::Core::Components;
 
 // Core related includes
 #include "IntrinsicCoreIrradiance.h"

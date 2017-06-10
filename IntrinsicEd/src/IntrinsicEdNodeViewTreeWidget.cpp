@@ -702,7 +702,7 @@ void captureIrradProbe(
     const Components::IrradianceProbeRefArray& p_IrradProbeRefs, bool p_Clear,
     float p_Time)
 {
-  using namespace RendererV;
+  using namespace RV;
 
   static glm::uvec2 atlasIndices[6]{glm::uvec2(0u, 1u), glm::uvec2(1u, 1u),
                                     glm::uvec2(2u, 1u), glm::uvec2(3u, 1u),
@@ -716,8 +716,8 @@ void captureIrradProbe(
       glm::vec3(glm::half_pi<float>(), 0.0f, 0.0f)}; // B / -y
   static uint32_t atlasIndexToFaceIdx[6] = {0, 4, 1, 5, 2, 3};
 
-  const glm::uvec2 cubeMapRes = RendererV::RenderSystem::getAbsoluteRenderSize(
-      RendererV::RenderSize::kCubemap);
+  const glm::uvec2 cubeMapRes =
+      RV::RenderSystem::getAbsoluteRenderSize(RV::RenderSize::kCubemap);
 
   const uint32_t faceSizeInBytes =
       cubeMapRes.x * cubeMapRes.y * 2u * sizeof(uint32_t);
@@ -738,22 +738,21 @@ void captureIrradProbe(
   World::setActiveCamera(camRef);
 
   // Setup buffer for readback
-  RendererV::Resources::BufferRef readBackBufferRef =
-      RendererV::Resources::BufferManager::createBuffer(
-          _N(IrradianceProbeReadBack));
+  RVResources::BufferRef readBackBufferRef =
+      RVResources::BufferManager::createBuffer(_N(IrradianceProbeReadBack));
   {
-    RendererV::Resources::BufferManager::resetToDefault(readBackBufferRef);
-    RendererV::Resources::BufferManager::addResourceFlags(
+    RVResources::BufferManager::resetToDefault(readBackBufferRef);
+    RVResources::BufferManager::addResourceFlags(
         readBackBufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
-    RendererV::Resources::BufferManager::_descMemoryPoolType(
-        readBackBufferRef) = RendererV::MemoryPoolType::kVolatileStagingBuffers;
+    RVResources::BufferManager::_descMemoryPoolType(readBackBufferRef) =
+        RV::MemoryPoolType::kVolatileStagingBuffers;
 
-    RendererV::Resources::BufferManager::_descBufferType(readBackBufferRef) =
-        RendererV::BufferType::kStorage;
-    RendererV::Resources::BufferManager::_descSizeInBytes(readBackBufferRef) =
+    RVResources::BufferManager::_descBufferType(readBackBufferRef) =
+        RV::BufferType::kStorage;
+    RVResources::BufferManager::_descSizeInBytes(readBackBufferRef) =
         faceSizeInBytes;
 
-    RendererV::Resources::BufferManager::createResources({readBackBufferRef});
+    RVResources::BufferManager::createResources({readBackBufferRef});
   }
 
   uint32_t prevDebugStageFlags = RenderPass::Debug::_activeDebugStageFlags;
@@ -822,10 +821,10 @@ void captureIrradProbe(
         // Copy image to host visible memory
         VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
 
-        RendererV::Resources::ImageRef sceneImageRef =
-            RendererV::Resources::ImageManager::getResourceByName(_N(Scene));
+        RVResources::ImageRef sceneImageRef =
+            RVResources::ImageManager::getResourceByName(_N(Scene));
 
-        RendererV::Resources::ImageManager::insertImageMemoryBarrier(
+        RVResources::ImageManager::insertImageMemoryBarrier(
             copyCmd, sceneImageRef, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
@@ -847,17 +846,15 @@ void captureIrradProbe(
 
         // Read back face
         vkCmdCopyImageToBuffer(
-            copyCmd,
-            RendererV::Resources::ImageManager::_vkImage(sceneImageRef),
+            copyCmd, RVResources::ImageManager::_vkImage(sceneImageRef),
             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            RendererV::Resources::BufferManager::_vkBuffer(readBackBufferRef),
-            1u, &bufferImageCopy);
+            RVResources::BufferManager::_vkBuffer(readBackBufferRef), 1u,
+            &bufferImageCopy);
 
         RenderSystem::flushTemporaryCommandBuffer();
 
         const uint8_t* sceneMemory =
-            RendererV::Resources::BufferManager::getGpuMemory(
-                readBackBufferRef);
+            RVResources::BufferManager::getGpuMemory(readBackBufferRef);
 
         memcpy(texCube.data(0u, atlasIndexToFaceIdx[atlasIdx], 0u), sceneMemory,
                faceSizeInBytes);
@@ -914,8 +911,8 @@ void captureIrradProbe(
   }
 
   // Cleanup and restore
-  RendererV::Resources::BufferManager::destroyResources({readBackBufferRef});
-  RendererV::Resources::BufferManager::destroyBuffer(readBackBufferRef);
+  RVResources::BufferManager::destroyResources({readBackBufferRef});
+  RVResources::BufferManager::destroyBuffer(readBackBufferRef);
   GpuMemoryManager::resetPool(MemoryPoolType::kVolatileStagingBuffers);
 
   Settings::Manager::_targetFrameRate = prevMaxFps;
@@ -932,7 +929,7 @@ const uint32_t _shTimeSamples = 8u;
 
 void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
 {
-  using namespace RendererV;
+  using namespace RV;
 
   Components::IrradianceProbeRef irradProbeRef;
   Components::NodeRef irradNodeRef;
@@ -947,8 +944,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
         currentEntity);
 
     const glm::uvec2 cubeMapRes =
-        RendererV::RenderSystem::getAbsoluteRenderSize(
-            RendererV::RenderSize::kCubemap);
+        RV::RenderSystem::getAbsoluteRenderSize(RV::RenderSize::kCubemap);
     RenderSystem::_customBackbufferDimensions = cubeMapRes;
     RenderSystem::resizeSwapChain(true);
 
@@ -962,10 +958,10 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
 
 void IntrinsicEdNodeViewTreeWidget::onCaptureAllIrradianceProbes()
 {
-  using namespace RendererV;
+  using namespace RV;
 
-  const glm::uvec2 cubeMapRes = RendererV::RenderSystem::getAbsoluteRenderSize(
-      RendererV::RenderSize::kCubemap);
+  const glm::uvec2 cubeMapRes =
+      RV::RenderSystem::getAbsoluteRenderSize(RV::RenderSize::kCubemap);
   RenderSystem::_customBackbufferDimensions = cubeMapRes;
   RenderSystem::resizeSwapChain(true);
 

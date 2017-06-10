@@ -255,7 +255,7 @@ physx::PxRigidActor* createTriangleMeshStaticKinematic(RigidBodyRef p_Ref,
 
 void RigidBodyManager::createResources(const RigidBodyRefArray& p_RigidBodies)
 {
-  RendererV::Resources::DrawCallRefArray drawCallsToCreate;
+  RVResources::DrawCallRefArray drawCallsToCreate;
 
   for (uint32_t rigidBodyIdx = 0u; rigidBodyIdx < p_RigidBodies.size();
        ++rigidBodyIdx)

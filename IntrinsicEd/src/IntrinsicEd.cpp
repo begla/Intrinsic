@@ -457,7 +457,7 @@ void IntrinsicEd::onReloadWorld()
 void IntrinsicEd::onReloadSettingsAndRendererConfig()
 {
   Settings::Manager::loadSettings();
-  RendererV::RenderSystem::onViewportChanged();
+  RV::RenderSystem::onViewportChanged();
 }
 
 void IntrinsicEd::onSaveWorld() { World::save(World::_filePath); }
@@ -799,46 +799,46 @@ void IntrinsicEd::onDebugGeometryChanged()
 
   if (_ui.actionShow_World_Bounding_Spheres->isChecked())
   {
-    RendererV::RenderPass::Debug::_activeDebugStageFlags |=
-        RendererV::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
+    RV::RenderPass::Debug::_activeDebugStageFlags |=
+        RV::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
   }
   else
   {
-    RendererV::RenderPass::Debug::_activeDebugStageFlags &=
-        ~RendererV::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
+    RV::RenderPass::Debug::_activeDebugStageFlags &=
+        ~RV::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
   }
 
   if (_ui.actionShow_Benchmark_Paths->isChecked())
   {
-    RendererV::RenderPass::Debug::_activeDebugStageFlags |=
-        RendererV::RenderPass::DebugStageFlags::kBenchmarkPaths;
+    RV::RenderPass::Debug::_activeDebugStageFlags |=
+        RV::RenderPass::DebugStageFlags::kBenchmarkPaths;
   }
   else
   {
-    RendererV::RenderPass::Debug::_activeDebugStageFlags &=
-        ~RendererV::RenderPass::DebugStageFlags::kBenchmarkPaths;
+    RV::RenderPass::Debug::_activeDebugStageFlags &=
+        ~RV::RenderPass::DebugStageFlags::kBenchmarkPaths;
   }
 
   if (_ui.actionWireframe_Rendering->isChecked())
   {
-    RendererV::RenderPass::Debug::_activeDebugStageFlags |=
-        RendererV::RenderPass::DebugStageFlags::kWireframeRendering;
+    RV::RenderPass::Debug::_activeDebugStageFlags |=
+        RV::RenderPass::DebugStageFlags::kWireframeRendering;
   }
   else
   {
-    RendererV::RenderPass::Debug::_activeDebugStageFlags &=
-        ~RendererV::RenderPass::DebugStageFlags::kWireframeRendering;
+    RV::RenderPass::Debug::_activeDebugStageFlags &=
+        ~RV::RenderPass::DebugStageFlags::kWireframeRendering;
   }
 }
 
 void IntrinsicEd::onCompileShaders()
 {
-  RendererV::Resources::GpuProgramManager::compileAllShaders();
+  RVResources::GpuProgramManager::compileAllShaders();
 }
 
 void IntrinsicEd::onRecompileShaders()
 {
-  RendererV::Resources::GpuProgramManager::compileAllShaders(true);
+  RVResources::GpuProgramManager::compileAllShaders(true);
 }
 
 void IntrinsicEd::onSettingsFileChanged(const QString&)
@@ -884,7 +884,7 @@ int IntrinsicEd::enterMainLoop()
     {
       Settings::Manager::loadSettings();
       updateSettingsChangeWatch();
-      RendererV::RenderSystem::onViewportChanged();
+      RV::RenderSystem::onViewportChanged();
       _settingsUpdatePending = false;
     }
   }

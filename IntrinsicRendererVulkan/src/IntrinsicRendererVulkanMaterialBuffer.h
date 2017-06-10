@@ -14,6 +14,8 @@
 
 #pragma once
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -48,8 +50,6 @@ struct MaterialBuffer
   updateMaterialBufferEntry(const uint32_t p_Index,
                             const MaterialBufferEntry& p_MaterialBufferEntry)
   {
-    using namespace Resources;
-
     // Update staging buffer
     {
       memcpy(BufferManager::getGpuMemory(_materialStagingBuffer),
@@ -72,11 +72,11 @@ struct MaterialBuffer
     RenderSystem::flushTemporaryCommandBuffer();
   }
 
-  static Resources::BufferRef _materialBuffer;
+  static BufferRef _materialBuffer;
 
 private:
   static _INTR_ARRAY(uint32_t) _materialBufferEntries;
-  static Resources::BufferRef _materialStagingBuffer;
+  static BufferRef _materialStagingBuffer;
 };
 }
 }

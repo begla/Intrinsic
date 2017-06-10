@@ -16,6 +16,9 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+using namespace CComponents;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -64,43 +67,40 @@ struct PerInstanceData
 
 glm::mat4 prevViewProjMatrix;
 
-Resources::ImageRef _volLightingBufferImageRef;
-Resources::ImageRef _volLightingBufferPrevFrameImageRef;
-Resources::ImageRef _volLightingScatteringBufferImageRef;
-Resources::ImageRef _shadowBufferExp;
-Resources::ImageRef _shadowBufferExpPingPong;
+ImageRef _volLightingBufferImageRef;
+ImageRef _volLightingBufferPrevFrameImageRef;
+ImageRef _volLightingScatteringBufferImageRef;
+ImageRef _shadowBufferExp;
+ImageRef _shadowBufferExpPingPong;
 
-Resources::RenderPassRef _renderPassRef;
-Resources::FramebufferRefArray _framebufferRefs;
-Resources::FramebufferRefArray _framebufferPingPongRefs;
+RenderPassRef _renderPassRef;
+FramebufferRefArray _framebufferRefs;
+FramebufferRefArray _framebufferPingPongRefs;
 
-Resources::PipelineRef _pipelineAccumRef;
-Resources::PipelineRef _pipelineScatteringRef;
+PipelineRef _pipelineAccumRef;
+PipelineRef _pipelineScatteringRef;
 
-Resources::DrawCallRef _drawCallEsmGenerateRef;
-Resources::DrawCallRef _drawCallEsmBlurRef;
-Resources::DrawCallRef _drawCallEsmBlurPingPongRef;
+DrawCallRef _drawCallEsmGenerateRef;
+DrawCallRef _drawCallEsmBlurRef;
+DrawCallRef _drawCallEsmBlurPingPongRef;
 
-Resources::ComputeCallRef _computeCallAccumRef;
-Resources::ComputeCallRef _computeCallAccumPrevFrameRef;
-Resources::ComputeCallRef _computeCallScatteringRef;
-Resources::ComputeCallRef _computeCallScatteringPrevFrameRef;
+ComputeCallRef _computeCallAccumRef;
+ComputeCallRef _computeCallAccumPrevFrameRef;
+ComputeCallRef _computeCallScatteringRef;
+ComputeCallRef _computeCallScatteringPrevFrameRef;
 
 _INTR_INLINE void
-updatePerInstanceData(Components::CameraRef p_CameraRef,
-                      Resources::ComputeCallRef p_CurrentAccumComputeCallRef)
+updatePerInstanceData(CameraRef p_CameraRef,
+                      ComputeCallRef p_CurrentAccumComputeCallRef)
 {
-  using namespace Resources;
-
-  Components::NodeRef camNodeRef =
-      Components::NodeManager::getComponentForEntity(
-          Components::CameraManager::_entity(p_CameraRef));
+  NodeRef camNodeRef =
+      NodeManager::getComponentForEntity(CameraManager::_entity(p_CameraRef));
 
   // Post effect data
   {
-    const glm::vec2 scattering = CoreResources::PostEffectManager::
+    const glm::vec2 scattering = CResources::PostEffectManager::
         _descVolumetricLightingScatteringDayNight(
-            CoreResources::PostEffectManager::_blendTargetRef);
+            CResources::PostEffectManager::_blendTargetRef);
 
     _perInstanceData.data0.x =
         glm::mix(scattering.y, scattering.x, World::_currentDayNightFactor) *
@@ -112,14 +112,11 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
       RenderProcess::UniformManager::_uniformDataSource.haltonSamples32;
 
   _perInstanceData.prevViewProjMatrix = prevViewProjMatrix;
-  prevViewProjMatrix =
-      Components::CameraManager::_viewProjectionMatrix(p_CameraRef);
-  _perInstanceData.projMatrix =
-      Components::CameraManager::_projectionMatrix(p_CameraRef);
+  prevViewProjMatrix = CameraManager::_viewProjectionMatrix(p_CameraRef);
+  _perInstanceData.projMatrix = CameraManager::_projectionMatrix(p_CameraRef);
 
-  _perInstanceData.camPos =
-      glm::vec4(Components::NodeManager::_worldPosition(camNodeRef),
-                TaskManager::_frameCounter);
+  _perInstanceData.camPos = glm::vec4(NodeManager::_worldPosition(camNodeRef),
+                                      TaskManager::_frameCounter);
 
   _perInstanceData.eyeVSVectorX = glm::vec4(
       glm::vec3(1.0 / _perInstanceData.projMatrix[0][0], 0.0, 0.0), 0.0);
@@ -127,24 +124,23 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
       glm::vec3(0.0, 1.0 / _perInstanceData.projMatrix[1][1], 0.0), 0.0);
   _perInstanceData.eyeVSVectorZ = glm::vec4(glm::vec3(0.0, 0.0, -1.0), 0.0);
   _perInstanceData.eyeWSVectorX =
-      Components::CameraManager::_inverseViewMatrix(p_CameraRef) *
+      CameraManager::_inverseViewMatrix(p_CameraRef) *
       _perInstanceData.eyeVSVectorX;
   _perInstanceData.eyeWSVectorX.w = TaskManager::_totalTimePassed;
   _perInstanceData.eyeWSVectorY =
-      Components::CameraManager::_inverseViewMatrix(p_CameraRef) *
+      CameraManager::_inverseViewMatrix(p_CameraRef) *
       _perInstanceData.eyeVSVectorY;
   _perInstanceData.eyeWSVectorZ =
-      Components::CameraManager::_inverseViewMatrix(p_CameraRef) *
+      CameraManager::_inverseViewMatrix(p_CameraRef) *
       _perInstanceData.eyeVSVectorZ;
 
-  _perInstanceData.nearFar = glm::vec4(
-      Components::CameraManager::_descNearPlane(p_CameraRef),
-      Components::CameraManager::_descFarPlane(p_CameraRef), 0.0f, 0.0f);
+  _perInstanceData.nearFar =
+      glm::vec4(CameraManager::_descNearPlane(p_CameraRef),
+                CameraManager::_descFarPlane(p_CameraRef), 0.0f, 0.0f);
 
   Math::FrustumCorners viewSpaceCorners;
   Math::extractFrustumsCorners(
-      Components::CameraManager::_inverseProjectionMatrix(p_CameraRef),
-      viewSpaceCorners);
+      CameraManager::_inverseProjectionMatrix(p_CameraRef), viewSpaceCorners);
 
   _perInstanceData.nearFarWidthHeight = glm::vec4(
       viewSpaceCorners.c[3].x - viewSpaceCorners.c[2].x /* Near Width */,
@@ -152,17 +148,17 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
       viewSpaceCorners.c[7].x - viewSpaceCorners.c[6].x /* Far Width */,
       viewSpaceCorners.c[6].y - viewSpaceCorners.c[5].y /* Far Height */);
 
-  const _INTR_ARRAY(CoreResources::FrustumRef)& shadowFrustums =
+  const _INTR_ARRAY(CResources::FrustumRef)& shadowFrustums =
       RenderProcess::Default::_shadowFrustums[p_CameraRef];
 
   for (uint32_t i = 0u; i < shadowFrustums.size(); ++i)
   {
-    CoreResources::FrustumRef shadowFrustumRef = shadowFrustums[i];
+    CResources::FrustumRef shadowFrustumRef = shadowFrustums[i];
 
     // Transform from camera view space => light proj. space
     _perInstanceData.shadowViewProjMatrix[i] =
-        CoreResources::FrustumManager::_viewProjectionMatrix(shadowFrustumRef) *
-        Components::CameraManager::_inverseViewMatrix(p_CameraRef);
+        CResources::FrustumManager::_viewProjectionMatrix(shadowFrustumRef) *
+        CameraManager::_inverseViewMatrix(p_CameraRef);
   }
 
   ComputeCallManager::updateUniformMemory({p_CurrentAccumComputeCallRef},
@@ -170,17 +166,11 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
                                           sizeof(PerInstanceData));
 }
 
-_INTR_INLINE Resources::ComputeCallRef
-createComputeCallAccumulation(glm::vec3 p_Dim,
-                              Resources::BufferRef p_LightBuffer,
-                              Resources::BufferRef p_LightIndexBuffer,
-                              Resources::BufferRef p_IrradProbeBuffer,
-                              Resources::BufferRef p_IrradProbeIndexBuffer,
-                              Resources::BufferRef p_CurrentVolLightingBuffer,
-                              Resources::BufferRef p_PrevVolLightingBuffer)
+_INTR_INLINE ComputeCallRef createComputeCallAccumulation(
+    glm::vec3 p_Dim, BufferRef p_LightBuffer, BufferRef p_LightIndexBuffer,
+    BufferRef p_IrradProbeBuffer, BufferRef p_IrradProbeIndexBuffer,
+    BufferRef p_CurrentVolLightingBuffer, BufferRef p_PrevVolLightingBuffer)
 {
-  using namespace Resources;
-
   ComputeCallRef computeCallRef =
       ComputeCallManager::createComputeCall(_N(VolumetricLighting));
   {
@@ -239,12 +229,9 @@ createComputeCallAccumulation(glm::vec3 p_Dim,
   return computeCallRef;
 }
 
-_INTR_INLINE Resources::ComputeCallRef
-createComputeCallScattering(glm::vec3 p_Dim,
-                            Resources::BufferRef p_CurrentVolLightingBuffer)
+_INTR_INLINE ComputeCallRef createComputeCallScattering(
+    glm::vec3 p_Dim, BufferRef p_CurrentVolLightingBuffer)
 {
-  using namespace Resources;
-
   ComputeCallRef computeCallScatteringRef =
       ComputeCallManager::createComputeCall(_N(VolumetricLighting));
   {
@@ -278,8 +265,6 @@ createComputeCallScattering(glm::vec3 p_Dim,
 
 _INTR_INLINE void generateExponentialShadowMaps(uint32_t p_ShadowMapCount)
 {
-  using namespace Resources;
-
   for (uint32_t shadowMapIndex = 0u; shadowMapIndex < p_ShadowMapCount;
        ++shadowMapIndex)
   {
@@ -312,8 +297,6 @@ _INTR_INLINE void generateExponentialShadowMaps(uint32_t p_ShadowMapCount)
 
 _INTR_INLINE void blurExponentialShadowMaps(uint32_t p_ShadowMapCount)
 {
-  using namespace Resources;
-
   static const float blurRadius = 5.0f;
 
   for (uint32_t shadowMapIndex = 0u; shadowMapIndex < p_ShadowMapCount;
@@ -378,8 +361,6 @@ float VolumetricLighting::_globalScatteringFactor = 1.0f;
 
 void VolumetricLighting::init()
 {
-  using namespace Resources;
-
   PipelineRefArray pipelinesToCreate;
   PipelineLayoutRefArray pipelineLayoutsToCreate;
   DrawCallRefArray drawCallsToCreate;
@@ -396,8 +377,7 @@ void VolumetricLighting::init()
 
       GpuProgramManager::reflectPipelineLayout(
           8u,
-          {Resources::GpuProgramManager::getResourceByName(
-              "volumetric_lighting.comp")},
+          {GpuProgramManager::getResourceByName("volumetric_lighting.comp")},
           pipelineLayoutAccum);
     }
     pipelineLayoutsToCreate.push_back(pipelineLayoutAccum);
@@ -409,7 +389,7 @@ void VolumetricLighting::init()
 
       GpuProgramManager::reflectPipelineLayout(
           8u,
-          {Resources::GpuProgramManager::getResourceByName(
+          {GpuProgramManager::getResourceByName(
               "volumetric_lighting_scattering.comp")},
           pipelineLayoutScattering);
     }
@@ -421,9 +401,7 @@ void VolumetricLighting::init()
       PipelineLayoutManager::resetToDefault(pipelineLayoutEsm);
 
       GpuProgramManager::reflectPipelineLayout(
-          8u,
-          {Resources::GpuProgramManager::getResourceByName(
-              "esm_generate.frag")},
+          8u, {GpuProgramManager::getResourceByName("esm_generate.frag")},
           pipelineLayoutEsm);
     }
     pipelineLayoutsToCreate.push_back(pipelineLayoutEsm);
@@ -788,15 +766,12 @@ void VolumetricLighting::destroy() {}
 
 // <-
 
-void VolumetricLighting::render(float p_DeltaT,
-                                Components::CameraRef p_CameraRef)
+void VolumetricLighting::render(float p_DeltaT, CameraRef p_CameraRef)
 {
-  using namespace Resources;
-
   _INTR_PROFILE_CPU("Render Pass", "Render Volumetric Lighting");
   _INTR_PROFILE_GPU("Render Volumetric Lighting");
 
-  const _INTR_ARRAY(CoreResources::FrustumRef)& shadowFrustums =
+  const _INTR_ARRAY(CResources::FrustumRef)& shadowFrustums =
       RenderProcess::Default::_shadowFrustums[p_CameraRef];
 
   const uint32_t shadowMapCount = (uint32_t)shadowFrustums.size();

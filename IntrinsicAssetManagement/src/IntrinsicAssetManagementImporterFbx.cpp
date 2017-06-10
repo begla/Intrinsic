@@ -268,26 +268,26 @@ void importMesh(FbxMesh* p_Mesh,
   }
 
   // Create dummy materials
-  RendererV::Resources::MaterialRefArray materialsToCreate;
+  RVResources::MaterialRefArray materialsToCreate;
 
   for (uint32_t i = 0u; i < subMeshCount; ++i)
   {
     const char* materialName = p_Mesh->GetNode()->GetMaterial(i)->GetName();
-    RendererV::Resources::MaterialRef materialRef =
-        RendererV::Resources::MaterialManager::_getResourceByName(
+    RVResources::MaterialRef materialRef =
+        RVResources::MaterialManager::_getResourceByName(
             materialName);
 
     if (!materialRef.isValid())
     {
       materialRef =
-          RendererV::Resources::MaterialManager::createMaterial(
+          RVResources::MaterialManager::createMaterial(
               materialName);
-      RendererV::Resources::MaterialManager::resetToDefault(materialRef);
+      RVResources::MaterialManager::resetToDefault(materialRef);
 
       materialsToCreate.push_back(materialRef);
     }
   }
-  RendererV::Resources::MaterialManager::createResources(
+  RVResources::MaterialManager::createResources(
       materialsToCreate);
 
   posArray.resize(subMeshCount);
@@ -448,20 +448,20 @@ void importMesh(FbxMesh* p_Mesh,
     Components::MeshRefArray componentsToRecreate;
 
     for (uint32_t i = 0u;
-         i < CoreComponents::MeshManager::getActiveResourceCount(); ++i)
+         i < CComponents::MeshManager::getActiveResourceCount(); ++i)
     {
       Components::MeshRef meshCompRef =
-          CoreComponents::MeshManager::getActiveResourceAtIndex(i);
+          CComponents::MeshManager::getActiveResourceAtIndex(i);
 
-      if (CoreComponents::MeshManager::_descMeshName(meshCompRef) ==
+      if (CComponents::MeshManager::_descMeshName(meshCompRef) ==
           Core::Resources::MeshManager::_name(meshRef))
       {
         componentsToRecreate.push_back(meshCompRef);
       }
     }
 
-    CoreComponents::MeshManager::destroyResources(componentsToRecreate);
-    CoreComponents::MeshManager::createResources(componentsToRecreate);
+    CComponents::MeshManager::destroyResources(componentsToRecreate);
+    CComponents::MeshManager::createResources(componentsToRecreate);
   }
 }
 

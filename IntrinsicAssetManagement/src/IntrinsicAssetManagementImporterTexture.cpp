@@ -16,8 +16,8 @@
 #include "stdafx_assets.h"
 #include "stdafx_vulkan.h"
 
-using namespace RendererV::Resources;
-using namespace RendererV;
+using namespace RV::Resources;
+using namespace RV;
 
 namespace Intrinsic
 {
@@ -50,7 +50,7 @@ void copyFile(const _INTR_STRING& p_Source, _INTR_STRING& p_Target)
 }
 
 ImageRef createTexture(const _INTR_STRING& p_TextureName,
-                       RendererV::Format::Enum p_Format)
+                       RV::Format::Enum p_Format)
 {
   ImageRefArray imagesToCreate;
   ImageRefArray imagesToDestroy;
@@ -70,8 +70,7 @@ ImageRef createTexture(const _INTR_STRING& p_TextureName,
   {
     ImageManager::resetToDefault(imageRef);
 
-    ImageManager::_descImageType(imageRef) =
-        RendererV::ImageType::kTextureFromFile;
+    ImageManager::_descImageType(imageRef) = RV::ImageType::kTextureFromFile;
     ImageManager::_descImageFormat(imageRef) = p_Format;
     ImageManager::_descFileName(imageRef) = p_TextureName + ".dds";
 
@@ -92,7 +91,7 @@ void ImporterTexture::importColorTextureFromFile(const _INTR_STRING& p_FilePath)
 
   compressTexture("-bc1 " + p_FilePath + " " + mediaPath + "/" + fileName +
                   ".dds");
-  ImageRef imgRef = createTexture(fileName, RendererV::Format::kBC1RGBUNorm);
+  ImageRef imgRef = createTexture(fileName, RV::Format::kBC1RGBUNorm);
 }
 
 // <-
@@ -105,7 +104,7 @@ void ImporterTexture::importAlebdoTextureFromFile(
 
   compressTexture("-bc1 " + p_FilePath + " " + mediaPath + "/" + fileName +
                   ".dds");
-  ImageRef imgRef = createTexture(fileName, RendererV::Format::kBC1RGBSrgb);
+  ImageRef imgRef = createTexture(fileName, RV::Format::kBC1RGBSrgb);
 }
 
 // <-
@@ -118,7 +117,7 @@ void ImporterTexture::importAlebdoAlphaTextureFromFile(
 
   compressTexture("-bc2 " + p_FilePath + " " + mediaPath + "/" + fileName +
                   ".dds");
-  ImageRef imgRef = createTexture(fileName, RendererV::Format::kBC2Srgb);
+  ImageRef imgRef = createTexture(fileName, RV::Format::kBC2Srgb);
 }
 
 // <-
@@ -131,7 +130,7 @@ void ImporterTexture::importNormalMapTextureFromFile(
 
   compressTexture("-bc1 " + p_FilePath + " " + mediaPath + "/" + fileName +
                   ".dds");
-  ImageRef imgRef = createTexture(fileName, RendererV::Format::kBC1RGBUNorm);
+  ImageRef imgRef = createTexture(fileName, RV::Format::kBC1RGBUNorm);
 
   // Calc. avg. normal length for specular AA
   float avgNormalLength = 1.0f;
@@ -170,7 +169,7 @@ void ImporterTexture::importHdrCubemapFromFile(const _INTR_STRING& p_FilePath)
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
   copyFile(p_FilePath, mediaPath + "/" + fileName + ".dds");
-  ImageRef imgRef = createTexture(fileName, RendererV::Format::kBC6UFloat);
+  ImageRef imgRef = createTexture(fileName, RV::Format::kBC6UFloat);
 }
 }
 }

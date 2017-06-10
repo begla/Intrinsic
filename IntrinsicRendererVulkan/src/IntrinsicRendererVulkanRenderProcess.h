@@ -33,7 +33,7 @@ struct Default
   static Core::Dod::RefArray _activeFrustums;
   static _INTR_HASH_MAP(Components::CameraRef,
                         _INTR_ARRAY(Dod::Ref)) _shadowFrustums;
-  static _INTR_HASH_MAP(CoreResources::FrustumRef, uint8_t) _cameraToIdMapping;
+  static _INTR_HASH_MAP(CResources::FrustumRef, uint8_t) _cameraToIdMapping;
 
   static _INTR_INLINE const
       LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>&

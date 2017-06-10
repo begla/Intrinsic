@@ -192,21 +192,19 @@ DrawCallRef DrawCallManager::createDrawCallForMesh(
     _descPipeline(drawCallMesh) = MaterialManager::_materialPassPipelines
         [MaterialManager::_materialPasses[p_MaterialPass].pipelineIdx];
 
-    _INTR_ASSERT(RendererV::Resources::PipelineManager::_vkPipeline(
+    _INTR_ASSERT(RVResources::PipelineManager::_vkPipeline(
         _descPipeline(drawCallMesh)));
 
     _descVertexBuffers(drawCallMesh) =
-        CoreResources::MeshManager::_vertexBuffersPerSubMesh(
-            p_Mesh)[p_SubMeshIdx];
+        CResources::MeshManager::_vertexBuffersPerSubMesh(p_Mesh)[p_SubMeshIdx];
     _descIndexBuffer(drawCallMesh) =
-        CoreResources::MeshManager::_indexBufferPerSubMesh(
-            p_Mesh)[p_SubMeshIdx];
+        CResources::MeshManager::_indexBufferPerSubMesh(p_Mesh)[p_SubMeshIdx];
     _descVertexCount(drawCallMesh) =
-        (uint32_t)CoreResources::MeshManager::_descPositionsPerSubMesh(
+        (uint32_t)CResources::MeshManager::_descPositionsPerSubMesh(
             p_Mesh)[p_SubMeshIdx]
             .size();
     _descIndexCount(drawCallMesh) =
-        (uint32_t)CoreResources::MeshManager::_descIndicesPerSubMesh(
+        (uint32_t)CResources::MeshManager::_descIndicesPerSubMesh(
             p_Mesh)[p_SubMeshIdx]
             .size();
     _descMaterial(drawCallMesh) = p_Material;
