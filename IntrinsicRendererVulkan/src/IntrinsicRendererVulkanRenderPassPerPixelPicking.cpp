@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -39,8 +41,6 @@ glm::uvec2 PerPixelPicking::_perPixelPickingSize = glm::uvec2(256u, 128u);
 
 void PerPixelPicking::init()
 {
-  using namespace Resources;
-
   RenderPassRefArray renderpassesToCreate;
 
   // Render passes
@@ -68,8 +68,6 @@ void PerPixelPicking::init()
 
 void PerPixelPicking::onReinitRendering()
 {
-  using namespace Resources;
-
   FramebufferRefArray fbsToDestroy;
   FramebufferRefArray fbsToCreate;
   ImageRefArray imgsToCreate;
@@ -183,8 +181,6 @@ void PerPixelPicking::destroy() {}
 
 void PerPixelPicking::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
-  using namespace Resources;
-
   if (GameStates::Editing::_editingMode != GameStates::EditingMode::kSelection)
   {
     return;
@@ -207,7 +203,7 @@ void PerPixelPicking::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 
   // Update per mesh uniform data
   {
-    CoreComponents::MeshManager::updateUniformData(visibleDrawCalls);
+    CComponents::MeshManager::updateUniformData(visibleDrawCalls);
   }
 
   ImageManager::insertImageMemoryBarrier(
@@ -268,8 +264,6 @@ void PerPixelPicking::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 
 Components::NodeRef PerPixelPicking::pickNode(const glm::vec2& p_UV)
 {
-  using namespace Resources;
-
   BufferRef readBackBufferToUse =
       _pickingReadBackBufferRefs[RenderSystem::_backbufferIndex];
 

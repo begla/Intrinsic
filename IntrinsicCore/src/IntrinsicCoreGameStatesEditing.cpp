@@ -119,8 +119,8 @@ struct PerInstanceDataGridFragment
 
 // <-
 
-RendererV::Resources::DrawCallRef _drawCallRefGizmo;
-RendererV::Resources::DrawCallRef _drawCallRefGrid;
+RVResources::DrawCallRef _drawCallRefGizmo;
+RVResources::DrawCallRef _drawCallRefGrid;
 
 // <-
 
@@ -570,40 +570,35 @@ void Editing::onReinitRendering()
   Resources::MeshRef meshRefGrid =
       Resources::MeshManager::getResourceByName(_N(plane));
 
-  RendererV::Resources::DrawCallRefArray drawCallsToDestroy;
+  RVResources::DrawCallRefArray drawCallsToDestroy;
   if (_drawCallRefGizmo.isValid())
     drawCallsToDestroy.push_back(_drawCallRefGizmo);
   if (_drawCallRefGrid.isValid())
     drawCallsToDestroy.push_back(_drawCallRefGrid);
 
-  RendererV::Resources::DrawCallManager::destroyDrawCallsAndResources(
+  RVResources::DrawCallManager::destroyDrawCallsAndResources(
       drawCallsToDestroy);
 
   // Draw calls
-  RendererV::Resources::DrawCallRefArray drawCallsToCreate;
+  RVResources::DrawCallRefArray drawCallsToCreate;
   {
-    _drawCallRefGizmo =
-        RendererV::Resources::DrawCallManager::createDrawCallForMesh(
-            _N(gizmo_translate), meshRefGizmo,
-            RendererV::Resources::MaterialManager::getResourceByName(_N(gizmo)),
-            RendererV::Resources::MaterialManager::getMaterialPassId(
-                _N(DebugGizmo)),
-            sizeof(PerInstanceDataGizmoVertex),
-            sizeof(PerInstanceDataGizmoFragment));
+    _drawCallRefGizmo = RVResources::DrawCallManager::createDrawCallForMesh(
+        _N(gizmo_translate), meshRefGizmo,
+        RVResources::MaterialManager::getResourceByName(_N(gizmo)),
+        RVResources::MaterialManager::getMaterialPassId(_N(DebugGizmo)),
+        sizeof(PerInstanceDataGizmoVertex),
+        sizeof(PerInstanceDataGizmoFragment));
     drawCallsToCreate.push_back(_drawCallRefGizmo);
 
-    _drawCallRefGrid =
-        RendererV::Resources::DrawCallManager::createDrawCallForMesh(
-            _N(Grid), meshRefGrid,
-            RendererV::Resources::MaterialManager::getResourceByName(_N(grid)),
-            RendererV::Resources::MaterialManager::getMaterialPassId(
-                _N(DebugGrid)),
-            sizeof(PerInstanceDataGridVertex),
-            sizeof(PerInstanceDataGridFragment));
+    _drawCallRefGrid = RVResources::DrawCallManager::createDrawCallForMesh(
+        _N(Grid), meshRefGrid,
+        RVResources::MaterialManager::getResourceByName(_N(grid)),
+        RVResources::MaterialManager::getMaterialPassId(_N(DebugGrid)),
+        sizeof(PerInstanceDataGridVertex), sizeof(PerInstanceDataGridFragment));
     drawCallsToCreate.push_back(_drawCallRefGrid);
   }
 
-  RendererV::Resources::DrawCallManager::createResources(drawCallsToCreate);
+  RVResources::DrawCallManager::createResources(drawCallsToCreate);
 }
 
 // <-
@@ -711,8 +706,8 @@ void Editing::updatePerInstanceData()
     }
 
     // Write to GPU memory
-    RendererV::Resources::DrawCallRefArray dcsToUpdate = {_drawCallRefGizmo};
-    RendererV::Resources::DrawCallManager::allocateAndUpdateUniformMemory(
+    RVResources::DrawCallRefArray dcsToUpdate = {_drawCallRefGizmo};
+    RVResources::DrawCallManager::allocateAndUpdateUniformMemory(
         dcsToUpdate, &perInstanceDataVertex, sizeof(PerInstanceDataGizmoVertex),
         &perInstanceDataFragment, sizeof(PerInstanceDataGizmoFragment));
   }
@@ -750,8 +745,8 @@ void Editing::updatePerInstanceData()
     }
 
     // Write to GPU memory
-    RendererV::Resources::DrawCallRefArray dcsToUpdate = {_drawCallRefGrid};
-    RendererV::Resources::DrawCallManager::allocateAndUpdateUniformMemory(
+    RVResources::DrawCallRefArray dcsToUpdate = {_drawCallRefGrid};
+    RVResources::DrawCallManager::allocateAndUpdateUniformMemory(
         dcsToUpdate, &perInstanceDataVertex, sizeof(PerInstanceDataGridVertex),
         &perInstanceDataFragment, sizeof(PerInstanceDataGridFragment));
   }
@@ -917,7 +912,7 @@ void Editing::update(float p_DeltaT)
         Input::KeyState::kPressed)
     {
       Components::NodeRef pickedNode =
-          RendererV::RenderPass::PerPixelPicking::pickNode(
+          RV::RenderPass::PerPixelPicking::pickNode(
               Input::System::getLastMousePosViewport());
 
       if (pickedNode.isValid())

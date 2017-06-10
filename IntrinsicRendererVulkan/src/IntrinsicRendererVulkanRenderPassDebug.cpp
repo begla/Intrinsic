@@ -18,6 +18,8 @@
 
 #define MAX_LINE_COUNT 256000
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -40,18 +42,18 @@ struct PerInstanceDataDebugLineVertex
   glm::mat4 normalMatrix;
 };
 
-Resources::ImageRef _albedoImageRef;
-Resources::ImageRef _normalImageRef;
-Resources::ImageRef _parameter0ImageRef;
-Resources::ImageRef _depthImageRef;
-Resources::FramebufferRef _framebufferRef;
+ImageRef _albedoImageRef;
+ImageRef _normalImageRef;
+ImageRef _parameter0ImageRef;
+ImageRef _depthImageRef;
+FramebufferRef _framebufferRef;
 
-Resources::PipelineLayoutRef _debugLinePipelineLayout;
-Resources::PipelineRef _debugLinePipelineRef;
-Resources::DrawCallRef _debugLineDrawCallRef;
-Resources::BufferRef _debugLineVertexBufferRef;
+PipelineLayoutRef _debugLinePipelineLayout;
+PipelineRef _debugLinePipelineRef;
+DrawCallRef _debugLineDrawCallRef;
+BufferRef _debugLineVertexBufferRef;
 
-Resources::RenderPassRef _renderPassRef;
+RenderPassRef _renderPassRef;
 
 DebugLineVertex* _mappedLineMemory = nullptr;
 uint32_t _currentLineVertexCount = 0u;
@@ -189,8 +191,6 @@ uint32_t Debug::_activeDebugStageFlags = DebugStageFlags::kSelectedObject;
 
 void Debug::init()
 {
-  using namespace Resources;
-
   RenderPassRefArray renderpassesToCreate;
   PipelineLayoutRefArray pipelineLayoutsToCreate;
   BufferRefArray buffersToCreate;
@@ -203,7 +203,7 @@ void Debug::init()
 
     GpuProgramManager::reflectPipelineLayout(
         8u,
-        {Resources::GpuProgramManager::getResourceByName("debug_line.vert"),
+        {GpuProgramManager::getResourceByName("debug_line.vert"),
          GpuProgramManager::getResourceByName("debug_line.frag")},
         _debugLinePipelineLayout);
 
@@ -255,16 +255,14 @@ void Debug::init()
   BufferManager::createResources(buffersToCreate);
 
   // Map line buffer memory
-  _mappedLineMemory = (DebugLineVertex*)Resources::BufferManager::getGpuMemory(
-      _debugLineVertexBufferRef);
+  _mappedLineMemory =
+      (DebugLineVertex*)BufferManager::getGpuMemory(_debugLineVertexBufferRef);
 }
 
 // <-
 
 void Debug::onReinitRendering()
 {
-  using namespace Resources;
-
   FramebufferRefArray framebuffersToDestroy;
   FramebufferRefArray framebuffersToCreate;
   PipelineRefArray pipelinesToDestroy;
@@ -488,8 +486,6 @@ void Debug::renderDecal(Dod::Ref p_Decal)
 
 void Debug::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
-  using namespace Resources;
-
   _INTR_PROFILE_CPU("Render Pass", "Render Debug Geometry");
   _INTR_PROFILE_GPU("Render Debug Geometry");
 
@@ -562,7 +558,7 @@ void Debug::render(float p_DeltaT, Components::CameraRef p_CameraRef)
         MaterialManager::getMaterialPassId(_N(GBufferWireframe)))
         .copy(visibleMeshDrawCalls);
     // Update per mesh uniform data
-    CoreComponents::MeshManager::updateUniformData(visibleMeshDrawCalls);
+    CComponents::MeshManager::updateUniformData(visibleMeshDrawCalls);
 
     if ((_activeDebugStageFlags & DebugStageFlags::kWireframeRendering) > 0u)
     {

@@ -30,8 +30,6 @@ _INTR_ARRAY(uint32_t) MaterialBuffer::_materialBufferEntries;
 
 void MaterialBuffer::init()
 {
-  using namespace Resources;
-
   BufferRefArray buffersToCreate;
 
   _materialBuffer = BufferManager::createBuffer(_N(MaterialBuffer));

@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -26,8 +28,6 @@ namespace RenderPass
 {
 void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
 {
-  using namespace Resources;
-
   Base::init(p_RenderPassDesc);
 
   PipelineRefArray pipelinesToCreate;
@@ -67,8 +67,8 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
 
     GpuProgramManager::reflectPipelineLayout(
         8u,
-        {Resources::GpuProgramManager::getResourceByName(vertGpuProgramName),
-         Resources::GpuProgramManager::getResourceByName(fragGpuProgramName)},
+        {GpuProgramManager::getResourceByName(vertGpuProgramName),
+         GpuProgramManager::getResourceByName(fragGpuProgramName)},
         pipelineLayout);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayout);
@@ -159,7 +159,7 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
       else if (strcmp(input[0].GetString(), "Buffer") == 0u)
       {
         BufferRef bufferRef =
-            Resources::BufferManager::getResourceByName(input[1].GetString());
+            BufferManager::getResourceByName(input[1].GetString());
 
         DrawCallManager::bindBuffer(
             _drawCallRef, input[2].GetString(),
@@ -177,8 +177,6 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
 
 void GenericFullscreen::destroy()
 {
-  using namespace Resources;
-
   Base::destroy();
 
   DrawCallRefArray drawCallsToDestroy;
@@ -206,8 +204,6 @@ void GenericFullscreen::destroy()
 void GenericFullscreen::render(float p_DeltaT,
                                Components::CameraRef p_CameraRef)
 {
-  using namespace Resources;
-
   _INTR_PROFILE_CPU_DEFINE(GenericFullscreenCPU, "Render Pass", _name.c_str());
   _INTR_PROFILE_CPU_CUSTOM(GenericFullscreenCPU);
   _INTR_PROFILE_GPU_DEFINE(GenericFullscreenGPU, _name.c_str());

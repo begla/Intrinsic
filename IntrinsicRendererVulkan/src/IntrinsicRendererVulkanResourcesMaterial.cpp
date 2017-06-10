@@ -166,16 +166,15 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
     }
 
     for (uint32_t i = 0u;
-         i < CoreComponents::MeshManager::getActiveResourceCount(); ++i)
+         i < CComponents::MeshManager::getActiveResourceCount(); ++i)
     {
       Components::MeshRef meshCompRef =
           Components::MeshManager::getActiveResourceAtIndex(i);
-      CoreResources::MeshRef meshRef =
-          CoreResources::MeshManager::getResourceByName(
-              Components::MeshManager::_descMeshName(meshCompRef));
+      CResources::MeshRef meshRef = CResources::MeshManager::getResourceByName(
+          Components::MeshManager::_descMeshName(meshCompRef));
 
-      CoreResources::MaterialNamesPerSubMeshArray& materialNamesPerSubMesh =
-          CoreResources::MeshManager::_descMaterialNamesPerSubMesh(meshRef);
+      CResources::MaterialNamesPerSubMeshArray& materialNamesPerSubMesh =
+          CResources::MeshManager::_descMaterialNamesPerSubMesh(meshRef);
       const uint32_t subMeshCount = (uint32_t)materialNamesPerSubMesh.size();
 
       for (uint32_t i = 0u; i < subMeshCount; ++i)
@@ -188,8 +187,8 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
     }
   }
 
-  CoreComponents::MeshManager::destroyResources(componentsToRecreate);
-  CoreComponents::MeshManager::createResources(componentsToRecreate);
+  CComponents::MeshManager::destroyResources(componentsToRecreate);
+  CComponents::MeshManager::createResources(componentsToRecreate);
 }
 
 // <-

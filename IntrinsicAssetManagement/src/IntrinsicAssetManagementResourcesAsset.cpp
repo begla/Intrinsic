@@ -80,8 +80,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
             importedMeshes[i], "managers/meshes/", ".mesh.json");
       }
 
-      RendererV::Resources::MaterialManager::saveToMultipleFiles(
-          "managers/materials/", ".material.json");
+      RVResources::MaterialManager::saveToMultipleFiles("managers/materials/",
+                                                        ".material.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kLinearColorTexture)
     {
@@ -91,8 +91,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      RendererV::Resources::ImageManager::saveToMultipleFiles(
-          "managers/images/", ".image.json");
+      RVResources::ImageManager::saveToMultipleFiles("managers/images/",
+                                                     ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kAlbedoTexture)
     {
@@ -102,8 +102,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      RendererV::Resources::ImageManager::saveToMultipleFiles(
-          "managers/images/", ".image.json");
+      RVResources::ImageManager::saveToMultipleFiles("managers/images/",
+                                                     ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kAlbedoAlphaTexture)
     {
@@ -113,8 +113,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      RendererV::Resources::ImageManager::saveToMultipleFiles(
-          "managers/images/", ".image.json");
+      RVResources::ImageManager::saveToMultipleFiles("managers/images/",
+                                                     ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kNormalTexture)
     {
@@ -124,8 +124,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      RendererV::Resources::ImageManager::saveToMultipleFiles(
-          "managers/images/", ".image.json");
+      RVResources::ImageManager::saveToMultipleFiles("managers/images/",
+                                                     ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kHdrTexture)
     {
@@ -135,8 +135,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      RendererV::Resources::ImageManager::saveToMultipleFiles(
-          "managers/images/", ".image.json");
+      RVResources::ImageManager::saveToMultipleFiles("managers/images/",
+                                                     ".image.json");
     }
   }
 }

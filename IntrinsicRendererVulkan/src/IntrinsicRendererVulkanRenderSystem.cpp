@@ -16,14 +16,14 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
 {
 namespace Vulkan
 {
-using namespace Resources;
-
 namespace
 {
 bool _swapChainUpdatePending = false;
@@ -307,9 +307,8 @@ void RenderSystem::dispatchDrawCall(Dod::Ref p_DrawCall,
   vkCmdBindPipeline(p_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     newPipeline);
 
-  VkDescriptorSet descSets[2] = {
-      Resources::DrawCallManager::_vkDescriptorSet(p_DrawCall),
-      Resources::ImageManager::getGlobalDescriptorSet()};
+  VkDescriptorSet descSets[2] = {DrawCallManager::_vkDescriptorSet(p_DrawCall),
+                                 ImageManager::getGlobalDescriptorSet()};
 
   if (DrawCallManager::_vkDescriptorSet(p_DrawCall))
   {

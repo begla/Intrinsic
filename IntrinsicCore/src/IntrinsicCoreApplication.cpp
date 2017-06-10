@@ -16,9 +16,6 @@
 #include "stdafx.h"
 #include <cmath>
 
-// Renderer includes
-#include "IntrinsicRendererVulkanRenderSystem.h"
-
 #pragma warning(disable : 4996)
 
 namespace Intrinsic
@@ -55,7 +52,7 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
   initManagers();
 
   // Init. renderer
-  RendererV::RenderSystem::init(p_PlatformHandle, p_PlatformWindow);
+  RV::RenderSystem::init(p_PlatformHandle, p_PlatformWindow);
 
 // MicroProfile init.
 #if defined(_INTR_PROFILING_ENABLED)
@@ -69,10 +66,9 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
 #if defined(MICROPROFILE_GPU_TIMERS_VULKAN)
     MicroProfileGpuInitVulkan(
-        &RendererV::RenderSystem::_vkDevice,
-        &RendererV::RenderSystem::_vkPhysicalDevice,
-        &RendererV::RenderSystem::_vkQueue,
-        &RendererV::RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex, 1u);
+        &RV::RenderSystem::_vkDevice, &RV::RenderSystem::_vkPhysicalDevice,
+        &RV::RenderSystem::_vkQueue,
+        &RV::RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex, 1u);
 #endif // MICROPROFILE_GPU_TIMERS_VULKAN
   }
 #endif // _INTR_PROFILING_ENABLED

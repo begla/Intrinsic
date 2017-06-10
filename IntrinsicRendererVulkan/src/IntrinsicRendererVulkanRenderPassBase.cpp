@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -26,8 +28,6 @@ namespace RenderPass
 {
 void Base::init(const rapidjson::Value& p_RenderPassDesc)
 {
-  using namespace Resources;
-
   _name = p_RenderPassDesc["name"].GetString();
 
   if (!p_RenderPassDesc.HasMember("outputs"))
@@ -158,8 +158,6 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
 
 void Base::destroy()
 {
-  using namespace Resources;
-
   FramebufferRefArray framebuffersToDestroy;
   RenderPassRefArray renderPassesToDestroy;
 

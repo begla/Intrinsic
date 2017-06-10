@@ -262,16 +262,16 @@ void IntrinsicEdManagerWindowAsset::onCompileQueuedAssets()
   if (!_assetsToRecompile.empty())
   {
     // TODO: Update only the assets which are affected by a changed asset
-    RendererV::Resources::DrawCallManager::destroyResources(
-        RendererV::Resources::DrawCallManager::_activeRefs);
-    RendererV::Resources::DrawCallManager::createResources(
-        RendererV::Resources::DrawCallManager::_activeRefs);
-    RendererV::Resources::ComputeCallManager::destroyResources(
-        RendererV::Resources::ComputeCallManager::_activeRefs);
-    RendererV::Resources::ComputeCallManager::createResources(
-        RendererV::Resources::ComputeCallManager::_activeRefs);
-    RendererV::Resources::MaterialManager::createResources(
-        RendererV::Resources::MaterialManager::_activeRefs);
+    RVResources::DrawCallManager::destroyResources(
+        RVResources::DrawCallManager::_activeRefs);
+    RVResources::DrawCallManager::createResources(
+        RVResources::DrawCallManager::_activeRefs);
+    RVResources::ComputeCallManager::destroyResources(
+        RVResources::ComputeCallManager::_activeRefs);
+    RVResources::ComputeCallManager::createResources(
+        RVResources::ComputeCallManager::_activeRefs);
+    RVResources::MaterialManager::createResources(
+        RVResources::MaterialManager::_activeRefs);
 
     _assetsToRecompile.clear();
   }

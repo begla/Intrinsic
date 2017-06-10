@@ -14,6 +14,8 @@
 
 #pragma once
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -28,7 +30,7 @@ struct UniformManager
   _INTR_INLINE static uint8_t* allocatePerInstanceDataMemory(uint32_t p_Size,
                                                              uint32_t& p_Offset)
   {
-    const uint32_t bufferIdx = RendererV::RenderSystem::_backbufferIndex %
+    const uint32_t bufferIdx = RV::RenderSystem::_backbufferIndex %
                                _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
 
     MemoryBlock block;
@@ -69,8 +71,6 @@ struct UniformManager
   _INTR_INLINE static void
   updatePerMaterialDataMemory(void* p_Data, uint32_t p_Size, uint32_t p_Offset)
   {
-    using namespace Resources;
-
     // Update staging memory
     {
       memcpy(BufferManager::getGpuMemory(_perMaterialStagingUniformBuffer),
@@ -100,9 +100,9 @@ struct UniformManager
   static uint8_t* _perInstanceMemory;
   static uint8_t* _perFrameMemory;
 
-  static Resources::BufferRef _perInstanceUniformBuffer;
-  static Resources::BufferRef _perMaterialUniformBuffer;
-  static Resources::BufferRef _perFrameUniformBuffer;
+  static BufferRef _perInstanceUniformBuffer;
+  static BufferRef _perMaterialUniformBuffer;
+  static BufferRef _perFrameUniformBuffer;
 
 private:
   static LockFreeFixedBlockAllocator<
@@ -117,7 +117,7 @@ private:
                                      _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES>
       _perMaterialAllocator;
 
-  static Resources::BufferRef _perMaterialStagingUniformBuffer;
+  static BufferRef _perMaterialStagingUniformBuffer;
 };
 }
 }
