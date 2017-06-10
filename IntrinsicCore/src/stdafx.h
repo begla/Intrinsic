@@ -120,9 +120,35 @@ namespace Intrinsic
 {
 namespace Core
 {
+namespace Resources
+{
+}
+namespace Components
+{
 }
 }
+}
+
+using namespace Intrinsic;
 using namespace Intrinsic::Core;
+
+namespace Intrinsic
+{
+namespace Renderer
+{
+namespace Vulkan
+{
+namespace Resources
+{
+}
+}
+}
+}
+
+// Namespace aliases
+namespace RendererV = Intrinsic::Renderer::Vulkan;
+namespace CoreResources = Intrinsic::Core::Resources;
+namespace CoreComponents = Intrinsic::Core::Components;
 
 // Core related includes
 #include "IntrinsicCoreIrradiance.h"

@@ -702,7 +702,7 @@ void captureIrradProbe(
     const Components::IrradianceProbeRefArray& p_IrradProbeRefs, bool p_Clear,
     float p_Time)
 {
-  using namespace Intrinsic::Renderer::Vulkan;
+  using namespace RendererV;
 
   static glm::uvec2 atlasIndices[6]{glm::uvec2(0u, 1u), glm::uvec2(1u, 1u),
                                     glm::uvec2(2u, 1u), glm::uvec2(3u, 1u),
@@ -716,9 +716,8 @@ void captureIrradProbe(
       glm::vec3(glm::half_pi<float>(), 0.0f, 0.0f)}; // B / -y
   static uint32_t atlasIndexToFaceIdx[6] = {0, 4, 1, 5, 2, 3};
 
-  const glm::uvec2 cubeMapRes =
-      Intrinsic::Renderer::Vulkan::RenderSystem::getAbsoluteRenderSize(
-          Intrinsic::Renderer::Vulkan::RenderSize::kCubemap);
+  const glm::uvec2 cubeMapRes = RendererV::RenderSystem::getAbsoluteRenderSize(
+      RendererV::RenderSize::kCubemap);
 
   const uint32_t faceSizeInBytes =
       cubeMapRes.x * cubeMapRes.y * 2u * sizeof(uint32_t);
@@ -739,25 +738,22 @@ void captureIrradProbe(
   World::setActiveCamera(camRef);
 
   // Setup buffer for readback
-  Intrinsic::Renderer::Vulkan::Resources::BufferRef readBackBufferRef =
-      Intrinsic::Renderer::Vulkan::Resources::BufferManager::createBuffer(
+  RendererV::Resources::BufferRef readBackBufferRef =
+      RendererV::Resources::BufferManager::createBuffer(
           _N(IrradianceProbeReadBack));
   {
-    Intrinsic::Renderer::Vulkan::Resources::BufferManager::resetToDefault(
-        readBackBufferRef);
-    Intrinsic::Renderer::Vulkan::Resources::BufferManager::addResourceFlags(
+    RendererV::Resources::BufferManager::resetToDefault(readBackBufferRef);
+    RendererV::Resources::BufferManager::addResourceFlags(
         readBackBufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
-    Intrinsic::Renderer::Vulkan::Resources::BufferManager::_descMemoryPoolType(
-        readBackBufferRef) =
-        Intrinsic::Renderer::Vulkan::MemoryPoolType::kVolatileStagingBuffers;
+    RendererV::Resources::BufferManager::_descMemoryPoolType(
+        readBackBufferRef) = RendererV::MemoryPoolType::kVolatileStagingBuffers;
 
-    Intrinsic::Renderer::Vulkan::Resources::BufferManager::_descBufferType(
-        readBackBufferRef) = Intrinsic::Renderer::Vulkan::BufferType::kStorage;
-    Intrinsic::Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-        readBackBufferRef) = faceSizeInBytes;
+    RendererV::Resources::BufferManager::_descBufferType(readBackBufferRef) =
+        RendererV::BufferType::kStorage;
+    RendererV::Resources::BufferManager::_descSizeInBytes(readBackBufferRef) =
+        faceSizeInBytes;
 
-    Intrinsic::Renderer::Vulkan::Resources::BufferManager::createResources(
-        {readBackBufferRef});
+    RendererV::Resources::BufferManager::createResources({readBackBufferRef});
   }
 
   uint32_t prevDebugStageFlags = RenderPass::Debug::_activeDebugStageFlags;
@@ -826,14 +822,12 @@ void captureIrradProbe(
         // Copy image to host visible memory
         VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
 
-        Intrinsic::Renderer::Vulkan::Resources::ImageRef sceneImageRef =
-            Intrinsic::Renderer::Vulkan::Resources::ImageManager::
-                getResourceByName(_N(Scene));
+        RendererV::Resources::ImageRef sceneImageRef =
+            RendererV::Resources::ImageManager::getResourceByName(_N(Scene));
 
-        Intrinsic::Renderer::Vulkan::Resources::ImageManager::
-            insertImageMemoryBarrier(copyCmd, sceneImageRef,
-                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                                     VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        RendererV::Resources::ImageManager::insertImageMemoryBarrier(
+            copyCmd, sceneImageRef, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
         VkBufferImageCopy bufferImageCopy = {};
         {
@@ -854,17 +848,15 @@ void captureIrradProbe(
         // Read back face
         vkCmdCopyImageToBuffer(
             copyCmd,
-            Intrinsic::Renderer::Vulkan::Resources::ImageManager::_vkImage(
-                sceneImageRef),
+            RendererV::Resources::ImageManager::_vkImage(sceneImageRef),
             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            Intrinsic::Renderer::Vulkan::Resources::BufferManager::_vkBuffer(
-                readBackBufferRef),
+            RendererV::Resources::BufferManager::_vkBuffer(readBackBufferRef),
             1u, &bufferImageCopy);
 
         RenderSystem::flushTemporaryCommandBuffer();
 
         const uint8_t* sceneMemory =
-            Intrinsic::Renderer::Vulkan::Resources::BufferManager::getGpuMemory(
+            RendererV::Resources::BufferManager::getGpuMemory(
                 readBackBufferRef);
 
         memcpy(texCube.data(0u, atlasIndexToFaceIdx[atlasIdx], 0u), sceneMemory,
@@ -922,10 +914,8 @@ void captureIrradProbe(
   }
 
   // Cleanup and restore
-  Intrinsic::Renderer::Vulkan::Resources::BufferManager::destroyResources(
-      {readBackBufferRef});
-  Intrinsic::Renderer::Vulkan::Resources::BufferManager::destroyBuffer(
-      readBackBufferRef);
+  RendererV::Resources::BufferManager::destroyResources({readBackBufferRef});
+  RendererV::Resources::BufferManager::destroyBuffer(readBackBufferRef);
   GpuMemoryManager::resetPool(MemoryPoolType::kVolatileStagingBuffers);
 
   Settings::Manager::_targetFrameRate = prevMaxFps;
@@ -942,7 +932,7 @@ const uint32_t _shTimeSamples = 8u;
 
 void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
 {
-  using namespace Intrinsic::Renderer::Vulkan;
+  using namespace RendererV;
 
   Components::IrradianceProbeRef irradProbeRef;
   Components::NodeRef irradNodeRef;
@@ -957,8 +947,8 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
         currentEntity);
 
     const glm::uvec2 cubeMapRes =
-        Intrinsic::Renderer::Vulkan::RenderSystem::getAbsoluteRenderSize(
-            Intrinsic::Renderer::Vulkan::RenderSize::kCubemap);
+        RendererV::RenderSystem::getAbsoluteRenderSize(
+            RendererV::RenderSize::kCubemap);
     RenderSystem::_customBackbufferDimensions = cubeMapRes;
     RenderSystem::resizeSwapChain(true);
 
@@ -972,11 +962,10 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
 
 void IntrinsicEdNodeViewTreeWidget::onCaptureAllIrradianceProbes()
 {
-  using namespace Intrinsic::Renderer::Vulkan;
+  using namespace RendererV;
 
-  const glm::uvec2 cubeMapRes =
-      Intrinsic::Renderer::Vulkan::RenderSystem::getAbsoluteRenderSize(
-          Intrinsic::Renderer::Vulkan::RenderSize::kCubemap);
+  const glm::uvec2 cubeMapRes = RendererV::RenderSystem::getAbsoluteRenderSize(
+      RendererV::RenderSize::kCubemap);
   RenderSystem::_customBackbufferDimensions = cubeMapRes;
   RenderSystem::resizeSwapChain(true);
 

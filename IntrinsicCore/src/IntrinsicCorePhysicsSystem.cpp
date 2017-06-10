@@ -137,7 +137,7 @@ void System::renderLineDebugGeometry()
     for (uint32_t i = 0; i < rb.getNbLines(); i++)
     {
       const physx::PxDebugLine& line = rb.getLines()[i];
-      Renderer::Vulkan::RenderPass::Debug::renderLine(
+      RendererV::RenderPass::Debug::renderLine(
           PhysxHelper::convert(line.pos0), PhysxHelper::convert(line.pos1),
           line.color0, line.color1);
     }

@@ -207,7 +207,7 @@ void PerPixelPicking::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 
   // Update per mesh uniform data
   {
-    Core::Components::MeshManager::updateUniformData(visibleDrawCalls);
+    CoreComponents::MeshManager::updateUniformData(visibleDrawCalls);
   }
 
   ImageManager::insertImageMemoryBarrier(

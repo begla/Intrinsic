@@ -562,7 +562,7 @@ void Debug::render(float p_DeltaT, Components::CameraRef p_CameraRef)
         MaterialManager::getMaterialPassId(_N(GBufferWireframe)))
         .copy(visibleMeshDrawCalls);
     // Update per mesh uniform data
-    Core::Components::MeshManager::updateUniformData(visibleMeshDrawCalls);
+    CoreComponents::MeshManager::updateUniformData(visibleMeshDrawCalls);
 
     if ((_activeDebugStageFlags & DebugStageFlags::kWireframeRendering) > 0u)
     {

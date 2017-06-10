@@ -50,22 +50,21 @@ VkBool32 messageCallback(VkDebugReportFlagsEXT p_Flags,
   _INTR_STRING text = p_Message;
   _INTR_STRING errorLevel = "";
 
-  Intrinsic::Core::Log::LogLevel::Enum logLevel =
-      Intrinsic::Core::Log::LogLevel::kInfo;
+  Log::LogLevel::Enum logLevel = Log::LogLevel::kInfo;
 
   if (p_Flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
   {
-    logLevel = Intrinsic::Core::Log::LogLevel::kError;
+    logLevel = Log::LogLevel::kError;
     errorLevel += "ERROR";
   }
   if (p_Flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
   {
-    logLevel = Intrinsic::Core::Log::LogLevel::kWarning;
+    logLevel = Log::LogLevel::kWarning;
     errorLevel += "WARNING";
   }
   if (p_Flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
   {
-    logLevel = Intrinsic::Core::Log::LogLevel::kWarning;
+    logLevel = Log::LogLevel::kWarning;
     errorLevel += "PERFORMANCE";
   }
   if (p_Flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)
@@ -77,9 +76,8 @@ VkBool32 messageCallback(VkDebugReportFlagsEXT p_Flags,
     errorLevel += "DEBUG";
   }
 
-  Intrinsic::Core::Log::Manager::log(
-      logLevel, "Vulkan : [%s] [%s] Code %u : %s", errorLevel.c_str(),
-      p_LayerPrefix, p_MsgCode, p_Message);
+  Log::Manager::log(logLevel, "Vulkan : [%s] [%s] Code %u : %s",
+                    errorLevel.c_str(), p_LayerPrefix, p_MsgCode, p_Message);
 
   return VK_FALSE;
 }

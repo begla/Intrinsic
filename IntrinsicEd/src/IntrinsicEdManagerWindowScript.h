@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #pragma once
-using namespace Intrinsic::Renderer;
 
 class IntrinsicEdManagerWindowScript : public IntrinsicEdManagerWindowBase
 {

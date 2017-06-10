@@ -98,9 +98,9 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
 
   // Post effect data
   {
-    const glm::vec2 scattering = Core::Resources::PostEffectManager::
+    const glm::vec2 scattering = CoreResources::PostEffectManager::
         _descVolumetricLightingScatteringDayNight(
-            Core::Resources::PostEffectManager::_blendTargetRef);
+            CoreResources::PostEffectManager::_blendTargetRef);
 
     _perInstanceData.data0.x =
         glm::mix(scattering.y, scattering.x, World::_currentDayNightFactor) *
@@ -152,17 +152,16 @@ updatePerInstanceData(Components::CameraRef p_CameraRef,
       viewSpaceCorners.c[7].x - viewSpaceCorners.c[6].x /* Far Width */,
       viewSpaceCorners.c[6].y - viewSpaceCorners.c[5].y /* Far Height */);
 
-  const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+  const _INTR_ARRAY(CoreResources::FrustumRef)& shadowFrustums =
       RenderProcess::Default::_shadowFrustums[p_CameraRef];
 
   for (uint32_t i = 0u; i < shadowFrustums.size(); ++i)
   {
-    Core::Resources::FrustumRef shadowFrustumRef = shadowFrustums[i];
+    CoreResources::FrustumRef shadowFrustumRef = shadowFrustums[i];
 
     // Transform from camera view space => light proj. space
     _perInstanceData.shadowViewProjMatrix[i] =
-        Core::Resources::FrustumManager::_viewProjectionMatrix(
-            shadowFrustumRef) *
+        CoreResources::FrustumManager::_viewProjectionMatrix(shadowFrustumRef) *
         Components::CameraManager::_inverseViewMatrix(p_CameraRef);
   }
 
@@ -797,7 +796,7 @@ void VolumetricLighting::render(float p_DeltaT,
   _INTR_PROFILE_CPU("Render Pass", "Render Volumetric Lighting");
   _INTR_PROFILE_GPU("Render Volumetric Lighting");
 
-  const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+  const _INTR_ARRAY(CoreResources::FrustumRef)& shadowFrustums =
       RenderProcess::Default::_shadowFrustums[p_CameraRef];
 
   const uint32_t shadowMapCount = (uint32_t)shadowFrustums.size();

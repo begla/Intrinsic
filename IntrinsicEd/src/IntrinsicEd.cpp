@@ -85,8 +85,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
   // Init. resources
   {
-    Intrinsic::AssetManagement::Resources::AssetManager::init();
-    Intrinsic::AssetManagement::Resources::AssetManager::loadFromMultipleFiles(
+    AssetManagement::Resources::AssetManager::init();
+    AssetManagement::Resources::AssetManager::loadFromMultipleFiles(
         "managers/assets/", ".asset.json");
   }
 
@@ -457,7 +457,7 @@ void IntrinsicEd::onReloadWorld()
 void IntrinsicEd::onReloadSettingsAndRendererConfig()
 {
   Settings::Manager::loadSettings();
-  Vulkan::RenderSystem::onViewportChanged();
+  RendererV::RenderSystem::onViewportChanged();
 }
 
 void IntrinsicEd::onSaveWorld() { World::save(World::_filePath); }
@@ -799,54 +799,46 @@ void IntrinsicEd::onDebugGeometryChanged()
 
   if (_ui.actionShow_World_Bounding_Spheres->isChecked())
   {
-    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags |=
-        Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
-            kWorldBoundingSpheres;
+    RendererV::RenderPass::Debug::_activeDebugStageFlags |=
+        RendererV::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
   }
   else
   {
-    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags &=
-        ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
-            kWorldBoundingSpheres;
+    RendererV::RenderPass::Debug::_activeDebugStageFlags &=
+        ~RendererV::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
   }
 
   if (_ui.actionShow_Benchmark_Paths->isChecked())
   {
-    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags |=
-        Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
-            kBenchmarkPaths;
+    RendererV::RenderPass::Debug::_activeDebugStageFlags |=
+        RendererV::RenderPass::DebugStageFlags::kBenchmarkPaths;
   }
   else
   {
-    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags &=
-        ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
-            kBenchmarkPaths;
+    RendererV::RenderPass::Debug::_activeDebugStageFlags &=
+        ~RendererV::RenderPass::DebugStageFlags::kBenchmarkPaths;
   }
 
   if (_ui.actionWireframe_Rendering->isChecked())
   {
-    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags |=
-        Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
-            kWireframeRendering;
+    RendererV::RenderPass::Debug::_activeDebugStageFlags |=
+        RendererV::RenderPass::DebugStageFlags::kWireframeRendering;
   }
   else
   {
-    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags &=
-        ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
-            kWireframeRendering;
+    RendererV::RenderPass::Debug::_activeDebugStageFlags &=
+        ~RendererV::RenderPass::DebugStageFlags::kWireframeRendering;
   }
 }
 
 void IntrinsicEd::onCompileShaders()
 {
-  Intrinsic::Renderer::Vulkan::Resources::GpuProgramManager::
-      compileAllShaders();
+  RendererV::Resources::GpuProgramManager::compileAllShaders();
 }
 
 void IntrinsicEd::onRecompileShaders()
 {
-  Intrinsic::Renderer::Vulkan::Resources::GpuProgramManager::compileAllShaders(
-      true);
+  RendererV::Resources::GpuProgramManager::compileAllShaders(true);
 }
 
 void IntrinsicEd::onSettingsFileChanged(const QString&)
@@ -892,7 +884,7 @@ int IntrinsicEd::enterMainLoop()
     {
       Settings::Manager::loadSettings();
       updateSettingsChangeWatch();
-      Vulkan::RenderSystem::onViewportChanged();
+      RendererV::RenderSystem::onViewportChanged();
       _settingsUpdatePending = false;
     }
   }

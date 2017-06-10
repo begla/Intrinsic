@@ -33,7 +33,7 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
     _INTR_PROFILE_CPU("General", "Mesh Inst. Data Updt. Job");
 
     Dod::Ref frustumRef =
-        Renderer::Vulkan::RenderProcess::Default::_activeFrustums[_frustumIdx];
+        RendererV::RenderProcess::Default::_activeFrustums[_frustumIdx];
     glm::mat4& viewMatrix =
         Resources::FrustumManager::_descViewMatrix(frustumRef);
     glm::mat4& viewProjectionMatrix =
@@ -41,8 +41,9 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
 
     for (uint32_t meshIdx = p_Range.start; meshIdx < p_Range.end; ++meshIdx)
     {
-      MeshRef meshCompRef = Renderer::Vulkan::RenderProcess::Default::
-          _visibleMeshComponents[_frustumIdx][meshIdx];
+      MeshRef meshCompRef =
+          RendererV::RenderProcess::Default::_visibleMeshComponents[_frustumIdx]
+                                                                   [meshIdx];
       Entity::EntityRef entityRef = MeshManager::_entity(meshCompRef);
       Components::NodeRef nodeRef =
           Components::NodeManager::getComponentForEntity(entityRef);
@@ -104,14 +105,13 @@ struct UniformUpdateParallelTaskSet : enki::ITaskSet
   {
     _INTR_PROFILE_CPU("General", "Mesh Uniform Data Updt. Job");
 
-    Renderer::Vulkan::Resources::DrawCallRefArray& drawCalls = *_drawCalls;
+    RendererV::Resources::DrawCallRefArray& drawCalls = *_drawCalls;
 
     for (uint32_t dcIdx = p_Range.start; dcIdx < p_Range.end; ++dcIdx)
     {
-      Renderer::Vulkan::Resources::DrawCallRef dcRef = drawCalls[dcIdx];
+      RendererV::Resources::DrawCallRef dcRef = drawCalls[dcIdx];
       MeshRef meshCompRef =
-          Renderer::Vulkan::Resources::DrawCallManager::_descMeshComponent(
-              dcRef);
+          RendererV::Resources::DrawCallManager::_descMeshComponent(dcRef);
       _INTR_ASSERT(meshCompRef.isValid());
 
       MeshPerInstanceDataVertex& vertData =
@@ -119,15 +119,14 @@ struct UniformUpdateParallelTaskSet : enki::ITaskSet
       MeshPerInstanceDataFragment& fragData =
           Components::MeshManager::_perInstanceDataFragment(meshCompRef);
 
-      Renderer::Vulkan::Resources::DrawCallManager::allocateUniformMemory(
-          dcRef);
-      Renderer::Vulkan::Resources::DrawCallManager::updateUniformMemory(
+      RendererV::Resources::DrawCallManager::allocateUniformMemory(dcRef);
+      RendererV::Resources::DrawCallManager::updateUniformMemory(
           dcRef, &vertData, sizeof(MeshPerInstanceDataVertex), &fragData,
           sizeof(MeshPerInstanceDataFragment));
     }
   }
 
-  Renderer::Vulkan::Resources::DrawCallRefArray* _drawCalls;
+  RendererV::Resources::DrawCallRefArray* _drawCalls;
 };
 
 // <-
@@ -141,40 +140,37 @@ struct DrawCallCollectionParallelTaskSet : enki::ITaskSet
   {
     _INTR_PROFILE_CPU("General", "Collect Visible Mesh Draw Calls Job");
 
-    auto& drawCallsPerMaterialPass = Renderer::Vulkan::Resources::
-        DrawCallManager::_drawCallsPerMaterialPass[_materialPassIdx];
+    auto& drawCallsPerMaterialPass = RendererV::Resources::DrawCallManager::
+        _drawCallsPerMaterialPass[_materialPassIdx];
     const uint32_t activeFrustumCount =
-        (uint32_t)
-            Renderer::Vulkan::RenderProcess::Default::_activeFrustums.size();
+        (uint32_t)RendererV::RenderProcess::Default::_activeFrustums.size();
 
     for (uint32_t drawCallIdx = p_Range.start; drawCallIdx < p_Range.end;
          ++drawCallIdx)
     {
-      Renderer::Vulkan::Resources::DrawCallRef drawCallRef =
+      RendererV::Resources::DrawCallRef drawCallRef =
           drawCallsPerMaterialPass[drawCallIdx];
-      Core::Components::MeshRef meshComponentRef =
-          Renderer::Vulkan::Resources::DrawCallManager::_descMeshComponent(
+      Components::MeshRef meshComponentRef =
+          RendererV::Resources::DrawCallManager::_descMeshComponent(
               drawCallRef);
 
       if (meshComponentRef.isValid())
       {
-        Core::Components::NodeRef nodeComponentRef =
-            Core::Components::MeshManager::_node(meshComponentRef);
+        Components::NodeRef nodeComponentRef =
+            Components::MeshManager::_node(meshComponentRef);
 
         for (uint32_t frustIdx = 0u; frustIdx < activeFrustumCount; ++frustIdx)
         {
           auto& visibleDrawCallsPerMaterialPass =
-              Renderer::Vulkan::RenderProcess::Default::
+              RendererV::RenderProcess::Default::
                   _visibleDrawCallsPerMaterialPass[frustIdx][_materialPassIdx];
-          if ((Core::Components::NodeManager::_visibilityMask(
-                   nodeComponentRef) &
+          if ((Components::NodeManager::_visibilityMask(nodeComponentRef) &
                (1u << frustIdx)) > 0u)
           {
-            Renderer::Vulkan::Resources::DrawCallManager::updateSortingHash(
-                drawCallRef,
-                Core::Components::MeshManager::_perInstanceDataVertex(
-                    meshComponentRef)
-                    .data0.y);
+            RendererV::Resources::DrawCallManager::updateSortingHash(
+                drawCallRef, Components::MeshManager::_perInstanceDataVertex(
+                                 meshComponentRef)
+                                 .data0.y);
 
             visibleDrawCallsPerMaterialPass.push_back(drawCallRef);
           }
@@ -197,25 +193,24 @@ struct MeshCollectionParallelTaskSet : enki::ITaskSet
   {
     _INTR_PROFILE_CPU("General", "Collect Visible Mesh Components Job");
     uint32_t activeFrustumsCount =
-        (uint32_t)
-            Renderer::Vulkan::RenderProcess::Default::_activeFrustums.size();
+        (uint32_t)RendererV::RenderProcess::Default::_activeFrustums.size();
 
     for (uint32_t meshCompId = p_Range.start; meshCompId < p_Range.end;
          ++meshCompId)
     {
-      Core::Components::MeshRef meshComponentRef =
-          Core::Components::MeshManager::getActiveResourceAtIndex(meshCompId);
-      Core::Components::NodeRef nodeComponentRef =
-          Core::Components::MeshManager::_node(meshComponentRef);
+      Components::MeshRef meshComponentRef =
+          Components::MeshManager::getActiveResourceAtIndex(meshCompId);
+      Components::NodeRef nodeComponentRef =
+          Components::MeshManager::_node(meshComponentRef);
 
       for (uint32_t frustIdx = 0u; frustIdx < activeFrustumsCount; ++frustIdx)
       {
 
-        if ((Core::Components::NodeManager::_visibilityMask(nodeComponentRef) &
+        if ((Components::NodeManager::_visibilityMask(nodeComponentRef) &
              (1u << frustIdx)) > 0u)
         {
-          auto& visibleMeshComponents = Renderer::Vulkan::RenderProcess::
-              Default::_visibleMeshComponents[frustIdx];
+          auto& visibleMeshComponents = RendererV::RenderProcess::Default::
+              _visibleMeshComponents[frustIdx];
           visibleMeshComponents.push_back(meshComponentRef);
         }
       }
@@ -240,7 +235,7 @@ MeshData::MeshData()
   for (uint32_t i = 0u; i < _INTR_MAX_MESH_COMPONENT_COUNT; ++i)
   {
     drawCalls[i].resize(
-        Renderer::Vulkan::Resources::MaterialManager::_materialPasses.size());
+        RendererV::Resources::MaterialManager::_materialPasses.size());
   }
 }
 
@@ -290,7 +285,7 @@ void MeshManager::init()
 
 void MeshManager::createResources(const MeshRefArray& p_Meshes)
 {
-  Renderer::Vulkan::Resources::DrawCallRefArray drawCallsToCreate;
+  RendererV::Resources::DrawCallRefArray drawCallsToCreate;
 
   for (uint32_t meshIdx = 0u; meshIdx < p_Meshes.size(); ++meshIdx)
   {
@@ -306,18 +301,17 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
 
     for (uint32_t subMeshIdx = 0u; subMeshIdx < subMeshCount; ++subMeshIdx)
     {
-      Renderer::Vulkan::Resources::MaterialRef matToUse =
-          Renderer::Vulkan::Resources::MaterialManager::getResourceByName(
+      RendererV::Resources::MaterialRef matToUse =
+          RendererV::Resources::MaterialManager::getResourceByName(
               Resources::MeshManager::_descMaterialNamesPerSubMesh(
                   meshRef)[subMeshIdx]);
 
       const uint32_t matPassMask =
-          Renderer::Vulkan::Resources::MaterialManager::_materialPassMask(
-              matToUse);
+          RendererV::Resources::MaterialManager::_materialPassMask(matToUse);
 
       for (uint32_t matPassIdx = 0u;
            matPassIdx <
-           Renderer::Vulkan::Resources::MaterialManager::_materialPasses.size();
+           RendererV::Resources::MaterialManager::_materialPasses.size();
            ++matPassIdx)
       {
         if ((matPassMask & (1u << matPassIdx)) == 0u)
@@ -325,13 +319,13 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
           continue;
         }
 
-        Renderer::Vulkan::Resources::DrawCallRef drawCallMesh =
-            Renderer::Vulkan::Resources::DrawCallManager::createDrawCallForMesh(
+        RendererV::Resources::DrawCallRef drawCallMesh =
+            RendererV::Resources::DrawCallManager::createDrawCallForMesh(
                 _N(_MeshComponent), meshRef, matToUse, matPassIdx,
                 sizeof(MeshPerInstanceDataVertex),
                 sizeof(MeshPerInstanceDataFragment), subMeshIdx);
 
-        Renderer::Vulkan::Resources::DrawCallManager::_descMeshComponent(
+        RendererV::Resources::DrawCallManager::_descMeshComponent(
             drawCallMesh) = meshCompRef;
 
         drawCallsToCreate.push_back(drawCallMesh);
@@ -351,8 +345,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
     }
   }
 
-  Renderer::Vulkan::Resources::DrawCallManager::createResources(
-      drawCallsToCreate);
+  RendererV::Resources::DrawCallManager::createResources(drawCallsToCreate);
 }
 
 // <-
@@ -374,7 +367,7 @@ void MeshManager::destroyResources(const MeshRefArray& p_Meshes)
       for (uint32_t dcIdx = 0u;
            dcIdx < drawCallsPerMaterialPass[matPassIdx].size(); ++dcIdx)
       {
-        Renderer::Vulkan::Resources::DrawCallRef dcRef =
+        RendererV::Resources::DrawCallRef dcRef =
             drawCallsPerMaterialPass[matPassIdx][dcIdx];
         dcsToDestroy.push_back(dcRef);
       }
@@ -383,7 +376,7 @@ void MeshManager::destroyResources(const MeshRefArray& p_Meshes)
     }
   }
 
-  Renderer::Vulkan::Resources::DrawCallManager::destroyDrawCallsAndResources(
+  RendererV::Resources::DrawCallManager::destroyDrawCallsAndResources(
       dcsToDestroy);
 }
 
@@ -394,12 +387,12 @@ void MeshManager::updatePerInstanceData(Dod::Ref p_CameraRef,
 {
   _INTR_PROFILE_CPU("General", "Update Per Instance Data");
 
-  const uint32_t frustumId = Renderer::Vulkan::RenderProcess::Default::
-                                 _cameraToIdMapping[p_CameraRef] +
-                             p_FrustumIdx;
+  const uint32_t frustumId =
+      RendererV::RenderProcess::Default::_cameraToIdMapping[p_CameraRef] +
+      p_FrustumIdx;
   _perInstanceDataUpdateTaskSet.m_SetSize =
-      (uint32_t)Renderer::Vulkan::RenderProcess::Default::_visibleMeshComponents
-          [frustumId]
+      (uint32_t)
+          RendererV::RenderProcess::Default::_visibleMeshComponents[frustumId]
               .size();
   _perInstanceDataUpdateTaskSet._frustumIdx = frustumId;
   _perInstanceDataUpdateTaskSet._camRef = p_CameraRef;

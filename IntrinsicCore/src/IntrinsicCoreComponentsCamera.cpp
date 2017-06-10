@@ -82,8 +82,8 @@ void CameraManager::updateFrustums(const CameraRefArray& p_Cameras)
         glm::lookAt(camWorldPosition, camWorldPosition + forward, up);
 
     const float aspectRatio =
-        Renderer::Vulkan::RenderSystem::_backbufferDimensions.x /
-        (float)Renderer::Vulkan::RenderSystem::_backbufferDimensions.y;
+        RendererV::RenderSystem::_backbufferDimensions.x /
+        (float)RendererV::RenderSystem::_backbufferDimensions.y;
     _projectionMatrix(campCompRef) = computeCustomProjMatrix(
         campCompRef, _descNearPlane(campCompRef), _descFarPlane(campCompRef));
 
@@ -101,8 +101,8 @@ glm::mat4 CameraManager::computeCustomProjMatrix(CameraRef p_Ref, float p_Near,
                                                  float p_Far)
 {
   const float aspectRatio =
-      Renderer::Vulkan::RenderSystem::_backbufferDimensions.x /
-      (float)Renderer::Vulkan::RenderSystem::_backbufferDimensions.y;
+      RendererV::RenderSystem::_backbufferDimensions.x /
+      (float)RendererV::RenderSystem::_backbufferDimensions.y;
   return glm::scale(glm::vec3(1.0f, -1.0f, 1.0f)) *
          glm::perspective(_descFov(p_Ref), aspectRatio, p_Near, p_Far);
 }

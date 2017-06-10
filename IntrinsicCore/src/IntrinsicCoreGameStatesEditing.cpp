@@ -119,8 +119,8 @@ struct PerInstanceDataGridFragment
 
 // <-
 
-Renderer::Vulkan::Resources::DrawCallRef _drawCallRefGizmo;
-Renderer::Vulkan::Resources::DrawCallRef _drawCallRefGrid;
+RendererV::Resources::DrawCallRef _drawCallRefGizmo;
+RendererV::Resources::DrawCallRef _drawCallRefGrid;
 
 // <-
 
@@ -570,43 +570,40 @@ void Editing::onReinitRendering()
   Resources::MeshRef meshRefGrid =
       Resources::MeshManager::getResourceByName(_N(plane));
 
-  Renderer::Vulkan::Resources::DrawCallRefArray drawCallsToDestroy;
+  RendererV::Resources::DrawCallRefArray drawCallsToDestroy;
   if (_drawCallRefGizmo.isValid())
     drawCallsToDestroy.push_back(_drawCallRefGizmo);
   if (_drawCallRefGrid.isValid())
     drawCallsToDestroy.push_back(_drawCallRefGrid);
 
-  Renderer::Vulkan::Resources::DrawCallManager::destroyDrawCallsAndResources(
+  RendererV::Resources::DrawCallManager::destroyDrawCallsAndResources(
       drawCallsToDestroy);
 
   // Draw calls
-  Renderer::Vulkan::Resources::DrawCallRefArray drawCallsToCreate;
+  RendererV::Resources::DrawCallRefArray drawCallsToCreate;
   {
     _drawCallRefGizmo =
-        Renderer::Vulkan::Resources::DrawCallManager::createDrawCallForMesh(
+        RendererV::Resources::DrawCallManager::createDrawCallForMesh(
             _N(gizmo_translate), meshRefGizmo,
-            Renderer::Vulkan::Resources::MaterialManager::getResourceByName(
-                _N(gizmo)),
-            Renderer::Vulkan::Resources::MaterialManager::getMaterialPassId(
+            RendererV::Resources::MaterialManager::getResourceByName(_N(gizmo)),
+            RendererV::Resources::MaterialManager::getMaterialPassId(
                 _N(DebugGizmo)),
             sizeof(PerInstanceDataGizmoVertex),
             sizeof(PerInstanceDataGizmoFragment));
     drawCallsToCreate.push_back(_drawCallRefGizmo);
 
     _drawCallRefGrid =
-        Renderer::Vulkan::Resources::DrawCallManager::createDrawCallForMesh(
+        RendererV::Resources::DrawCallManager::createDrawCallForMesh(
             _N(Grid), meshRefGrid,
-            Renderer::Vulkan::Resources::MaterialManager::getResourceByName(
-                _N(grid)),
-            Renderer::Vulkan::Resources::MaterialManager::getMaterialPassId(
+            RendererV::Resources::MaterialManager::getResourceByName(_N(grid)),
+            RendererV::Resources::MaterialManager::getMaterialPassId(
                 _N(DebugGrid)),
             sizeof(PerInstanceDataGridVertex),
             sizeof(PerInstanceDataGridFragment));
     drawCallsToCreate.push_back(_drawCallRefGrid);
   }
 
-  Renderer::Vulkan::Resources::DrawCallManager::createResources(
-      drawCallsToCreate);
+  RendererV::Resources::DrawCallManager::createResources(drawCallsToCreate);
 }
 
 // <-
@@ -714,13 +711,10 @@ void Editing::updatePerInstanceData()
     }
 
     // Write to GPU memory
-    Renderer::Vulkan::Resources::DrawCallRefArray dcsToUpdate = {
-        _drawCallRefGizmo};
-    Renderer::Vulkan::Resources::DrawCallManager::
-        allocateAndUpdateUniformMemory(dcsToUpdate, &perInstanceDataVertex,
-                                       sizeof(PerInstanceDataGizmoVertex),
-                                       &perInstanceDataFragment,
-                                       sizeof(PerInstanceDataGizmoFragment));
+    RendererV::Resources::DrawCallRefArray dcsToUpdate = {_drawCallRefGizmo};
+    RendererV::Resources::DrawCallManager::allocateAndUpdateUniformMemory(
+        dcsToUpdate, &perInstanceDataVertex, sizeof(PerInstanceDataGizmoVertex),
+        &perInstanceDataFragment, sizeof(PerInstanceDataGizmoFragment));
   }
 
   // Axis plane
@@ -756,13 +750,10 @@ void Editing::updatePerInstanceData()
     }
 
     // Write to GPU memory
-    Renderer::Vulkan::Resources::DrawCallRefArray dcsToUpdate = {
-        _drawCallRefGrid};
-    Renderer::Vulkan::Resources::DrawCallManager::
-        allocateAndUpdateUniformMemory(dcsToUpdate, &perInstanceDataVertex,
-                                       sizeof(PerInstanceDataGridVertex),
-                                       &perInstanceDataFragment,
-                                       sizeof(PerInstanceDataGridFragment));
+    RendererV::Resources::DrawCallRefArray dcsToUpdate = {_drawCallRefGrid};
+    RendererV::Resources::DrawCallManager::allocateAndUpdateUniformMemory(
+        dcsToUpdate, &perInstanceDataVertex, sizeof(PerInstanceDataGridVertex),
+        &perInstanceDataFragment, sizeof(PerInstanceDataGridFragment));
   }
 }
 
@@ -926,7 +917,7 @@ void Editing::update(float p_DeltaT)
         Input::KeyState::kPressed)
     {
       Components::NodeRef pickedNode =
-          Renderer::Vulkan::RenderPass::PerPixelPicking::pickNode(
+          RendererV::RenderPass::PerPixelPicking::pickNode(
               Input::System::getLastMousePosViewport());
 
       if (pickedNode.isValid())

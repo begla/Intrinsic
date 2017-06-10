@@ -17,7 +17,7 @@
 #include "stdafx_editor.h"
 #include "stdafx_assets.h"
 
-using namespace Intrinsic::AssetManagement::Resources;
+using namespace AssetManagement::Resources;
 
 IntrinsicEdManagerWindowAsset::IntrinsicEdManagerWindowAsset(QWidget* parent)
     : IntrinsicEdManagerWindowBase(parent)
@@ -93,7 +93,7 @@ void IntrinsicEdManagerWindowAsset::onPopulateResourceTree()
     _resourceToItemMapping[assetEntry] = item;
 
     if (AssetManager::_descAssetType(assetEntry) ==
-        Intrinsic::AssetManagement::Resources::AssetType::kMesh)
+        AssetManagement::Resources::AssetType::kMesh)
     {
       meshes->addChild(item);
     }
@@ -257,22 +257,21 @@ void IntrinsicEdManagerWindowAsset::onResourceTreePopulated()
 
 void IntrinsicEdManagerWindowAsset::onCompileQueuedAssets()
 {
-  Intrinsic::AssetManagement::Resources::AssetManager::compileAssets(
-      _assetsToRecompile);
+  AssetManagement::Resources::AssetManager::compileAssets(_assetsToRecompile);
 
   if (!_assetsToRecompile.empty())
   {
     // TODO: Update only the assets which are affected by a changed asset
-    Vulkan::Resources::DrawCallManager::destroyResources(
-        Vulkan::Resources::DrawCallManager::_activeRefs);
-    Vulkan::Resources::DrawCallManager::createResources(
-        Vulkan::Resources::DrawCallManager::_activeRefs);
-    Vulkan::Resources::ComputeCallManager::destroyResources(
-        Vulkan::Resources::ComputeCallManager::_activeRefs);
-    Vulkan::Resources::ComputeCallManager::createResources(
-        Vulkan::Resources::ComputeCallManager::_activeRefs);
-    Vulkan::Resources::MaterialManager::createResources(
-        Vulkan::Resources::MaterialManager::_activeRefs);
+    RendererV::Resources::DrawCallManager::destroyResources(
+        RendererV::Resources::DrawCallManager::_activeRefs);
+    RendererV::Resources::DrawCallManager::createResources(
+        RendererV::Resources::DrawCallManager::_activeRefs);
+    RendererV::Resources::ComputeCallManager::destroyResources(
+        RendererV::Resources::ComputeCallManager::_activeRefs);
+    RendererV::Resources::ComputeCallManager::createResources(
+        RendererV::Resources::ComputeCallManager::_activeRefs);
+    RendererV::Resources::MaterialManager::createResources(
+        RendererV::Resources::MaterialManager::_activeRefs);
 
     _assetsToRecompile.clear();
   }

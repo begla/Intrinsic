@@ -214,9 +214,8 @@ struct RenderSystem
 
   // <-
 
-  _INTR_INLINE static void
-  releaseResource(const Intrinsic::Core::Name& p_TypeName, void* p_UserData0,
-                  void* p_UserData1)
+  _INTR_INLINE static void releaseResource(const Name& p_TypeName,
+                                           void* p_UserData0, void* p_UserData1)
   {
     ResourceReleaseEntry entry = {p_TypeName, p_UserData0, p_UserData1, 0u};
     _resourcesToFree.push_back(entry);
