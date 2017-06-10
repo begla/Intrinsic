@@ -21,6 +21,8 @@
 
 #define HALTON_SAMPLE_COUNT 1024
 
+using namespace CResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -205,8 +207,8 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
     UniformManager::_uniformDataSource.postParams0.y =
         World::_currentDayNightFactor;
     UniformManager::_uniformDataSource.postParams0.z =
-        CResources::PostEffectManager::_descDoFStartDistance(
-            CResources::PostEffectManager::_blendTargetRef);
+        PostEffectManager::_descDoFStartDistance(
+            PostEffectManager::_blendTargetRef);
 
     UniformManager::_uniformDataSource.cameraParameters.x =
         Components::CameraManager::_descNearPlane(p_Camera);
@@ -286,10 +288,9 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
           UniformManager::_uniformDataSource.inverseViewMatrix;
 
       // Sky
-      const glm::vec3 sunDir =
-          CResources::PostEffectManager::calcActualSunOrientation(
-              CResources::PostEffectManager::_blendTargetRef) *
-          glm::vec3(0.0f, 0.0f, 1.0f);
+      const glm::vec3 sunDir = PostEffectManager::calcActualSunOrientation(
+                                   PostEffectManager::_blendTargetRef) *
+                               glm::vec3(0.0f, 0.0f, 1.0f);
       fragmentData.sunLightDirWS = glm::vec4(sunDir, 0.0f);
       fragmentData.sunLightDirVS =
           UniformManager::_uniformDataSource.viewMatrix *
@@ -297,8 +298,8 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
       fragmentData.sunLightColorAndIntensity =
           World::_currentSunLightColorAndIntensity;
       fragmentData.sunLightColorAndIntensity.w *=
-          CResources::PostEffectManager::_descSunIntensity(
-              CResources::PostEffectManager::_blendTargetRef);
+          PostEffectManager::_descSunIntensity(
+              PostEffectManager::_blendTargetRef);
 
       const float elevation =
           glm::half_pi<float>() -
@@ -308,15 +309,14 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
       // TODO: Move params to post effect
       SkyModel::ArHosekSkyModelState skyModel =
           SkyModel::createSkyModelStateRGB(
-              CResources::PostEffectManager::_descSkyTurbidity(
-                  CResources::PostEffectManager::_blendTargetRef),
-              CResources::PostEffectManager::_descSkyAlbedo(
-                  CResources::PostEffectManager::_blendTargetRef),
+              PostEffectManager::_descSkyTurbidity(
+                  PostEffectManager::_blendTargetRef),
+              PostEffectManager::_descSkyAlbedo(
+                  PostEffectManager::_blendTargetRef),
               elevation);
-      const float radianceFactor =
-          World::_currentDayNightFactor *
-          CResources::PostEffectManager::_descSkyLightIntensity(
-              CResources::PostEffectManager::_blendTargetRef);
+      const float radianceFactor = World::_currentDayNightFactor *
+                                   PostEffectManager::_descSkyLightIntensity(
+                                       PostEffectManager::_blendTargetRef);
       skyModel.radiances[0] *= radianceFactor;
       skyModel.radiances[1] *= radianceFactor;
       skyModel.radiances[2] *= radianceFactor;

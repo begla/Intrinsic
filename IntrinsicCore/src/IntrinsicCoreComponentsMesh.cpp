@@ -15,6 +15,8 @@
 // Precompiled header file
 #include "stdafx.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Core
@@ -105,13 +107,12 @@ struct UniformUpdateParallelTaskSet : enki::ITaskSet
   {
     _INTR_PROFILE_CPU("General", "Mesh Uniform Data Updt. Job");
 
-    RVResources::DrawCallRefArray& drawCalls = *_drawCalls;
+    DrawCallRefArray& drawCalls = *_drawCalls;
 
     for (uint32_t dcIdx = p_Range.start; dcIdx < p_Range.end; ++dcIdx)
     {
-      RVResources::DrawCallRef dcRef = drawCalls[dcIdx];
-      MeshRef meshCompRef =
-          RVResources::DrawCallManager::_descMeshComponent(dcRef);
+      DrawCallRef dcRef = drawCalls[dcIdx];
+      MeshRef meshCompRef = DrawCallManager::_descMeshComponent(dcRef);
       _INTR_ASSERT(meshCompRef.isValid());
 
       MeshPerInstanceDataVertex& vertData =
@@ -119,14 +120,14 @@ struct UniformUpdateParallelTaskSet : enki::ITaskSet
       MeshPerInstanceDataFragment& fragData =
           Components::MeshManager::_perInstanceDataFragment(meshCompRef);
 
-      RVResources::DrawCallManager::allocateUniformMemory(dcRef);
-      RVResources::DrawCallManager::updateUniformMemory(
+      DrawCallManager::allocateUniformMemory(dcRef);
+      DrawCallManager::updateUniformMemory(
           dcRef, &vertData, sizeof(MeshPerInstanceDataVertex), &fragData,
           sizeof(MeshPerInstanceDataFragment));
     }
   }
 
-  RVResources::DrawCallRefArray* _drawCalls;
+  DrawCallRefArray* _drawCalls;
 };
 
 // <-
@@ -140,18 +141,17 @@ struct DrawCallCollectionParallelTaskSet : enki::ITaskSet
   {
     _INTR_PROFILE_CPU("General", "Collect Visible Mesh Draw Calls Job");
 
-    auto& drawCallsPerMaterialPass = RVResources::DrawCallManager::
-        _drawCallsPerMaterialPass[_materialPassIdx];
+    auto& drawCallsPerMaterialPass =
+        DrawCallManager::_drawCallsPerMaterialPass[_materialPassIdx];
     const uint32_t activeFrustumCount =
         (uint32_t)RV::RenderProcess::Default::_activeFrustums.size();
 
     for (uint32_t drawCallIdx = p_Range.start; drawCallIdx < p_Range.end;
          ++drawCallIdx)
     {
-      RVResources::DrawCallRef drawCallRef =
-          drawCallsPerMaterialPass[drawCallIdx];
+      DrawCallRef drawCallRef = drawCallsPerMaterialPass[drawCallIdx];
       Components::MeshRef meshComponentRef =
-          RVResources::DrawCallManager::_descMeshComponent(drawCallRef);
+          DrawCallManager::_descMeshComponent(drawCallRef);
 
       if (meshComponentRef.isValid())
       {
@@ -165,7 +165,7 @@ struct DrawCallCollectionParallelTaskSet : enki::ITaskSet
           if ((Components::NodeManager::_visibilityMask(nodeComponentRef) &
                (1u << frustIdx)) > 0u)
           {
-            RVResources::DrawCallManager::updateSortingHash(
+            DrawCallManager::updateSortingHash(
                 drawCallRef, Components::MeshManager::_perInstanceDataVertex(
                                  meshComponentRef)
                                  .data0.y);
@@ -232,7 +232,7 @@ MeshData::MeshData()
 
   for (uint32_t i = 0u; i < _INTR_MAX_MESH_COMPONENT_COUNT; ++i)
   {
-    drawCalls[i].resize(RVResources::MaterialManager::_materialPasses.size());
+    drawCalls[i].resize(MaterialManager::_materialPasses.size());
   }
 }
 
@@ -282,7 +282,7 @@ void MeshManager::init()
 
 void MeshManager::createResources(const MeshRefArray& p_Meshes)
 {
-  RVResources::DrawCallRefArray drawCallsToCreate;
+  DrawCallRefArray drawCallsToCreate;
 
   for (uint32_t meshIdx = 0u; meshIdx < p_Meshes.size(); ++meshIdx)
   {
@@ -298,31 +298,26 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
 
     for (uint32_t subMeshIdx = 0u; subMeshIdx < subMeshCount; ++subMeshIdx)
     {
-      RVResources::MaterialRef matToUse =
-          RVResources::MaterialManager::getResourceByName(
-              Resources::MeshManager::_descMaterialNamesPerSubMesh(
-                  meshRef)[subMeshIdx]);
+      MaterialRef matToUse = MaterialManager::getResourceByName(
+          Resources::MeshManager::_descMaterialNamesPerSubMesh(
+              meshRef)[subMeshIdx]);
 
-      const uint32_t matPassMask =
-          RVResources::MaterialManager::_materialPassMask(matToUse);
+      const uint32_t matPassMask = MaterialManager::_materialPassMask(matToUse);
 
       for (uint32_t matPassIdx = 0u;
-           matPassIdx < RVResources::MaterialManager::_materialPasses.size();
-           ++matPassIdx)
+           matPassIdx < MaterialManager::_materialPasses.size(); ++matPassIdx)
       {
         if ((matPassMask & (1u << matPassIdx)) == 0u)
         {
           continue;
         }
 
-        RVResources::DrawCallRef drawCallMesh =
-            RVResources::DrawCallManager::createDrawCallForMesh(
-                _N(_MeshComponent), meshRef, matToUse, matPassIdx,
-                sizeof(MeshPerInstanceDataVertex),
-                sizeof(MeshPerInstanceDataFragment), subMeshIdx);
+        DrawCallRef drawCallMesh = DrawCallManager::createDrawCallForMesh(
+            _N(_MeshComponent), meshRef, matToUse, matPassIdx,
+            sizeof(MeshPerInstanceDataVertex),
+            sizeof(MeshPerInstanceDataFragment), subMeshIdx);
 
-        RVResources::DrawCallManager::_descMeshComponent(drawCallMesh) =
-            meshCompRef;
+        DrawCallManager::_descMeshComponent(drawCallMesh) = meshCompRef;
 
         drawCallsToCreate.push_back(drawCallMesh);
 
@@ -341,7 +336,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
     }
   }
 
-  RVResources::DrawCallManager::createResources(drawCallsToCreate);
+  DrawCallManager::createResources(drawCallsToCreate);
 }
 
 // <-
@@ -363,8 +358,7 @@ void MeshManager::destroyResources(const MeshRefArray& p_Meshes)
       for (uint32_t dcIdx = 0u;
            dcIdx < drawCallsPerMaterialPass[matPassIdx].size(); ++dcIdx)
       {
-        RVResources::DrawCallRef dcRef =
-            drawCallsPerMaterialPass[matPassIdx][dcIdx];
+        DrawCallRef dcRef = drawCallsPerMaterialPass[matPassIdx][dcIdx];
         dcsToDestroy.push_back(dcRef);
       }
 
@@ -372,7 +366,7 @@ void MeshManager::destroyResources(const MeshRefArray& p_Meshes)
     }
   }
 
-  RVResources::DrawCallManager::destroyDrawCallsAndResources(dcsToDestroy);
+  DrawCallManager::destroyDrawCallsAndResources(dcsToDestroy);
 }
 
 // <-

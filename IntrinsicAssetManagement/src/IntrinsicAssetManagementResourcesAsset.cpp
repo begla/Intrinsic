@@ -16,6 +16,9 @@
 #include "stdafx_assets.h"
 #include "stdafx_vulkan.h"
 
+using namespace RVResources;
+using namespace CResources;
+
 namespace Intrinsic
 {
 namespace AssetManagement
@@ -68,7 +71,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     {
       ImporterFbx::init();
 
-      _INTR_ARRAY(CResources::MeshRef) importedMeshes;
+      _INTR_ARRAY(MeshRef) importedMeshes;
       ImporterFbx::importMeshesFromFile(Settings::Manager::_assetMeshPath +
                                             "/" + _descAssetFileName(assetRef),
                                         importedMeshes);
@@ -76,12 +79,12 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
 
       for (uint32_t i = 0u; i < importedMeshes.size(); ++i)
       {
-        CResources::MeshManager::saveToMultipleFilesSingleResource(
+        MeshManager::saveToMultipleFilesSingleResource(
             importedMeshes[i], "managers/meshes/", ".mesh.json");
       }
 
-      RVResources::MaterialManager::saveToMultipleFiles("managers/materials/",
-                                                        ".material.json");
+      MaterialManager::saveToMultipleFiles("managers/materials/",
+                                           ".material.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kLinearColorTexture)
     {
@@ -91,8 +94,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      RVResources::ImageManager::saveToMultipleFiles("managers/images/",
-                                                     ".image.json");
+      ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kAlbedoTexture)
     {
@@ -102,8 +104,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      RVResources::ImageManager::saveToMultipleFiles("managers/images/",
-                                                     ".image.json");
+      ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kAlbedoAlphaTexture)
     {
@@ -113,8 +114,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      RVResources::ImageManager::saveToMultipleFiles("managers/images/",
-                                                     ".image.json");
+      ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kNormalTexture)
     {
@@ -124,8 +124,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      RVResources::ImageManager::saveToMultipleFiles("managers/images/",
-                                                     ".image.json");
+      ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kHdrTexture)
     {
@@ -135,8 +134,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      RVResources::ImageManager::saveToMultipleFiles("managers/images/",
-                                                     ".image.json");
+      ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
   }
 }

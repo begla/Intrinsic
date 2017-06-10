@@ -17,6 +17,7 @@
 #include "stdafx.h"
 
 using namespace RVResources;
+using namespace CResources;
 
 namespace Intrinsic
 {
@@ -35,7 +36,7 @@ RenderPassRef _renderPassRef;
 // <-
 
 _INTR_INLINE void calculateFrustumForSplit(uint32_t p_SplitIdx,
-                                           CResources::FrustumRef p_FrustumRef,
+                                           FrustumRef p_FrustumRef,
                                            Components::CameraRef p_CameraRef)
 {
   _INTR_PROFILE_CPU("Render Pass", "Calc. Shadow Map Matrices");
@@ -54,16 +55,15 @@ _INTR_INLINE void calculateFrustumForSplit(uint32_t p_SplitIdx,
   const glm::vec3 worldBoundsCenter = Math::calcAABBCenter(worldBounds);
 
   glm::vec3 euler =
-      glm::eulerAngles(CResources::PostEffectManager::calcActualSunOrientation(
-          CResources::PostEffectManager::_blendTargetRef));
+      glm::eulerAngles(PostEffectManager::calcActualSunOrientation(
+          PostEffectManager::_blendTargetRef));
   euler = glm::trunc(euler * 25.0f) / 25.0f;
   const glm::vec3 quantSunDir = glm::quat(euler) * glm::vec3(0.0f, 0.0f, 1.0f);
 
   const glm::vec3 eye = worldBoundsHalfExtentLength * quantSunDir;
   const glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f);
 
-  glm::mat4& shadowViewMatrix =
-      CResources::FrustumManager::_descViewMatrix(p_FrustumRef);
+  glm::mat4& shadowViewMatrix = FrustumManager::_descViewMatrix(p_FrustumRef);
   shadowViewMatrix = glm::lookAt(eye, center, glm::vec3(0.0f, 1.0f, 0.0f));
 
   const float nearPlane =
@@ -128,7 +128,7 @@ _INTR_INLINE void calculateFrustumForSplit(uint32_t p_SplitIdx,
   float orthoNear = FLT_MAX;
   float orthoFar = -FLT_MAX;
 
-  // Calc. near/fear
+  // Calculate near/fear
   {
     glm::vec3 aabbCorners[8];
     Math::calcAABBCorners(worldBounds, aabbCorners);
@@ -143,11 +143,11 @@ _INTR_INLINE void calculateFrustumForSplit(uint32_t p_SplitIdx,
     }
   }
 
-  CResources::FrustumManager::_descProjectionType(p_FrustumRef) =
-      CResources::ProjectionType::kOrthographic;
-  CResources::FrustumManager::_descNearFarPlaneDistances(p_FrustumRef) =
+  FrustumManager::_descProjectionType(p_FrustumRef) =
+      ProjectionType::kOrthographic;
+  FrustumManager::_descNearFarPlaneDistances(p_FrustumRef) =
       glm::vec2(orthoNear, orthoFar);
-  CResources::FrustumManager::_descProjectionMatrix(p_FrustumRef) = glm::ortho(
+  FrustumManager::_descProjectionMatrix(p_FrustumRef) = glm::ortho(
       orthoLeft, orthoRight, orthoBottom, orthoTop, orthoNear, orthoFar);
 }
 }
@@ -232,22 +232,20 @@ void Shadow::destroy() {}
 // <-
 
 void Shadow::prepareFrustums(Components::CameraRef p_CameraRef,
-                             _INTR_ARRAY(CResources::FrustumRef) &
-                                 p_ShadowFrustums)
+                             _INTR_ARRAY(FrustumRef) & p_ShadowFrustums)
 {
   _INTR_PROFILE_CPU("Render Pass", "Prepare Shadow Frustums");
 
   for (uint32_t i = 0u; i < p_ShadowFrustums.size(); ++i)
   {
-    CResources::FrustumManager::destroyFrustum(p_ShadowFrustums[i]);
+    FrustumManager::destroyFrustum(p_ShadowFrustums[i]);
   }
   p_ShadowFrustums.clear();
 
   for (uint32_t shadowMapIdx = 0u; shadowMapIdx < _INTR_PSSM_SPLIT_COUNT;
        ++shadowMapIdx)
   {
-    CResources::FrustumRef frustumRef =
-        CResources::FrustumManager::createFrustum(_N(ShadowFrustum));
+    FrustumRef frustumRef = FrustumManager::createFrustum(_N(ShadowFrustum));
 
     calculateFrustumForSplit(shadowMapIdx, frustumRef, p_CameraRef);
 
@@ -265,7 +263,7 @@ void Shadow::render(float p_DeltaT, Components::CameraRef p_CameraRef)
   _INTR_PROFILE_COUNTER_SET("Dispatched Draw Calls (Shadows)",
                             DrawCallDispatcher::_dispatchedDrawCallCount);
 
-  const _INTR_ARRAY(CResources::FrustumRef)& shadowFrustums =
+  const _INTR_ARRAY(FrustumRef)& shadowFrustums =
       RenderProcess::Default::_shadowFrustums[p_CameraRef];
   for (uint32_t shadowMapIdx = 0u; shadowMapIdx < shadowFrustums.size();
        ++shadowMapIdx)
@@ -273,7 +271,7 @@ void Shadow::render(float p_DeltaT, Components::CameraRef p_CameraRef)
     _INTR_PROFILE_CPU("Render Pass", "Render Shadow Map");
     _INTR_PROFILE_GPU("Render Shadow Map");
 
-    CResources::FrustumRef frustumRef = shadowFrustums[shadowMapIdx];
+    FrustumRef frustumRef = shadowFrustums[shadowMapIdx];
 
     ImageManager::insertImageMemoryBarrierSubResource(
         _shadowBufferImageRef, VK_IMAGE_LAYOUT_UNDEFINED,

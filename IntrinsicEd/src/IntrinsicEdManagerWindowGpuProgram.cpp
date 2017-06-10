@@ -16,6 +16,8 @@
 #include "stdafx.h"
 #include "stdafx_editor.h"
 
+using namespace RVResources;
+
 IntrinsicEdManagerWindowGpuProgram::IntrinsicEdManagerWindowGpuProgram(
     QWidget* parent)
     : IntrinsicEdManagerWindowBase(parent)
@@ -46,17 +48,14 @@ void IntrinsicEdManagerWindowGpuProgram::onShaderChanged(
     const QString& p_FileName)
 {
   // Recompile shaders
-  for (uint32_t i = 0u;
-       i < RVResources::GpuProgramManager::getActiveResourceCount(); ++i)
+  for (uint32_t i = 0u; i < GpuProgramManager::getActiveResourceCount(); ++i)
   {
-    RVResources::GpuProgramRef ref =
-        RVResources::GpuProgramManager::getActiveResourceAtIndex(i);
-    if (strcmp(
-            p_FileName.toStdString().c_str(),
-            (_shaderAssetPath +
-             RVResources::GpuProgramManager::_descGpuProgramName(ref).c_str())
-                .toStdString()
-                .c_str()) == 0u)
+    GpuProgramRef ref = GpuProgramManager::getActiveResourceAtIndex(i);
+    if (strcmp(p_FileName.toStdString().c_str(),
+               (_shaderAssetPath +
+                GpuProgramManager::_descGpuProgramName(ref).c_str())
+                   .toStdString()
+                   .c_str()) == 0u)
     {
       if (std::find(_shadersToRecompile.begin(), _shadersToRecompile.end(),
                     ref) == _shadersToRecompile.end())
@@ -76,20 +75,17 @@ void IntrinsicEdManagerWindowGpuProgram::onResourceTreePopulated()
   if (!files.empty())
     _shaderChangeWatch->removePaths(files);
 
-  for (uint32_t i = 0u;
-       i < RVResources::GpuProgramManager::getActiveResourceCount(); ++i)
+  for (uint32_t i = 0u; i < GpuProgramManager::getActiveResourceCount(); ++i)
   {
-    RVResources::GpuProgramRef ref =
-        RVResources::GpuProgramManager::getActiveResourceAtIndex(i);
+    GpuProgramRef ref = GpuProgramManager::getActiveResourceAtIndex(i);
     _shaderChangeWatch->addPath(
-        _shaderAssetPath +
-        RVResources::GpuProgramManager::_descGpuProgramName(ref).c_str());
+        _shaderAssetPath + GpuProgramManager::_descGpuProgramName(ref).c_str());
   }
 }
 
 void IntrinsicEdManagerWindowGpuProgram::onCompileQueuedShaders()
 {
-  RVResources::GpuProgramManager::compileShaders(_shadersToRecompile);
+  GpuProgramManager::compileShaders(_shadersToRecompile);
   _shadersToRecompile.clear();
 
   onResourceTreePopulated();
