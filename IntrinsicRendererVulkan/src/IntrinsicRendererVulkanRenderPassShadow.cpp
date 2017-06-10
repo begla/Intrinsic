@@ -34,7 +34,7 @@ Resources::RenderPassRef _renderPassRef;
 
 _INTR_INLINE void
 calculateFrustumForSplit(uint32_t p_SplitIdx,
-                         Core::Resources::FrustumRef p_FrustumRef,
+                         CoreResources::FrustumRef p_FrustumRef,
                          Components::CameraRef p_CameraRef)
 {
   _INTR_PROFILE_CPU("Render Pass", "Calc. Shadow Map Matrices");
@@ -53,8 +53,8 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
   const glm::vec3 worldBoundsCenter = Math::calcAABBCenter(worldBounds);
 
   glm::vec3 euler = glm::eulerAngles(
-      Core::Resources::PostEffectManager::calcActualSunOrientation(
-          Core::Resources::PostEffectManager::_blendTargetRef));
+      CoreResources::PostEffectManager::calcActualSunOrientation(
+          CoreResources::PostEffectManager::_blendTargetRef));
   euler = glm::trunc(euler * 25.0f) / 25.0f;
   const glm::vec3 quantSunDir = glm::quat(euler) * glm::vec3(0.0f, 0.0f, 1.0f);
 
@@ -62,7 +62,7 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
   const glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f);
 
   glm::mat4& shadowViewMatrix =
-      Core::Resources::FrustumManager::_descViewMatrix(p_FrustumRef);
+      CoreResources::FrustumManager::_descViewMatrix(p_FrustumRef);
   shadowViewMatrix = glm::lookAt(eye, center, glm::vec3(0.0f, 1.0f, 0.0f));
 
   const float nearPlane =
@@ -142,11 +142,11 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
     }
   }
 
-  Core::Resources::FrustumManager::_descProjectionType(p_FrustumRef) =
-      Core::Resources::ProjectionType::kOrthographic;
-  Core::Resources::FrustumManager::_descNearFarPlaneDistances(p_FrustumRef) =
+  CoreResources::FrustumManager::_descProjectionType(p_FrustumRef) =
+      CoreResources::ProjectionType::kOrthographic;
+  CoreResources::FrustumManager::_descNearFarPlaneDistances(p_FrustumRef) =
       glm::vec2(orthoNear, orthoFar);
-  Core::Resources::FrustumManager::_descProjectionMatrix(p_FrustumRef) =
+  CoreResources::FrustumManager::_descProjectionMatrix(p_FrustumRef) =
       glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, orthoNear,
                  orthoFar);
 }
@@ -234,22 +234,22 @@ void Shadow::destroy() {}
 // <-
 
 void Shadow::prepareFrustums(Components::CameraRef p_CameraRef,
-                             _INTR_ARRAY(Core::Resources::FrustumRef) &
+                             _INTR_ARRAY(CoreResources::FrustumRef) &
                                  p_ShadowFrustums)
 {
   _INTR_PROFILE_CPU("Render Pass", "Prepare Shadow Frustums");
 
   for (uint32_t i = 0u; i < p_ShadowFrustums.size(); ++i)
   {
-    Core::Resources::FrustumManager::destroyFrustum(p_ShadowFrustums[i]);
+    CoreResources::FrustumManager::destroyFrustum(p_ShadowFrustums[i]);
   }
   p_ShadowFrustums.clear();
 
   for (uint32_t shadowMapIdx = 0u; shadowMapIdx < _INTR_PSSM_SPLIT_COUNT;
        ++shadowMapIdx)
   {
-    Core::Resources::FrustumRef frustumRef =
-        Core::Resources::FrustumManager::createFrustum(_N(ShadowFrustum));
+    CoreResources::FrustumRef frustumRef =
+        CoreResources::FrustumManager::createFrustum(_N(ShadowFrustum));
 
     calculateFrustumForSplit(shadowMapIdx, frustumRef, p_CameraRef);
 
@@ -269,7 +269,7 @@ void Shadow::render(float p_DeltaT, Components::CameraRef p_CameraRef)
   _INTR_PROFILE_COUNTER_SET("Dispatched Draw Calls (Shadows)",
                             DrawCallDispatcher::_dispatchedDrawCallCount);
 
-  const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+  const _INTR_ARRAY(CoreResources::FrustumRef)& shadowFrustums =
       RenderProcess::Default::_shadowFrustums[p_CameraRef];
   for (uint32_t shadowMapIdx = 0u; shadowMapIdx < shadowFrustums.size();
        ++shadowMapIdx)
@@ -277,7 +277,7 @@ void Shadow::render(float p_DeltaT, Components::CameraRef p_CameraRef)
     _INTR_PROFILE_CPU("Render Pass", "Render Shadow Map");
     _INTR_PROFILE_GPU("Render Shadow Map");
 
-    Core::Resources::FrustumRef frustumRef = shadowFrustums[shadowMapIdx];
+    CoreResources::FrustumRef frustumRef = shadowFrustums[shadowMapIdx];
 
     ImageManager::insertImageMemoryBarrierSubResource(
         _shadowBufferImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
@@ -305,7 +305,7 @@ void Shadow::render(float p_DeltaT, Components::CameraRef p_CameraRef)
     // Update per mesh uniform data
     {
       Components::MeshManager::updatePerInstanceData(p_CameraRef, frustumIdx);
-      Core::Components::MeshManager::updateUniformData(visibleDrawCalls);
+      CoreComponents::MeshManager::updateUniformData(visibleDrawCalls);
     }
 
     VkClearValue clearValues[1] = {};

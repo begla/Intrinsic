@@ -28,9 +28,8 @@ struct UniformManager
   _INTR_INLINE static uint8_t* allocatePerInstanceDataMemory(uint32_t p_Size,
                                                              uint32_t& p_Offset)
   {
-    const uint32_t bufferIdx =
-        Renderer::Vulkan::RenderSystem::_backbufferIndex %
-        _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
+    const uint32_t bufferIdx = RendererV::RenderSystem::_backbufferIndex %
+                               _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
 
     MemoryBlock block;
 

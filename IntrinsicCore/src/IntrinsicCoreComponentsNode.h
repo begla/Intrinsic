@@ -667,10 +667,10 @@ private:
 
 namespace std
 {
-template <> class hash<Intrinsic::Core::Components::NodeRef>
+template <> class hash<Components::NodeRef>
 {
 public:
-  size_t operator()(const Intrinsic::Core::Components::NodeRef& p_Ref) const
+  size_t operator()(const Components::NodeRef& p_Ref) const
   {
     return p_Ref._id;
   }

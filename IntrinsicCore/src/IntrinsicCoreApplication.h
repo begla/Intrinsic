@@ -20,19 +20,17 @@ namespace Core
 {
 struct Application
 {
-  static _INTR_HASH_MAP(Name,
-                        Intrinsic::Core::Dod::Components::ComponentManagerEntry)
+  static _INTR_HASH_MAP(Name, Dod::Components::ComponentManagerEntry)
       _componentManagerMapping;
-  static _INTR_HASH_MAP(Name,
-                        Intrinsic::Core::Dod::Resources::ResourceManagerEntry)
+  static _INTR_HASH_MAP(Name, Dod::Resources::ResourceManagerEntry)
       _resourceManagerMapping;
 
-  static _INTR_HASH_MAP(Name, Intrinsic::Core::Dod::PropertyCompilerEntry)
+  static _INTR_HASH_MAP(Name, Dod::PropertyCompilerEntry)
       _componentPropertyCompilerMapping;
-  static _INTR_HASH_MAP(Name, Intrinsic::Core::Dod::PropertyCompilerEntry)
+  static _INTR_HASH_MAP(Name, Dod::PropertyCompilerEntry)
       _resourcePropertyCompilerMapping;
 
-  static _INTR_ARRAY(Intrinsic::Core::Dod::Components::ComponentManagerEntry)
+  static _INTR_ARRAY(Dod::Components::ComponentManagerEntry)
       _orderedComponentManagers;
 
   static void init(void* p_PlatformHandle, void* p_PlatformWindow);

@@ -72,7 +72,7 @@ enum Enum
 
 struct ResourceReleaseEntry
 {
-  Intrinsic::Core::Name typeName;
+  Name typeName;
 
   void* userData0;
   void* userData1;

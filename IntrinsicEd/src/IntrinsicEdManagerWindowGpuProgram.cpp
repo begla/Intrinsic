@@ -47,16 +47,18 @@ void IntrinsicEdManagerWindowGpuProgram::onShaderChanged(
 {
   // Recompile shaders
   for (uint32_t i = 0u;
-       i < Vulkan::Resources::GpuProgramManager::getActiveResourceCount(); ++i)
+       i < RendererV::Resources::GpuProgramManager::getActiveResourceCount();
+       ++i)
   {
-    Vulkan::Resources::GpuProgramRef ref =
-        Vulkan::Resources::GpuProgramManager::getActiveResourceAtIndex(i);
-    if (strcmp(p_FileName.toStdString().c_str(),
-               (_shaderAssetPath +
-                Vulkan::Resources::GpuProgramManager::_descGpuProgramName(ref)
-                    .c_str())
-                   .toStdString()
-                   .c_str()) == 0u)
+    RendererV::Resources::GpuProgramRef ref =
+        RendererV::Resources::GpuProgramManager::getActiveResourceAtIndex(i);
+    if (strcmp(
+            p_FileName.toStdString().c_str(),
+            (_shaderAssetPath +
+             RendererV::Resources::GpuProgramManager::_descGpuProgramName(ref)
+                 .c_str())
+                .toStdString()
+                .c_str()) == 0u)
     {
       if (std::find(_shadersToRecompile.begin(), _shadersToRecompile.end(),
                     ref) == _shadersToRecompile.end())
@@ -77,19 +79,21 @@ void IntrinsicEdManagerWindowGpuProgram::onResourceTreePopulated()
     _shaderChangeWatch->removePaths(files);
 
   for (uint32_t i = 0u;
-       i < Vulkan::Resources::GpuProgramManager::getActiveResourceCount(); ++i)
+       i < RendererV::Resources::GpuProgramManager::getActiveResourceCount();
+       ++i)
   {
-    Vulkan::Resources::GpuProgramRef ref =
-        Vulkan::Resources::GpuProgramManager::getActiveResourceAtIndex(i);
+    RendererV::Resources::GpuProgramRef ref =
+        RendererV::Resources::GpuProgramManager::getActiveResourceAtIndex(i);
     _shaderChangeWatch->addPath(
         _shaderAssetPath +
-        Vulkan::Resources::GpuProgramManager::_descGpuProgramName(ref).c_str());
+        RendererV::Resources::GpuProgramManager::_descGpuProgramName(ref)
+            .c_str());
   }
 }
 
 void IntrinsicEdManagerWindowGpuProgram::onCompileQueuedShaders()
 {
-  Vulkan::Resources::GpuProgramManager::compileShaders(_shadersToRecompile);
+  RendererV::Resources::GpuProgramManager::compileShaders(_shadersToRecompile);
   _shadersToRecompile.clear();
 
   onResourceTreePopulated();

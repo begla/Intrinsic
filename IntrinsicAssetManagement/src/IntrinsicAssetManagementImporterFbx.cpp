@@ -268,26 +268,26 @@ void importMesh(FbxMesh* p_Mesh,
   }
 
   // Create dummy materials
-  Renderer::Vulkan::Resources::MaterialRefArray materialsToCreate;
+  RendererV::Resources::MaterialRefArray materialsToCreate;
 
   for (uint32_t i = 0u; i < subMeshCount; ++i)
   {
     const char* materialName = p_Mesh->GetNode()->GetMaterial(i)->GetName();
-    Renderer::Vulkan::Resources::MaterialRef materialRef =
-        Renderer::Vulkan::Resources::MaterialManager::_getResourceByName(
+    RendererV::Resources::MaterialRef materialRef =
+        RendererV::Resources::MaterialManager::_getResourceByName(
             materialName);
 
     if (!materialRef.isValid())
     {
       materialRef =
-          Renderer::Vulkan::Resources::MaterialManager::createMaterial(
+          RendererV::Resources::MaterialManager::createMaterial(
               materialName);
-      Renderer::Vulkan::Resources::MaterialManager::resetToDefault(materialRef);
+      RendererV::Resources::MaterialManager::resetToDefault(materialRef);
 
       materialsToCreate.push_back(materialRef);
     }
   }
-  Renderer::Vulkan::Resources::MaterialManager::createResources(
+  RendererV::Resources::MaterialManager::createResources(
       materialsToCreate);
 
   posArray.resize(subMeshCount);
@@ -448,20 +448,20 @@ void importMesh(FbxMesh* p_Mesh,
     Components::MeshRefArray componentsToRecreate;
 
     for (uint32_t i = 0u;
-         i < Core::Components::MeshManager::getActiveResourceCount(); ++i)
+         i < CoreComponents::MeshManager::getActiveResourceCount(); ++i)
     {
       Components::MeshRef meshCompRef =
-          Core::Components::MeshManager::getActiveResourceAtIndex(i);
+          CoreComponents::MeshManager::getActiveResourceAtIndex(i);
 
-      if (Core::Components::MeshManager::_descMeshName(meshCompRef) ==
+      if (CoreComponents::MeshManager::_descMeshName(meshCompRef) ==
           Core::Resources::MeshManager::_name(meshRef))
       {
         componentsToRecreate.push_back(meshCompRef);
       }
     }
 
-    Core::Components::MeshManager::destroyResources(componentsToRecreate);
-    Core::Components::MeshManager::createResources(componentsToRecreate);
+    CoreComponents::MeshManager::destroyResources(componentsToRecreate);
+    CoreComponents::MeshManager::createResources(componentsToRecreate);
   }
 }
 

@@ -401,7 +401,7 @@ void Default::renderFrame(float p_DeltaT)
       {
         Components::CameraRef camRef = _cameras[i];
 
-        Core::Resources::FrustumRef frustumRef =
+        CoreResources::FrustumRef frustumRef =
             Components::CameraManager::_frustum(camRef);
         _cameraToIdMapping[camRef] = (uint8_t)_activeFrustums.size();
         _activeFrustums.push_back(frustumRef);
@@ -409,7 +409,7 @@ void Default::renderFrame(float p_DeltaT)
         // Only allow shadows for the main view
         if (_cameraNames[i] == _N(ActiveCamera))
         {
-          _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+          _INTR_ARRAY(CoreResources::FrustumRef)& shadowFrustums =
               _shadowFrustums[camRef];
           RenderPass::Shadow::prepareFrustums(camRef, shadowFrustums);
           _activeFrustums.insert(RenderProcess::Default::_activeFrustums.end(),
@@ -419,10 +419,10 @@ void Default::renderFrame(float p_DeltaT)
 
       Components::CameraManager::updateFrustums(
           Components::CameraManager::_activeRefs);
-      Core::Resources::FrustumManager::prepareForRendering(
-          Core::Resources::FrustumManager::_activeRefs);
+      CoreResources::FrustumManager::prepareForRendering(
+          CoreResources::FrustumManager::_activeRefs);
 
-      Core::Resources::FrustumManager::cullNodes(
+      CoreResources::FrustumManager::cullNodes(
           RenderProcess::Default::_activeFrustums);
 
       // Collect visible draw calls and mesh components

@@ -85,8 +85,6 @@ void IntrinsicEdPropertyEditorResourceSelector::updateComboBoxItems()
 
 void IntrinsicEdPropertyEditorResourceSelector::updateFromProperty()
 {
-  using namespace Intrinsic::Core;
-
   _INTR_ASSERT(_property);
   const rapidjson::Value& prop = *_property;
 

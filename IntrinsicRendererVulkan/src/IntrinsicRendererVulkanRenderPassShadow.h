@@ -30,7 +30,7 @@ struct Shadow
   static void destroy();
 
   static void prepareFrustums(Components::CameraRef p_CameraRef,
-                              _INTR_ARRAY(Core::Resources::FrustumRef) &
+                              _INTR_ARRAY(CoreResources::FrustumRef) &
                                   p_ShadowFrustums);
 
   static void render(float p_DeltaT, Components::CameraRef p_CameraRef);

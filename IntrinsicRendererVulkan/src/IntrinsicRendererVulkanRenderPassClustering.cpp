@@ -615,16 +615,16 @@ _INTR_INLINE void renderLighting(Resources::FramebufferRef p_FramebufferRef,
     _lightingPerInstanceData.data0.y = Clustering::_globalAmbientFactor;
     _lightingPerInstanceData.data0.z = World::_currentDayNightFactor;
 
-    const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+    const _INTR_ARRAY(CoreResources::FrustumRef)& shadowFrustums =
         RenderProcess::Default::_shadowFrustums[p_CameraRef];
 
     for (uint32_t i = 0u; i < shadowFrustums.size(); ++i)
     {
-      Core::Resources::FrustumRef shadowFrustumRef = shadowFrustums[i];
+      CoreResources::FrustumRef shadowFrustumRef = shadowFrustums[i];
 
       // Transform from camera view space => light proj. space
       _lightingPerInstanceData.shadowViewProjMatrix[i] =
-          Core::Resources::FrustumManager::_viewProjectionMatrix(
+          CoreResources::FrustumManager::_viewProjectionMatrix(
               shadowFrustumRef) *
           Components::CameraManager::_inverseViewMatrix(p_CameraRef);
     }

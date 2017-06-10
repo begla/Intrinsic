@@ -84,7 +84,7 @@ int _main(int argc, char* argv[])
   QPixmap splashscreen(":/Media/splashscreen");
   _INTR_ASSERT(!splashscreen.isNull());
 
-  Intrinsic::Core::Log::Manager::addLogListener({onLoggedSplashscreen});
+  Log::Manager::addLogListener({onLoggedSplashscreen});
 
   splash = new QSplashScreen(splashscreen /*, Qt::WindowStaysOnTopHint*/);
   splash->show();
@@ -107,8 +107,7 @@ int main(int argc, char* argv[])
   {
     return _main(argc, argv);
   }
-  __except (Intrinsic::Core::CrashDumpGeneratorWin32::GenerateDump(
-      GetExceptionInformation()))
+  __except (CrashDumpGeneratorWin32::GenerateDump(GetExceptionInformation()))
   {
     return -1;
   }

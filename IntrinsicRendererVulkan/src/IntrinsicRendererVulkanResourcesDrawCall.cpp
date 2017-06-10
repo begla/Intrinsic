@@ -192,21 +192,21 @@ DrawCallRef DrawCallManager::createDrawCallForMesh(
     _descPipeline(drawCallMesh) = MaterialManager::_materialPassPipelines
         [MaterialManager::_materialPasses[p_MaterialPass].pipelineIdx];
 
-    _INTR_ASSERT(Renderer::Vulkan::Resources::PipelineManager::_vkPipeline(
+    _INTR_ASSERT(RendererV::Resources::PipelineManager::_vkPipeline(
         _descPipeline(drawCallMesh)));
 
     _descVertexBuffers(drawCallMesh) =
-        Core::Resources::MeshManager::_vertexBuffersPerSubMesh(
+        CoreResources::MeshManager::_vertexBuffersPerSubMesh(
             p_Mesh)[p_SubMeshIdx];
     _descIndexBuffer(drawCallMesh) =
-        Core::Resources::MeshManager::_indexBufferPerSubMesh(
+        CoreResources::MeshManager::_indexBufferPerSubMesh(
             p_Mesh)[p_SubMeshIdx];
     _descVertexCount(drawCallMesh) =
-        (uint32_t)Core::Resources::MeshManager::_descPositionsPerSubMesh(
+        (uint32_t)CoreResources::MeshManager::_descPositionsPerSubMesh(
             p_Mesh)[p_SubMeshIdx]
             .size();
     _descIndexCount(drawCallMesh) =
-        (uint32_t)Core::Resources::MeshManager::_descIndicesPerSubMesh(
+        (uint32_t)CoreResources::MeshManager::_descIndicesPerSubMesh(
             p_Mesh)[p_SubMeshIdx]
             .size();
     _descMaterial(drawCallMesh) = p_Material;

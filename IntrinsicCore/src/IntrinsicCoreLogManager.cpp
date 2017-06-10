@@ -90,7 +90,7 @@ void Manager::log(LogLevel::Enum p_LogLevel, const char* p_Message, ...)
     logFile.flush();
   }
 
-  if (p_LogLevel == Intrinsic::Core::Log::LogLevel::kError)
+  if (p_LogLevel == Log::LogLevel::kError)
   {
     _INTR_ERROR_DIALOG(messageBuffer);
   }

@@ -137,7 +137,7 @@ void TaskManager::executeTasks()
     _INTR_PROFILE_CPU("TaskManager", "Rendering Tasks");
 
     // Rendering
-    Renderer::Vulkan::RenderProcess::Default::renderFrame(modDeltaT);
+    RendererV::RenderProcess::Default::renderFrame(modDeltaT);
   }
 
   {

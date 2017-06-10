@@ -54,12 +54,9 @@ struct Name
 
 namespace std
 {
-template <> class hash<Intrinsic::Core::Name>
+template <> class hash<Name>
 {
 public:
-  size_t operator()(const Intrinsic::Core::Name& p_Name) const
-  {
-    return p_Name._hash;
-  }
+  size_t operator()(const Name& p_Name) const { return p_Name._hash; }
 };
 };

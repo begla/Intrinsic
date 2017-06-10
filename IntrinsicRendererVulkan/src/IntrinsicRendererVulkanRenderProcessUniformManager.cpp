@@ -205,8 +205,8 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
     UniformManager::_uniformDataSource.postParams0.y =
         World::_currentDayNightFactor;
     UniformManager::_uniformDataSource.postParams0.z =
-        Core::Resources::PostEffectManager::_descDoFStartDistance(
-            Core::Resources::PostEffectManager::_blendTargetRef);
+        CoreResources::PostEffectManager::_descDoFStartDistance(
+            CoreResources::PostEffectManager::_blendTargetRef);
 
     UniformManager::_uniformDataSource.cameraParameters.x =
         Components::CameraManager::_descNearPlane(p_Camera);
@@ -287,8 +287,8 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 
       // Sky
       const glm::vec3 sunDir =
-          Core::Resources::PostEffectManager::calcActualSunOrientation(
-              Core::Resources::PostEffectManager::_blendTargetRef) *
+          CoreResources::PostEffectManager::calcActualSunOrientation(
+              CoreResources::PostEffectManager::_blendTargetRef) *
           glm::vec3(0.0f, 0.0f, 1.0f);
       fragmentData.sunLightDirWS = glm::vec4(sunDir, 0.0f);
       fragmentData.sunLightDirVS =
@@ -297,8 +297,8 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
       fragmentData.sunLightColorAndIntensity =
           World::_currentSunLightColorAndIntensity;
       fragmentData.sunLightColorAndIntensity.w *=
-          Core::Resources::PostEffectManager::_descSunIntensity(
-              Core::Resources::PostEffectManager::_blendTargetRef);
+          CoreResources::PostEffectManager::_descSunIntensity(
+              CoreResources::PostEffectManager::_blendTargetRef);
 
       const float elevation =
           glm::half_pi<float>() -
@@ -308,15 +308,15 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
       // TODO: Move params to post effect
       SkyModel::ArHosekSkyModelState skyModel =
           SkyModel::createSkyModelStateRGB(
-              Core::Resources::PostEffectManager::_descSkyTurbidity(
-                  Core::Resources::PostEffectManager::_blendTargetRef),
-              Core::Resources::PostEffectManager::_descSkyAlbedo(
-                  Core::Resources::PostEffectManager::_blendTargetRef),
+              CoreResources::PostEffectManager::_descSkyTurbidity(
+                  CoreResources::PostEffectManager::_blendTargetRef),
+              CoreResources::PostEffectManager::_descSkyAlbedo(
+                  CoreResources::PostEffectManager::_blendTargetRef),
               elevation);
       const float radianceFactor =
           World::_currentDayNightFactor *
-          Core::Resources::PostEffectManager::_descSkyLightIntensity(
-              Core::Resources::PostEffectManager::_blendTargetRef);
+          CoreResources::PostEffectManager::_descSkyLightIntensity(
+              CoreResources::PostEffectManager::_blendTargetRef);
       skyModel.radiances[0] *= radianceFactor;
       skyModel.radiances[1] *= radianceFactor;
       skyModel.radiances[2] *= radianceFactor;

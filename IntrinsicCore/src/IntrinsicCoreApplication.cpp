@@ -25,17 +25,17 @@ namespace Intrinsic
 {
 namespace Core
 {
-_INTR_HASH_MAP(Name, Intrinsic::Core::Dod::Components::ComponentManagerEntry)
+_INTR_HASH_MAP(Name, Dod::Components::ComponentManagerEntry)
 Application::_componentManagerMapping;
-_INTR_HASH_MAP(Name, Intrinsic::Core::Dod::Resources::ResourceManagerEntry)
+_INTR_HASH_MAP(Name, Dod::Resources::ResourceManagerEntry)
 Application::_resourceManagerMapping;
 
-_INTR_HASH_MAP(Name, Intrinsic::Core::Dod::PropertyCompilerEntry)
+_INTR_HASH_MAP(Name, Dod::PropertyCompilerEntry)
 Application::_componentPropertyCompilerMapping;
-_INTR_HASH_MAP(Name, Intrinsic::Core::Dod::PropertyCompilerEntry)
+_INTR_HASH_MAP(Name, Dod::PropertyCompilerEntry)
 Application::_resourcePropertyCompilerMapping;
 
-_INTR_ARRAY(Intrinsic::Core::Dod::Components::ComponentManagerEntry)
+_INTR_ARRAY(Dod::Components::ComponentManagerEntry)
 Application::_orderedComponentManagers;
 
 enki::TaskScheduler Application::_scheduler;
@@ -55,7 +55,7 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
   initManagers();
 
   // Init. renderer
-  Renderer::Vulkan::RenderSystem::init(p_PlatformHandle, p_PlatformWindow);
+  RendererV::RenderSystem::init(p_PlatformHandle, p_PlatformWindow);
 
 // MicroProfile init.
 #if defined(_INTR_PROFILING_ENABLED)
@@ -69,11 +69,10 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
 #if defined(MICROPROFILE_GPU_TIMERS_VULKAN)
     MicroProfileGpuInitVulkan(
-        &Renderer::Vulkan::RenderSystem::_vkDevice,
-        &Renderer::Vulkan::RenderSystem::_vkPhysicalDevice,
-        &Renderer::Vulkan::RenderSystem::_vkQueue,
-        &Renderer::Vulkan::RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex,
-        1u);
+        &RendererV::RenderSystem::_vkDevice,
+        &RendererV::RenderSystem::_vkPhysicalDevice,
+        &RendererV::RenderSystem::_vkQueue,
+        &RendererV::RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex, 1u);
 #endif // MICROPROFILE_GPU_TIMERS_VULKAN
   }
 #endif // _INTR_PROFILING_ENABLED
