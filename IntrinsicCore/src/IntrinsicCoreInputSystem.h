@@ -84,6 +84,9 @@ enum Enum
   kF,
   kT,
 
+  kDel,
+  kBackspace,
+
   kMouseLeft,
   kMouseRight,
 

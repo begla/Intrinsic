@@ -990,6 +990,24 @@ void Editing::update(float p_DeltaT)
       Components::NodeManager::updateTransforms(nodeRef);
     }
   }
+  else if ((Input::System::getKeyStates()[Input::Key::kDel] ==
+                Input::KeyState::kPressed ||
+            Input::System::getKeyStates()[Input::Key::kBackspace] ==
+                Input::KeyState::kPressed) &&
+           _currentlySelectedEntity.isValid())
+  {
+    Components::NodeRef currSelNodeRef =
+        Components::NodeManager::getComponentForEntity(
+            _currentlySelectedEntity);
+
+    if (currSelNodeRef != World::getRootNode())
+    {
+      World::destroyNodeFull(currSelNodeRef);
+      _currentlySelectedEntity = World::getRootNode();
+      Resources::EventManager::queueEventIfNotExisting(
+          _N(CurrentlySelectedEntityChanged));
+    }
+  }
 
   if (Input::System::getKeyStates()[Input::Key::kAlt] ==
           Input::KeyState::kPressed ||
