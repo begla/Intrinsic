@@ -134,6 +134,12 @@ void SDL::pumpEvents()
       case SDLK_ESCAPE:
         keyEvent.key = Input::Key::kEscape;
         break;
+      case SDLK_DELETE:
+        keyEvent.key = Input::Key::kDel;
+        break;
+      case SDLK_BACKSPACE:
+        keyEvent.key = Input::Key::kBackspace;
+        break;
       }
 
       if (keyEvent.key != (uint32_t)-1)
