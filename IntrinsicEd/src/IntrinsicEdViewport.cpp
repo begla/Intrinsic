@@ -96,6 +96,8 @@ void IntrinsicEdViewport::dragEnterEvent(QDragEnterEvent* event)
     stream >> prefabName;
 
     spawnPrefab(prefabName.toStdString().c_str());
+
+    setFocus();
   }
 }
 
