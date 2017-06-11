@@ -1,0 +1,51 @@
+[
+    {
+        "name": "Boids",
+        "offsetToParent": 0,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -1024.5,
+                        575.25,
+                        -219.5
+                    ],
+                    "localOrient": [
+                        1.4355805433297065e-10,
+                        0.923770546913147,
+                        -8.08223248327522e-8,
+                        0.4120674133300781
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        -1024.5,
+                        575.25,
+                        -219.5
+                    ],
+                    "worldOrient": [
+                        1.4355805433297065e-10,
+                        0.923770546913147,
+                        -8.08223248327522e-8,
+                        0.4120674133300781
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "Swarm",
+                "properties": {
+                    "boidMeshName": "sphere_emissive"
+                }
+            }
+        ]
+    }
+]

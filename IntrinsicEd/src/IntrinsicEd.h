@@ -40,6 +40,7 @@ public:
 
   void closeEvent(QCloseEvent*) override;
   int enterMainLoop();
+  void tick();
 
   static IntrinsicEd* _mainWindow;
   static IntrinsicEdNodeView* _nodeView;

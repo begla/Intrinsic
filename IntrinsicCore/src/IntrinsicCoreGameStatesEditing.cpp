@@ -1003,7 +1003,8 @@ void Editing::update(float p_DeltaT)
     if (currSelNodeRef != World::getRootNode())
     {
       World::destroyNodeFull(currSelNodeRef);
-      _currentlySelectedEntity = World::getRootNode();
+      _currentlySelectedEntity =
+          Components::NodeManager::_entity(World::getRootNode());
       Resources::EventManager::queueEventIfNotExisting(
           _N(CurrentlySelectedEntityChanged));
     }
