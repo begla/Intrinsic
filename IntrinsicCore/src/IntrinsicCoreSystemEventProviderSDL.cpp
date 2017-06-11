@@ -187,8 +187,7 @@ void SDL::pumpEvents()
       Input::MouseMoveEvent mouseEvent = {
           glm::vec2(sdlEvent.motion.x, sdlEvent.motion.y),
           glm::vec2(sdlEvent.motion.x, sdlEvent.motion.y) /
-              glm::vec2(RV::RenderSystem::_backbufferDimensions),
-          glm::vec2(sdlEvent.motion.xrel, sdlEvent.motion.yrel)};
+              glm::vec2(RV::RenderSystem::_backbufferDimensions)};
 
       Input::System::processMouseMoveEvent(mouseEvent);
     }
