@@ -24,8 +24,10 @@ IntrinsicEdPrefabsView::IntrinsicEdPrefabsView(QWidget* parent)
   _model->setNameFilterDisables(false);
   setModel(_model);
   setRootIndex(_model->setRootPath("media/prefabs"));
-  // setHeaderHidden(true);
+  setHeaderHidden(true);
+  setColumnHidden(3, true);
   setColumnHidden(2, true);
+  setColumnHidden(1, true);
 }
 
 IntrinsicEdPrefabsView::~IntrinsicEdPrefabsView() {}
