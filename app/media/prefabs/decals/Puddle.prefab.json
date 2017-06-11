@@ -1,0 +1,64 @@
+[
+    {
+        "name": "Decal1",
+        "offsetToParent": 0,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -944.0,
+                        568.75,
+                        -238.25
+                    ],
+                    "localOrient": [
+                        -0.6211917400360107,
+                        -0.3378176689147949,
+                        -0.3378176689147949,
+                        0.6211917400360107
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        -944.0,
+                        568.75,
+                        -238.25
+                    ],
+                    "worldOrient": [
+                        -0.6211917400360107,
+                        -0.3378176689147949,
+                        -0.3378176689147949,
+                        0.6211917400360107
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "Decal",
+                "properties": {
+                    "albedoTextureName": "decal_puddle",
+                    "normalTextureName": "decal_puddle_NRM",
+                    "pbrTextureName": "decal_puddle_PBR",
+                    "uvTransform": [
+                        1.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    "halfExtent": [
+                        8.0,
+                        8.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    }
+]
