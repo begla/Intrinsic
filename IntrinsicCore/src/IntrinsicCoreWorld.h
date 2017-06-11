@@ -27,6 +27,7 @@ struct World
 
   static void destroyNodeFull(Components::NodeRef p_Ref);
   static Components::NodeRef cloneNodeFull(Components::NodeRef p_Ref);
+  static void alignNodeWithGround(Components::NodeRef p_NodeRef);
 
   static void save(const _INTR_STRING& p_FilePath);
 

@@ -449,11 +449,13 @@ void Debug::renderSphere(const glm::vec3& p_Center, float p_Radius,
 
 void Debug::renderDecal(Dod::Ref p_Decal)
 {
-  const glm::vec3 halfExtent =
-      Components::DecalManager::_descHalfExtent(p_Decal);
+
   const Components::NodeRef nodeRef =
       Components::NodeManager::getComponentForEntity(
           Components::DecalManager::_entity(p_Decal));
+  const glm::vec3 halfExtent =
+      Components::DecalManager::_descHalfExtent(p_Decal) *
+      Components::NodeManager::_worldSize(nodeRef);
 
   const glm::quat orient = Components::NodeManager::_worldOrientation(nodeRef);
   const glm::vec3 right = orient * glm::vec3(halfExtent.x, 0.0f, 0.0f);

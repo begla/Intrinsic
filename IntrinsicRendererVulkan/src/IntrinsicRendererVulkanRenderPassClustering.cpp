@@ -361,7 +361,8 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
               Components::DecalManager::_entity(decalRef));
 
       const glm::vec3 decalHalfExtent =
-          Components::DecalManager::_descHalfExtent(decalRef);
+          Components::DecalManager::_descHalfExtent(decalRef) *
+          Components::NodeManager::_worldSize(decalNodeRef);
       const glm::vec3 decalWorldPos =
           Components::NodeManager::_worldPosition(decalNodeRef);
       const glm::quat decalWorldOrientation =
