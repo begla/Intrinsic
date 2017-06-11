@@ -155,7 +155,7 @@ void IntrinsicEdViewport::dragMoveEvent(QDragMoveEvent* event)
     setFocus();
   }
 
-  IntrinsicEd::_mainWindow->tick();
+  IntrinsicEd::_mainWindow->tickMainLoop();
 }
 
 void IntrinsicEdViewport::dropEvent(QDropEvent* event)

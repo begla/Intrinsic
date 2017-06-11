@@ -880,23 +880,22 @@ int IntrinsicEd::enterMainLoop()
 {
   while (Application::_running)
   {
-    tick();
+    updateUI();
+    {
+      tickMainLoop();
+    }
+    _propertyView->updatePropertyView();
+
+    if (_settingsUpdatePending)
+    {
+      Settings::Manager::loadSettings();
+      updateSettingsChangeWatch();
+      RV::RenderSystem::onViewportChanged();
+      _settingsUpdatePending = false;
+    }
   }
 
   return 0;
 }
 
-void IntrinsicEd::tick()
-{
-  updateUI();
-  TaskManager::executeTasks();
-  _propertyView->updatePropertyView();
-
-  if (_settingsUpdatePending)
-  {
-    Settings::Manager::loadSettings();
-    updateSettingsChangeWatch();
-    RV::RenderSystem::onViewportChanged();
-    _settingsUpdatePending = false;
-  }
-}
+void IntrinsicEd::tickMainLoop() { TaskManager::executeTasks(); }

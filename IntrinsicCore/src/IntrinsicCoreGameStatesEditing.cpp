@@ -970,22 +970,54 @@ void Editing::update(float p_DeltaT)
             _currentlySelectedEntity);
 
     physx::PxRaycastHit hit;
-    const Math::Ray ray = {Components::NodeManager::_worldPosition(nodeRef) +
-                               glm::vec3(0.0f, 5.0f, 0.0f),
-                           glm::vec3(0.0f, -1.0f, 0.0f)};
+    Math::Ray ray = {glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 0.0f)};
+
+    Components::DecalRef decalRef =
+        Components::DecalManager::getComponentForEntity(
+            _currentlySelectedEntity);
+
+    // Special handling for decals
+    if (decalRef.isValid())
+    {
+      ray.d = Components::NodeManager::_worldOrientation(nodeRef) *
+              glm::vec3(0.0f, 0.0f, -1.0f);
+    }
+    ray.o = Components::NodeManager::_worldPosition(nodeRef) - ray.d * 5.0f;
+
     if (PhysxHelper::raycast(ray, hit, 1000.0f))
     {
-      Components::NodeManager::updateFromWorldPosition(
-          nodeRef, glm::vec3(hit.position.x, hit.position.y, hit.position.z));
+      if (!decalRef.isValid())
+      {
+        const glm::vec3 hitNormal =
+            glm::vec3(hit.normal.x, hit.normal.y, hit.normal.z);
 
-      const glm::vec3 hitNormal =
-          glm::vec3(hit.normal.x, hit.normal.y, hit.normal.z);
-      const glm::vec3 currentNormal =
-          Components::NodeManager::_worldOrientation(nodeRef) *
-          glm::vec3(0.0f, 1.0f, 0.0f);
-      Components::NodeManager::updateFromWorldOrientation(
-          nodeRef, glm::rotation(currentNormal, hitNormal) *
-                       Components::NodeManager::_worldOrientation(nodeRef));
+        Components::NodeManager::updateFromWorldPosition(
+            nodeRef, glm::vec3(hit.position.x, hit.position.y, hit.position.z));
+        const glm::vec3 currentNormal =
+            Components::NodeManager::_worldOrientation(nodeRef) *
+            glm::vec3(0.0f, 1.0f, 0.0f);
+        Components::NodeManager::updateFromWorldOrientation(
+            nodeRef, glm::rotation(currentNormal, hitNormal) *
+                         Components::NodeManager::_worldOrientation(nodeRef));
+      }
+      else
+      {
+        const glm::vec3 hitNormal =
+            glm::vec3(hit.normal.x, hit.normal.y, hit.normal.z);
+
+        Components::NodeManager::updateFromWorldPosition(
+            nodeRef,
+            glm::vec3(hit.position.x, hit.position.y, hit.position.z) +
+                hitNormal *
+                    Components::DecalManager::_descHalfExtent(decalRef).z);
+
+        const glm::vec3 currentNormal =
+            Components::NodeManager::_worldOrientation(nodeRef) *
+            glm::vec3(0.0f, 0.0f, 1.0f);
+        Components::NodeManager::updateFromWorldOrientation(
+            nodeRef, glm::rotation(currentNormal, hitNormal) *
+                         Components::NodeManager::_worldOrientation(nodeRef));
+      }
 
       Components::NodeManager::updateTransforms(nodeRef);
     }
