@@ -880,7 +880,6 @@ int IntrinsicEd::enterMainLoop()
 {
   while (Application::_running)
   {
-    qApp->processEvents();
     tick();
   }
 
