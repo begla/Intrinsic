@@ -85,19 +85,17 @@ void IntrinsicEdViewport::onKeyPressed(Resources::EventRef p_EventRef)
 
 void IntrinsicEdViewport::dragEnterEvent(QDragEnterEvent* event)
 {
-  event->accept();
-
   const QMimeData* mimeData = event->mimeData();
   if (mimeData->hasFormat("PrefabFilePath") && !_currentPrefab.isValid())
   {
+    event->accept();
+
     QByteArray encodedData = mimeData->data("PrefabFilePath");
     QDataStream stream(&encodedData, QIODevice::ReadOnly);
     QString prefabName;
     stream >> prefabName;
 
     spawnPrefab(prefabName.toStdString().c_str());
-
-    setFocus();
   }
 }
 
@@ -153,6 +151,8 @@ void IntrinsicEdViewport::dragMoveEvent(QDragMoveEvent* event)
     NodeRef nodeRef = NodeManager::getComponentForEntity(_currentPrefab);
     positionNodeOnGround(nodeRef);
     NodeManager::updateTransforms(nodeRef);
+
+    setFocus();
   }
 
   IntrinsicEd::_mainWindow->tick();

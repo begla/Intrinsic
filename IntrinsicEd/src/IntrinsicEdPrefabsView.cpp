@@ -40,13 +40,19 @@ QStringList IntrinsicEdPrefabModel::mimeTypes() const
 QMimeData*
 IntrinsicEdPrefabModel::mimeData(const QModelIndexList& indexes) const
 {
+  QFileInfo info = fileInfo(indexes[0]);
   QMimeData* mimeData = new QMimeData();
-  QByteArray encodedData;
-  QDataStream stream(&encodedData, QIODevice::WriteOnly);
 
-  stream << filePath(indexes[0]);
+  if (info.isFile())
+  {
+    QByteArray encodedData;
+    QDataStream stream(&encodedData, QIODevice::WriteOnly);
 
-  mimeData->setData("PrefabFilePath", encodedData);
+    stream << info.filePath();
+
+    mimeData->setData("PrefabFilePath", encodedData);
+  }
+
   return mimeData;
 }
 
