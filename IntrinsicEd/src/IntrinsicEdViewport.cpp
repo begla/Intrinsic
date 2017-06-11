@@ -152,6 +152,12 @@ void IntrinsicEdViewport::dragMoveEvent(QDragMoveEvent* event)
     positionNodeOnGround(nodeRef);
     NodeManager::updateTransforms(nodeRef);
 
+    if (IntrinsicEd::_prefabsBrowser->_ui.alignWithGround->isChecked())
+    {
+      World::alignNodeWithGround(nodeRef);
+      NodeManager::updateTransforms(nodeRef);
+    }
+
     setFocus();
   }
 
@@ -171,11 +177,33 @@ void IntrinsicEdViewport::spawnPrefab(const _INTR_STRING& p_PrefabFilePath)
 
   positionNodeOnGround(nodeRef);
 
+  const glm::vec3 randomRotEuler = glm::vec3(
+      Math::calcRandomFloatMinMax(
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMinX->value()),
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMaxX->value())),
+      Math::calcRandomFloatMinMax(
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMinY->value()),
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMaxY->value())),
+      Math::calcRandomFloatMinMax(
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMinZ->value()),
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMaxZ->value())));
+  const glm::vec2 randomScale =
+      glm::vec2(Math::calcRandomFloatMinMax(
+                    IntrinsicEd::_prefabsBrowser->_ui.scaleMinHor->value(),
+                    IntrinsicEd::_prefabsBrowser->_ui.scaleMaxHor->value()),
+                Math::calcRandomFloatMinMax(
+                    IntrinsicEd::_prefabsBrowser->_ui.scaleMinVert->value(),
+                    IntrinsicEd::_prefabsBrowser->_ui.scaleMaxVert->value()));
+
+  NodeManager::_orientation(nodeRef) =
+      NodeManager::_orientation(nodeRef) * glm::quat(randomRotEuler);
+  NodeManager::_size(nodeRef) *=
+      glm::vec3(randomScale.x, randomScale.y, randomScale.x);
+
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
   World::loadNodeResources(nodeRef);
 
   GameStates::Editing::_currentlySelectedEntity = entityRef;
-
   _currentPrefab = entityRef;
 }
 

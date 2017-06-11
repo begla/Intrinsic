@@ -968,59 +968,7 @@ void Editing::update(float p_DeltaT)
     Components::NodeRef nodeRef =
         Components::NodeManager::getComponentForEntity(
             _currentlySelectedEntity);
-
-    physx::PxRaycastHit hit;
-    Math::Ray ray = {glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 0.0f)};
-
-    Components::DecalRef decalRef =
-        Components::DecalManager::getComponentForEntity(
-            _currentlySelectedEntity);
-
-    // Special handling for decals
-    if (decalRef.isValid())
-    {
-      ray.d = Components::NodeManager::_worldOrientation(nodeRef) *
-              glm::vec3(0.0f, 0.0f, -1.0f);
-    }
-    ray.o = Components::NodeManager::_worldPosition(nodeRef) - ray.d * 5.0f;
-
-    if (PhysxHelper::raycast(ray, hit, 1000.0f))
-    {
-      if (!decalRef.isValid())
-      {
-        const glm::vec3 hitNormal =
-            glm::vec3(hit.normal.x, hit.normal.y, hit.normal.z);
-
-        Components::NodeManager::updateFromWorldPosition(
-            nodeRef, glm::vec3(hit.position.x, hit.position.y, hit.position.z));
-        const glm::vec3 currentNormal =
-            Components::NodeManager::_worldOrientation(nodeRef) *
-            glm::vec3(0.0f, 1.0f, 0.0f);
-        Components::NodeManager::updateFromWorldOrientation(
-            nodeRef, glm::rotation(currentNormal, hitNormal) *
-                         Components::NodeManager::_worldOrientation(nodeRef));
-      }
-      else
-      {
-        const glm::vec3 hitNormal =
-            glm::vec3(hit.normal.x, hit.normal.y, hit.normal.z);
-
-        Components::NodeManager::updateFromWorldPosition(
-            nodeRef,
-            glm::vec3(hit.position.x, hit.position.y, hit.position.z) +
-                hitNormal *
-                    Components::DecalManager::_descHalfExtent(decalRef).z);
-
-        const glm::vec3 currentNormal =
-            Components::NodeManager::_worldOrientation(nodeRef) *
-            glm::vec3(0.0f, 0.0f, 1.0f);
-        Components::NodeManager::updateFromWorldOrientation(
-            nodeRef, glm::rotation(currentNormal, hitNormal) *
-                         Components::NodeManager::_worldOrientation(nodeRef));
-      }
-
-      Components::NodeManager::updateTransforms(nodeRef);
-    }
+    World::alignNodeWithGround(nodeRef);
   }
   else if ((Input::System::getKeyStates()[Input::Key::kDel] ==
                 Input::KeyState::kPressed ||

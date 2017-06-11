@@ -151,13 +151,72 @@ Components::NodeRef World::cloneNodeFull(Components::NodeRef p_Ref)
   return clonedNodes[0];
 }
 
+void World::alignNodeWithGround(Components::NodeRef p_NodeRef)
+{
+  Entity::EntityRef entityRef = Components::NodeManager::_entity(p_NodeRef);
+
+  physx::PxRaycastHit hit;
+  Math::Ray ray = {glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 0.0f)};
+
+  Components::DecalRef decalRef =
+      Components::DecalManager::getComponentForEntity(entityRef);
+
+  // Special handling for decals
+  if (decalRef.isValid())
+  {
+    ray.d = Components::NodeManager::_worldOrientation(p_NodeRef) *
+            glm::vec3(0.0f, 0.0f, -1.0f);
+  }
+  ray.o = Components::NodeManager::_worldPosition(p_NodeRef) - ray.d * 5.0f;
+
+  if (PhysxHelper::raycast(ray, hit, 1000.0f))
+  {
+    if (!decalRef.isValid())
+    {
+      const glm::vec3 hitNormal =
+          glm::vec3(hit.normal.x, hit.normal.y, hit.normal.z);
+
+      Components::NodeManager::updateFromWorldPosition(
+          p_NodeRef, glm::vec3(hit.position.x, hit.position.y, hit.position.z));
+      const glm::vec3 currentNormal =
+          Components::NodeManager::_worldOrientation(p_NodeRef) *
+          glm::vec3(0.0f, 1.0f, 0.0f);
+      Components::NodeManager::updateFromWorldOrientation(
+          p_NodeRef, glm::normalize(glm::rotation(currentNormal, hitNormal) *
+                                    Components::NodeManager::_worldOrientation(
+                                        p_NodeRef)));
+    }
+    else
+    {
+      const glm::vec3 hitNormal =
+          glm::vec3(hit.normal.x, hit.normal.y, hit.normal.z);
+
+      Components::NodeManager::updateFromWorldPosition(
+          p_NodeRef,
+          glm::vec3(hit.position.x, hit.position.y, hit.position.z) +
+              hitNormal *
+                  Components::DecalManager::_descHalfExtent(decalRef).z);
+
+      const glm::vec3 currentNormal =
+          Components::NodeManager::_worldOrientation(p_NodeRef) *
+          glm::vec3(0.0f, 0.0f, 1.0f);
+      Components::NodeManager::updateFromWorldOrientation(
+          p_NodeRef, glm::normalize(glm::rotation(currentNormal, hitNormal) *
+                                    Components::NodeManager::_worldOrientation(
+                                        p_NodeRef)));
+    }
+
+    Components::NodeManager::updateTransforms(p_NodeRef);
+  }
+}
+
 // <-
 
-void World::destroyNodeFull(Components::NodeRef p_Ref)
+void World::destroyNodeFull(Components::NodeRef p_NodeRef)
 {
   // Collect entities
   Entity::EntityRefArray entities;
-  Components::NodeManager::collectEntities(p_Ref, entities);
+  Components::NodeManager::collectEntities(p_NodeRef, entities);
 
   // Cleanup components and entities
   {
