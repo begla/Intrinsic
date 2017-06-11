@@ -137,13 +137,12 @@ struct MouseMoveEvent
 {
   glm::vec2 pos;
   glm::vec2 posViewport;
-  glm::vec2 posRel;
 };
 
 struct System
 {
   static void init();
-  static void reset();
+  static void updateLastMousePos();
 
   static void processAxisEvent(const AxisEvent& p_Event);
   static void processKeyPressEvent(const KeyEvent& p_Event);
@@ -212,6 +211,7 @@ private:
   static uint8_t _keyStates[Key::kCount];
   static float _axisStates[Axis::kCount];
 
+  static glm::vec2 _prevMousPos;
   static glm::vec2 _lastMousePos;
   static glm::vec2 _lastMousePosViewport;
   static glm::vec2 _lastMousePosRel;

@@ -46,7 +46,7 @@ glm::quat _initialOrientation = glm::quat();
 glm::vec3 _translScalePlaneNormal = glm::vec3(0.0f);
 
 float _lastGizmoScale = 1.0f;
-const float _mouseSens = glm::half_pi<float>() * 0.02f;
+const float _mouseSens = glm::half_pi<float>() * 0.025f;
 const float _controllerSens = 10.0f;
 
 // Grid
