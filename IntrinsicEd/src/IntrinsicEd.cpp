@@ -881,19 +881,23 @@ int IntrinsicEd::enterMainLoop()
   while (Application::_running)
   {
     qApp->processEvents();
-
-    updateUI();
-    TaskManager::executeTasks();
-    _propertyView->updatePropertyView();
-
-    if (_settingsUpdatePending)
-    {
-      Settings::Manager::loadSettings();
-      updateSettingsChangeWatch();
-      RV::RenderSystem::onViewportChanged();
-      _settingsUpdatePending = false;
-    }
+    tick();
   }
 
   return 0;
+}
+
+void IntrinsicEd::tick()
+{
+  updateUI();
+  TaskManager::executeTasks();
+  _propertyView->updatePropertyView();
+
+  if (_settingsUpdatePending)
+  {
+    Settings::Manager::loadSettings();
+    updateSettingsChangeWatch();
+    RV::RenderSystem::onViewportChanged();
+    _settingsUpdatePending = false;
+  }
 }

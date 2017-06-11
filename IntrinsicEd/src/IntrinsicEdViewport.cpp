@@ -86,13 +86,9 @@ void IntrinsicEdViewport::onKeyPressed(Resources::EventRef p_EventRef)
 void IntrinsicEdViewport::dragEnterEvent(QDragEnterEvent* event)
 {
   event->accept();
-}
 
-void IntrinsicEdViewport::dropEvent(QDropEvent* event)
-{
   const QMimeData* mimeData = event->mimeData();
-
-  if (mimeData->hasFormat("PrefabFilePath"))
+  if (mimeData->hasFormat("PrefabFilePath") && !_currentPrefab.isValid())
   {
     QByteArray encodedData = mimeData->data("PrefabFilePath");
     QDataStream stream(&encodedData, QIODevice::ReadOnly);
@@ -103,11 +99,24 @@ void IntrinsicEdViewport::dropEvent(QDropEvent* event)
   }
 }
 
-void IntrinsicEdViewport::spawnPrefab(const _INTR_STRING& p_PrefabFilePath)
+void IntrinsicEdViewport::dragLeaveEvent(QDragLeaveEvent* event)
 {
-  NodeRef nodeRef = World::loadNodeHierarchy(p_PrefabFilePath);
-  Entity::EntityRef entityRef = NodeManager::_entity(nodeRef);
-  NodeManager::attachChild(World::getRootNode(), nodeRef);
+  if (_currentPrefab.isValid())
+  {
+    World::destroyNodeFull(NodeManager::getComponentForEntity(_currentPrefab));
+
+    if (GameStates::Editing::_currentlySelectedEntity == _currentPrefab)
+    {
+      GameStates::Editing::_currentlySelectedEntity =
+          NodeManager::_entity(World::getRootNode());
+    }
+
+    _currentPrefab = Dod::Ref();
+  }
+}
+
+_INTR_INLINE void IntrinsicEdViewport::positionNodeOnGround(Dod::Ref p_NodeRef)
+{
 
   CameraRef camRef = World::getActiveCamera();
   NodeRef camNodeRef =
@@ -127,17 +136,45 @@ void IntrinsicEdViewport::spawnPrefab(const _INTR_STRING& p_PrefabFilePath)
   if (PhysxHelper::raycast(worldRay, hit, 50000.0f,
                            physx::PxQueryFlag::eSTATIC))
   {
-    NodeManager::_position(nodeRef) = worldRay.o + worldRay.d * hit.distance;
+    NodeManager::_position(p_NodeRef) = worldRay.o + worldRay.d * hit.distance;
   }
   else
   {
-    NodeManager::_position(nodeRef) = worldRay.o + worldRay.d * 10.0f;
+    NodeManager::_position(p_NodeRef) = worldRay.o + worldRay.d * 10.0f;
   }
+}
+
+void IntrinsicEdViewport::dragMoveEvent(QDragMoveEvent* event)
+{
+  if (_currentPrefab.isValid())
+  {
+    NodeRef nodeRef = NodeManager::getComponentForEntity(_currentPrefab);
+    positionNodeOnGround(nodeRef);
+    NodeManager::updateTransforms(nodeRef);
+  }
+
+  IntrinsicEd::_mainWindow->tick();
+}
+
+void IntrinsicEdViewport::dropEvent(QDropEvent* event)
+{
+  _currentPrefab = Dod::Ref();
+}
+
+void IntrinsicEdViewport::spawnPrefab(const _INTR_STRING& p_PrefabFilePath)
+{
+  NodeRef nodeRef = World::loadNodeHierarchy(p_PrefabFilePath);
+  Entity::EntityRef entityRef = NodeManager::_entity(nodeRef);
+  NodeManager::attachChild(World::getRootNode(), nodeRef);
+
+  positionNodeOnGround(nodeRef);
 
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
   World::loadNodeResources(nodeRef);
 
   GameStates::Editing::_currentlySelectedEntity = entityRef;
+
+  _currentPrefab = entityRef;
 }
 
 void IntrinsicEdViewport::onKeyReleased(Resources::EventRef p_EventRef) {}

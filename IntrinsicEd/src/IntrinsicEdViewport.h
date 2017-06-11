@@ -23,11 +23,17 @@ public:
   ~IntrinsicEdViewport();
   void dropEvent(QDropEvent* event) override;
   void dragEnterEvent(QDragEnterEvent* event) override;
+  void dragMoveEvent(QDragMoveEvent* event) override;
+  void dragLeaveEvent(QDragLeaveEvent* event) override;
 
+  void positionNodeOnGround(Intrinsic::Core::Dod::Ref p_NodeRef);
   void spawnPrefab(const _INTR_STRING& p_PrefabFilePath);
 
   void onKeyPressed(Resources::EventRef p_EventRef);
   void onKeyReleased(Resources::EventRef p_EventRef);
   void onAxisChanged(Resources::EventRef p_EventRef);
   void onMouseMoved(Resources::EventRef p_EventRef);
+
+private:
+  Intrinsic::Core::Dod::Ref _currentPrefab;
 };
