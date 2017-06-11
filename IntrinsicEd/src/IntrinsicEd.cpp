@@ -882,6 +882,7 @@ int IntrinsicEd::enterMainLoop()
   {
     updateUI();
     {
+      qApp->processEvents();
       tickMainLoop();
     }
     _propertyView->updatePropertyView();
