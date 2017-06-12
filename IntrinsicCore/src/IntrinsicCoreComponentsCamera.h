@@ -136,7 +136,7 @@ struct CameraManager
   static glm::mat4 computeCustomProjMatrix(CameraRef p_Ref, float p_Near,
                                            float p_Far);
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   // Description
