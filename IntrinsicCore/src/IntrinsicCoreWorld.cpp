@@ -533,25 +533,13 @@ void World::load(const _INTR_STRING& p_FilePath)
 
 void World::updateDayNightCycle(float p_DeltaT)
 {
-  Math::Gradient<glm::vec4, 7u> sunColorGradient;
-  {
-    sunColorGradient._keyPoints[0] = 0.0f; // Sunrise
-    sunColorGradient._keyPoints[1] = 0.05f;
-    sunColorGradient._keyPoints[2] = 0.1f;
-    sunColorGradient._keyPoints[3] = 0.40f;
-    sunColorGradient._keyPoints[4] = 0.45f; // Dawn
-    sunColorGradient._keyPoints[5] = 0.5f;  // Night
-    sunColorGradient._keyPoints[6] = 1.0f;
-
-    sunColorGradient._values[0] = glm::vec4(glm::vec3(1.0f), 0.025f);
-    sunColorGradient._values[1] = glm::vec4(1.0f, 0.643f, 0.376f, 0.5f);
-    sunColorGradient._values[2] = glm::vec4(1.0f, 0.6f, 0.5f, 1.0f);
-    sunColorGradient._values[3] = glm::vec4(1.0f, 0.6f, 0.5f, 1.0f);
-    sunColorGradient._values[4] = glm::vec4(1.0f, 0.643f, 0.376f, 0.5f);
-    sunColorGradient._values[5] = glm::vec4(glm::vec3(1.0f), 0.025f);
-    sunColorGradient._values[6] = glm::vec4(glm::vec3(1.0f), 0.025f);
-  }
-
+  static Math::Gradient<glm::vec4, 7u> sunColorGradient = {
+      {glm::vec4(glm::vec3(1.0f), 0.025f),
+       glm::vec4(1.0f, 0.643f, 0.376f, 0.5f), glm::vec4(1.0f, 0.6f, 0.5f, 1.0f),
+       glm::vec4(1.0f, 0.6f, 0.5f, 1.0f), glm::vec4(1.0f, 0.643f, 0.376f, 0.5f),
+       glm::vec4(glm::vec3(1.0f), 0.025f), glm::vec4(glm::vec3(1.0f), 0.025f)},
+      {0.0f, /* Sunrise */ 0.05f, 0.1f, 0.4f, 0.45f /* Dawn */, 0.5f /*Night*/,
+       1.0f}};
   static const float dayNightCycleDurationInS = 20.0f * 60.0f;
   static const float dayNightFadeInPerc = 0.05f;
   static const float nightLightIntens = 0.05f;
