@@ -199,7 +199,7 @@ struct PipelineManager
     }
   }
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   _INTR_INLINE static VertexLayoutRef& _descVertexLayout(PipelineRef p_Ref)

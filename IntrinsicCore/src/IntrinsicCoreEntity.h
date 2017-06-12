@@ -116,7 +116,7 @@ struct EntityManager : Dod::ManagerBase<_INTR_MAX_ENTITY_COUNT, EntityData>
     _nameResourceMap[_data.name[p_Ref._id]] = p_Ref;
   }
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   _INTR_INLINE static const Name& _name(EntityRef p_Ref)

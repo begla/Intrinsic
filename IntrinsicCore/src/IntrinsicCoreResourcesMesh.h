@@ -365,7 +365,7 @@ struct MeshManager
 
   static void destroyResources(const MeshRefArray& p_Meshes);
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   // Description

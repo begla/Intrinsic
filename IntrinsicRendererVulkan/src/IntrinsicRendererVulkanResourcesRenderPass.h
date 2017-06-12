@@ -150,7 +150,7 @@ struct RenderPassManager
     }
   }
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   // Description

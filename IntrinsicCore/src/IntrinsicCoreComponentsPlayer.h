@@ -92,7 +92,7 @@ struct PlayerManager
 
   // <-
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   // Description
