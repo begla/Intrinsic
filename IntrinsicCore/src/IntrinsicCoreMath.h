@@ -25,7 +25,7 @@ template <class Type, uint32_t Count> struct Gradient
   Gradient() {}
 
   Type _values[Count];
-  float _percentages[Count];
+  float _keyPoints[Count];
 };
 
 struct AABB
