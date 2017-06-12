@@ -25,7 +25,7 @@ namespace Components
 {
 void SwarmManager::init()
 {
-  _INTR_LOG_INFO("Inititializing Character Controller Component Manager...");
+  _INTR_LOG_INFO("Inititializing Swarm Component Manager...");
 
   Dod::Components::ComponentManagerBase<
       SwarmData, _INTR_MAX_SWARM_COMPONENT_COUNT>::_initComponentManager();
