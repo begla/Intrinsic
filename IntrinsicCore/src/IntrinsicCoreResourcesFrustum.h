@@ -55,18 +55,16 @@ struct FrustumData : Dod::Resources::ResourceDataBase
     frustumCornersWorldSpace.resize(_INTR_MAX_FRUSTUM_COUNT);
   }
 
-  // <-
-
+  // Description
   _INTR_ARRAY(uint8_t) descProjectionType;
   _INTR_ARRAY(glm::vec2) descNearFarPlaneDistances;
-
   _INTR_ARRAY(glm::mat4) descViewMatrix;
   _INTR_ARRAY(glm::mat4) descPrevViewMatrix;
-  _INTR_ARRAY(glm::mat4) invViewMatrix;
-
   _INTR_ARRAY(glm::mat4) descProjectionMatrix;
-  _INTR_ARRAY(glm::mat4) invProjectionMatrix;
 
+  // Resources
+  _INTR_ARRAY(glm::mat4) invProjectionMatrix;
+  _INTR_ARRAY(glm::mat4) invViewMatrix;
   _INTR_ARRAY(glm::mat4) viewProjectionMatrix;
   _INTR_ARRAY(glm::mat4) invViewProjectionMatrix;
 
@@ -133,9 +131,7 @@ struct FrustumManager
 
   // <-
 
-  // Member refs.
-  // ->
-
+  // Description
   _INTR_INLINE static uint8_t& _descProjectionType(FrustumRef p_Ref)
   {
     return _data.descProjectionType[p_Ref._id];
@@ -157,6 +153,7 @@ struct FrustumManager
     return _data.descProjectionMatrix[p_Ref._id];
   }
 
+  // Resources
   _INTR_INLINE static glm::mat4& _invViewMatrix(FrustumRef p_Ref)
   {
     return _data.invViewMatrix[p_Ref._id];
@@ -177,6 +174,7 @@ struct FrustumManager
   {
     return _data.frustumWorldPosition[p_Ref._id];
   }
+
   _INTR_INLINE static Math::FrustumPlanes&
   _frustumPlanesViewSpace(FrustumRef p_Ref)
   {

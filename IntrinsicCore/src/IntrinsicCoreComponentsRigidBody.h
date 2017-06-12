@@ -148,9 +148,6 @@ struct RigidBodyManager
   static void updateNodesFromActors(const RigidBodyRefArray& p_RigidBodies);
   static void updateActorsFromNodes(const RigidBodyRefArray& p_RigidBodies);
 
-  // Member refs
-  // ->
-
   // Description
   _INTR_INLINE static RigidBodyType::Enum&
   _descRigidBodyType(RigidBodyRef p_Ref)

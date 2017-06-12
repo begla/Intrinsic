@@ -357,9 +357,6 @@ struct ImageManager
     _data.descImageFlags[p_Ref._id] &= ~p_Flags;
   }
 
-  // Member refs.
-  // ->
-
   // Description
   _INTR_INLINE static MemoryPoolType::Enum& _descMemoryPoolType(ImageRef p_Ref)
   {
@@ -398,7 +395,7 @@ struct ImageManager
     return _data.descAvgNormLength[p_Ref._id];
   }
 
-  // GPU resources
+  // Resources
   _INTR_INLINE static VkImage& _vkImage(ImageRef p_Ref)
   {
     return _data.vkImage[p_Ref._id];
