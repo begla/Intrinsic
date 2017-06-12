@@ -24,6 +24,8 @@
 #include "ubos.inc.glsl"
 #include "gbuffer.inc.glsl"
 
+const float alphaThreshold = 0.2;
+
 layout (binding = 0) uniform PerInstance
 {
   vec4 nearFarWidthHeight;
@@ -85,9 +87,13 @@ void main()
       vec2 decalUV = posDecalSS.xy * vec2(0.5, 0.5) + 0.5;
       decalUV = decalUV * decal.uvTransform.xy + decal.uvTransform.zw;
 
-      albedo = texture(globalTextures[decal.textureIds.x], decalUV);
-      normal = normalize(TBN * (texture(globalTextures[decal.textureIds.y], decalUV).xyz * 2.0 - 1.0));
-      pbr = texture(globalTextures[decal.textureIds.z], decalUV);
+      const vec4 albedoSample = texture(globalTextures[decal.textureIds.x], decalUV);
+      if (albedoSample.a >= alphaThreshold)
+      {
+        albedo = albedoSample;
+        normal = normalize(TBN * (texture(globalTextures[decal.textureIds.y], decalUV).xyz * 2.0 - 1.0));
+        pbr = texture(globalTextures[decal.textureIds.z], decalUV);
+      } 
     }
   }
 
