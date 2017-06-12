@@ -20,6 +20,14 @@ namespace Core
 {
 namespace Math
 {
+template <class Type, uint32_t Count> struct Gradient
+{
+  Gradient() {}
+
+  Type _values[Count];
+  float _percentages[Count];
+};
+
 struct AABB
 {
   AABB() {}
@@ -34,6 +42,13 @@ struct AABB
 
 struct AABB2
 {
+  AABB2() {}
+
+  AABB2(const glm::vec3& p_Center, const glm::vec3& p_HalfExtent)
+      : center(p_Center), halfExtent(p_HalfExtent)
+  {
+  }
+
   glm::vec3 center;
   glm::vec3 halfExtent;
 };
@@ -544,7 +559,7 @@ _INTR_INLINE float noiseHash(float n, float p_Seed)
 
 // <-
 
-_INTR_INLINE float noise(const glm::vec3 p_X, float p_Seed = 753.5453123f)
+_INTR_INLINE float noise(const glm::vec3& p_X, float p_Seed = 753.5453123f)
 {
   glm::vec3 p = glm::floor(p_X);
   glm::vec3 f = glm::fract(p_X);
@@ -566,7 +581,7 @@ _INTR_INLINE float noise(const glm::vec3 p_X, float p_Seed = 753.5453123f)
 
 // <-
 
-_INTR_INLINE float noise(const glm::vec3 p_X, uint32_t p_Octaves,
+_INTR_INLINE float noise(const glm::vec3& p_X, uint32_t p_Octaves,
                          float p_Seed = 753.5453123f)
 {
   float n = 0.0f;
@@ -698,16 +713,6 @@ _INTR_INLINE glm::vec3 bezierQuadratic(const _INTR_ARRAY(glm::vec3) p_Points,
 
   return interpPoints[0];
 }
-
-// <-
-
-template <class Type, uint32_t Count> struct Gradient
-{
-  Gradient() {}
-
-  Type _values[Count];
-  float _percentages[Count];
-};
 
 // <-
 

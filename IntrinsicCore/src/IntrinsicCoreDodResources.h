@@ -103,7 +103,6 @@ struct ResourceManagerBase : Dod::ManagerBase<IdCount, DataType>
   _INTR_INLINE static Ref _getResourceByName(const Name& p_Name)
   {
     auto resourceIt = _nameResourceMap.find(p_Name);
-
     if (resourceIt == _nameResourceMap.end())
     {
       return Dod::Ref();

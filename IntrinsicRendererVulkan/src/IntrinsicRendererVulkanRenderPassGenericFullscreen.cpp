@@ -66,9 +66,8 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
     PipelineLayoutManager::resetToDefault(pipelineLayout);
 
     GpuProgramManager::reflectPipelineLayout(
-        8u,
-        {GpuProgramManager::getResourceByName(vertGpuProgramName),
-         GpuProgramManager::getResourceByName(fragGpuProgramName)},
+        8u, {GpuProgramManager::getResourceByName(vertGpuProgramName),
+             GpuProgramManager::getResourceByName(fragGpuProgramName)},
         pipelineLayout);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayout);
@@ -221,9 +220,8 @@ void GenericFullscreen::render(float p_DeltaT,
       uniformData.uniformData, uniformData.size);
 
   RenderSystem::beginRenderPass(
-      _renderPassRef,
-      _framebufferRefs[RenderSystem::_backbufferIndex %
-                       _framebufferRefs.size()],
+      _renderPassRef, _framebufferRefs[RenderSystem::_backbufferIndex %
+                                       _framebufferRefs.size()],
       VK_SUBPASS_CONTENTS_INLINE, (uint32_t)_clearValues.size(),
       _clearValues.data());
   {

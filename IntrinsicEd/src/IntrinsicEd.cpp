@@ -592,9 +592,9 @@ spawnDefaultEntity(const Name& p_Name,
 
     Components::NodeRef nodeRef =
         Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
+    Components::NodeManager::attachChild(World::_rootNode, nodeRef);
 
-    Components::CameraRef activeCamera = World::getActiveCamera();
+    Components::CameraRef activeCamera = World::_activeCamera;
     Components::NodeRef cameraNode =
         Components::NodeManager::getComponentForEntity(
             Components::CameraManager::_entity(activeCamera));

@@ -1241,11 +1241,12 @@ void spawnAndSimulateTestLights(Components::CameraRef p_CameraRef)
   for (uint32_t i = 0u; i < _testLights.size(); ++i)
   {
     TestLight& light = _testLights[i];
-    const glm::vec3 worldPos = glm::vec3(
-        light.spawnPos.x,
-        light.spawnPos.y + 2000.0f * sin(light.spawnPos.x + light.spawnPos.y +
-                                         TaskManager::_totalTimePassed * 0.1f),
-        light.spawnPos.z);
+    const glm::vec3 worldPos =
+        glm::vec3(light.spawnPos.x,
+                  light.spawnPos.y +
+                      2000.0f * sin(light.spawnPos.x + light.spawnPos.y +
+                                    TaskManager::_totalTimePassed * 0.1f),
+                  light.spawnPos.z);
 
     light.light.posAndRadiusVS = glm::vec4(
         glm::vec3(Components::CameraManager::_viewMatrix(p_CameraRef) *
@@ -1262,7 +1263,7 @@ void Clustering::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 
   // Testing code for profiling purposes
   {
-    Components::NodeRef rootNodeRef = World::getRootNode();
+    Components::NodeRef rootNodeRef = World::_rootNode;
     Entity::EntityRef rootEntityRef =
         Components::NodeManager::_entity(rootNodeRef);
 

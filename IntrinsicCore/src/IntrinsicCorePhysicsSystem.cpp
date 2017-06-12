@@ -103,7 +103,7 @@ void System::updatePvdCamera()
 {
   _INTR_PROFILE_CPU("Physics", "Update PVD Camera");
 
-  Components::CameraRef activeCameraRef = World::getActiveCamera();
+  Components::CameraRef activeCameraRef = World::_activeCamera;
 
   if (activeCameraRef.isValid() && _pxPhysics->getVisualDebugger())
   {

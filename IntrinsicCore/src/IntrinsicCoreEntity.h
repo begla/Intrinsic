@@ -57,11 +57,10 @@ struct EntityManager : Dod::ManagerBase<_INTR_MAX_ENTITY_COUNT, EntityData>
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember("name",
-                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(Entity), _N(string),
-                                             _name(p_Ref), false, false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "name", _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Entity),
+                                  _N(string), _name(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   _INTR_INLINE static void initFromDescriptor(EntityRef p_Ref,
