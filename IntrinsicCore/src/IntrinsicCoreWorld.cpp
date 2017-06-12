@@ -21,11 +21,12 @@ namespace Core
 {
 Components::NodeRef World::_rootNode;
 Components::CameraRef World::_activeCamera;
+_INTR_STRING World::_filePath;
+
 float World::_currentTime = 0.1f;
+float World::_currentDayNightFactor = 0.0f;
 glm::quat World::_currentSunLightOrientation = glm::quat();
 glm::vec4 World::_currentSunLightColorAndIntensity = glm::vec4();
-float World::_currentDayNightFactor = 0.0f;
-_INTR_STRING World::_filePath;
 
 namespace
 {
