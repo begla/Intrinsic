@@ -153,7 +153,7 @@ void Benchmark::update(float p_DeltaT)
 
   const Components::NodeRef camNodeRef =
       Components::NodeManager::getComponentForEntity(
-          Components::CameraManager::_entity(World::getActiveCamera()));
+          Components::CameraManager::_entity(World::_activeCamera));
 
   const Path& currentPath = _paths[_pathIdx];
   Data& data = _benchmarkData[_pathIdx];

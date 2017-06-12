@@ -108,7 +108,7 @@ void IntrinsicEdViewport::dragLeaveEvent(QDragLeaveEvent* event)
     if (GameStates::Editing::_currentlySelectedEntity == _currentPrefab)
     {
       GameStates::Editing::_currentlySelectedEntity =
-          NodeManager::_entity(World::getRootNode());
+          NodeManager::_entity(World::_rootNode);
     }
 
     _currentPrefab = Dod::Ref();
@@ -118,7 +118,7 @@ void IntrinsicEdViewport::dragLeaveEvent(QDragLeaveEvent* event)
 _INTR_INLINE void IntrinsicEdViewport::positionNodeOnGround(Dod::Ref p_NodeRef)
 {
 
-  CameraRef camRef = World::getActiveCamera();
+  CameraRef camRef = World::_activeCamera;
   NodeRef camNodeRef =
       NodeManager::getComponentForEntity(CameraManager::_entity(camRef));
 
@@ -173,7 +173,7 @@ void IntrinsicEdViewport::spawnPrefab(const _INTR_STRING& p_PrefabFilePath)
 {
   NodeRef nodeRef = World::loadNodeHierarchy(p_PrefabFilePath);
   Entity::EntityRef entityRef = NodeManager::_entity(nodeRef);
-  NodeManager::attachChild(World::getRootNode(), nodeRef);
+  NodeManager::attachChild(World::_rootNode, nodeRef);
 
   positionNodeOnGround(nodeRef);
 

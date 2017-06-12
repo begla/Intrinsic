@@ -252,7 +252,7 @@ _INTR_INLINE glm::vec3 snapToGrid(const glm::vec3& p_Position, float p_GridSize)
 
 _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
 {
-  Components::CameraRef camRef = World::getActiveCamera();
+  Components::CameraRef camRef = World::_activeCamera;
   Components::NodeRef camNodeRef =
       Components::NodeManager::getComponentForEntity(
           Components::CameraManager::_entity(camRef));
@@ -312,10 +312,10 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
   else if (Input::System::getKeyStates()[Input::Key::kCtrl] ==
            Input::KeyState::kPressed)
   {
-    _orbitRadius =
-        glm::max(_orbitRadius - Editing::_cameraSpeed *
+    _orbitRadius = glm::max(_orbitRadius -
+                                Editing::_cameraSpeed *
                                     (_camAngVel.x - _camAngVel.y) * p_DeltaT,
-                 0.1f);
+                            0.1f);
   }
 
   camRot = glm::quat(_eulerAngles);
@@ -340,7 +340,7 @@ _INTR_INLINE void updateCameraFreeFlight(float p_DeltaT)
     _cameraMode = CameraMode::kFreeFlight;
   }
 
-  Components::CameraRef camRef = World::getActiveCamera();
+  Components::CameraRef camRef = World::_activeCamera;
   Components::NodeRef camNodeRef =
       Components::NodeManager::getComponentForEntity(
           Components::CameraManager::_entity(camRef));
@@ -424,7 +424,7 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
   if (Input::System::getKeyStates()[Input::Key::kMouseLeft] ==
       Input::KeyState::kPressed)
   {
-    Components::CameraRef camRef = World::getActiveCamera();
+    Components::CameraRef camRef = World::_activeCamera;
     Components::NodeRef camNodeRef =
         Components::NodeManager::getComponentForEntity(
             Components::CameraManager::_entity(camRef));
@@ -651,7 +651,7 @@ void Editing::deativate()
 
 void Editing::updatePerInstanceData()
 {
-  Components::CameraRef camRef = World::getActiveCamera();
+  Components::CameraRef camRef = World::_activeCamera;
   _INTR_ASSERT(camRef.isValid());
 
   // Gizmo
@@ -843,7 +843,7 @@ void Editing::update(float p_DeltaT)
     if (Input::System::getKeyStates()[Input::Key::kMouseLeft] ==
         Input::KeyState::kPressed)
     {
-      Components::CameraRef camRef = World::getActiveCamera();
+      Components::CameraRef camRef = World::_activeCamera;
       Components::NodeRef camNodeRef =
           Components::NodeManager::getComponentForEntity(
               Components::CameraManager::_entity(camRef));
@@ -939,7 +939,7 @@ void Editing::update(float p_DeltaT)
   {
     Components::NodeRef camNodeRef =
         Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(World::getActiveCamera()));
+            Components::CameraManager::_entity(World::_activeCamera));
     Components::NodeRef entityNodeRef =
         Components::NodeManager::getComponentForEntity(
             _currentlySelectedEntity);
@@ -951,8 +951,7 @@ void Editing::update(float p_DeltaT)
     const glm::vec3 newPosition =
         Math::calcAABBCenter(
             Components::NodeManager::_worldAABB(entityNodeRef)) -
-        camOffset *
-            Components::CameraManager::_forward(World::getActiveCamera());
+        camOffset * Components::CameraManager::_forward(World::_activeCamera);
 
     const float blendFactor = deltaT * 2.0f;
     Components::NodeManager::_position(camNodeRef) =
@@ -980,11 +979,11 @@ void Editing::update(float p_DeltaT)
         Components::NodeManager::getComponentForEntity(
             _currentlySelectedEntity);
 
-    if (currSelNodeRef != World::getRootNode())
+    if (currSelNodeRef != World::_rootNode)
     {
       World::destroyNodeFull(currSelNodeRef);
       _currentlySelectedEntity =
-          Components::NodeManager::_entity(World::getRootNode());
+          Components::NodeManager::_entity(World::_rootNode);
       Resources::EventManager::queueEventIfNotExisting(
           _N(CurrentlySelectedEntityChanged));
     }

@@ -122,7 +122,7 @@ _INTR_ARRAY(Components::CameraRef) _cameras;
 
 _INTR_INLINE void executeRenderSteps(float p_DeltaT)
 {
-  Components::CameraRef activeCamera = World::getActiveCamera();
+  Components::CameraRef activeCamera = World::_activeCamera;
   Components::CameraRef currentActiveCamera = Components::CameraRef();
 
   for (uint32_t i = 0u; i < _renderSteps.size(); ++i)
@@ -380,7 +380,7 @@ void Default::renderFrame(float p_DeltaT)
           {
             const Name& cameraName = _cameraNames[i];
 
-            Components::CameraRef cam = World::getActiveCamera();
+            Components::CameraRef cam = World::_activeCamera;
             if (cameraName != _N(ActiveCamera))
               cam = Components::CameraManager::getComponentForEntity(
                   Entity::EntityManager::getEntityByName(cameraName));
@@ -390,7 +390,7 @@ void Default::renderFrame(float p_DeltaT)
         }
         else
         {
-          _cameras.push_back(World::getActiveCamera());
+          _cameras.push_back(World::_activeCamera);
         }
       }
 

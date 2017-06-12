@@ -67,7 +67,7 @@ void Main::update(float p_DeltaT)
 
     if (Components::PlayerManager::_descPlayerId(playerRef) == 0u)
     {
-      Components::CameraRef camRef = World::getActiveCamera();
+      Components::CameraRef camRef = World::_activeCamera;
       Components::NodeRef camNodeRef =
           Components::NodeManager::getComponentForEntity(
               Components::CameraManager::_entity(camRef));

@@ -20,32 +20,50 @@ namespace Core
 {
 struct World
 {
-  typedef _INTR_ARRAY(Components::NodeRef) NodeArray;
-
   static void init();
   static void destroy();
+
+  // <-
+
+  static void load(const _INTR_STRING& p_FilePath);
+  static void save(const _INTR_STRING& p_FilePath);
+
+  // <-
 
   static void destroyNodeFull(Components::NodeRef p_Ref);
   static Components::NodeRef cloneNodeFull(Components::NodeRef p_Ref);
   static void alignNodeWithGround(Components::NodeRef p_NodeRef);
 
-  static void save(const _INTR_STRING& p_FilePath);
-
-  static void load(const _INTR_STRING& p_FilePath);
+  // <-
 
   static void saveNodeHierarchy(const _INTR_STRING& p_FilePath,
                                 Components::NodeRef p_RootNodeRef);
   static Components::NodeRef loadNodeHierarchy(const _INTR_STRING& p_FilePath);
   static void loadNodeResources(Components::NodeRef p_RootNodeRef);
 
+  // <-
+
   static void updateDayNightCycle(float p_DeltaT);
 
+  // <-
+
+  static _INTR_STRING _filePath;
+  static Components::NodeRef _rootNode;
+  static Components::CameraRef _activeCamera;
+
+  // <-
+
+  static float _currentTime;
+  static float _currentDayNightFactor;
+  static glm::quat _currentSunLightOrientation;
+  static glm::vec4 _currentSunLightColorAndIntensity;
+
+  // Scripting interface
   _INTR_INLINE static Components::NodeRef getRootNode() { return _rootNode; }
   _INTR_INLINE static void setRootNode(Components::NodeRef p_Node)
   {
     _rootNode = p_Node;
   }
-
   _INTR_INLINE static const Components::CameraRef getActiveCamera()
   {
     return _activeCamera;
@@ -54,18 +72,6 @@ struct World
   {
     _activeCamera = p_Camera;
   }
-
-  static float _currentTime;
-  static float _currentDayNightFactor;
-
-  static glm::quat _currentSunLightOrientation;
-  static glm::vec4 _currentSunLightColorAndIntensity;
-
-  static _INTR_STRING _filePath;
-
-protected:
-  static Components::NodeRef _rootNode;
-  static Components::CameraRef _activeCamera;
 };
 }
 }

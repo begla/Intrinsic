@@ -226,7 +226,7 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
           Entity::EntityManager::createEntity(_N(Boid));
       Components::NodeRef nodeRef =
           Components::NodeManager::createNode(entityRef);
-      Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
+      Components::NodeManager::attachChild(World::_rootNode, nodeRef);
 
       Components::NodeManager::_flags(nodeRef) |=
           Components::NodeFlags::kSpawned;
@@ -280,7 +280,7 @@ void SwarmManager::destroyResources(const SwarmRefArray& p_Swarms)
     Dod::RefArray& lights = Components::SwarmManager::_lights(swarmRef);
     Dod::RefArray& meshes = Components::SwarmManager::_meshes(swarmRef);
 
-    if (World::getRootNode()
+    if (World::_rootNode
             .isValid()) // Check if the world is currently being destroyed
     {
       for (uint32_t i = 0u; i < nodes.size(); ++i)

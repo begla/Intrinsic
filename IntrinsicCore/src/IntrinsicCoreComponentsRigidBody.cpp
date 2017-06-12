@@ -368,8 +368,9 @@ void RigidBodyManager::updateActorsFromNodes(
     physx::PxRigidDynamic* rigidDynamic = actor->isRigidDynamic();
     physx::PxRigidStatic* rigidStatic = actor->isRigidStatic();
 
-    if (rigidDynamic && rigidDynamic->getRigidBodyFlags().isSet(
-                            physx::PxRigidBodyFlag::eKINEMATIC))
+    if (rigidDynamic &&
+        rigidDynamic->getRigidBodyFlags().isSet(
+            physx::PxRigidBodyFlag::eKINEMATIC))
     {
       // Update kinematic target
       const physx::PxTransform transform =

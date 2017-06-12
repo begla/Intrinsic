@@ -330,7 +330,7 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
         Components::NodeManager::_entity(currentNode);
 
     // Don't allow deleting the main node
-    if (World::getRootNode() != currentNode)
+    if (World::_rootNode != currentNode)
     {
       QAction* cloneNode =
           new QAction(QIcon(":/Icons/icons/cad/layer.png"), "Clone Node", this);
@@ -753,14 +753,14 @@ void captureIrradProbe(
       Entity::EntityManager::createEntity(_N(ProbeCamera));
   Components::NodeRef camNodeRef =
       Components::NodeManager::createNode(entityRef);
-  Components::NodeManager::attachChild(World::getRootNode(), camNodeRef);
+  Components::NodeManager::attachChild(World::_rootNode, camNodeRef);
   Components::CameraRef camRef =
       Components::CameraManager::createCamera(entityRef);
   Components::CameraManager::resetToDefault(camRef);
   Components::CameraManager::_descFov(camRef) = glm::radians(90.0f);
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
 
-  Components::CameraRef prevCamera = World::getActiveCamera();
+  Components::CameraRef prevCamera = World::_activeCamera;
   World::setActiveCamera(camRef);
 
   // Setup buffer for readback
