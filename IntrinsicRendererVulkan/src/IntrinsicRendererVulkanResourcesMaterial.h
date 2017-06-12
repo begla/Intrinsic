@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref MaterialRef;
 typedef Dod::RefArray MaterialRefArray;
 typedef Name& (*MaterialResourceFunction)(Dod::Ref);

@@ -26,6 +26,10 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
+typedef Dod::Ref CharacterControllerRef;
+typedef _INTR_ARRAY(CharacterControllerRef) CharacterControllerRefArray;
+
 namespace CharacterControllerCollisionFlags
 {
 enum Flags
@@ -35,9 +39,6 @@ enum Flags
   kDown = 0x04
 };
 }
-
-typedef Dod::Ref CharacterControllerRef;
-typedef _INTR_ARRAY(CharacterControllerRef) CharacterControllerRefArray;
 
 struct CharacterControllerData : Dod::Components::ComponentDataBase
 {

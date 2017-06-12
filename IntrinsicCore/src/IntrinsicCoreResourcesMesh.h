@@ -26,6 +26,7 @@ namespace Core
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref MeshRef;
 typedef _INTR_ARRAY(MeshRef) MeshRefArray;
 

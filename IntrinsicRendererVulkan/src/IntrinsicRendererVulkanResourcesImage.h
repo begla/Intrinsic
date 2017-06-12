@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref ImageRef;
 typedef _INTR_ARRAY(ImageRef) ImageRefArray;
 typedef _INTR_ARRAY(_INTR_ARRAY(VkImageView)) ImageViewArray;

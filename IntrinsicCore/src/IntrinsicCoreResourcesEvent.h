@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref EventRef;
 typedef _INTR_ARRAY(EventRef) EventRefArray;
 

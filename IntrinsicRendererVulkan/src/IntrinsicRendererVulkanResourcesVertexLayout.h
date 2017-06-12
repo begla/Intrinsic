@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref VertexLayoutRef;
 typedef Dod::RefArray VertexLayoutRefArray;
 

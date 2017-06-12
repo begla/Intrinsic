@@ -26,6 +26,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref RigidBodyRef;
 typedef _INTR_ARRAY(RigidBodyRef) RigidBodyRefArray;
 

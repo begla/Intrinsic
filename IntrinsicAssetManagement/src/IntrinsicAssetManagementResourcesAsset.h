@@ -20,6 +20,7 @@ namespace AssetManagement
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref AssetRef;
 typedef _INTR_ARRAY(AssetRef) AssetRefArray;
 

@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref CameraRef;
 typedef _INTR_ARRAY(CameraRef) CameraRefArray;
 

@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref SwarmRef;
 typedef _INTR_ARRAY(SwarmRef) SwarmRefArray;
 

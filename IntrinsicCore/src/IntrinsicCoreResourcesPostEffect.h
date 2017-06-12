@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref PostEffectRef;
 typedef _INTR_ARRAY(PostEffectRef) PostEffectRefArray;
 

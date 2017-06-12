@@ -24,6 +24,10 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
+typedef Dod::Ref NodeRef;
+typedef _INTR_ARRAY(NodeRef) NodeRefArray;
+
 namespace NodeFlags
 {
 enum Flags
@@ -31,9 +35,6 @@ enum Flags
   kSpawned = 0x01u,
 };
 }
-
-typedef Dod::Ref NodeRef;
-typedef _INTR_ARRAY(NodeRef) NodeRefArray;
 
 ///
 /// Stores the Node Component Data in a data oriented fashion.

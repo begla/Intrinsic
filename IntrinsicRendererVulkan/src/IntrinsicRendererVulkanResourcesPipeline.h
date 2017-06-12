@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref PipelineRef;
 typedef _INTR_ARRAY(PipelineRef) PipelineRefArray;
 

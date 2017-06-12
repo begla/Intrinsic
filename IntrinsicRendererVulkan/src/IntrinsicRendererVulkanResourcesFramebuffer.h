@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref FramebufferRef;
 typedef _INTR_ARRAY(FramebufferRef) FramebufferRefArray;
 typedef _INTR_ARRAY(AttachmentInfo) AttachmentInfoArray;
@@ -38,11 +39,12 @@ struct FramebufferData : Dod::Resources::ResourceDataBase
     vkFramebuffer.resize(_INTR_MAX_FRAMEBUFFER_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(Resources::RenderPassRef) descRenderPass;
   _INTR_ARRAY(AttachmentInfoArray) descAttachedImages;
   _INTR_ARRAY(glm::uvec2) descDimensions;
 
-  // GPU resources
+  // Resources
   _INTR_ARRAY(VkFramebuffer) vkFramebuffer;
 };
 
@@ -168,7 +170,7 @@ struct FramebufferManager
     return _data.descDimensions[p_Ref._id];
   }
 
-  // GPU resources
+  // Resources
   _INTR_INLINE static VkFramebuffer& _vkFrameBuffer(FramebufferRef p_Ref)
   {
     return _data.vkFramebuffer[p_Ref._id];

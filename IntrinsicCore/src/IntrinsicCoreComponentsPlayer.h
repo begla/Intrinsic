@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref PlayerRef;
 typedef _INTR_ARRAY(PlayerRef) PlayerRefArray;
 
