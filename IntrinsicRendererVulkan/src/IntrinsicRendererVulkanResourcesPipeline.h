@@ -50,7 +50,7 @@ struct PipelineData : Dod::Resources::ResourceDataBase
     vkPipeline.resize(_INTR_MAX_RENDER_PASS_COUNT);
   }
 
-  // Desc.
+  // Description
   _INTR_ARRAY(VertexLayoutRef) descVertexLayout;
   _INTR_ARRAY(PipelineLayoutRef) descPipelineLayout;
   _INTR_ARRAY(RenderPassRef) descRenderPass;
@@ -69,7 +69,7 @@ struct PipelineData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(glm::uvec2) descAbsoluteScissorDimensions;
   _INTR_ARRAY(glm::uvec2) descAbsoluteViewportDimensions;
 
-  // GPU resources
+  // Resources
   _INTR_ARRAY(VkPipeline) vkPipeline;
 };
 
@@ -199,9 +199,7 @@ struct PipelineManager
     }
   }
 
-  // Accessors
-  // ->
-
+  // Resources
   _INTR_INLINE static VertexLayoutRef& _descVertexLayout(PipelineRef p_Ref)
   {
     return _data.descVertexLayout[p_Ref._id];
@@ -266,7 +264,7 @@ struct PipelineManager
     return _data.descAbsoluteViewportDimensions[p_Ref._id];
   }
 
-  // GPU resources
+  // Resources
   _INTR_INLINE static VkPipeline& _vkPipeline(PipelineRef p_Ref)
   {
     return _data.vkPipeline[p_Ref._id];

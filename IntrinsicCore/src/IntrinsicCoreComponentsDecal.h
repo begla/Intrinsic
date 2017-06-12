@@ -36,6 +36,7 @@ struct DecalData : Dod::Components::ComponentDataBase
     descHalfExtent.resize(_INTR_MAX_DECAL_COMPONENT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(Name) descAlbedoTextureName;
   _INTR_ARRAY(Name) descNormalTextureName;
   _INTR_ARRAY(Name) descPBRTextureName;
@@ -139,9 +140,6 @@ struct DecalManager
   }
 
   // <-
-
-  // Accessors
-  // ->
 
   // Description
   _INTR_INLINE static Name& _descAlbedoTextureName(DecalRef p_Ref)

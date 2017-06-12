@@ -38,10 +38,11 @@ struct VertexLayoutData : Dod::Resources::ResourceDataBase
     vkPipelineVertexInputStateCreateInfo.resize(_INTR_MAX_VERTEX_LAYOUT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(_INTR_ARRAY(VertexBinding)) descVertexBindings;
   _INTR_ARRAY(_INTR_ARRAY(VertexAttribute)) descVertexAttributes;
 
-  // GPU resources
+  // Resources
   _INTR_ARRAY(_INTR_ARRAY(VkVertexInputBindingDescription))
   vkVertexInputBindingDescs;
   _INTR_ARRAY(_INTR_ARRAY(VkVertexInputAttributeDescription))
@@ -144,9 +145,7 @@ struct VertexLayoutManager
     }
   }
 
-  // Accessors
-  // ->
-
+  // Description
   _INTR_INLINE static _INTR_ARRAY(VertexAttribute) &
       _descVertexAttributes(VertexLayoutRef p_Ref)
   {
@@ -158,7 +157,7 @@ struct VertexLayoutManager
     return _data.descVertexBindings[p_Ref._id];
   }
 
-  // GPU Resources
+  // Resources
   _INTR_INLINE static _INTR_ARRAY(VkVertexInputAttributeDescription) &
       _vkVertexInputAttributeDescs(VertexLayoutRef p_Ref)
   {

@@ -152,8 +152,7 @@ struct FramebufferManager
     }
   }
 
-  // Accessors
-  // ->
+  // Description
   _INTR_INLINE static Resources::RenderPassRef&
   _descRenderPass(FramebufferRef p_Ref)
   {

@@ -30,8 +30,7 @@ struct ScriptData : Dod::Resources::ResourceDataBase
     descScriptFileName.resize(_INTR_MAX_SCRIPT_COUNT);
   }
 
-  // <-
-
+  // Description
   _INTR_ARRAY(_INTR_STRING) descScriptFileName;
 };
 
@@ -159,13 +158,6 @@ struct ScriptManager
                              float p_DeltaT);
   static void callOnCreate(ScriptRef p_ScriptRef, Dod::Ref p_ScriptCompRef);
   static void callOnDestroy(ScriptRef p_Script, Dod::Ref p_ScriptCompRef);
-
-  // <-
-
-  // Accessors
-  // ->
-
-  // <-
 
   // Description
   _INTR_INLINE static _INTR_STRING& _descScriptFileName(ScriptRef p_Ref)

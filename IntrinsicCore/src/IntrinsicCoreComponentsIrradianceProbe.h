@@ -169,9 +169,6 @@ struct IrradianceProbeManager
 
   // <-
 
-  // Accessors
-  // ->
-
   // Description
   _INTR_INLINE static float& _descRadius(IrradianceProbeRef p_Ref)
   {

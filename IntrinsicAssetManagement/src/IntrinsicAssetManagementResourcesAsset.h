@@ -49,8 +49,7 @@ struct AssetData : Dod::Resources::ResourceDataBase
     descAssetType.resize(_INTR_MAX_ASSET_COUNT);
   }
 
-  // <-
-
+  // Description
   _INTR_ARRAY(_INTR_STRING) descAssetFileName;
   _INTR_ARRAY(AssetType::Enum) descAssetType;
 };
@@ -154,11 +153,6 @@ struct AssetManager
   // <-
 
   static void compileAssets(AssetRefArray& p_Refs);
-
-  // Accessors
-  // ->
-
-  // <-
 
   // Description
   _INTR_INLINE static _INTR_STRING& _descAssetFileName(AssetRef p_Ref)

@@ -54,6 +54,7 @@ struct EventData : Dod::Resources::ResourceDataBase
     queuedEventData.resize(_INTR_MAX_EVENT_COUNT);
   }
 
+  // Resources
   _INTR_ARRAY(QueuedEventData) queuedEventData;
 };
 
@@ -163,9 +164,7 @@ struct EventManager
     EventListenerManager::destroyEventListener(p_EventListener);
   }
 
-  // Accessors
-  // ->
-
+  // Resources
   _INTR_INLINE static QueuedEventData& _queuedEventData(EventRef p_EventRef)
   {
     return _data.queuedEventData[p_EventRef._id];

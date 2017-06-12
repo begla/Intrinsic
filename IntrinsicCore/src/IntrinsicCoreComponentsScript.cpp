@@ -38,6 +38,8 @@ void ScriptManager::createResources(const ScriptRefArray& p_Scripts)
   }
 }
 
+// <-
+
 void ScriptManager::destroyResources(const ScriptRefArray& p_Scripts)
 {
   for (uint32_t scriptIdx = 0u; scriptIdx < p_Scripts.size(); ++scriptIdx)
@@ -49,6 +51,8 @@ void ScriptManager::destroyResources(const ScriptRefArray& p_Scripts)
     _script(scriptRef) = Resources::ScriptRef();
   }
 }
+
+// <-
 
 void ScriptManager::tickScripts(ScriptRefArray& p_Scripts, float p_DeltaT)
 {

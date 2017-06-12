@@ -34,6 +34,7 @@ struct LightData : Dod::Components::ComponentDataBase
     descIntensity.resize(_INTR_MAX_LIGHT_COMPONENT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(float) descRadius;
   _INTR_ARRAY(glm::vec3) descColor;
   _INTR_ARRAY(float) descIntensity;
@@ -122,9 +123,6 @@ struct LightManager
   }
 
   // <-
-
-  // Accessors
-  // ->
 
   // Description
   _INTR_INLINE static float& _descRadius(LightRef p_Ref)

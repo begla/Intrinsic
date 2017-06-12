@@ -37,8 +37,10 @@ struct PipelineLayoutData : Dod::Resources::ResourceDataBase
     vkDescriptorPool.resize(_INTR_MAX_PIPELINE_LAYOUT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(_INTR_ARRAY(BindingDescription)) bindingDescs;
 
+  // Resources
   _INTR_ARRAY(VkPipelineLayout) vkPipelineLayout;
   _INTR_ARRAY(VkDescriptorSetLayout) vkDescriptorSetLayout;
   _INTR_ARRAY(VkDescriptorPool) vkDescriptorPool;
@@ -142,15 +144,14 @@ struct PipelineLayoutManager
   allocateAndWriteDescriptorSet(PipelineLayoutRef p_Ref,
                                 const _INTR_ARRAY(BindingInfo) & p_BindInfos);
 
-  // Accessors
-  // ->
-
+  // Description
   _INTR_INLINE static _INTR_ARRAY(BindingDescription) &
       _descBindingDescs(PipelineLayoutRef p_Ref)
   {
     return _data.bindingDescs[p_Ref._id];
   }
 
+  // Resources
   _INTR_INLINE static VkPipelineLayout&
   _vkPipelineLayout(PipelineLayoutRef p_Ref)
   {

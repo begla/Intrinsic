@@ -38,10 +38,12 @@ struct CameraData : Dod::Components::ComponentDataBase
     up.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(float) descFov;
   _INTR_ARRAY(float) descNearPlane;
   _INTR_ARRAY(float) descFarPlane;
 
+  // Resources
   _INTR_ARRAY(Resources::FrustumRef) frustum;
   _INTR_ARRAY(glm::vec3) forward;
   _INTR_ARRAY(glm::vec3) up;
@@ -135,9 +137,6 @@ struct CameraManager
 
   static glm::mat4 computeCustomProjMatrix(CameraRef p_Ref, float p_Near,
                                            float p_Far);
-
-  // Accessors
-  // ->
 
   // Description
   _INTR_INLINE static float& _descNearPlane(CameraRef p_Ref)

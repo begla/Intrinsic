@@ -126,14 +126,13 @@ struct ResourceManagerBase : Dod::ManagerBase<IdCount, DataType>
     return (_data.resourceFlags[p_Ref._id] & p_Flags) == p_Flags;
   }
 
-  // Accessors
-  // ->
-
   _INTR_INLINE static Name& _name(Ref p_Ref) { return _data.name[p_Ref._id]; }
   _INTR_INLINE static uint8_t& _resourceFlags(Ref p_Ref)
   {
     return _data.resourceFlags[p_Ref._id];
   }
+
+  // <-
 
   static _INTR_HASH_MAP(Name, Ref) _nameResourceMap;
   static DataType _data;

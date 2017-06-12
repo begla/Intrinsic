@@ -67,6 +67,7 @@ struct NodeData : Dod::Components::ComponentDataBase
     nextSibling.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
   }
 
+  // Resources
   _INTR_ARRAY(uint32_t) flags;
 
   _INTR_ARRAY(glm::vec3) position;
@@ -471,8 +472,7 @@ struct NodeManager
     }
   }
 
-  // Accessors
-  // ->
+  // Scripting interface
 
   /// Gets the total amount of available sorted nodes.
   _INTR_INLINE static uint32_t getSortedNodeCount()
@@ -520,10 +520,7 @@ struct NodeManager
     _data.size[p_Ref._id] = p_Size;
   }
 
-  // <-
-
-  // Member refs
-  // ->
+  // Resources
 
   /// The parent Node of this Node. If any.
   _INTR_INLINE static NodeRef& _parent(NodeRef p_Ref)
@@ -634,9 +631,6 @@ private:
   {
     _rootNodes.push_back(p_Ref);
   }
-
-  // <-
-
   /// Removes the given Node from the root node array.
   _INTR_INLINE static void internalRemoveFromRootNodeArray(NodeRef p_Ref)
   {
