@@ -40,7 +40,7 @@ struct RenderPassData : Dod::Resources::ResourceDataBase
   // Description
   _INTR_ARRAY(_INTR_ARRAY(AttachmentDescription)) descAttachments;
 
-  // GPU resources
+  // Resources
   _INTR_ARRAY(VkRenderPass) vkRenderPass;
 };
 
@@ -150,9 +150,6 @@ struct RenderPassManager
     }
   }
 
-  // Accessors
-  // ->
-
   // Description
   _INTR_INLINE static _INTR_ARRAY(AttachmentDescription) &
       _descAttachments(RenderPassRef p_Ref)
@@ -160,7 +157,7 @@ struct RenderPassManager
     return _data.descAttachments[p_Ref._id];
   }
 
-  // GPU resources
+  // Resources
   _INTR_INLINE static VkRenderPass& _vkRenderPass(RenderPassRef p_Ref)
   {
     return _data.vkRenderPass[p_Ref._id];

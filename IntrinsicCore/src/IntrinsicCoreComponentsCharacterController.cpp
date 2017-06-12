@@ -31,6 +31,8 @@ namespace
 physx::PxControllerManager* _pxControllerManager = nullptr;
 }
 
+// <-
+
 void CharacterControllerManager::init()
 {
   _INTR_LOG_INFO("Inititializing Character Controller Component Manager...");
@@ -70,10 +72,13 @@ void CharacterControllerManager::init()
         propCompilerCharacterController;
   }
 
+  _INTR_ASSERT(_pxControllerManager == nullptr);
   _pxControllerManager =
       PxCreateControllerManager(*Physics::System::_pxScene, false);
   _INTR_ASSERT(_pxControllerManager);
 }
+
+// <-
 
 void CharacterControllerManager::updateControllers(
     const CharacterControllerRefArray& p_CharacterControllers, float p_DeltaT)
@@ -195,6 +200,8 @@ void CharacterControllerManager::updateControllers(
   }
 }
 
+// <-
+
 void CharacterControllerManager::createResources(
     const CharacterControllerRefArray& p_CharacterControllers)
 {
@@ -227,6 +234,8 @@ void CharacterControllerManager::createResources(
     }
   }
 }
+
+// <-
 
 void CharacterControllerManager::destroyResources(
     const CharacterControllerRefArray& p_CharacterControllers)

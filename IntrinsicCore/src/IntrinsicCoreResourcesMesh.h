@@ -365,9 +365,6 @@ struct MeshManager
 
   static void destroyResources(const MeshRefArray& p_Meshes);
 
-  // Accessors
-  // ->
-
   // Description
   _INTR_INLINE static PositionsPerSubMeshArray&
   _descPositionsPerSubMesh(MeshRef p_Ref)

@@ -62,10 +62,12 @@ struct CameraControllerData : Dod::Components::ComponentDataBase
         _INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(Name) descTargetObjectName;
   _INTR_ARRAY(CameraControllerType::Enum) descCameraControllerType;
   _INTR_ARRAY(glm::vec3) descTargetEulerAngles;
 
+  // Resources
   _INTR_ARRAY(glm::vec3) lastTargetEulerAngles;
   _INTR_ARRAY(float) timeSinceLastOrientationChange;
 };
@@ -183,9 +185,6 @@ struct CameraControllerManager
 
   // <-
 
-  // Members refs
-  // ->
-
   // Description
 
   /// The target orientation of the Camera Controller Component described in
@@ -208,6 +207,7 @@ struct CameraControllerManager
   }
 
   // Resources
+
   /// The euler angles seen during the last update call.
   _INTR_INLINE static glm::vec3&
   _lastTargetEulerAngles(CameraControllerRef p_Ref)

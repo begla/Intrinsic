@@ -507,9 +507,6 @@ struct MaterialManager
 
   static void loadMaterialPassConfig();
 
-  // Accessors
-  // ->
-
   // Description
   _INTR_INLINE static Name& _descAlbedoTextureName(MaterialRef p_Ref)
   {

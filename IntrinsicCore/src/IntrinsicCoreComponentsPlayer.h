@@ -31,6 +31,7 @@ struct PlayerData : Dod::Components::ComponentDataBase
     descPlayerId.resize(_INTR_MAX_PLAYER_COMPONENT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(uint32_t) descPlayerId;
 };
 
@@ -89,11 +90,6 @@ struct PlayerManager
       _descPlayerId(p_Ref) =
           JsonHelper::readPropertyUint(p_Properties["playerId"]);
   }
-
-  // <-
-
-  // Accessors
-  // ->
 
   // Description
   _INTR_INLINE static uint32_t& _descPlayerId(PlayerRef p_Ref)

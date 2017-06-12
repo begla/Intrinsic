@@ -47,9 +47,11 @@ struct MeshData : Dod::Components::ComponentDataBase
 {
   MeshData();
 
+  // Description
   _INTR_ARRAY(Name) descMeshName;
   _INTR_ARRAY(glm::vec4) descColorTint;
 
+  // Resources
   _INTR_ARRAY(MeshPerInstanceDataVertex) perInstanceDataVertex;
   _INTR_ARRAY(MeshPerInstanceDataFragment) perInstanceDataFragment;
   _INTR_ARRAY(DrawCallArray) drawCalls;
@@ -148,9 +150,7 @@ struct MeshManager
 
   static void collectDrawCallsAndMeshComponents();
 
-  // Accessors
-  // ->
-
+  // Scripting interface
   _INTR_INLINE static const Name& getMeshName(MeshRef p_Ref)
   {
     return _data.descMeshName[p_Ref._id];
@@ -159,11 +159,6 @@ struct MeshManager
   {
     _data.descMeshName[p_Ref._id] = p_Name;
   }
-
-  // <-
-
-  // Member refs
-  // ->
 
   // Description
   _INTR_INLINE static Name& _descMeshName(MeshRef p_Ref)
@@ -190,8 +185,6 @@ struct MeshManager
   {
     return _data.drawCalls[p_Ref._id];
   }
-
-  // Refs
   _INTR_INLINE static Components::NodeRef& _node(MeshRef p_Ref)
   {
     return _data.node[p_Ref._id];

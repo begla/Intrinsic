@@ -33,8 +33,10 @@ struct ScriptData : Dod::Components::ComponentDataBase
     script.resize(_INTR_MAX_SCRIPT_COMPONENT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(Name) descScriptName;
 
+  // Resources
   _INTR_ARRAY(Dod::Ref) script;
 };
 
@@ -138,9 +140,6 @@ struct ScriptManager
   // <-
 
   static void tickScripts(ScriptRefArray& p_Scripts, float p_DeltaT);
-
-  // Accessors
-  // ->
 
   // Description
   _INTR_INLINE static Name& _descScriptName(ScriptRef p_Ref)

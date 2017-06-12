@@ -151,11 +151,6 @@ struct CharacterControllerManager
   updateControllers(const CharacterControllerRefArray& p_CharacterControllers,
                     float p_DeltaT);
 
-  // <-
-
-  // Members refs
-  // ->
-
   // Resources
   _INTR_INLINE static glm::vec3&
   _currentMoveVector(CharacterControllerRef p_Ref)
