@@ -97,7 +97,7 @@ void main()
     }
   }
 
-  if (albedo.a < 0.2)
+  if (albedo.a < alphaThreshold)
   {
     discard;
   }
