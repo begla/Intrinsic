@@ -822,12 +822,11 @@ void RenderSystem::initOrUpdateVkSwapChain()
     bool found = false;
     for (uint32_t i = 0u; i < presentModeCount; ++i)
     {
-      _INTR_LOG_INFO("Present mode '%u' available...", presentModes[i]);
-
       if (presentModes[i] == presentModeToUse)
       {
         _INTR_LOG_INFO("Using present mode '%u'...", presentModes[i]);
         found = true;
+        break;
       }
     }
 
