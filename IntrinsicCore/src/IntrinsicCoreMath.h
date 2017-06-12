@@ -716,24 +716,24 @@ _INTR_INLINE glm::vec3 bezierQuadratic(const _INTR_ARRAY(glm::vec3) p_Points,
 
 template <class Type, uint32_t Count>
 _INTR_INLINE Type interpolateGradient(const Gradient<Type, Count>& p_Gradient,
-                                      float p_Percentage)
+                                      float p_KeyValue)
 {
   _INTR_ASSERT(Count >= 2u);
-  _INTR_ASSERT(p_Percentage >= 0.0f && p_Percentage <= 1.0f);
+  _INTR_ASSERT(p_KeyValue >= 0.0f && p_KeyValue <= 1.0f);
 
   for (uint32_t i = 0u; i < Count - 1u; ++i)
   {
-    const float currentPerc = p_Gradient._percentages[i];
-    const float nextPerc = p_Gradient._percentages[i + 1];
+    const float currentPerc = p_Gradient._keyPoints[i];
+    const float nextPerc = p_Gradient._keyPoints[i + 1];
     _INTR_ASSERT(currentPerc <= nextPerc);
 
-    if (p_Percentage >= currentPerc && p_Percentage < nextPerc)
+    if (p_KeyValue >= currentPerc && p_KeyValue < nextPerc)
     {
       Type currentValue = p_Gradient._values[i];
       Type nextValue = p_Gradient._values[i + 1];
 
       const float interp =
-          (p_Percentage - currentPerc) / (nextPerc - currentPerc);
+          (p_KeyValue - currentPerc) / (nextPerc - currentPerc);
       return glm::mix(currentValue, nextValue, interp);
     }
   }
