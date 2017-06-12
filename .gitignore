@@ -11,6 +11,7 @@ app/*.ilk
 !app/BsSndRpt64.exe
 app/platforms
 app/assets/world_machine/*.tmd.session
+app/media/pipeline_caches/*.pc
 
 distro/
 *.7z
