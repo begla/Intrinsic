@@ -471,7 +471,7 @@ struct NodeManager
     }
   }
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   /// Gets the total amount of available sorted nodes.

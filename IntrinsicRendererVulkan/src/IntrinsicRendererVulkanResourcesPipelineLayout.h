@@ -142,7 +142,7 @@ struct PipelineLayoutManager
   allocateAndWriteDescriptorSet(PipelineLayoutRef p_Ref,
                                 const _INTR_ARRAY(BindingInfo) & p_BindInfos);
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   _INTR_INLINE static _INTR_ARRAY(BindingDescription) &

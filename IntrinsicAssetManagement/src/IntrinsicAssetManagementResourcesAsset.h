@@ -155,7 +155,7 @@ struct AssetManager
 
   static void compileAssets(AssetRefArray& p_Refs);
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   // <-

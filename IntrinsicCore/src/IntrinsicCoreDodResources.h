@@ -126,7 +126,7 @@ struct ResourceManagerBase : Dod::ManagerBase<IdCount, DataType>
     return (_data.resourceFlags[p_Ref._id] & p_Flags) == p_Flags;
   }
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   _INTR_INLINE static Name& _name(Ref p_Ref) { return _data.name[p_Ref._id]; }
@@ -169,10 +169,11 @@ protected:
                                               rapidjson::Value& p_Properties,
                                               rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember(
-        "name", _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Resource),
-                                  _N(string), _name(p_Ref), false, false),
-        p_Document.GetAllocator());
+    p_Properties.AddMember("name",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(Resource), _N(string),
+                                             _name(p_Ref), false, false),
+                           p_Document.GetAllocator());
   }
 
   // <-

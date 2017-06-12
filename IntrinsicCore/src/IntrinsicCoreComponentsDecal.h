@@ -140,7 +140,7 @@ struct DecalManager
 
   // <-
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   // Description
