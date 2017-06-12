@@ -97,7 +97,12 @@ int _main(int argc, char* argv[])
 
   Log::Manager::removeLogListener({onLoggedSplashscreen});
 
-  return w.enterMainLoop();
+  {
+    w.enterMainLoop();
+  }
+  RV::RenderSystem::shutdown();
+
+  return 0;
 }
 
 #if defined(GENERATE_CRASH_DUMPS)

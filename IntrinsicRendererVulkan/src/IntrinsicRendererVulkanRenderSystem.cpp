@@ -29,6 +29,25 @@ namespace
 bool _swapChainUpdatePending = false;
 const float _timeBetweenSwapChainUpdates = 1.0f;
 float _timePassedSinceLastSwapChainUpdate = _timeBetweenSwapChainUpdates;
+
+VkPhysicalDeviceProperties _vkPhysicalDeviceProps;
+VkPhysicalDeviceFeatures _vkPhysicalDeviceFeatures;
+
+_INTR_STRING getPipelineCacheUUID()
+{
+  _INTR_STRING uuid;
+  for (uint32_t i = 0u; i < VK_UUID_SIZE; ++i)
+  {
+    uuid += StringUtil::toString(
+        (uint32_t)_vkPhysicalDeviceProps.pipelineCacheUUID[i]);
+  }
+  return uuid;
+}
+
+_INTR_STRING getPipelineCacheFilePath()
+{
+  return "media/pipeline_caches/" + getPipelineCacheUUID() + ".pc";
+}
 }
 
 // Public static members
@@ -174,6 +193,26 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
   MaterialManager::createAllResources();
 
   _INTR_LOG_POP();
+}
+
+// <-
+
+void RenderSystem::shutdown()
+{
+  _INTR_ARRAY(uint8_t) pipelineData;
+
+  size_t pipelineDataSize;
+  vkGetPipelineCacheData(_vkDevice, _vkPipelineCache, &pipelineDataSize,
+                         nullptr);
+
+  pipelineData.resize(pipelineDataSize);
+  vkGetPipelineCacheData(_vkDevice, _vkPipelineCache, &pipelineDataSize,
+                         pipelineData.data());
+
+  _INTR_STRING pipelineCachePath = getPipelineCacheFilePath();
+  _INTR_OFSTREAM of(pipelineCachePath.c_str(), std::ofstream::binary);
+  of.write((const char*)pipelineData.data(), pipelineData.size());
+  of.close();
 }
 
 // <-
@@ -564,8 +603,6 @@ void RenderSystem::initVkDevice()
   _INTR_LOG_PUSH();
 
   // Retrieve the physical device and its features
-  VkPhysicalDeviceProperties physDeviceProps;
-  VkPhysicalDeviceFeatures physDevFeatures;
   {
     uint32_t deviceCount;
     VkResult result =
@@ -585,18 +622,19 @@ void RenderSystem::initVkDevice()
     // Always use the first device found
     _vkPhysicalDevice = physDevs[0];
 
-    vkGetPhysicalDeviceProperties(_vkPhysicalDevice, &physDeviceProps);
-    vkGetPhysicalDeviceFeatures(_vkPhysicalDevice, &physDevFeatures);
+    vkGetPhysicalDeviceProperties(_vkPhysicalDevice, &_vkPhysicalDeviceProps);
+    vkGetPhysicalDeviceFeatures(_vkPhysicalDevice, &_vkPhysicalDeviceFeatures);
 
     // Queue memory properties
     vkGetPhysicalDeviceMemoryProperties(_vkPhysicalDevice,
                                         &_vkPhysicalDeviceMemoryProperties);
 
-    _INTR_LOG_INFO("Using physical device %s (Driver Ver. %u, API Ver. %u, "
-                   "Vendor ID %u, Device ID %u, Device Type %u)...",
-                   physDeviceProps.deviceName, physDeviceProps.driverVersion,
-                   physDeviceProps.apiVersion, physDeviceProps.vendorID,
-                   physDeviceProps.deviceID, physDeviceProps.deviceType);
+    _INTR_LOG_INFO(
+        "Using physical device %s (Driver Ver. %u, API Ver. %u, "
+        "Vendor ID %u, Device ID %u, Device Type %u)...",
+        _vkPhysicalDeviceProps.deviceName, _vkPhysicalDeviceProps.driverVersion,
+        _vkPhysicalDeviceProps.apiVersion, _vkPhysicalDeviceProps.vendorID,
+        _vkPhysicalDeviceProps.deviceID, _vkPhysicalDeviceProps.deviceType);
   }
 
   // Find graphics _AND_ compute queue
@@ -682,7 +720,7 @@ void RenderSystem::initVkDevice()
     deviceCreateInfo.pNext = nullptr;
     deviceCreateInfo.queueCreateInfoCount = 1u;
     deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-    deviceCreateInfo.pEnabledFeatures = &physDevFeatures;
+    deviceCreateInfo.pEnabledFeatures = &_vkPhysicalDeviceFeatures;
 
     if (enabledExtensions.size() > 0)
     {
@@ -1006,12 +1044,33 @@ void RenderSystem::initVkPipelineCache()
 {
   _INTR_LOG_INFO("Creating Vulkan cache...");
 
+  _INTR_ARRAY(uint8_t) pipelineCacheData;
+
+  _INTR_STRING pipelineCacheFilePath = getPipelineCacheFilePath();
+  _INTR_IFSTREAM ifs(pipelineCacheFilePath.c_str(), std::ifstream::binary);
+
+  ifs.seekg(0, ifs.end);
+  std::streamoff size = ifs.tellg();
+  ifs.seekg(0);
+
+  if (size != -1)
+  {
+    pipelineCacheData.resize(size);
+    ifs.read((char*)pipelineCacheData.data(), size);
+  }
+  else
+  {
+    _INTR_LOG_WARNING("No pipeline cache available...");
+  }
+
+  ifs.close();
+
   VkPipelineCacheCreateInfo pipelineCache = {};
   {
     pipelineCache.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
     pipelineCache.pNext = nullptr;
-    pipelineCache.initialDataSize = 0;
-    pipelineCache.pInitialData = nullptr;
+    pipelineCache.initialDataSize = pipelineCacheData.size();
+    pipelineCache.pInitialData = pipelineCacheData.data();
     pipelineCache.flags = 0u;
   }
 

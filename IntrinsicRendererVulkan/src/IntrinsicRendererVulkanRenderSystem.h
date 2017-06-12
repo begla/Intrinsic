@@ -23,6 +23,7 @@ namespace Vulkan
 struct RenderSystem
 {
   static void init(void* p_PlatformHandle, void* p_PlatformWindow);
+  static void shutdown();
 
   // <-
 
