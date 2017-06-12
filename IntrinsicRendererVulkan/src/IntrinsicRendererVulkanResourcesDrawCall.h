@@ -49,6 +49,7 @@ struct DrawCallData : Dod::Resources::ResourceDataBase
     sortingHash.resize(_INTR_MAX_DRAW_CALL_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(uint32_t) descVertexCount;
   _INTR_ARRAY(uint32_t) descIndexCount;
   _INTR_ARRAY(uint32_t) descInstanceCount;
@@ -61,7 +62,7 @@ struct DrawCallData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(uint8_t) descMaterialPass;
   _INTR_ARRAY(Dod::Ref) descMeshComponent;
 
-  // GPU resources
+  // Resources
   _INTR_ARRAY(_INTR_ARRAY(uint32_t)) dynamicOffsets;
   _INTR_ARRAY(VkDescriptorSet) vkDescriptorSet;
   _INTR_ARRAY(_INTR_ARRAY(VkDeviceSize)) vertexBufferOffsets;
@@ -427,13 +428,7 @@ struct DrawCallManager
                          uint8_t p_UboType, uint32_t p_RangeInBytes,
                          uint32_t p_OffsetInBytes = 0u);
 
-  // <-
-
-  // Member refs.
-  // ->
-
   // Description
-
   _INTR_INLINE static uint32_t& _descVertexCount(DrawCallRef p_Ref)
   {
     return _data.descVertexCount[p_Ref._id];
@@ -481,7 +476,6 @@ struct DrawCallManager
   }
 
   // Resources
-
   _INTR_INLINE static uint32_t& _sortingHash(DrawCallRef p_Ref)
   {
     return _data.sortingHash[p_Ref._id];
@@ -507,8 +501,6 @@ struct DrawCallManager
   {
     return _data.vkDescriptorSet[p_Ref._id];
   }
-
-  // <-
 
   // Static members
   static _INTR_ARRAY(_INTR_ARRAY(DrawCallRef)) _drawCallsPerMaterialPass;
