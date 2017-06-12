@@ -162,7 +162,7 @@ struct ScriptManager
 
   // <-
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   // <-

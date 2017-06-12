@@ -144,7 +144,7 @@ struct VertexLayoutManager
     }
   }
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   _INTR_INLINE static _INTR_ARRAY(VertexAttribute) &

@@ -507,7 +507,7 @@ struct MaterialManager
 
   static void loadMaterialPassConfig();
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   // Description

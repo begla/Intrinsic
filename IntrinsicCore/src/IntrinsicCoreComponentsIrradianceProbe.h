@@ -169,7 +169,7 @@ struct IrradianceProbeManager
 
   // <-
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   // Description

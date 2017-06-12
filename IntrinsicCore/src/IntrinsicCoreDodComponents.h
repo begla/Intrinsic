@@ -64,7 +64,6 @@ struct ComponentManagerBase : Dod::ManagerBase<IdCount, DataType>
     return componentIt->second;
   }
 
-  // Setter/getter
   _INTR_INLINE static Entity::EntityRef& _entity(Ref p_Ref)
   {
     return _data.entity[p_Ref._id];

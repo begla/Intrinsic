@@ -89,7 +89,7 @@ struct EventListenerManager
         _INTR_MAX_EVENT_LISTENER_COUNT>::_destroyResource(p_Ref);
   }
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   _INTR_INLINE static EventCallbackFunction&

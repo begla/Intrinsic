@@ -163,7 +163,7 @@ struct EventManager
     EventListenerManager::destroyEventListener(p_EventListener);
   }
 
-  // Getter/Setter
+  // Accessors
   // ->
 
   _INTR_INLINE static QueuedEventData& _queuedEventData(EventRef p_EventRef)
