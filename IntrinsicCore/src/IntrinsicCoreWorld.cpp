@@ -535,13 +535,13 @@ void World::updateDayNightCycle(float p_DeltaT)
 {
   Math::Gradient<glm::vec4, 7u> sunColorGradient;
   {
-    sunColorGradient._percentages[0] = 0.0f; // Sunrise
-    sunColorGradient._percentages[1] = 0.05f;
-    sunColorGradient._percentages[2] = 0.1f;
-    sunColorGradient._percentages[3] = 0.40f;
-    sunColorGradient._percentages[4] = 0.45f; // Dawn
-    sunColorGradient._percentages[5] = 0.5f;  // Night
-    sunColorGradient._percentages[6] = 1.0f;
+    sunColorGradient._keyPoints[0] = 0.0f; // Sunrise
+    sunColorGradient._keyPoints[1] = 0.05f;
+    sunColorGradient._keyPoints[2] = 0.1f;
+    sunColorGradient._keyPoints[3] = 0.40f;
+    sunColorGradient._keyPoints[4] = 0.45f; // Dawn
+    sunColorGradient._keyPoints[5] = 0.5f;  // Night
+    sunColorGradient._keyPoints[6] = 1.0f;
 
     sunColorGradient._values[0] = glm::vec4(glm::vec3(1.0f), 0.025f);
     sunColorGradient._values[1] = glm::vec4(1.0f, 0.643f, 0.376f, 0.5f);
