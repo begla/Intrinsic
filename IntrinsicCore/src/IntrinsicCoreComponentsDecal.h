@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref DecalRef;
 typedef _INTR_ARRAY(DecalRef) DecalRefArray;
 

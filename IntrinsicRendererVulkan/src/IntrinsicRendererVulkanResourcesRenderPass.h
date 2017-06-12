@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref RenderPassRef;
 typedef Dod::RefArray RenderPassRefArray;
 

@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref ScriptRef;
 typedef _INTR_ARRAY(ScriptRef) ScriptRefArray;
 

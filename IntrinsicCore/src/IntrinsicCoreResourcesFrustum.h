@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref FrustumRef;
 typedef _INTR_ARRAY(FrustumRef) FrustumRefArray;
 

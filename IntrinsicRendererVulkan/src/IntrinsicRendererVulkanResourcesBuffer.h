@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref BufferRef;
 typedef _INTR_ARRAY(BufferRef) BufferRefArray;
 
@@ -39,13 +40,13 @@ struct BufferData : Dod::Resources::ResourceDataBase
     memoryAllocationInfo.resize(_INTR_MAX_BUFFER_COUNT);
   }
 
-  // <-
-
+  // Description
   _INTR_ARRAY(BufferType::Enum) descBufferType;
   _INTR_ARRAY(MemoryPoolType::Enum) descMemoryPoolType;
   _INTR_ARRAY(uint32_t) descSizeInBytes;
   _INTR_ARRAY(void*) descInitialData;
 
+  // Resources
   _INTR_ARRAY(VkDescriptorBufferInfo) vkDescriptorBufferInfo;
   _INTR_ARRAY(VkBuffer) vkBuffer;
   _INTR_ARRAY(GpuMemoryAllocationInfo) memoryAllocationInfo;
@@ -194,9 +195,7 @@ struct BufferManager
                                       p_SrcStages, p_DstStages);
   }
 
-  // Members refs.
-  // ->
-
+  // Description
   _INTR_INLINE static BufferType::Enum& _descBufferType(BufferRef p_Ref)
   {
     return _data.descBufferType[p_Ref._id];
@@ -214,7 +213,7 @@ struct BufferManager
     return _data.descSizeInBytes[p_Ref._id];
   }
 
-  // GPU resources
+  // Resources
   _INTR_INLINE static VkBuffer& _vkBuffer(BufferRef p_Ref)
   {
     return _data.vkBuffer[p_Ref._id];

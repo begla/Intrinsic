@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Entity
 {
+// Typedefs
 typedef Dod::Ref EntityRef;
 typedef _INTR_ARRAY(EntityRef) EntityRefArray;
 

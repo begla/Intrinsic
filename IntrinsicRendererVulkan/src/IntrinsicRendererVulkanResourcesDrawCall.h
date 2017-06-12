@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref DrawCallRef;
 typedef _INTR_ARRAY(DrawCallRef) DrawCallRefArray;
 

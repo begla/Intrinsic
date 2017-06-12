@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref LightRef;
 typedef _INTR_ARRAY(LightRef) LightRefArray;
 

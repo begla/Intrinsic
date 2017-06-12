@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref IrradianceProbeRef;
 typedef _INTR_ARRAY(IrradianceProbeRef) IrradianceProbeRefArray;
 

@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref ComputeCallRef;
 typedef _INTR_ARRAY(ComputeCallRef) ComputeCallRefArray;
 
@@ -38,11 +39,12 @@ struct ComputeCallData : Dod::Resources::ResourceDataBase
     vkDescriptorSet.resize(_INTR_MAX_COMPUTE_CALL_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(PipelineRef) descPipeline;
   _INTR_ARRAY(_INTR_ARRAY(BindingInfo)) descBindInfos;
   _INTR_ARRAY(glm::uvec3) descDimensions;
 
-  // GPU resources
+  // Resources
   _INTR_ARRAY(_INTR_ARRAY(uint32_t)) dynamicOffsets;
   _INTR_ARRAY(VkDescriptorSet) vkDescriptorSet;
 };
@@ -186,9 +188,7 @@ struct ComputeCallManager
                          uint8_t p_UboType, uint32_t p_RangeInBytes,
                          uint32_t p_OffsetInBytes = 0u);
 
-  // Members refs.
-  // ->
-
+  // Description
   _INTR_INLINE static PipelineRef& _descPipeline(PipelineLayoutRef p_Ref)
   {
     return _data.descPipeline[p_Ref._id];
@@ -203,6 +203,7 @@ struct ComputeCallManager
     return _data.descDimensions[p_Ref._id];
   }
 
+  // Resources
   _INTR_INLINE static _INTR_ARRAY(uint32_t) &
       _dynamicOffsets(PipelineLayoutRef p_Ref)
   {
