@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+#define MAX_LIGHT_COUNT (16u * 1024u)
+
 #define MAX_LIGHT_COUNT_PER_CLUSTER 256u
 #define MAX_IRRAD_PROBES_PER_CLUSTER 4u
 #define MAX_DECALS_PER_CLUSTER 64u
@@ -818,7 +820,7 @@ void Clustering::init()
       BufferManager::_descMemoryPoolType(_lightBuffer) =
           MemoryPoolType::kStaticStagingBuffers;
       BufferManager::_descSizeInBytes(_lightBuffer) =
-          _INTR_MAX_LIGHT_COMPONENT_COUNT * sizeof(Light);
+          MAX_LIGHT_COUNT * sizeof(Light);
       buffersToCreate.push_back(_lightBuffer);
     }
 
@@ -1241,12 +1243,11 @@ void spawnAndSimulateTestLights(Components::CameraRef p_CameraRef)
   for (uint32_t i = 0u; i < _testLights.size(); ++i)
   {
     TestLight& light = _testLights[i];
-    const glm::vec3 worldPos =
-        glm::vec3(light.spawnPos.x,
-                  light.spawnPos.y +
-                      2000.0f * sin(light.spawnPos.x + light.spawnPos.y +
-                                    TaskManager::_totalTimePassed * 0.1f),
-                  light.spawnPos.z);
+    const glm::vec3 worldPos = glm::vec3(
+        light.spawnPos.x,
+        light.spawnPos.y + 2000.0f * sin(light.spawnPos.x + light.spawnPos.y +
+                                         TaskManager::_totalTimePassed * 0.1f),
+        light.spawnPos.z);
 
     light.light.posAndRadiusVS = glm::vec4(
         glm::vec3(Components::CameraManager::_viewMatrix(p_CameraRef) *
