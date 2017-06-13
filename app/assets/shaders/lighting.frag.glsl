@@ -178,11 +178,16 @@ void main()
     }
 #endif // DEBUG_VIS_CLUSTERS
 
-    for (uint li=0; li<lightCount; ++li)
+    for (uint li=0; li<lightCount; li+=2)
     {
       Light light = lights[lightIndices[clusterIdx + li + 1]];
       calcPointLightLighting(light, 
         d, matParams, outColor);
+
+      light = lights[lightIndices[clusterIdx + li + 2]];
+      light.colorAndIntensity.w *= float(li + 1 < lightCount);
+        calcPointLightLighting(light, 
+          d, matParams, outColor);
     }
   }
 }
