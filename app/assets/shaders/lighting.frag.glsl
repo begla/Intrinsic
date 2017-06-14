@@ -113,24 +113,18 @@ void main()
   // Irradiance
   vec3 irrad = d.diffuseColor * sampleSH(uboPerFrame.skyLightSH, normalWS) / MATH_PI;
   {
-    const uint clusterIdx = calcClusterIndex(gridPos, maxIrradProbeCountPerCluster);
+    const uint clusterIdx = calcClusterIndex(gridPos, maxIrradProbeCountPerCluster) / 2;
     const uint irradProbeCount = irradProbeIndices[clusterIdx];
 
-    for (uint pi=0; pi<irradProbeCount; ++pi)
+    for (uint pi=0; pi<irradProbeCount; pi+=2)
     {
-      IrradProbe probe = irradProbes[irradProbeIndices[clusterIdx + pi + 1]];
+      const uint packedProbeIndices = irradProbeIndices[clusterIdx + pi / 2 + 1];
+      
+      IrradProbe probe = irradProbes[packedProbeIndices & 0xFFFF];
+      calcLocalIrradiance(probe, d, normalWS, irrad, 1.0);
 
-      const float distToProbe = distance(d.posVS, probe.posAndRadius.xyz);
-      if (distToProbe < probe.posAndRadius.w)
-      {
-        const float fadeRange = probe.posAndRadius.w * probe.data0.x;
-        const float fadeStart = probe.posAndRadius.w - fadeRange;
-        const float fade = pow(1.0 - max(distToProbe - fadeStart, 0.0) 
-          / fadeRange, probe.data0.y);
-        
-        irrad = mix(irrad, d.diffuseColor 
-          * sampleSH(probe.shData, normalWS) / MATH_PI, fade);
-      }
+      probe = irradProbes[packedProbeIndices >> 16];
+      calcLocalIrradiance(probe, d, normalWS, irrad, float(pi + 1 < irradProbeCount));
     }
   }
 
@@ -166,7 +160,7 @@ void main()
 
   // Point lights
   {
-    const uint clusterIdx = calcClusterIndex(gridPos, maxLightCountPerCluster);
+    const uint clusterIdx = calcClusterIndex(gridPos, maxLightCountPerCluster) / 2;
     const uint lightCount = lightIndices[clusterIdx];
 
 //#define DEBUG_VIS_CLUSTERS
@@ -180,11 +174,13 @@ void main()
 
     for (uint li=0; li<lightCount; li+=2)
     {
-      Light light = lights[lightIndices[clusterIdx + li + 1]];
-      calcPointLightLighting(light, 
-        d, matParams, outColor);
+      const uint packedLightIndices = lightIndices[clusterIdx + li / 2u + 1u];
 
-      light = lights[lightIndices[clusterIdx + li + 2]];
+      Light light = lights[packedLightIndices & 0xFFFF];
+        calcPointLightLighting(light,
+          d, matParams, outColor);
+
+      light = lights[packedLightIndices >> 16];
       light.colorAndIntensity.w *= float(li + 1 < lightCount);
         calcPointLightLighting(light, 
           d, matParams, outColor);

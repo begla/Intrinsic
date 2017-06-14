@@ -51,3 +51,22 @@ void calcPointLightLighting(
   calcTransl(d, matParams, att, 
     vec4(lightColor, light.colorAndIntensity.w), outColor);
 }
+
+void calcLocalIrradiance(in IrradProbe probe, 
+  in LightingData d,
+  vec3 normalWS,
+  inout vec3 irrad, 
+  float fadeFactor)
+{
+  const float distToProbe = distance(d.posVS, probe.posAndRadius.xyz);
+  if (distToProbe < probe.posAndRadius.w)
+  {
+    const float fadeRange = probe.posAndRadius.w * probe.data0.x;
+    const float fadeStart = probe.posAndRadius.w - fadeRange;
+    const float fade = pow(1.0 - max(distToProbe - fadeStart, 0.0) 
+      / fadeRange, probe.data0.y);
+
+    irrad = mix(irrad, d.diffuseColor 
+      * sampleSH(probe.shData, normalWS) / MATH_PI, fade * fadeFactor);
+  }
+}

@@ -20,6 +20,7 @@
 
 #include "lib_math.glsl"
 #include "lib_lighting.glsl"
+#include "lib_buffers.glsl"
 #include "lib_vol_lighting.glsl"
 #include "lib_noise.glsl"
 #include "lib_clustering.glsl"
@@ -73,6 +74,8 @@ layout (binding = 8) buffer IrradProbeIndexBuffer
 };
 layout (binding = 9) uniform sampler2DArray shadowBufferExpTex;
 layout (binding = 10) uniform sampler2D kelvinLutTex;
+
+#include "volumetric_lighting.inc.glsl"
 
 // TODO
 const vec3 heightRefPosWS = vec3(0.0, 700.0, 0.0);
@@ -162,23 +165,18 @@ void main()
 
   // Local irradiance
   {
-    const uint clusterIdx = calcClusterIndex(gridPos, maxIrradProbeCountPerCluster);
+    const uint clusterIdx = calcClusterIndex(gridPos, maxIrradProbeCountPerCluster) / 2;
     const uint irradProbeCount = irradProbeIndices[clusterIdx];
 
-    for (uint pi=0; pi<irradProbeCount; ++pi)
+    for (uint pi=0; pi<irradProbeCount; pi+=2)
     {
-      IrradProbe probe = irradProbes[irradProbeIndices[clusterIdx + pi + 1]];
-
-      const float distToProbe = distance(posVS, probe.posAndRadius.xyz);
-      if (distToProbe < probe.posAndRadius.w)
-      {
-        const float fadeRange = probe.posAndRadius.w * probe.data0.x;
-        const float fadeStart = probe.posAndRadius.w - fadeRange;
-        const float fade = pow(1.0 - max(distToProbe - fadeStart, 0.0) 
-          / fadeRange, probe.data0.y);
-        
-        irrad = mix(irrad, sampleSH(probe.shData, rayWS) / MATH_PI, fade);
-      }
+      const uint packedProbeIndices = irradProbeIndices[clusterIdx + pi / 2 + 1];
+      
+      IrradProbe probe = irradProbes[packedProbeIndices & 0xFFFF];
+      calcLocalIrradiance(probe, posVS, rayWS, irrad, 1.0);
+ 
+      probe = irradProbes[packedProbeIndices >> 16];
+      calcLocalIrradiance(probe, posVS, rayWS, irrad, float(pi + 1 < irradProbeCount));
     }
   }
 
@@ -186,20 +184,19 @@ void main()
 
   // Local lights
   {
-    const uint clusterIdx = calcClusterIndex(gridPos, maxLightCountPerCluster);
+    const uint clusterIdx = calcClusterIndex(gridPos, maxLightCountPerCluster) / 2;
     uint lightCount = lightIndices[clusterIdx];
 
     for (uint li=0; li<lightCount; ++li)
     {
-      Light light = lights[lightIndices[clusterIdx + li + 1]];
-
-      const vec3 lightDistVec = light.posAndRadius.xyz - posVS;
-      const float dist = length(lightDistVec);
-      const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
-      if (att * light.colorAndIntensity.w < MIN_FALLOFF) continue;
-
-      lighting += att * light.colorAndIntensity.rgb 
-        * light.colorAndIntensity.a * kelvinToRGB(light.temp.r, kelvinLutTex) / MATH_PI;
+      const uint packedLightIndices = lightIndices[clusterIdx + li / 2 + 1];
+      
+      Light light = lights[packedLightIndices & 0xFFFF];
+      calcPointLight(light, posVS, lighting);
+      
+      light = lights[packedLightIndices >> 16];
+      light.colorAndIntensity.w *= float(li < lightCount + 1);
+      calcPointLight(light, posVS, lighting);
     }   
   }
 
