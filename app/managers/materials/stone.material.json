@@ -22,7 +22,7 @@
         "translucencyThickness": 1.0,
         "emissiveIntensity": 0.0,
         "normalTextureName": "stones_NRM",
-        "pbrTextureName": "checkerboard_PBR",
+        "pbrTextureName": "default_PBR",
         "metalMaskBias": 0.0,
         "roughnessBias": 0.0,
         "specularBias": 0.0

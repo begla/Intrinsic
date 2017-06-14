@@ -22,8 +22,8 @@
         ],
         "translucencyThickness": 0.0,
         "emissiveIntensity": 0.0,
-        "normalTextureName": "default_NRM",
-        "pbrTextureName": "default_PBR",
+        "normalTextureName": "Prop_Atlas_01_NRM",
+        "pbrTextureName": "Prop_Atlas_01_PBR",
         "metalMaskBias": 0.0,
         "roughnessBias": 0.0,
         "specularBias": 0.0

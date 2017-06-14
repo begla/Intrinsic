@@ -6,7 +6,7 @@
             "GBufferWireframe",
             "GBufferWater"
         ],
-        "albedoTextureName": "white",
+        "albedoTextureName": "black",
         "emissiveTextureName": "white",
         "uvOffsetScale": [
             0.0,

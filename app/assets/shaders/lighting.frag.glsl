@@ -103,7 +103,7 @@ void main()
     d.posVS = unproject(inUV0, depth, uboPerFrame.invProjMatrix); 
     d.N = normalize(decodeNormal(normalSample.rg));
     d.L = uboPerFrame.sunLightDirVS.xyz;
-    d.energy = vec3(uboPerFrame.sunLightColorAndIntensity.w);
+    d.energy = uboPerFrame.sunLightColorAndIntensity.w;
     
     calculateLightingDataSun(d);  
   }
