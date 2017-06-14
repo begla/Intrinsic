@@ -117,7 +117,7 @@ void main()
   // Tonemapping
   outColor.rgb *= exposure;
   outColor.rgb = tonemap(outColor.rgb);
-  vec3 whiteScale = 1.0/tonemap(vec3(W));
+  vec3 whiteScale = 1.0 / tonemap(vec3(W));
   outColor.rgb *= whiteScale;
   
   // Bleach Bypass

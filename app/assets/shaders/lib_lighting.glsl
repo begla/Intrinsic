@@ -60,6 +60,7 @@ struct LightingData
 {
   // Source
   vec3 L;
+  vec3 LSpec;
   vec3 V;
   vec3 N;
   vec3 energy;
@@ -79,6 +80,7 @@ struct LightingData
   float NdV;
   float NdH;
   float VdH;
+  float LdH;
   float roughness2;
 };
 
@@ -94,18 +96,27 @@ vec3 F_Schlick(vec3 value, float VdH)
   return fc + value * (1.0 - fc);
 }
 
-float V_Smith(float NdV, float NdL, float roughness2)
+vec2 VF_GGX(float LdH, float roughness2)
 {
-  const float VisSmithV = NdL * (NdV * (1.0 - roughness2) + roughness2);
-  const float VisSmithL = NdV * (NdL * (1.0 - roughness2) + roughness2);
-  return 0.5 * (1.0 / (VisSmithV + VisSmithL + 1.0e-6));
+  // Fresnel
+  const float LdH5 = pow(LdH, 5.0);
+  const float Fa = 1.0;
+  const float Fb = LdH5;
+
+  // Visibility
+  const float k = roughness2 * 0.5;
+  const float k2 = k * k;
+  const float invK2 = 1.0 - k2;
+  const float vis = 1.0 / (LdH * LdH * invK2 + k2);
+
+  return vec2(Fa * vis, Fb * vis);
 }
 
 float D_GGX(float NdH, float roughness2)
 {
-  const float r = roughness2 * roughness2;
-  const float f = (NdH * r - NdH) * NdH + 1.0;
-  return r / (MATH_PI * f * f);
+  const float roughness4 = roughness2 * roughness2;
+  const float denom = NdH * NdH * (roughness4 - 1.0) + 1.0;
+  return clamp(roughness4 / (MATH_PI * denom * denom), 0.0, 10.0);
 }
 
 // IBL
@@ -218,6 +229,28 @@ void calculateLightingData(inout LightingData d)
   d.NdV = clamp(abs(dot(d.N, d.V)) + 1.0e-5, 0.0, 1.0);
   d.NdH = clamp(dot(d.N, d.H), 0.0, 1.0);
   d.VdH = clamp(dot(d.V, d.H), 0.0, 1.0);
+  d.LdH = clamp(dot(d.L, d.H), 0.0, 1.0);
+}
+
+void calculateLightingDataSun(inout LightingData d)
+{
+  d.V = -normalize(d.posVS); 
+
+  // Sun area light;
+  const float sunRadius = MATH_PI * 0.025;
+  const float sunR = sin(sunRadius);
+  const float sunD = cos(sunRadius);
+  const vec3 R = reflect(-d.V, d.N);
+  const float DdR = dot(d.L, R);
+  const vec3 S = R - DdR * d.L;
+  d.L = DdR < sunD ? normalize(sunD * d.L + normalize(S) * sunR) : R;
+
+  d.H = normalize(d.L + d.V);
+  d.NdL = clamp(dot(d.N, d.L), 0.0, 1.0); 
+  d.NdV = clamp(abs(dot(d.N, d.V)) + 1.0e-5, 0.0, 1.0);
+  d.NdH = clamp(dot(d.N, d.H), 0.0, 1.0);
+  d.VdH = clamp(dot(d.V, d.H), 0.0, 1.0);
+  d.LdH = clamp(dot(d.L, d.H), 0.0, 1.0);
 }
 
 vec3 calcDiffuse(LightingData d)
@@ -227,11 +260,13 @@ vec3 calcDiffuse(LightingData d)
 
 vec3 calcSpecular(LightingData d)
 {
-  const vec3 F = F_Schlick(d.specularColor, d.VdH);
-  const float Vis = V_Smith(d.NdV, d.NdL, d.roughness2);
-  const float D = D_GGX(d.NdH, d.roughness2) * d.energy.y;
+  const float F0 = 0.0;
+
+  const float D = D_GGX(d.NdH, d.roughness2);
+  const vec2 FV0 = VF_GGX(d.LdH, d.roughness2);
+  const float FV = F0 * FV0.x + (1.0 - F0) * FV0.y;
   
-  return F * Vis * D;
+  return D * FV * d.specularColor.xyz * d.energy.y;
 }
 
 vec3 calcLighting(LightingData d)

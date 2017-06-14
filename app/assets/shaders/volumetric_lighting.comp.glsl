@@ -150,7 +150,7 @@ void main()
     if (shadowMapIdx != uint(-1)) 
     {
       const vec4 shadowSample = texture(shadowBufferExpTex, vec3(posLS.xy, shadowMapIdx));
-      shadowAttenuation = clamp(calculateShadowESM(shadowSample, posLS.z)*1.1 - 0.1, 0.0, 1.0);
+      shadowAttenuation = clamp(calculateShadowESM(shadowSample, posLS.z) * 1.1 - 0.1, 0.0, 1.0);
     }
 
     const vec3 lightColor = uboPerFrame.sunLightColorAndIntensity.xyz 

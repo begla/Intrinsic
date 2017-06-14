@@ -88,17 +88,25 @@ void main()
   const vec4 parameter0Sample = textureLod(parameter0Tex, inUV0, 0.0);
   const MaterialParameters matParams = materialParameters[uint(parameter0Sample.y)];
 
+  // Setup lighting data for sunlight
   LightingData d;
-  d.baseColor = albedoSample.rgb;  
-  d.metalMask = parameter0Sample.r;
-  d.specular = normalSample.b;
-  d.roughness = normalSample.a;
-  initLightingDataFromGBuffer(d);
-  d.posVS = unproject(inUV0, depth, uboPerFrame.invProjMatrix);
-  d.N = normalize(decodeNormal(normalSample.rg));  
-  d.L = uboPerFrame.sunLightDirVS.xyz;
-  d.energy = vec3(uboPerFrame.sunLightColorAndIntensity.w * 0.5);
-  calculateLightingData(d);
+  {
+    d.baseColor = albedoSample.rgb;
+    d.metalMask = parameter0Sample.r;
+    d.specular = normalSample.b;
+    d.roughness = normalSample.a;
+
+    initLightingDataFromGBuffer(d);  
+  }
+
+  {
+    d.posVS = unproject(inUV0, depth, uboPerFrame.invProjMatrix); 
+    d.N = normalize(decodeNormal(normalSample.rg));
+    d.L = uboPerFrame.sunLightDirVS.xyz;
+    d.energy = vec3(uboPerFrame.sunLightColorAndIntensity.w);
+    
+    calculateLightingDataSun(d);  
+  }
 
   const uvec3 gridPos = calcGridPosForViewPos(d.posVS, uboPerInstance.nearFar, 
     uboPerInstance.nearFarWidthHeight);
