@@ -78,7 +78,7 @@ void writeGBuffer(in GBuffer gbuffer, inout vec4 outAlbedo, inout vec4 outNormal
   outAlbedo = gbuffer.albedo; 
   outNormal.rg = encodeNormal(gbuffer.normal);
   outNormal.b = clamp(gbuffer.specular, 0.0, 1.0);
-  outNormal.a = clamp(gbuffer.roughness, 0.05, 1.0);
+  outNormal.a = clamp(gbuffer.roughness, 0.0, 1.0);
   outParameter0.rgba = vec4(clamp(gbuffer.metalMask, 0.0, 1.0), gbuffer.materialBufferIdx, gbuffer.occlusion, gbuffer.emissive);
 }
 

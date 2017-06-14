@@ -48,11 +48,12 @@ const float fogDensity = 0.001;
 const float fogStart = 1200.0;
 const float fogSunScatteringIntens = 0.0;
 
-const float waterFogDensity = 20.0;
-const float waterFogMaxBlendFactor = 0.85;
+const float waterFogDensity = 60.0;
+const float waterFogMaxBlendFactor = 1.0;
 const float waterFogDecayExp = 16.0;
-const vec3 waterFogColor0 = vec3(0.0, 1.0, 1.0);
-const vec3 waterFogColor1 = vec3(0.0, 0.2, 0.2);
+
+const vec4 waterFogColor0 = vec4(0.0, 1.0, 1.0, 1.0);
+const vec4 waterFogColor1 = vec4(0.0, 0.2, 0.2, 1.0);
 
 void main()
 {
@@ -114,11 +115,10 @@ void main()
     const float linDepthTransp = linearizeDepth(depthTransp, uboPerInstance.camParams.x, 
       uboPerInstance.camParams.y);
 
-    const float waterFog = min(1.0 - exp(-(linDepthOpaque - linDepthTransp) * waterFogDensity), 
-      waterFogMaxBlendFactor);
+    const float waterFog = 1.0 - exp(-(linDepthOpaque - linDepthTransp) * waterFogDensity);
+    const vec4 waterFogColor = mix(waterFogColor0, waterFogColor1, F * 0.5 + 0.5);
 
-    opaque.rgb = mix(opaque.rgb, fogIrrad * mix(waterFogColor0, waterFogColor1, F), 
-      waterFog);
+    opaque.rgb = mix(opaque.rgb, fogIrrad * waterFogColor.rgb, waterFog);
     outColor.rgb = mix(opaque, lightingTransp, albedoTransparents.a);
   }
   else

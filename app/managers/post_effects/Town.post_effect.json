@@ -3,7 +3,7 @@
     "properties": {
         "name": "Town",
         "scatteringDayNight": [
-            0.001500000013038516,
+            0.0005000000237487257,
             0.00800000037997961
         ],
         "sunOrientation": [

@@ -63,7 +63,7 @@ struct LightingData
   vec3 LSpec;
   vec3 V;
   vec3 N;
-  vec3 energy;
+  float energy;
   vec3 posVS;
 
   vec3 baseColor;
@@ -116,7 +116,7 @@ float D_GGX(float NdH, float roughness2)
 {
   const float roughness4 = roughness2 * roughness2;
   const float denom = NdH * NdH * (roughness4 - 1.0) + 1.0;
-  return clamp(roughness4 / (MATH_PI * denom * denom), 0.0, 10.0);
+  return roughness4 / (MATH_PI * denom * denom);
 }
 
 // IBL
@@ -216,9 +216,11 @@ vec3 sampleSH(vec4 data[7], vec3 dir)
 
 void initLightingDataFromGBuffer(inout LightingData d)
 {
+  const float adjRough = d.roughness * 0.8 + 0.2;
+  d.roughness2 = adjRough * adjRough;
+
   d.diffuseColor = d.baseColor - d.baseColor * d.metalMask;
   d.specularColor = mix(0.08 * d.specular.xxx, d.baseColor, d.metalMask);
-  d.roughness2 = d.roughness * d.roughness;
 }
 
 void calculateLightingData(inout LightingData d)
@@ -255,18 +257,18 @@ void calculateLightingDataSun(inout LightingData d)
 
 vec3 calcDiffuse(LightingData d)
 {
-  return d.energy.x * d.diffuseColor * (1.0 / MATH_PI);
+  return d.energy * d.diffuseColor * (1.0 / MATH_PI);
 }
 
 vec3 calcSpecular(LightingData d)
 {
-  const float F0 = 0.0;
+  const float F0 = 0.04;
 
-  const float D = D_GGX(d.NdH, d.roughness2);
+  const float D = D_GGX(d.NdH, d.roughness2) * d.energy;
   const vec2 FV0 = VF_GGX(d.LdH, d.roughness2);
-  const float FV = F0 * FV0.x + (1.0 - F0) * FV0.y;
+  const vec3 FV = F0 * FV0.x + (1.0 - F0) * FV0.y * d.specularColor;
   
-  return D * FV * d.specularColor.xyz * d.energy.y;
+  return D * FV;
 }
 
 vec3 calcLighting(LightingData d)

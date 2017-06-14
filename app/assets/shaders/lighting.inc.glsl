@@ -41,7 +41,7 @@ void calcPointLightLighting(
   const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
 
   d.L = lightDistVec / dist;
-  d.energy = vec3(light.colorAndIntensity.a);
+  d.energy = light.colorAndIntensity.a;
   calculateLightingData(d);
 
   const vec3 lightColor = light.colorAndIntensity.rgb 
