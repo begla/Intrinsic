@@ -3,7 +3,7 @@
     "properties": {
         "name": "Town",
         "scatteringDayNight": [
-            0.00019999999494757503,
+            0.001500000013038516,
             0.00800000037997961
         ],
         "sunOrientation": [
@@ -16,7 +16,7 @@
         "skyLightIntensity": 0.05000000074505806,
         "skyTurbidity": 2.0,
         "skyAlbedo": 0.0,
-        "sunIntensity": 20.0,
+        "sunIntensity": 10.0,
         "dofStartDistance": 100.0
     }
 }
