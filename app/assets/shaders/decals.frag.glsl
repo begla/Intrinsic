@@ -50,6 +50,8 @@ layout (location = 0) in vec2 inUV0;
 
 OUTPUT
 
+#include "decals.inc.glsl"
+
 void main()
 {
   const float depth = textureLod(depthTex, inUV0, 0.0).x;
@@ -69,32 +71,19 @@ void main()
   const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, 
     uboPerInstance.nearFarWidthHeight);
 
-  const uint clusterIdx = calcClusterIndex(gridPos, maxDecalCountPerCluster);
+  const uint clusterIdx = calcClusterIndex(gridPos, maxDecalCountPerCluster) / 2;
   const uint decalCount = decalIndices[clusterIdx];
 
-  for (uint di=0; di<decalCount; ++di)
+  for (uint di=0; di<decalCount; di+=2)
   {
-    Decal decal = decals[decalIndices[clusterIdx + di + 1]];
+    uint packedDecalIndices = decalIndices[clusterIdx + di / 2 + 1];
 
-    vec4 posDecalSS = decal.viewProjMatrix * vec4(posVS, 1.0);
-    posDecalSS /= posDecalSS.w;
-
-    if (all(lessThanEqual(posDecalSS.xyz, vec3(1.0, 1.0, 1.0)))
-      && all(greaterThanEqual(posDecalSS.xyz, vec3(-1.0, -1.0, 0.0))))
-    {
-      const mat3 TBN = mat3(-decal.tangentVS.xyz, decal.binormalVS.xyz, decal.normalVS.xyz);
-
-      vec2 decalUV = posDecalSS.xy * vec2(0.5, 0.5) + 0.5;
-      decalUV = decalUV * decal.uvTransform.xy + decal.uvTransform.zw;
-
-      const vec4 albedoSample = texture(globalTextures[decal.textureIds.x], decalUV);
-      if (albedoSample.a >= alphaThreshold)
-      {
-        albedo = albedoSample;
-        normal = normalize(TBN * (texture(globalTextures[decal.textureIds.y], decalUV).xyz * 2.0 - 1.0));
-        pbr = texture(globalTextures[decal.textureIds.z], decalUV);
-      } 
-    }
+    Decal decal = decals[packedDecalIndices & 0xFFFF];
+    calcDecal(decal, posVS, globalTextures, albedo, 
+      normal, pbr, 1.0);
+    decal = decals[packedDecalIndices >> 16];
+    calcDecal(decal, posVS, globalTextures, albedo, 
+      normal, pbr, float(di + 1 < decalCount)); 
   }
 
   if (albedo.a < alphaThreshold)
