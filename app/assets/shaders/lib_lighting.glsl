@@ -72,9 +72,13 @@ struct LightingData
   float roughness;
   
   // Result
+  float invDistToLight;
+
   vec3 diffuseColor;
   vec3 specularColor;
+  vec2 lobeEnergy;
 
+  vec3 R;
   vec3 H;
   float NdL;
   float NdV;
@@ -216,16 +220,22 @@ vec3 sampleSH(vec4 data[7], vec3 dir)
 
 void initLightingDataFromGBuffer(inout LightingData d)
 {
-  const float adjRough = d.roughness * 0.8 + 0.2;
+  const float adjRough = d.roughness * 0.95 + 0.05;
   d.roughness2 = adjRough * adjRough;
 
   d.diffuseColor = d.baseColor - d.baseColor * d.metalMask;
   d.specularColor = mix(0.08 * d.specular.xxx, d.baseColor, d.metalMask);
 }
 
+void calculateLightingDataBase(inout LightingData d)
+{
+  d.V = -normalize(d.posVS);
+  d.R = reflect(-d.V, d.N);  
+  d.lobeEnergy = vec2(d.energy);
+}
+
 void calculateLightingData(inout LightingData d)
 {
-  d.V = -normalize(d.posVS); 
   d.H = normalize(d.L + d.V);
   d.NdL = clamp(dot(d.N, d.L), 0.0, 1.0); 
   d.NdV = clamp(abs(dot(d.N, d.V)) + 1.0e-5, 0.0, 1.0);
@@ -234,37 +244,47 @@ void calculateLightingData(inout LightingData d)
   d.LdH = clamp(dot(d.L, d.H), 0.0, 1.0);
 }
 
-void calculateLightingDataSun(inout LightingData d)
+void calculateDiscL(inout LightingData d, float discRadius)
 {
-  d.V = -normalize(d.posVS); 
+  const float discR = sin(discRadius);
+  const float discD = cos(discRadius);
 
-  // Sun area light;
-  const float sunRadius = MATH_PI * 0.025;
-  const float sunR = sin(sunRadius);
-  const float sunD = cos(sunRadius);
-  const vec3 R = reflect(-d.V, d.N);
-  const float DdR = dot(d.L, R);
-  const vec3 S = R - DdR * d.L;
-  d.L = DdR < sunD ? normalize(sunD * d.L + normalize(S) * sunR) : R;
+  const float DdR = dot(d.L, d.R);
+  const vec3 S = d.R - DdR * d.L;
 
-  d.H = normalize(d.L + d.V);
-  d.NdL = clamp(dot(d.N, d.L), 0.0, 1.0); 
-  d.NdV = clamp(abs(dot(d.N, d.V)) + 1.0e-5, 0.0, 1.0);
-  d.NdH = clamp(dot(d.N, d.H), 0.0, 1.0);
-  d.VdH = clamp(dot(d.V, d.H), 0.0, 1.0);
-  d.LdH = clamp(dot(d.L, d.H), 0.0, 1.0);
+  d.L = DdR < discD ? normalize(discD * d.L + normalize(S) * discR) : d.R;
+  d.invDistToLight = 1.0 / discD;
+}
+
+void calculateSpehereL(inout LightingData d, float sphereRadius, vec3 lightDistVec)
+{
+  const vec3 closestPointRay = dot(lightDistVec, d.R) * d.R;
+  const vec3 centerToRay = closestPointRay - lightDistVec;
+  const vec3 cloestPointSphere = lightDistVec + centerToRay 
+    * clamp(sphereRadius * (1.0 / sqrt(dot(centerToRay, centerToRay))), 0.0, 1.0);
+  
+  d.L = normalize(cloestPointSphere);
+  d.invDistToLight = 1.0 / length(lightDistVec);
+}
+
+void calculateLobeEnergySphere(inout LightingData d, float sphereRadius)
+{
+  const float sphereAngle = clamp(sphereRadius * d.invDistToLight, 0.0, 1.0);
+  float energ = d.roughness2 / clamp(d.roughness2 + 0.5 * sphereAngle, 0.0, 1.0);
+  energ *= energ;
+  d.lobeEnergy.y *= energ;
 }
 
 vec3 calcDiffuse(LightingData d)
 {
-  return d.energy * d.diffuseColor * (1.0 / MATH_PI);
+  return d.lobeEnergy.x * d.diffuseColor * (1.0 / MATH_PI);
 }
 
 vec3 calcSpecular(LightingData d)
 {
   const float F0 = 0.04;
 
-  const float D = D_GGX(d.NdH, d.roughness2) * d.energy;
+  const float D = D_GGX(d.NdH, d.roughness2) * d.lobeEnergy.y;
   const vec2 FV0 = VF_GGX(d.LdH, d.roughness2);
   const vec3 FV = F0 * FV0.x + (1.0 - F0) * FV0.y * d.specularColor;
   
