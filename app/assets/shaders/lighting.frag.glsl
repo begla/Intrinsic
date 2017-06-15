@@ -96,16 +96,19 @@ void main()
     d.specular = normalSample.b;
     d.roughness = normalSample.a;
 
-    initLightingDataFromGBuffer(d);  
+    initLightingDataFromGBuffer(d);
   }
 
   {
     d.posVS = unproject(inUV0, depth, uboPerFrame.invProjMatrix); 
     d.N = normalize(decodeNormal(normalSample.rg));
-    d.L = uboPerFrame.sunLightDirVS.xyz;
     d.energy = uboPerFrame.sunLightColorAndIntensity.w;
-    
-    calculateLightingDataSun(d);  
+    calculateLightingDataBase(d);
+
+    d.L = uboPerFrame.sunLightDirVS.xyz;
+    calculateDiscL(d, 0.025 * MATH_PI);
+    calculateLobeEnergySphere(d, 0.025 * MATH_PI);
+    calculateLightingData(d);
   }
 
   const uvec3 gridPos = calcGridPosForViewPos(d.posVS, uboPerInstance.nearFar, 
@@ -161,9 +164,10 @@ void main()
     float shadowAttenuation = cloudShadows 
       * calcShadowAttenuation(d.posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
     outColor.rgb += shadowAttenuation * sunLightColorAndIntensity.rgb * calcLighting(d);
+    
     calcTransl(d, matParams, 
       clamp(uboPerFrame.sunLightDirWS.y - 0.3, 0.0, 1.0), // Dim for low sun
-      sunLightColorAndIntensity, outColor);   
+      sunLightColorAndIntensity, outColor);
   }
 
   // Point lights

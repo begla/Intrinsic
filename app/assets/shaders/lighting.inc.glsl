@@ -39,10 +39,14 @@ void calcPointLightLighting(
   const vec3 lightDistVec = light.posAndRadius.xyz - d.posVS;
   const float dist = length(lightDistVec);
   const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
-
-  d.L = lightDistVec / dist;
+  
   d.energy = light.colorAndIntensity.a;
-  calculateLightingData(d);
+  {
+    calculateLightingDataBase(d);
+    calculateSpehereL(d, 0.5, lightDistVec);
+    calculateLobeEnergySphere(d, 0.5);
+    calculateLightingData(d);    
+  }
 
   const vec3 lightColor = light.colorAndIntensity.rgb 
     * kelvinToRGB(light.temp.r, kelvinLutTex);
