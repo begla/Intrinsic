@@ -42,7 +42,7 @@ shared vec4 temp1[LUM_AND_BRIGHT_THREADS][LUM_AND_BRIGHT_THREADS];
 
 vec4 brightClampAndLuminance(vec4 s)
 {
-  const float maxLum = 500.0;
+  const float maxLum = 10.0;
   s.rgb = min(s.rgb, maxLum);
   s.a = dot(s.rgb, LUM_WEIGHTS) + DELTA;
   s.rgb = max(s.rgb - uboPerInstance.bloomThreshold.x, vec3(0.0));
@@ -53,26 +53,22 @@ layout (local_size_x = LUM_AND_BRIGHT_THREADS, local_size_y = LUM_AND_BRIGHT_THR
 void main()
 {
   const vec2 samplePoint = (2.0 * vec2(gl_GlobalInvocationID.xy) + 0.5) / vec2(uboPerInstance.dim.x, uboPerInstance.dim.y);
-  vec4 bright = vec4(0.0);
+  vec4 bright = vec4(10000.0);
   const ivec2 outPos = 2 * ivec2(gl_GlobalInvocationID.xy);
 
-  vec4 b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 0)));
-  imageStore(output0Tex, outPos, b);
-  bright += b;
+  // Gather the minimum of the surrounding pixels to fight
+  // specular aliasing
+  bright = min(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 0)), bright);
+  bright = min(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 2)), bright);
+  bright = min(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 0)), bright);
+  bright = min(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 2)), bright);
+  bright = brightClampAndLuminance(bright);
 
-  b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 2)));
-  imageStore(output0Tex, outPos + ivec2(0, 1), b);
-  bright += b;
-  
-  b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 0)));
-  imageStore(output0Tex, outPos + ivec2(1, 0), b);
-  bright += b;
-  
-  b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 2)));
-  imageStore(output0Tex, outPos + ivec2(1, 1), b);
-  bright += b;
+  imageStore(output0Tex, outPos, bright);
+  imageStore(output0Tex, outPos + ivec2(1.0, 0.0), bright);
+  imageStore(output0Tex, outPos + ivec2(0.0, 1.0), bright);
+  imageStore(output0Tex, outPos + ivec2(1.0, 1.0), bright);
 
-  bright = bright / 4;
   temp0[gl_LocalInvocationID.x][gl_LocalInvocationID.y] = bright;
 
   imageStore(output1Tex, ivec2(gl_LocalInvocationID.xy + gl_WorkGroupID.xy * LUM_AND_BRIGHT_THREADS), bright);
