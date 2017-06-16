@@ -100,20 +100,12 @@ vec3 F_Schlick(vec3 value, float VdH)
   return fc + value * (1.0 - fc);
 }
 
-vec2 VF_GGX(float LdH, float roughness2)
+float V_GGX(float NdL, float NdV, float roughness2)
 {
-  // Fresnel
-  const float LdH5 = pow(LdH, 5.0);
-  const float Fa = 1.0;
-  const float Fb = LdH5;
-
-  // Visibility
-  const float k = roughness2 * 0.5;
-  const float k2 = k * k;
-  const float invK2 = 1.0 - k2;
-  const float vis = 1.0 / (LdH * LdH * invK2 + k2);
-
-  return vec2(Fa * vis, Fb * vis);
+  float k = roughness2 * 0.5;
+  float V = NdV * (1.0 - k) + k;
+  float L = NdL * (1.0 - k) + k;
+  return 0.25 / (V * L);
 }
 
 float D_GGX(float NdH, float roughness2)
@@ -272,7 +264,7 @@ void calculateLobeEnergySphere(inout LightingData d, float sphereRadius)
   const float sphereAngle = clamp(sphereRadius * d.invDistToLight, 0.0, 1.0);
   float energ = d.roughness2 / clamp(d.roughness2 + 0.5 * sphereAngle, 0.0, 1.0);
   energ *= energ;
-  d.lobeEnergy.y *= energ;
+  d.lobeEnergy *= energ;
 }
 
 vec3 calcDiffuse(LightingData d)
@@ -282,13 +274,13 @@ vec3 calcDiffuse(LightingData d)
 
 vec3 calcSpecular(LightingData d)
 {
-  const float F0 = 0.04;
-
   const float D = D_GGX(d.NdH, d.roughness2) * d.lobeEnergy.y;
-  const vec2 FV0 = VF_GGX(d.LdH, d.roughness2);
-  const vec3 FV = F0 * FV0.x + (1.0 - F0) * FV0.y * d.specularColor;
+  const float V = V_GGX(d.NdL, d.NdV, d.roughness2);
+  const float FHelper = F_Schlick(d.roughness2, d.VdH);
+  const vec3 F = clamp(50.0 * d.specularColor.g, 0.0, 1.0) * FHelper 
+    + (1.0 - FHelper) * d.specularColor;
   
-  return D * FV;
+  return D * F * V;
 }
 
 vec3 calcLighting(LightingData d)
