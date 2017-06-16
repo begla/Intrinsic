@@ -39,6 +39,7 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
     descSkyAlbedo.resize(_INTR_MAX_POST_EFFECT_COUNT);
     descSkyLightIntensity.resize(_INTR_MAX_POST_EFFECT_COUNT);
     descSkyTurbidity.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descCloudShadowsIntensity.resize(_INTR_MAX_POST_EFFECT_COUNT);
 
     descDoFStartDistance.resize(_INTR_MAX_POST_EFFECT_COUNT);
   }
@@ -54,6 +55,7 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(float) descSkyTurbidity;
   _INTR_ARRAY(float) descSkyAlbedo;
   _INTR_ARRAY(float) descSkyLightIntensity;
+  _INTR_ARRAY(float) descCloudShadowsIntensity;
 
   _INTR_ARRAY(float) descDoFStartDistance;
 };
@@ -85,6 +87,7 @@ struct PostEffectManager
     _descSkyAlbedo(p_Ref) = 0.0f;
     _descSkyLightIntensity(p_Ref) = 0.05f;
     _descDoFStartDistance(p_Ref) = 10000.0f;
+    _descCloudShadowsIntensity(p_Ref) = 0.0f;
   }
 
   // <-
@@ -146,6 +149,11 @@ struct PostEffectManager
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
                           _descSunIntensity(p_Ref), false, false),
         p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "cloudShadowsIntensity",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descCloudShadowsIntensity(p_Ref), false, false),
+        p_Document.GetAllocator());
 
     p_Properties.AddMember("dofStartDistance",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
@@ -186,6 +194,9 @@ struct PostEffectManager
     if (p_Properties.HasMember("dayNightFactor"))
       _descDayNightFactor(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["dayNightFactor"]);
+    if (p_Properties.HasMember("cloudShadowsIntensity"))
+      _descCloudShadowsIntensity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["cloudShadowsIntensity"]);
 
     if (p_Properties.HasMember("dofStartDistance"))
       _descDoFStartDistance(p_Ref) =
@@ -251,6 +262,9 @@ struct PostEffectManager
                  _descSkyLightIntensity(p_Right), p_BlendFactor);
     _descSunIntensity(p_Target) = glm::mix(
         _descSunIntensity(p_Left), _descSunIntensity(p_Right), p_BlendFactor);
+    _descCloudShadowsIntensity(p_Target) =
+        glm::mix(_descCloudShadowsIntensity(p_Left),
+                 _descCloudShadowsIntensity(p_Right), p_BlendFactor);
 
     _descDoFStartDistance(p_Target) =
         glm::mix(_descDoFStartDistance(p_Left), _descDoFStartDistance(p_Right),
@@ -292,6 +306,10 @@ struct PostEffectManager
   _INTR_INLINE static float& _descSunIntensity(PostEffectRef p_Ref)
   {
     return _data.descSunIntensity[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descCloudShadowsIntensity(PostEffectRef p_Ref)
+  {
+    return _data.descCloudShadowsIntensity[p_Ref._id];
   }
 
   _INTR_INLINE static float& _descDoFStartDistance(PostEffectRef p_Ref)

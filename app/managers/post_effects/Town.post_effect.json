@@ -17,6 +17,7 @@
         "skyTurbidity": 2.0,
         "skyAlbedo": 0.0,
         "sunIntensity": 10.0,
+        "cloudShadowsIntensity": 1.0,
         "dofStartDistance": 100.0
     }
 }
