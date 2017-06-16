@@ -1,0 +1,31 @@
+{
+    "name": "props",
+    "properties": {
+        "name": "props",
+        "materialPassMask": [
+            "GBufferDefault",
+            "GBufferWireframe",
+            "Shadow",
+            "PerPixelPicking"
+        ],
+        "albedoTextureName": "props",
+        "emissiveTextureName": "white",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 0.0,
+        "emissiveIntensity": 0.0,
+        "normalTextureName": "props_NRM",
+        "pbrTextureName": "props_PBR",
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": 0.0
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "name": "props",
+    "properties": {
+        "name": "props",
+        "imageType": 1,
+        "imageFormat": 10,
+        "fileName": "props.dds",
+        "avgNormLength": 1.0
+    }
+}

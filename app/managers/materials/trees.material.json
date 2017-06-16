@@ -1,0 +1,33 @@
+{
+    "name": "trees",
+    "properties": {
+        "name": "trees",
+        "materialPassMask": [
+            "GBufferWireframe",
+            "GBufferFoliage",
+            "ShadowFoliage",
+            "PerPixelPicking",
+            "GBufferFoliagePrePass"
+        ],
+        "albedoTextureName": "trees",
+        "emissiveTextureName": "white",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 1.0,
+        "emissiveIntensity": 0.0,
+        "normalTextureName": "trees_NRM",
+        "pbrTextureName": "trees_PBR",
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": -1.0,
+        "blendMaskTextureName": "white"
+    }
+}
