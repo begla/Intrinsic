@@ -539,8 +539,8 @@ void World::updateDayNightCycle(float p_DeltaT)
        glm::vec4(1.0f, 0.643f, 0.376f, 0.5f), glm::vec4(1.0f, 0.6f, 0.5f, 1.0f),
        glm::vec4(1.0f, 0.6f, 0.5f, 1.0f), glm::vec4(1.0f, 0.643f, 0.376f, 0.5f),
        glm::vec4(glm::vec3(1.0f), 0.025f), glm::vec4(glm::vec3(1.0f), 0.025f)},
-      {0.0f, /* Sunrise */ 0.05f, 0.1f, 0.4f, 0.45f /* Dawn */, 0.5f /*Night*/,
-       1.0f}};
+      {0.0f, /* Sunrise */ 0.05f, 0.1f, 0.4f, 0.45f /* Dawn */,
+       0.5f /* Night */, 1.0f}};
   static const float dayNightCycleDurationInS = 20.0f * 60.0f;
   static const float dayNightFadeInPerc = 0.05f;
   static const float nightLightIntens = 0.05f;
