@@ -87,6 +87,8 @@ void main()
   const vec4 normalSample = textureLod(normalTex, inUV0, 0.0);
   const vec4 parameter0Sample = textureLod(parameter0Tex, inUV0, 0.0);
   const MaterialParameters matParams = materialParameters[uint(parameter0Sample.y)];
+  const float occlusion = parameter0Sample.z;
+  const float emissive = parameter0Sample.w;
 
   // Setup lighting data for sunlight
   LightingData d;
@@ -139,18 +141,18 @@ void main()
     }
   }
 
-  outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, parameter0Sample.z) * irrad;
+  outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, occlusion) * irrad;
 
   // Specular
   {
     const float specLod = burleyToMipApprox(d.roughness);
     const vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
-    outColor.rgb += uboPerInstance.data0.y * uboPerInstance.data0.z * uboPerInstance.data0.y 
-      * parameter0Sample.z * spec;    
+    outColor.rgb += uboPerInstance.data0.y * uboPerInstance.data0.z 
+      * spec;    
   }
 
   // Emissive
-  outColor.rgb += parameter0Sample.w * matParams.emissiveIntensity * d.baseColor;
+  outColor.rgb += emissive * matParams.emissiveIntensity * d.baseColor;
 
   // Cloud shadows
   const vec4 posWS = uboPerFrame.invViewMatrix * vec4(d.posVS, 1.0);
