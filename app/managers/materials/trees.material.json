@@ -1,7 +1,7 @@
 {
-    "name": "Tree_Atlas_01",
+    "name": "trees",
     "properties": {
-        "name": "Tree_Atlas_01",
+        "name": "trees",
         "materialPassMask": [
             "GBufferWireframe",
             "GBufferFoliage",
@@ -9,7 +9,7 @@
             "PerPixelPicking",
             "GBufferFoliagePrePass"
         ],
-        "albedoTextureName": "Tree_Atlas_01",
+        "albedoTextureName": "trees",
         "emissiveTextureName": "white",
         "uvOffsetScale": [
             0.0,
@@ -23,8 +23,8 @@
         ],
         "translucencyThickness": 1.0,
         "emissiveIntensity": 0.0,
-        "normalTextureName": "Tree_Atlas_01_NRM",
-        "pbrTextureName": "Tree_Atlas_01_PBR",
+        "normalTextureName": "trees_NRM",
+        "pbrTextureName": "trees_PBR",
         "metalMaskBias": 0.0,
         "roughnessBias": 0.0,
         "specularBias": -1.0,

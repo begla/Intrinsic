@@ -1,10 +1,10 @@
 {
-    "name": "Prop_Atlas_01",
+    "name": "trees",
     "properties": {
-        "name": "Prop_Atlas_01",
+        "name": "trees",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "Prop_Atlas_01.dds",
+        "fileName": "trees.dds",
         "avgNormLength": 1.0
     }
 }

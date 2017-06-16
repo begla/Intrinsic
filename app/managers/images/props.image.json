@@ -1,10 +1,10 @@
 {
-    "name": "Rock_01",
+    "name": "props",
     "properties": {
-        "name": "Rock_01",
+        "name": "props",
         "imageType": 1,
         "imageFormat": 10,
-        "fileName": "Rock_01.dds",
+        "fileName": "props.dds",
         "avgNormLength": 1.0
     }
 }

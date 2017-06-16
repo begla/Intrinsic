@@ -1,10 +1,10 @@
 {
-    "name": "Rock_01_PBR",
+    "name": "props_PBR",
     "properties": {
-        "name": "Rock_01_PBR",
+        "name": "props_PBR",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "Rock_01_PBR.dds",
+        "fileName": "props_PBR.dds",
         "avgNormLength": 1.0
     }
 }

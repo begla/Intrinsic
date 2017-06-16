@@ -1,10 +1,10 @@
 {
-    "name": "Tree_Atlas_01_NRM",
+    "name": "trees_NRM",
     "properties": {
-        "name": "Tree_Atlas_01_NRM",
+        "name": "trees_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "fileName": "Tree_Atlas_01_NRM.dds",
+        "fileName": "trees_NRM.dds",
         "avgNormLength": 0.9055908918380737
     }
 }
