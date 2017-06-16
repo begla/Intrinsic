@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+// Allow more lights than available components to support the massive amount of
+// test lights
 #define MAX_LIGHT_COUNT (16u * 1024u)
 
 #define MAX_LIGHT_COUNT_PER_CLUSTER 256u
@@ -24,6 +26,8 @@
 
 #define GRID_DEPTH_SLICE_COUNT 24u
 #define GRID_SIZE_Y 8u
+#define GRID_SIZE_X 16u
+#define GRID_CLUSTER_COUNT (GRID_SIZE_X * GRID_SIZE_Y * GRID_DEPTH_SLICE_COUNT)
 
 using namespace RVResources;
 using namespace CResources;
@@ -103,12 +107,16 @@ uint32_t _currentDecalCount = 0u;
 uint16_t* _lightIndexBufferGpuMemory = nullptr;
 Light* _lightBufferGpuMemory = nullptr;
 Light* _lightBufferMemory = nullptr;
+
 uint16_t* _irradProbeIndexBufferGpuMemory = nullptr;
 IrradProbe* _irradProbeBufferGpuMemory = nullptr;
 IrradProbe* _irradProbeBufferMemory = nullptr;
+
 uint16_t* _decalIndexBufferGpuMemory = nullptr;
 Decal* _decalBufferGpuMemory = nullptr;
 Decal* _decalBufferMemory = nullptr;
+
+uint32_t _depthSliceDirtyMask = 0u;
 
 // <-
 
@@ -133,12 +141,12 @@ struct DecalsPerInstanceData
 // Have to match the values in the shader
 const float _gridDepth = 10000.0f;
 const glm::uvec3 _gridRes =
-    glm::uvec3(16u, GRID_SIZE_Y, GRID_DEPTH_SLICE_COUNT);
+    glm::uvec3(GRID_SIZE_X, GRID_SIZE_Y, GRID_DEPTH_SLICE_COUNT);
 const float _gridDepthExp = 3.0f;
 const float _gridDepthSliceScale =
     _gridDepth / glm::pow((float)(_gridRes.z - 1u), _gridDepthExp);
 const float _gridDepthSliceScaleRcp = 1.0f / _gridDepthSliceScale;
-const uint32_t _totalClusterCount = _gridRes.x * _gridRes.y * _gridRes.z;
+const uint32_t _totalClusterCount = GRID_CLUSTER_COUNT;
 
 const uint32_t _totalLightGridSize =
     _totalClusterCount * MAX_LIGHT_COUNT_PER_CLUSTER;
@@ -149,12 +157,12 @@ const uint32_t _totalDecalGridSize =
 
 // <-
 
-_INTR_INLINE uint32_t calcClusterIndex(glm::uvec3 p_GridPos,
+_INTR_INLINE uint32_t calcClusterIndex(glm::uvec3 p_Cluster,
                                        uint32_t p_ClusterSize)
 {
-  return p_GridPos.x * p_ClusterSize +
-         p_GridPos.y * _gridRes.x * p_ClusterSize +
-         p_GridPos.z * _gridRes.y * _gridRes.x * p_ClusterSize;
+  return p_Cluster.x * p_ClusterSize +
+         p_Cluster.y * _gridRes.x * p_ClusterSize +
+         p_Cluster.z * _gridRes.y * _gridRes.x * p_ClusterSize;
 }
 
 _INTR_INLINE float calcGridDepthSlice(uint32_t p_DepthSliceIdx)
@@ -332,7 +340,7 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
 {
   _INTR_PROFILE_CPU("Clustered", "Cull And Write Buffers");
 
-  // TODO: Add coarse frustum culling pre-pass
+  // TODO: Add frustum culling broad phase
   {
     _INTR_PROFILE_CPU("Clustered", "Write Buffers");
 
@@ -560,26 +568,31 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
       {
         Application::_scheduler.AddTaskSetToPipe(&taskSet);
         _activeTaskSets.push_back(z);
+        _depthSliceDirtyMask |= 1u << z;
       }
-      else
+      else if ((_depthSliceDirtyMask & (1u << z)) > 0u)
       {
         // Reset counts
         for (uint32_t y = 0u; y < _gridRes.y; ++y)
         {
           for (uint32_t x = 0u; x < _gridRes.x; ++x)
           {
-            const glm::uint32_t lightClusterIdx = calcClusterIndex(
-                glm::uvec3(x, y, z), MAX_LIGHT_COUNT_PER_CLUSTER);
-            const glm::uint32_t probeClusterIdx = calcClusterIndex(
-                glm::uvec3(x, y, z), MAX_IRRAD_PROBES_PER_CLUSTER);
-            const glm::uint32_t decalClusterIdx =
-                calcClusterIndex(glm::uvec3(x, y, z), MAX_DECALS_PER_CLUSTER);
+            const glm::uvec3 cluster = glm::uvec3(x, y, z);
 
-            _lightIndexBufferGpuMemory[lightClusterIdx] = 0u;
-            _irradProbeIndexBufferGpuMemory[probeClusterIdx] = 0u;
-            _decalIndexBufferGpuMemory[decalClusterIdx] = 0u;
+            const glm::uint32_t lightClusterIdx =
+                calcClusterIndex(cluster, MAX_LIGHT_COUNT_PER_CLUSTER);
+            const glm::uint32_t probeClusterIdx =
+                calcClusterIndex(cluster, MAX_IRRAD_PROBES_PER_CLUSTER);
+            const glm::uint32_t decalClusterIdx =
+                calcClusterIndex(cluster, MAX_DECALS_PER_CLUSTER);
+
+            (uint32_t&)_lightIndexBufferGpuMemory[lightClusterIdx] = 0u;
+            (uint32_t&)_irradProbeIndexBufferGpuMemory[probeClusterIdx] = 0u;
+            (uint32_t&)_decalIndexBufferGpuMemory[decalClusterIdx] = 0u;
           }
         }
+
+        _depthSliceDirtyMask &= ~(1u << z);
       }
     }
   }
@@ -708,6 +721,7 @@ _INTR_INLINE void renderDecals(Components::CameraRef p_CameraRef)
 
 // <-
 
+// Static variables
 float Clustering::_globalAmbientFactor = 1.0f;
 
 // <-
