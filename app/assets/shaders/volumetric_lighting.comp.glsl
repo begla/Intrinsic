@@ -187,7 +187,7 @@ void main()
     const uint clusterIdx = calcClusterIndex(gridPos, maxLightCountPerCluster) / 2;
     uint lightCount = lightIndices[clusterIdx];
 
-    for (uint li=0; li<lightCount; ++li)
+    for (uint li=0; li<lightCount; li+=2)
     {
       const uint packedLightIndices = lightIndices[clusterIdx + li / 2 + 1];
       
