@@ -43,8 +43,8 @@ void calcPointLightLighting(
   d.energy = light.colorAndIntensity.a;
   {
     calculateLightingDataBase(d);
-    calculateSpehereL(d, 0.5, lightDistVec);
-    calculateLobeEnergySphere(d, 0.5);
+    calculateSpehereL(d, 0.1, lightDistVec);
+    calculateLobeEnergySphere(d, 0.1);
     calculateLightingData(d);    
   }
 
