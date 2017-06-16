@@ -154,9 +154,9 @@ void main()
 
   // Cloud shadows
   const vec4 posWS = uboPerFrame.invViewMatrix * vec4(d.posVS, 1.0);
-  const float cloudShadows = clamp(texture(noiseTex, 
+  const float cloudShadows = mix(1.0, clamp(texture(noiseTex, 
     clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0 
-    + uboPerInstance.data0.x * 0.025).r * 3.0 - 0.5, 0.1, 1.0);
+    + uboPerInstance.data0.x * 0.025).r * 3.0 - 0.5, 0.1, 1.0), uboPerFrame.postParams0.w);
 
   // Sunlight
   {

@@ -43,7 +43,7 @@
         ]
     },
     {
-        "name": "GroundStone",
+        "name": "Plane",
         "offsetToParent": -1,
         "propertyEntries": [
             {
@@ -84,9 +84,16 @@
                 }
             },
             {
+                "type": "RigidBody",
+                "properties": {
+                    "rigidBodyType": 2,
+                    "density": 1.0
+                }
+            },
+            {
                 "type": "Mesh",
                 "properties": {
-                    "meshName": "plane_stone",
+                    "meshName": "plane_concrete",
                     "colorTint": [
                         1.0,
                         1.0,
@@ -105,15 +112,15 @@
                 "type": "Node",
                 "properties": {
                     "localPos": [
-                        -14.223320007324219,
-                        66.98600769042969,
-                        283.2440490722656
+                        8.207942008972168,
+                        79.92366790771485,
+                        268.9534912109375
                     ],
                     "localOrient": [
-                        0.0029298432637006046,
-                        0.9934908747673035,
-                        -0.11080263555049896,
-                        0.026269886642694474
+                        -0.017848113551735879,
+                        0.9763482213020325,
+                        -0.19633667171001435,
+                        -0.08875557035207749
                     ],
                     "localSize": [
                         0.0,
@@ -121,15 +128,15 @@
                         0.0
                     ],
                     "worldPos": [
-                        -14.223320007324219,
-                        66.98600769042969,
-                        283.2440490722656
+                        8.207942008972168,
+                        79.92366790771485,
+                        268.9534912109375
                     ],
                     "worldOrient": [
-                        0.0029298432637006046,
-                        0.9934908747673035,
-                        -0.11080263555049896,
-                        0.026269886642694474
+                        -0.017848113551735879,
+                        0.9763482213020325,
+                        -0.19633667171001435,
+                        -0.08875557035207749
                     ],
                     "worldSize": [
                         0.0,
@@ -263,6 +270,14 @@
                         1.0
                     ]
                 }
+            },
+            {
+                "type": "PostEffectVolume",
+                "properties": {
+                    "postEffectName": "MaterialTest",
+                    "radius": 5000.0,
+                    "blendRange": 50.0
+                }
             }
         ]
     },
@@ -310,8 +325,132 @@
         ]
     },
     {
-        "name": "MatMetalT",
+        "name": "Decal1",
+        "offsetToParent": -6,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -31.677764892578126,
+                        -11.75,
+                        161.94998168945313
+                    ],
+                    "localOrient": [
+                        -0.6211917996406555,
+                        -0.3378176987171173,
+                        -0.3378176987171173,
+                        0.6211917996406555
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        -31.677764892578126,
+                        -11.75,
+                        161.94998168945313
+                    ],
+                    "worldOrient": [
+                        -0.6211917996406555,
+                        -0.3378176987171173,
+                        -0.3378176987171173,
+                        0.6211917996406555
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "Decal",
+                "properties": {
+                    "albedoTextureName": "decal_pothole",
+                    "normalTextureName": "decal_pothole_NRM",
+                    "pbrTextureName": "decal_pothole_PBR",
+                    "uvTransform": [
+                        1.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    "halfExtent": [
+                        50.0,
+                        50.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "Decal2",
         "offsetToParent": -1,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -34.918548583984378,
+                        179.18382263183595,
+                        0.0
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.7716245651245117,
+                        0.6360782384872437
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        99.75001525878906,
+                        -11.750015258789063,
+                        35.249969482421878
+                    ],
+                    "worldOrient": [
+                        -0.6557949781417847,
+                        0.264448344707489,
+                        0.264448344707489,
+                        0.6557949781417847
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "Decal",
+                "properties": {
+                    "albedoTextureName": "decal_pothole",
+                    "normalTextureName": "decal_pothole_NRM",
+                    "pbrTextureName": "decal_pothole_PBR",
+                    "uvTransform": [
+                        1.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    "halfExtent": [
+                        50.0,
+                        50.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "MatMetalT",
+        "offsetToParent": -3,
         "propertyEntries": [
             {
                 "type": "Node",
@@ -366,7 +505,7 @@
     },
     {
         "name": "MatWater",
-        "offsetToParent": -2,
+        "offsetToParent": -4,
         "propertyEntries": [
             {
                 "type": "Node",
@@ -421,7 +560,7 @@
     },
     {
         "name": "MatWhite",
-        "offsetToParent": -3,
+        "offsetToParent": -5,
         "propertyEntries": [
             {
                 "type": "Node",
@@ -476,7 +615,7 @@
     },
     {
         "name": "MatEmissive",
-        "offsetToParent": -4,
+        "offsetToParent": -6,
         "propertyEntries": [
             {
                 "type": "Node",
@@ -531,7 +670,7 @@
     },
     {
         "name": "MatEffect",
-        "offsetToParent": -5,
+        "offsetToParent": -7,
         "propertyEntries": [
             {
                 "type": "Node",
@@ -586,7 +725,7 @@
     },
     {
         "name": "MatDefaultT",
-        "offsetToParent": -6,
+        "offsetToParent": -8,
         "propertyEntries": [
             {
                 "type": "Node",
@@ -641,7 +780,7 @@
     },
     {
         "name": "MatDefault",
-        "offsetToParent": -7,
+        "offsetToParent": -9,
         "propertyEntries": [
             {
                 "type": "Node",
@@ -696,7 +835,7 @@
     },
     {
         "name": "MatCube",
-        "offsetToParent": -8,
+        "offsetToParent": -10,
         "propertyEntries": [
             {
                 "type": "Node",

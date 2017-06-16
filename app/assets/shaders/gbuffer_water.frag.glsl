@@ -102,14 +102,14 @@ void main()
   albedo.a = mix(albedo.a, 1.0, foamFade);    
   albedo.a = mix(albedo.a, 0.0, edgeFade);
   albedo.rgb = mix(albedo.rgb, foam.rgb, foamFade);
-  vec2 metalRoughness = mix(vec2(1.0, 0.15), vec2(0.0, 1.0), foamFade);
+  vec2 metalRoughness = mix(vec2(0.0, 0.0), vec2(0.0, 0.8), foamFade);
 
   GBuffer gbuffer;
   {
     gbuffer.albedo = albedo;
     gbuffer.normal = normalize(TBN * (normal.xyz * 2.0 - 1.0));
     gbuffer.metalMask = metalRoughness.x;
-    gbuffer.specular = 0.0;
+    gbuffer.specular = 0.5;
     gbuffer.roughness = adjustRoughness(metalRoughness.y, uboPerMaterial.data1.x);
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
     gbuffer.emissive = 0.0;

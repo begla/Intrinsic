@@ -195,7 +195,7 @@ void main()
       calcPointLight(light, posVS, lighting);
       
       light = lights[packedLightIndices >> 16];
-      light.colorAndIntensity.w *= float(li < lightCount + 1);
+      light.colorAndIntensity.w *= float(li + 1 < lightCount);
       calcPointLight(light, posVS, lighting);
     }   
   }

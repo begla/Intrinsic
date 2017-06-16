@@ -58,4 +58,6 @@ layout (binding = x) uniform PerFrame \
   vec4 sunLightDirWS; \
   vec4 skyLightSH[7]; \
   vec4 sunLightColorAndIntensity; \
+  \
+  vec4 postParams0; \
 } uboPerFrame

@@ -40,6 +40,8 @@ struct PerFrameDataFrament
   glm::vec4 sunLightDirWS;
   glm::vec4 skyLightSH[7];
   glm::vec4 sunLightColorAndIntensity;
+
+  glm::vec4 postParams0;
 };
 
 struct UniformBufferDataEntry

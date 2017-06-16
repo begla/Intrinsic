@@ -209,6 +209,9 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
     UniformManager::_uniformDataSource.postParams0.z =
         PostEffectManager::_descDoFStartDistance(
             PostEffectManager::_blendTargetRef);
+    UniformManager::_uniformDataSource.postParams0.w =
+        PostEffectManager::_descCloudShadowsIntensity(
+            PostEffectManager::_blendTargetRef);
 
     UniformManager::_uniformDataSource.cameraParameters.x =
         Components::CameraManager::_descNearPlane(p_Camera);
@@ -281,6 +284,8 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 
     PerFrameDataFrament fragmentData;
     {
+      fragmentData.postParams0 = UniformManager::_uniformDataSource.postParams0;
+
       fragmentData.viewMatrix = UniformManager::_uniformDataSource.viewMatrix;
       fragmentData.invProjectionMatrix =
           UniformManager::_uniformDataSource.inverseProjectionMatrix;

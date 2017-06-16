@@ -1,10 +1,10 @@
 {
-    "name": "LightingTest",
+    "name": "MaterialTest",
     "properties": {
-        "name": "LightingTest",
+        "name": "MaterialTest",
         "scatteringDayNight": [
-            0.004999999888241291,
-            0.004999999888241291
+            0.0,
+            0.0
         ],
         "sunOrientation": [
             0.0,
@@ -12,11 +12,11 @@
             0.0,
             1.0
         ],
-        "dayNightFactor": 0.0,
-        "skyLightIntensity": 0.0,
+        "dayNightFactor": 1.0,
+        "skyLightIntensity": 0.05000000074505806,
         "skyTurbidity": 2.0,
         "skyAlbedo": 0.0,
-        "sunIntensity": 0.0,
+        "sunIntensity": 5.0,
         "cloudShadowsIntensity": 0.0,
         "dofStartDistance": 10000.0
     }
