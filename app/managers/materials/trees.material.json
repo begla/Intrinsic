@@ -27,7 +27,7 @@
         "pbrTextureName": "trees_PBR",
         "metalMaskBias": 0.0,
         "roughnessBias": 0.0,
-        "specularBias": -1.0,
+        "specularBias": -0.5,
         "blendMaskTextureName": "white"
     }
 }
