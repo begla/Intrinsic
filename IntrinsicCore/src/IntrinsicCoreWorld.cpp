@@ -546,7 +546,7 @@ void World::updateDayNightCycle(float p_DeltaT)
   static const float nightLightIntens = 0.05f;
 
   _currentTime += p_DeltaT / dayNightCycleDurationInS;
-  _currentTime = glm::mod(_currentTime, 0.99f);
+  _currentTime = glm::mod(_currentTime, 1.0f);
 
   float currentDayNightFactor = 0.0f;
   if (_currentTime < 0.5f)
