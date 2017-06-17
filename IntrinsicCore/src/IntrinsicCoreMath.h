@@ -741,6 +741,21 @@ _INTR_INLINE Type interpolateGradient(const Gradient<Type, Count>& p_Gradient,
   _INTR_ASSERT(false && "Invalid values provided");
   return glm::vec4(0.0f);
 }
+
+_INTR_INLINE float radicalInverse(uint32_t p_Bits)
+{
+  p_Bits = (p_Bits << 16u) | (p_Bits >> 16u);
+  p_Bits = ((p_Bits & 0x55555555u) << 1u) | ((p_Bits & 0xAAAAAAAAu) >> 1u);
+  p_Bits = ((p_Bits & 0x33333333u) << 2u) | ((p_Bits & 0xCCCCCCCCu) >> 2u);
+  p_Bits = ((p_Bits & 0x0F0F0F0Fu) << 4u) | ((p_Bits & 0xF0F0F0F0u) >> 4u);
+  p_Bits = ((p_Bits & 0x00FF00FFu) << 8u) | ((p_Bits & 0xFF00FF00u) >> 8u);
+  return float(p_Bits) * 2.3283064365386963e-10f; // / 0x100000000
+}
+
+_INTR_INLINE glm::vec2 hammersley(uint32_t p_I, uint32_t p_N)
+{
+  return glm::vec2(float(p_I) / float(p_N), radicalInverse(p_I));
+}
 }
 }
 }

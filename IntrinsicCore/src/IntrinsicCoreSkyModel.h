@@ -274,9 +274,9 @@ calculateSkyModelRadianceRGB(const ArHosekSkyModelState& p_SkyModelState,
 // <-
 
 /// Projects the current sky model setup to a third order SH
-_INTR_INLINE Irradiance::SH9
-project(const ArHosekSkyModelState& p_SkyModelState,
-        const glm::vec3& p_LightDir, uint32_t p_SampleCount)
+_INTR_INLINE IBL::SH9 project(const ArHosekSkyModelState& p_SkyModelState,
+                              const glm::vec3& p_LightDir,
+                              uint32_t p_SampleCount)
 {
   static _INTR_ARRAY(glm::vec3) randomRaySamples;
   while (randomRaySamples.size() < p_SampleCount)
@@ -289,7 +289,7 @@ project(const ArHosekSkyModelState& p_SkyModelState,
         glm::vec3(0.0f, 0.0f, 1.0));
   }
 
-  Irradiance::SH9 result;
+  IBL::SH9 result;
   for (uint32_t i = 0u; i < p_SampleCount; ++i)
   {
     const glm::vec3 randomRaySample = randomRaySamples[i];
@@ -303,7 +303,7 @@ project(const ArHosekSkyModelState& p_SkyModelState,
         calculateSkyModelRadianceRGB(p_SkyModelState, theta, gamma) *
         glm::vec3(p_SkyModelState.radiances[0], p_SkyModelState.radiances[1],
                   p_SkyModelState.radiances[2]);
-    result += Irradiance::project(randomRaySample, sample);
+    result += IBL::project(randomRaySample, sample);
   }
 
   result *= (4.0f * glm::pi<float>()) / p_SampleCount;

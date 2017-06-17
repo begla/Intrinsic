@@ -153,7 +153,6 @@ namespace CResources = Intrinsic::Core::Resources;
 namespace CComponents = Intrinsic::Core::Components;
 
 // Core related includes
-#include "IntrinsicCoreIrradiance.h"
 #include "IntrinsicCoreTriangleOptimizer.h"
 #include "IntrinsicCoreSettingsManager.h"
 #include "IntrinsicCoreLockFreeStack.h"
@@ -163,6 +162,7 @@ namespace CComponents = Intrinsic::Core::Components;
 #include "IntrinsicUtil.h"
 #include "IntrinsicCoreSimd.h"
 #include "IntrinsicCoreMath.h"
+#include "IntrinsicCoreIBL.h"
 #include "IntrinsicCoreName.h"
 #include "IntrinsicCoreJsonHelper.h"
 #include "IntrinsicCoreTimingHelper.h"
