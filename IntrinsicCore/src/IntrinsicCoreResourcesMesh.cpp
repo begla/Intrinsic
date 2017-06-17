@@ -90,6 +90,8 @@ void MeshManager::init()
         MeshManager::loadFromMultipleFiles;
     managerEntry.saveToMultipleFilesFunction = MeshManager::saveToMultipleFiles;
     managerEntry.getResourceFlagsFunction = MeshManager::_resourceFlags;
+    managerEntry.onPropertyUpdateFinishedFunction =
+        MeshManager::updateDependentResources;
 
     Application::_resourceManagerMapping[_N(Mesh)] = managerEntry;
   }
@@ -107,6 +109,28 @@ void MeshManager::init()
 }
 
 // <-
+
+_INTR_INLINE void MeshManager::updateDependentResources(MeshRef p_Ref)
+{
+  Components::MeshRefArray componentsToRecreate;
+
+  // Update mesh components using this mesh
+  for (uint32_t i = 0u; i < CComponents::MeshManager::getActiveResourceCount();
+       ++i)
+  {
+    Components::MeshRef meshCompRef =
+        CComponents::MeshManager::getActiveResourceAtIndex(i);
+
+    if (CComponents::MeshManager::_descMeshName(meshCompRef) ==
+        MeshManager::_name(p_Ref))
+    {
+      componentsToRecreate.push_back(meshCompRef);
+    }
+  }
+
+  CComponents::MeshManager::destroyResources(componentsToRecreate);
+  CComponents::MeshManager::createResources(componentsToRecreate);
+}
 
 void MeshManager::createResources(const MeshRefArray& p_Meshes)
 {

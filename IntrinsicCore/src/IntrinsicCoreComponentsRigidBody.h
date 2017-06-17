@@ -111,6 +111,7 @@ struct RigidBodyManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(RigidBodyRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("rigidBodyType"))

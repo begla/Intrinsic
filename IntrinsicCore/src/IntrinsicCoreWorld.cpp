@@ -117,7 +117,7 @@ Components::NodeRef World::cloneNodeFull(Components::NodeRef p_Ref)
             managerEntry.resetToDefaultFunction(newCompRef);
 
           _INTR_ASSERT(propCompIt->second.initFunction);
-          propCompIt->second.initFunction(newCompRef, properties);
+          propCompIt->second.initFunction(newCompRef, false, properties);
         }
       }
     }
@@ -432,7 +432,7 @@ Components::NodeRef World::loadNodeHierarchy(const _INTR_STRING& p_FilePath)
             managerEntry.resetToDefaultFunction(componentRef);
           }
 
-          compEntryIt->second.initFunction(componentRef,
+          compEntryIt->second.initFunction(componentRef, false,
                                            propertyEntry["properties"]);
 
           if (strcmp(componentType.GetString(), "Node") == 0u)

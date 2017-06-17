@@ -137,10 +137,12 @@ struct ImageManager
   }
 
   _INTR_INLINE static void initFromDescriptor(ImageRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         ImageData, _INTR_MAX_IMAGE_COUNT>::_initFromDescriptor(p_Ref,
+                                                               p_GenerateDesc,
                                                                p_Properties);
 
     if (p_Properties.HasMember("imageType"))

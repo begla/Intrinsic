@@ -130,11 +130,13 @@ struct GpuProgramManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(GpuProgramRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         GpuProgramData,
-        _INTR_MAX_GPU_PROGRAM_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
+        _INTR_MAX_GPU_PROGRAM_COUNT>::_initFromDescriptor(p_Ref, p_GenerateDesc,
+                                                          p_Properties);
 
     if (p_Properties.HasMember("gpuProgramName"))
       _descGpuProgramName(p_Ref) =

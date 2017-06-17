@@ -166,11 +166,13 @@ struct PostEffectManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(PostEffectRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         PostEffectData,
-        _INTR_MAX_POST_EFFECT_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
+        _INTR_MAX_POST_EFFECT_COUNT>::_initFromDescriptor(p_Ref, p_GenerateDesc,
+                                                          p_Properties);
 
     if (p_Properties.HasMember("scatteringDayNight"))
       _descVolumetricLightingScatteringDayNight(p_Ref) =

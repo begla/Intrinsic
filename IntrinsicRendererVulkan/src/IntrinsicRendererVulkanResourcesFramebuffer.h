@@ -93,11 +93,13 @@ struct FramebufferManager
   }
 
   _INTR_INLINE static void initFromDescriptor(FramebufferRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         FramebufferData,
-        _INTR_MAX_FRAMEBUFFER_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
+        _INTR_MAX_FRAMEBUFFER_COUNT>::_initFromDescriptor(p_Ref, p_GenerateDesc,
+                                                          p_Properties);
   }
 
   _INTR_INLINE static void saveToSingleFile(const char* p_FileName)
