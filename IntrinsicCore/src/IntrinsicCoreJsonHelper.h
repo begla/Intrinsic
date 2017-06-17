@@ -153,7 +153,7 @@ _INTR_INLINE glm::vec4 readPropertyVec4(const rapidjson::Value& p_Property)
 _INTR_INLINE rapidjson::Value
 createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
                const Name& p_Category, const Name& p_Editor,
-               const Irradiance::SH9& p_Value, bool p_ReadOnly, bool p_Internal)
+               const IBL::SH9& p_Value, bool p_ReadOnly, bool p_Internal)
 {
   rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);
   rapidjson::Value values = rapidjson::Value(rapidjson::kArrayType);
@@ -192,9 +192,9 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
   return property;
 }
 
-_INTR_INLINE Irradiance::SH9 readPropertySH(const rapidjson::Value& p_Property)
+_INTR_INLINE IBL::SH9 readPropertySH(const rapidjson::Value& p_Property)
 {
-  Irradiance::SH9 coeffs;
+  IBL::SH9 coeffs;
   glm::vec3* rawCoeffs = (glm::vec3*)&coeffs;
 
   if (p_Property.IsObject())

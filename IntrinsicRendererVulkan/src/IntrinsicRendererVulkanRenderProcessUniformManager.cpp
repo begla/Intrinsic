@@ -328,8 +328,8 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 
       // Project sky light SH
       {
-        Irradiance::SH9 skyLightSH = SkyModel::project(skyModel, sunDir, 64u);
-        memcpy(fragmentData.skyLightSH, &skyLightSH, sizeof(Irradiance::SH9));
+        IBL::SH9 skyLightSH = SkyModel::project(skyModel, sunDir, 64u);
+        memcpy(fragmentData.skyLightSH, &skyLightSH, sizeof(IBL::SH9));
       }
 
       // Pack sky model configs/radiance for sky sampling

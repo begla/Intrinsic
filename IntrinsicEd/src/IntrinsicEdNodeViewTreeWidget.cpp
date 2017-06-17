@@ -902,7 +902,23 @@ void captureIrradProbe(
 #endif // STORE_ATLAS_DDS
       }
 
-// Save textures
+//{
+//  gli::texture_cube filteredTexCube =
+//      gli::texture_cube(gli::FORMAT_RGBA16_SFLOAT_PACK16, cubeMapRes,
+//                        gli::levels(cubeMapRes));
+
+//  IBL::prefilterGGX(texCube, filteredTexCube);
+
+//  _INTR_STRING timeString = StringUtil::toString(p_Time);
+//  StringUtil::replace(timeString, ".", "-");
+
+//  const _INTR_STRING filePath =
+//      "media/irradiance_probes/" +
+//      Entity::EntityManager::_name(currentEntity).getString() +
+//      "_cube_filtered_" + timeString + ".dds";
+//  gli::save_dds(filteredTexCube, filePath.c_str());
+//}
+
 #if defined(STORE_ATLAS_DDS)
       {
         const _INTR_STRING filePath =
@@ -927,9 +943,9 @@ void captureIrradProbe(
       }
 #endif // STORE_CUBE_DDS
 
-      // Store SH irrad.
+      // Generate and store SH irrad.
       Components::IrradianceProbeManager::_descSHs(irradProbeRef)
-          .push_back(Irradiance::project(texCube));
+          .push_back(IBL::project(texCube));
     }
   }
 
