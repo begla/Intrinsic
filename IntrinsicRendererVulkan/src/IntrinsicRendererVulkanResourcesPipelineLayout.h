@@ -94,11 +94,13 @@ struct PipelineLayoutManager
   }
 
   _INTR_INLINE static void initFromDescriptor(PipelineLayoutRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         PipelineLayoutData,
         _INTR_MAX_PIPELINE_LAYOUT_COUNT>::_initFromDescriptor(p_Ref,
+                                                              p_GenerateDesc,
                                                               p_Properties);
   }
 

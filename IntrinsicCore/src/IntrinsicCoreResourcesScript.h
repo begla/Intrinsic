@@ -87,10 +87,12 @@ struct ScriptManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(ScriptRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         ScriptData, _INTR_MAX_SCRIPT_COUNT>::_initFromDescriptor(p_Ref,
+                                                                 p_GenerateDesc,
                                                                  p_Properties);
 
     if (p_Properties.HasMember("scriptFileName"))

@@ -106,6 +106,7 @@ struct PostEffectVolumeManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(PostEffectVolumeRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("postEffectName"))

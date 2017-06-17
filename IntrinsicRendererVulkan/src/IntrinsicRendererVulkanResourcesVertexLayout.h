@@ -99,11 +99,13 @@ struct VertexLayoutManager
   }
 
   _INTR_INLINE static void initFromDescriptor(VertexLayoutRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         VertexLayoutData,
         _INTR_MAX_VERTEX_LAYOUT_COUNT>::_initFromDescriptor(p_Ref,
+                                                            p_GenerateDesc,
                                                             p_Properties);
   }
 

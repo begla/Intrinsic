@@ -177,7 +177,7 @@ protected:
 
   // <-
 
-  _INTR_INLINE static void _initFromDescriptor(Ref p_Ref,
+  _INTR_INLINE static void _initFromDescriptor(Ref p_Ref, bool p_GenerateDesc,
                                                rapidjson::Value& p_Properties)
   {
     _name(p_Ref) = JsonHelper::readPropertyName(p_Properties["name"]);
@@ -395,7 +395,7 @@ protected:
 
       Ref ref = _createResource(resource["name"].GetString());
       p_ResetToDefaultFunction(ref);
-      p_InitFunction(ref, resource["properties"]);
+      p_InitFunction(ref, false, resource["properties"]);
     }
   }
 
@@ -457,7 +457,7 @@ protected:
 
       Ref ref = _createResource(resource["name"].GetString());
       p_ResetToDefaultFunction(ref);
-      p_InitFunction(ref, resource["properties"]);
+      p_InitFunction(ref, false, resource["properties"]);
 
       tinydir_next(&dir);
     }

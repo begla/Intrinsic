@@ -126,6 +126,7 @@ struct ScriptManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(ScriptRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("scriptName"))

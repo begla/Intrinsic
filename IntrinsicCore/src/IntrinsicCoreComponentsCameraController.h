@@ -161,6 +161,7 @@ struct CameraControllerManager
   /// Initializes all properties from a JSON descriptor.
   ///
   _INTR_INLINE static void initFromDescriptor(CameraControllerRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("cameraControllerType"))

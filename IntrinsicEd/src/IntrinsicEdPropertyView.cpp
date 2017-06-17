@@ -405,7 +405,7 @@ void IntrinsicEdPropertyView::onValueChanged(rapidjson::Value& p_Properties)
       Dod::PropertyCompilerEntry& entry = _currentPropertyCompilerEntries[i];
       Dod::ManagerEntry& managerEntry = _currentManagerEntries[i];
 
-      entry.initFunction(entry.ref, p_Properties);
+      entry.initFunction(entry.ref, true, p_Properties);
 
       // Recreate resources if available
       if (managerEntry.destroyResourcesFunction &&

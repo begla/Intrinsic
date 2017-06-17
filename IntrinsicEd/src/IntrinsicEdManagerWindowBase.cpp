@@ -131,7 +131,7 @@ void IntrinsicEdManagerWindowBase::onItemChanged(QTreeWidgetItem* item,
                                             doc.GetAllocator());
       item->setText(0, newResourceName.c_str());
 
-      _propertyCompilerEntry.initFunction(resource, properties);
+      _propertyCompilerEntry.initFunction(resource, true, properties);
       _ui.propertyView->clearAndUpdatePropertyView();
     }
   }
@@ -213,7 +213,7 @@ void IntrinsicEdManagerWindowBase::onCloneResource()
     properties["name"]["value"].SetString(
         makeResourceNameUnique(properties["name"]["value"].GetString()).c_str(),
         doc.GetAllocator());
-    _propertyCompilerEntry.initFunction(cloneedResourceRef, properties);
+    _propertyCompilerEntry.initFunction(cloneedResourceRef, true, properties);
 
     if (_resourceManagerEntry.createResourcesFunction)
     {

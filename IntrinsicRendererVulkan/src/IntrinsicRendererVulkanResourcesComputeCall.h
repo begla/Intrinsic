@@ -94,11 +94,14 @@ struct ComputeCallManager
   }
 
   _INTR_INLINE static void initFromDescriptor(ComputeCallRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         ComputeCallData,
-        _INTR_MAX_COMPUTE_CALL_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
+        _INTR_MAX_COMPUTE_CALL_COUNT>::_initFromDescriptor(p_Ref,
+                                                           p_GenerateDesc,
+                                                           p_Properties);
   }
 
   _INTR_INLINE static void saveToSingleFile(const char* p_FileName)

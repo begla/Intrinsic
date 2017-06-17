@@ -107,10 +107,12 @@ struct BufferManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(BufferRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         BufferData, _INTR_MAX_BUFFER_COUNT>::_initFromDescriptor(p_Ref,
+                                                                 p_GenerateDesc,
                                                                  p_Properties);
   }
 
