@@ -208,12 +208,12 @@ void IntrinsicEdManagerWindowBase::onCloneResource()
     rapidjson::Document doc;
     rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
 
-    _propertyCompilerEntry.compileFunction(templateResourceRef, true,
+    _propertyCompilerEntry.compileFunction(templateResourceRef, false,
                                            properties, doc);
-    properties["name"]["value"].SetString(
-        makeResourceNameUnique(properties["name"]["value"].GetString()).c_str(),
+    properties["name"].SetString(
+        makeResourceNameUnique(properties["name"].GetString()).c_str(),
         doc.GetAllocator());
-    _propertyCompilerEntry.initFunction(cloneedResourceRef, true, properties);
+    _propertyCompilerEntry.initFunction(cloneedResourceRef, false, properties);
 
     if (_resourceManagerEntry.createResourcesFunction)
     {
