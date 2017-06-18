@@ -181,9 +181,12 @@ struct GpuProgramManager
   // <-
 
   static void compileShaders(GpuProgramRefArray p_Refs,
-                             bool p_ForceRecompile = false);
-  static void compileShader(GpuProgramRef p_Ref, bool p_ForceRecompile = false);
-  static void compileAllShaders(bool p_ForceRecompile = false);
+                             bool p_ForceRecompile = false,
+                             bool p_UpdateResources = true);
+  static void compileShader(GpuProgramRef p_Ref, bool p_ForceRecompile = false,
+                            bool p_UpdateResources = true);
+  static void compileAllShaders(bool p_ForceRecompile = false,
+                                bool p_UpdateResources = true);
 
   // <-
 
@@ -216,6 +219,8 @@ struct GpuProgramManager
         VkShaderModule nullModule = VK_NULL_HANDLE;
         _vkShaderModule(ref) = nullModule;
       }
+
+      _spirvBuffer(ref).clear();
     }
   }
 
