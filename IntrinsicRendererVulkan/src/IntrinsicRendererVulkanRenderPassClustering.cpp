@@ -20,9 +20,10 @@
 // test lights
 #define MAX_LIGHT_COUNT (16u * 1024u)
 
-#define MAX_LIGHT_COUNT_PER_CLUSTER 256u
-#define MAX_IRRAD_PROBES_PER_CLUSTER 4u
-#define MAX_DECALS_PER_CLUSTER 64u
+// +2 for the 16-bit aligned count in front of the list
+#define MAX_LIGHT_COUNT_PER_CLUSTER (256u + 2u)
+#define MAX_IRRAD_PROBES_PER_CLUSTER (8u + 2u)
+#define MAX_DECALS_PER_CLUSTER (64u + 2u)
 
 #define GRID_DEPTH_SLICE_COUNT 24u
 #define GRID_SIZE_Y 8u
