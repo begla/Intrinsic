@@ -53,9 +53,9 @@ _INTR_INLINE void initStaticUniformData()
   }
 
   UniformManager::_uniformDataSource.blurParamsXNormal =
-      glm::vec4(3.0f, 0.0f, 1.0f, 0.0f);
+      glm::vec4(2.0f, 0.0f, 1.0f, 0.0f);
   UniformManager::_uniformDataSource.blurParamsYNormal =
-      glm::vec4(3.0f, 0.0f, 0.0f, 1.0f);
+      glm::vec4(2.0f, 0.0f, 0.0f, 1.0f);
   UniformManager::_uniformDataSource.blurParamsXMedium =
       glm::vec4(6.0f, 0.0f, 1.0f, 0.0f);
   UniformManager::_uniformDataSource.blurParamsYMedium =

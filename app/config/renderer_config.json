@@ -707,7 +707,7 @@
 			"name" : "BlurScene_X",
 			"fragmentGpuProgram" : "blur.frag",
 			"viewportRenderSize" : "Half",
-			"perInstanceDataBufferName" : "BlurLowX",
+			"perInstanceDataBufferName" : "BlurX",
 			"inputs" : [
 				["Image", "SceneDownSampled", "inputTex", "Fragment", "NearestClamp"]
 			],
@@ -732,7 +732,7 @@
 			"name" : "BlurScene_Y",
 			"fragmentGpuProgram" : "blur.frag",
 			"viewportRenderSize" : "Half",
-			"perInstanceDataBufferName" : "BlurLowY",
+			"perInstanceDataBufferName" : "BlurY",
 			"inputs" : [
 				["Image", "SceneBlurredPingPong", "inputTex", "Fragment", "NearestClamp"]
 			],
