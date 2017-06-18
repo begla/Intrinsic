@@ -418,10 +418,11 @@ void IntrinsicEdNodeViewTreeWidget::createNode(QTreeWidgetItem* p_Parent)
       _nodeToItemMap[nodeRef] = item;
       _itemToNodeMap[item] = nodeRef;
 
-      item->setText(0, Entity::EntityManager::_name(
-                           Components::NodeManager::_entity(nodeRef))
-                           .getString()
-                           .c_str());
+      item->setText(0,
+                    Entity::EntityManager::_name(
+                        Components::NodeManager::_entity(nodeRef))
+                        .getString()
+                        .c_str());
       item->setIcon(0, QIcon(":/Icons/target"));
     }
     else
@@ -430,10 +431,11 @@ void IntrinsicEdNodeViewTreeWidget::createNode(QTreeWidgetItem* p_Parent)
       _nodeToItemMap[nodeRef] = item;
       _itemToNodeMap[item] = nodeRef;
 
-      item->setText(0, Entity::EntityManager::_name(
-                           Components::NodeManager::_entity(nodeRef))
-                           .getString()
-                           .c_str());
+      item->setText(0,
+                    Entity::EntityManager::_name(
+                        Components::NodeManager::_entity(nodeRef))
+                        .getString()
+                        .c_str());
       item->setIcon(0, QIcon(":/Icons/globe"));
     }
 
