@@ -86,7 +86,7 @@ void Main::update(float p_DeltaT)
 
       if (camCtrlRef.isValid())
       {
-        static const float camSpeed = 2.0f;
+        static const float camSpeed = 3.0f;
         static const float camSpeedMouse = 0.75f;
 
         glm::vec3& targetEulerAngles =
@@ -107,9 +107,8 @@ void Main::update(float p_DeltaT)
       static const float jumpSpeed = 20.0f;
 
       const float actualMovedSpeed =
-          moveSpeed * (1.0f +
-                       runMultiplier * Input::System::getVirtualKeyState(
-                                           Input::VirtualKey::kRun));
+          moveSpeed * (1.0f + runMultiplier * Input::System::getVirtualKeyState(
+                                                  Input::VirtualKey::kRun));
 
       glm::vec3 moveVector = glm::vec3(0.0f);
       {
