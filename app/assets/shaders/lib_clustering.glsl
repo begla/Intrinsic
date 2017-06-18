@@ -39,9 +39,9 @@ struct Decal
 };
 
 // Have to match the values on C++ side
-const uint maxLightCountPerCluster = 256;
-const uint maxIrradProbeCountPerCluster = 4;
-const uint maxDecalCountPerCluster = 64;
+const uint maxLightCountPerCluster = 256 + 2;
+const uint maxIrradProbeCountPerCluster = 8 + 2;
+const uint maxDecalCountPerCluster = 64 + 2;
 
 const float gridDepth = 10000.0f;
 const uvec3 gridRes = uvec3(16u, 8u, 24u);
