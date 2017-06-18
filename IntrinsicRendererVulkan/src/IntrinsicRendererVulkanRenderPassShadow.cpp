@@ -57,10 +57,9 @@ _INTR_INLINE void calculateFrustumForSplit(uint32_t p_SplitIdx,
   glm::vec3 euler =
       glm::eulerAngles(PostEffectManager::calcActualSunOrientation(
           PostEffectManager::_blendTargetRef));
-  euler = glm::trunc(euler * 25.0f) / 25.0f;
-  const glm::vec3 quantSunDir = glm::quat(euler) * glm::vec3(0.0f, 0.0f, 1.0f);
+  const glm::vec3 sunDir = glm::quat(euler) * glm::vec3(0.0f, 0.0f, 1.0f);
 
-  const glm::vec3 eye = worldBoundsHalfExtentLength * quantSunDir;
+  const glm::vec3 eye = worldBoundsHalfExtentLength * sunDir;
   const glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f);
 
   glm::mat4& shadowViewMatrix = FrustumManager::_descViewMatrix(p_FrustumRef);
