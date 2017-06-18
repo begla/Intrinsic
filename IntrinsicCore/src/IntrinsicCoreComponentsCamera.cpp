@@ -81,8 +81,6 @@ void CameraManager::updateFrustums(const CameraRefArray& p_Cameras)
     _viewMatrix(campCompRef) =
         glm::lookAt(camWorldPosition, camWorldPosition + forward, up);
 
-    const float aspectRatio = RV::RenderSystem::_backbufferDimensions.x /
-                              (float)RV::RenderSystem::_backbufferDimensions.y;
     _projectionMatrix(campCompRef) = computeCustomProjMatrix(
         campCompRef, _descNearPlane(campCompRef), _descFarPlane(campCompRef));
 
