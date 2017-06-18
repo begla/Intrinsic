@@ -97,6 +97,10 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
   {
     GameStates::Editing::init();
   }
+
+  {
+    RV::RenderSystem::onViewportChanged();
+  }
 }
 
 void Application::initManagers()
