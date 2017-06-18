@@ -309,8 +309,8 @@ protected:
          i < Dod::ManagerBase<IdCount, DataType>::_activeRefs.size(); ++i)
     {
       Ref ref = Dod::ManagerBase<IdCount, DataType>::_activeRefs[i];
-      _saveToMultipleFilesSingleResource(ref, p_Path, p_Extension,
-                                         p_CompileFunction);
+      _saveToMultipleFilesSingleResource<WriterType>(ref, p_Path, p_Extension,
+                                                     p_CompileFunction);
     }
   }
 
