@@ -548,10 +548,29 @@ void World::updateDayNightCycle(float p_DeltaT)
   _currentTime += p_DeltaT / dayNightCycleDurationInS;
   _currentTime = glm::mod(_currentTime, 1.0f);
 
-  float currentDayNightFactor = 0.0f;
-  if (_currentTime < 0.5f)
+  // Quant the current time to avoid shadow flickering due to the constant sun
+  // light movement
+  static const float quantInterval = 0.01f;
+  static const float quantIntervalFadePerc = 0.05f;
+
+  float quantCurrentTime =
+      glm::trunc(_currentTime * (1.0f / quantInterval)) * quantInterval;
+
+  // Smoothly animate to the next quant step
+  const float fadeStart =
+      quantCurrentTime + quantInterval - quantIntervalFadePerc * quantInterval;
+  if (_currentTime > fadeStart)
   {
-    const float perc = _currentTime / 0.5f;
+    const float fadePerc =
+        (_currentTime - fadeStart) / (quantIntervalFadePerc * quantInterval);
+    quantCurrentTime =
+        glm::mix(quantCurrentTime, quantCurrentTime + quantInterval, fadePerc);
+  }
+
+  float currentDayNightFactor = 0.0f;
+  if (quantCurrentTime < 0.5f)
+  {
+    const float perc = quantCurrentTime / 0.5f;
     currentDayNightFactor =
         1.0f - glm::smoothstep<float>(1.0f - dayNightFadeInPerc, 1.0f, perc);
     currentDayNightFactor *=
@@ -559,10 +578,10 @@ void World::updateDayNightCycle(float p_DeltaT)
   }
 
   float sunPerc = 0.0f;
-  if (_currentTime <= 0.5f)
-    sunPerc = _currentTime / 0.5f;
+  if (quantCurrentTime <= 0.5f)
+    sunPerc = quantCurrentTime / 0.5f;
   else
-    sunPerc = 1.0f - (_currentTime - 0.5f) / 0.5f;
+    sunPerc = 1.0f - (quantCurrentTime - 0.5f) / 0.5f;
 
   const float sunSin =
       glm::clamp(std::sin(sunPerc * glm::pi<float>()), -0.9f, 0.9f);
@@ -574,8 +593,8 @@ void World::updateDayNightCycle(float p_DeltaT)
   _currentSunLightOrientation =
       glm::rotation(glm::vec3(0.0, 0.0, 1.0), lightVec);
   _currentDayNightFactor = glm::mix(0.05f, 1.0f, currentDayNightFactor);
-  _currentSunLightColorAndIntensity =
-      Math::interpolateGradient<glm::vec4, 7u>(sunColorGradient, _currentTime);
+  _currentSunLightColorAndIntensity = Math::interpolateGradient<glm::vec4, 7u>(
+      sunColorGradient, quantCurrentTime);
 }
 }
 }
