@@ -22,6 +22,8 @@ namespace IBL
 {
 void initCubemapProcessing();
 
+// <-
+
 // Struct defining a third order SH
 struct SH9
 {
@@ -63,6 +65,8 @@ struct SH9
   glm::vec3 L24;
 };
 
+// <-
+
 _INTR_INLINE IBL::SH9 blend(const IBL::SH9& p_Left, const IBL::SH9& p_Right,
                             float p_Blend)
 {
@@ -80,6 +84,8 @@ _INTR_INLINE IBL::SH9 blend(const IBL::SH9& p_Left, const IBL::SH9& p_Right,
   }
   return result;
 }
+
+// <-
 
 // https://en.wikipedia.org/wiki/Cube_mapping
 _INTR_INLINE glm::vec3 mapXYSToDirection(const glm::uvec3& p_PixelPos,
@@ -118,6 +124,8 @@ _INTR_INLINE glm::vec3 mapXYSToDirection(const glm::uvec3& p_PixelPos,
   dir *= glm::vec3(-1.0f, 1.0f, 1.0f);
   return dir;
 }
+
+// <-
 
 // https://en.wikipedia.org/wiki/Cube_mapping
 _INTR_INLINE glm::vec3 mapDirectionToUVS(const glm::vec3& p_Direction)
@@ -194,6 +202,8 @@ _INTR_INLINE glm::vec3 mapDirectionToUVS(const glm::vec3& p_Direction)
   return uvs;
 }
 
+// <-
+
 // http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
 _INTR_INLINE glm::vec3 importanceSampleGGX(glm::vec2 p_Xi, float p_Roughness,
                                            glm::vec3 p_N)
@@ -214,6 +224,8 @@ _INTR_INLINE glm::vec3 importanceSampleGGX(glm::vec2 p_Xi, float p_Roughness,
   // Tangent to world space
   return tanX * H.x + tanY * H.y + p_N * H.z;
 }
+
+// <-
 
 void preFilterGGX(const gli::texture_cube& p_Input, gli::texture_cube& p_Output,
                   const uint32_t* p_SampleCounts, float p_MinRoughness = 0.05f);
@@ -247,7 +259,7 @@ _INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
       glm::vec3 prefilteredColor = glm::vec3(0.0f);
 
       float totalWeight = 0.0f;
-      for (uint32_t i = 0; i < sampleCount; i++)
+
       {
         glm::vec2 Xi = Math::hammersley(i, sampleCount);
         glm::vec3 H = importanceSampleGGX(Xi, roughness, R);
@@ -274,6 +286,8 @@ _INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
   }
 }
 
+// <-
+
 _INTR_INLINE SH9 project(const glm::vec3& p_Direction, const glm::vec3& p_Color)
 {
 
@@ -297,6 +311,8 @@ _INTR_INLINE SH9 project(const glm::vec3& p_Direction, const glm::vec3& p_Color)
 
   return sh;
 }
+
+// <-
 
 _INTR_INLINE SH9 project(const gli::texture_cube& p_CubeMap)
 {
