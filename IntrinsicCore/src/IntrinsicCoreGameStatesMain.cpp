@@ -87,7 +87,7 @@ void Main::update(float p_DeltaT)
       if (camCtrlRef.isValid())
       {
         static const float camSpeed = 3.0f;
-        static const float camSpeedMouse = 0.75f;
+        static const float camSpeedMouse = 0.075f;
 
         glm::vec3& targetEulerAngles =
             Components::CameraControllerManager::_descTargetEulerAngles(

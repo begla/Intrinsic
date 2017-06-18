@@ -28,7 +28,6 @@ float System::_virtualKeyStates[VirtualKey::kCount] = {};
 glm::vec2 System::_lastMousePos = glm::vec2(0.0f);
 glm::vec2 System::_lastMousePosViewport = glm::vec2(0.0f);
 glm::vec2 System::_lastMousePosRel = glm::vec2(0.0f);
-glm::vec2 System::_prevMousPos = glm::vec2(0.0f);
 
 _INTR_HASH_MAP(uint32_t, uint32_t) System::_keyToVirtualKeyMapping;
 _INTR_HASH_MAP(uint32_t, uint32_t) System::_axisToVirtualKeyMapping;
@@ -52,11 +51,7 @@ void System::init()
   _axisToVirtualKeyMapping[Axis::kTriggerRight] = VirtualKey::kRun;
 }
 
-void System::updateLastMousePos()
-{
-  _lastMousePosRel = _lastMousePos - _prevMousPos;
-  _prevMousPos = _lastMousePos;
-}
+void System::reset() { _lastMousePosRel = glm::vec2(0.0f); }
 
 // <-
 
@@ -125,15 +120,19 @@ void System::processKeyReleaseEvent(const KeyEvent& p_Event)
 void System::processMouseMoveEvent(const MouseMoveEvent& p_Event)
 {
   if (_lastMousePos != p_Event.pos ||
-      _lastMousePosViewport != p_Event.posViewport)
+      _lastMousePosViewport != p_Event.posViewport ||
+      _lastMousePosRel != p_Event.posRel)
   {
     Resources::QueuedEventData eventData;
     eventData.mouseEvent.pos[0] = p_Event.pos.x;
     eventData.mouseEvent.pos[1] = p_Event.pos.y;
     eventData.mouseEvent.posViewport[0] = p_Event.posViewport.x;
     eventData.mouseEvent.posViewport[1] = p_Event.posViewport.y;
+    eventData.mouseEvent.posRel[0] = p_Event.posRel.x;
+    eventData.mouseEvent.posRel[1] = p_Event.posRel.y;
     Resources::EventManager::queueEvent(_N(MouseMoved), eventData);
 
+    _lastMousePosRel += p_Event.posRel;
     _lastMousePos = p_Event.pos;
     _lastMousePosViewport = p_Event.posViewport;
   }

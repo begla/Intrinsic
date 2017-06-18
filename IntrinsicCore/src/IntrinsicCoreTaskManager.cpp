@@ -72,7 +72,7 @@ void TaskManager::executeTasks()
     {
       _INTR_PROFILE_CPU("TaskManager", "Pump Events");
 
-      Input::System::updateLastMousePos();
+      Input::System::reset();
       SystemEventProvider::SDL::pumpEvents();
     }
 
