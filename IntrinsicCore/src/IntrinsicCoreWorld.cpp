@@ -558,10 +558,21 @@ void World::updateDayNightCycle(float p_DeltaT)
         glm::smoothstep<float>(0.0f, dayNightFadeInPerc, perc);
   }
 
-  const float sunAngleRad =
-      glm::clamp(std::sin(_currentTime * glm::pi<float>()) * glm::pi<float>(),
-                 glm::radians(2.5f), glm::radians(177.5f));
-  _currentSunLightOrientation = glm::quat(glm::vec3(-sunAngleRad, 0.0f, 0.0f));
+  float sunPerc = 0.0f;
+  if (_currentTime <= 0.5f)
+    sunPerc = _currentTime / 0.5f;
+  else
+    sunPerc = 1.0f - (_currentTime - 0.5f) / 0.5f;
+
+  const float sunSin =
+      glm::clamp(std::sin(sunPerc * glm::pi<float>()), -0.9f, 0.9f);
+  const float sunCos =
+      glm::clamp(std::cos(sunPerc * glm::pi<float>()), -0.9f, 0.9f);
+  const glm::vec3 lightVec =
+      glm::normalize(glm::vec3(sunCos, 0.75f * sunSin, -sunSin));
+
+  _currentSunLightOrientation =
+      glm::rotation(glm::vec3(0.0, 0.0, 1.0), lightVec);
   _currentDayNightFactor = glm::mix(0.05f, 1.0f, currentDayNightFactor);
   _currentSunLightColorAndIntensity =
       Math::interpolateGradient<glm::vec4, 7u>(sunColorGradient, _currentTime);
