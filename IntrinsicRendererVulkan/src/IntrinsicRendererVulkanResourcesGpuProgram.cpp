@@ -323,7 +323,8 @@ void GpuProgramManager::reflectPipelineLayout(
 }
 
 void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
-                                       bool p_ForceRecompile)
+                                       bool p_ForceRecompile,
+                                       bool p_UpdateResources)
 {
   _INTR_LOG_INFO("Loading/Compiling GPU Programs...");
 
@@ -465,23 +466,28 @@ void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
     }
   }
 
-  PipelineManager::destroyResources(changedPipelines);
-  GpuProgramManager::destroyResources(changedGpuPrograms);
+  if (p_UpdateResources)
+  {
+    PipelineManager::destroyResources(changedPipelines);
+    GpuProgramManager::destroyResources(changedGpuPrograms);
 
-  GpuProgramManager::createResources(changedGpuPrograms);
-  PipelineManager::createResources(changedPipelines);
+    GpuProgramManager::createResources(changedGpuPrograms);
+    PipelineManager::createResources(changedPipelines);
+  }
 }
 
 void GpuProgramManager::compileShader(GpuProgramRef p_Ref,
-                                      bool p_ForceRecompile)
+                                      bool p_ForceRecompile,
+                                      bool p_UpdateResources)
 {
   GpuProgramRefArray refs = {p_Ref};
-  compileShaders(refs, p_ForceRecompile);
+  compileShaders(refs, p_ForceRecompile, p_UpdateResources);
 }
 
-void GpuProgramManager::compileAllShaders(bool p_ForceRecompile)
+void GpuProgramManager::compileAllShaders(bool p_ForceRecompile,
+                                          bool p_UpdateResources)
 {
-  compileShaders(_activeRefs, p_ForceRecompile);
+  compileShaders(_activeRefs, p_ForceRecompile, p_UpdateResources);
 }
 
 // <-
@@ -496,7 +502,7 @@ void GpuProgramManager::createResources(const GpuProgramRefArray& p_Refs)
     // No spirv buffer? Retrieve it from the cache or compile the shader
     if (spirvBuffer.empty())
     {
-      compileShader(ref);
+      compileShader(ref, false, false);
     }
 
     VkShaderModule& module = _vkShaderModule(ref);
