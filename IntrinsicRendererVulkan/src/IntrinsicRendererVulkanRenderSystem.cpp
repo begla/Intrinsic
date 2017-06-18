@@ -130,9 +130,15 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     _INTR_PROFILE_AUTO("Create Resources");
 
     {
+      _INTR_PROFILE_AUTO("Compile Shaders");
+
+      GpuProgramManager::compileAllShaders(false, false);
+    }
+
+    {
       _INTR_PROFILE_AUTO("Create GPU Program Resources");
 
-      GpuProgramManager::createAllResources();
+      GpuProgramManager::createResources(GpuProgramManager::_activeRefs);
     }
 
     RenderPassManager::createAllResources();
