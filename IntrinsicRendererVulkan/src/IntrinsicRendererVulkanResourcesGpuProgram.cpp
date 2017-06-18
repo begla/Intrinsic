@@ -503,6 +503,10 @@ void GpuProgramManager::createResources(const GpuProgramRefArray& p_Refs)
     if (spirvBuffer.empty())
     {
       compileShader(ref, false, false);
+      if (spirvBuffer.empty())
+      {
+        continue;
+      }
     }
 
     VkShaderModule& module = _vkShaderModule(ref);

@@ -43,6 +43,11 @@ _INTR_INLINE void createPxTriangleMesh(MeshRef p_MeshRef)
 
   Physics::System::_pxCooking->setParams(params);
 
+  // Don't even try to create empty triangle meshes
+  if (MeshManager::_descPositionsPerSubMesh(p_MeshRef).empty() ||
+      MeshManager::_descIndicesPerSubMesh(p_MeshRef).empty())
+    return;
+
   physx::PxTriangleMeshDesc meshDesc;
   meshDesc.points.count =
       (uint32_t)MeshManager::_descPositionsPerSubMesh(p_MeshRef)[0].size();
