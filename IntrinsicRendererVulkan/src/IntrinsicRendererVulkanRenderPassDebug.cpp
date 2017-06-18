@@ -202,8 +202,9 @@ void Debug::init()
     PipelineLayoutManager::resetToDefault(_debugLinePipelineLayout);
 
     GpuProgramManager::reflectPipelineLayout(
-        8u, {GpuProgramManager::getResourceByName("debug_line.vert"),
-             GpuProgramManager::getResourceByName("debug_line.frag")},
+        8u,
+        {GpuProgramManager::getResourceByName("debug_line.vert"),
+         GpuProgramManager::getResourceByName("debug_line.frag")},
         _debugLinePipelineLayout);
 
     pipelineLayoutsToCreate.push_back(_debugLinePipelineLayout);

@@ -168,11 +168,10 @@ protected:
                                               rapidjson::Value& p_Properties,
                                               rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember("name",
-                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(Resource), _N(string),
-                                             _name(p_Ref), false, false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "name", _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Resource),
+                                  _N(string), _name(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   // <-

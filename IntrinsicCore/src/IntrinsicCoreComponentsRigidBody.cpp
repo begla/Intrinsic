@@ -284,8 +284,9 @@ void RigidBodyManager::createResources(const RigidBodyRefArray& p_RigidBodies)
                  RigidBodyType::kTriangleMeshKinematic)
     {
       _pxRigidActor(rigidBodyRef) = createTriangleMeshStaticKinematic(
-          rigidBodyRef, _descRigidBodyType(rigidBodyRef) ==
-                            RigidBodyType::kTriangleMeshKinematic);
+          rigidBodyRef,
+          _descRigidBodyType(rigidBodyRef) ==
+              RigidBodyType::kTriangleMeshKinematic);
     }
   }
 }
