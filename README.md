@@ -80,6 +80,6 @@ Intrinsic uses the following proprietary libraries:
 Assets and icons sourced from:
 
 * https://cloud.blender.org/
-* http://www.hdrlabs.com/sibl/archive.html
+* https://www.artstation.com/artwork/xKkaW
 * http://www.flaticon.com
 * http://www.gametextures.com
