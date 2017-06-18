@@ -1,3 +1,4 @@
+cd %~dp0
 call Build_Debug.bat
 
 IF %ERRORLEVEL% EQU 0 (

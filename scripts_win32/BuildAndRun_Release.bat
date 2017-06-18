@@ -1,3 +1,4 @@
+cd %~dp0
 call Build_Release.bat
 
 IF %ERRORLEVEL% EQU 0 (
