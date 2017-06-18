@@ -734,9 +734,9 @@ void captureIrradProbe(
                                     glm::uvec2(2u, 1u), glm::uvec2(3u, 1u),
                                     glm::uvec2(1u, 0u), glm::uvec2(1u, 2u)};
   static glm::quat rotationsPerAtlasIdx[6] = {
-      glm::vec3(0.0f, glm::half_pi<float>(), 0.0f),  // L / +x
+      glm::vec3(0.0f, -glm::half_pi<float>(), 0.0f), // L / +x
       glm::vec3(0.0f, 0.0f, 0.0f),                   // F / +z
-      glm::vec3(0.0f, -glm::half_pi<float>(), 0.0f), // R / -x
+      glm::vec3(0.0f, glm::half_pi<float>(), 0.0f),  // R / -x
       glm::vec3(0.0f, -glm::pi<float>(), 0.0f),      // B / -z
       glm::vec3(-glm::half_pi<float>(), 0.0f, 0.0f), // T / +y
       glm::vec3(glm::half_pi<float>(), 0.0f, 0.0f)}; // B / -y
@@ -902,22 +902,28 @@ void captureIrradProbe(
 #endif // STORE_ATLAS_DDS
       }
 
-//{
-//  gli::texture_cube filteredTexCube =
-//      gli::texture_cube(gli::FORMAT_RGBA16_SFLOAT_PACK16, cubeMapRes,
-//                        gli::levels(cubeMapRes));
+      if (false)
+      {
+        // Output texture
+        gli::texture_cube filteredTexCube =
+            gli::texture_cube(gli::FORMAT_RGBA16_SFLOAT_PACK16, cubeMapRes,
+                              gli::levels(cubeMapRes));
 
-//  IBL::prefilterGGX(texCube, filteredTexCube);
+        const _INTR_ARRAY(uint32_t) sampleCounts = {
+            16u, 512u, 1024u, 1024u, 1024u, 1024u, 1024u, 1024u, 1024u};
+        _INTR_ASSERT(sampleCounts.size() == filteredTexCube.levels());
 
-//  _INTR_STRING timeString = StringUtil::toString(p_Time);
-//  StringUtil::replace(timeString, ".", "-");
+        IBL::preFilterGGX(texCube, filteredTexCube, sampleCounts.data());
 
-//  const _INTR_STRING filePath =
-//      "media/irradiance_probes/" +
-//      Entity::EntityManager::_name(currentEntity).getString() +
-//      "_cube_filtered_" + timeString + ".dds";
-//  gli::save_dds(filteredTexCube, filePath.c_str());
-//}
+        _INTR_STRING timeString = StringUtil::toString(p_Time);
+        StringUtil::replace(timeString, ".", "-");
+
+        const _INTR_STRING filePath =
+            "media/irradiance_probes/" +
+            Entity::EntityManager::_name(currentEntity).getString() +
+            "_cube_filtered_" + timeString + ".dds";
+        gli::save_dds(filteredTexCube, filePath.c_str());
+      }
 
 #if defined(STORE_ATLAS_DDS)
       {

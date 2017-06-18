@@ -15,7 +15,7 @@
 #define PSSM_SPLIT_COUNT 4u
 #define MAX_SHADOW_MAP_COUNT 4u
 #define EPSILON 1.0e-6
-#define IBL_MIP_OFFSET 3
+#define IBL_MIN_ROUGHNESS 0.05
 #define IBL_MIP_COUNT 9
 
 #define ESM_POSITIVE_EXPONENT 300.0
@@ -118,45 +118,13 @@ float D_GGX(float NdH, float roughness2)
 // IBL
 // ->
 
-float roughnessFromPerceptualRoughness(float perceptualRoughness)
+float roughnessToMipIdx(float roughness)
 {
-  return perceptualRoughness*perceptualRoughness;
-}
-
-float specularPowerFromPerceptualRoughness(float perceptualRoughness)
-{
-  const float roughness = roughnessFromPerceptualRoughness(perceptualRoughness);
-  return (2.0 / max(EPSILON, roughness*roughness)) - 2.0;
-}
-
-float perceptualRoughnessFromRoughness(float roughness)
-{
-  return sqrt(max(0.0, roughness));
-}
-
-float perceptualRoughnessFromSpecularPower(float specPower)
-{
-  const float roughness = sqrt(2.0/(specPower + 2.0));
-  return perceptualRoughnessFromRoughness(roughness);
-}
-
-float burleyToMip(float perceptualRoughness, float NdotR)
-{
-  float specPower = specularPowerFromPerceptualRoughness(perceptualRoughness);
-  specPower /= (4.0 * max(NdotR, EPSILON));
-  const float scale = perceptualRoughnessFromSpecularPower(specPower);
-  return scale * (IBL_MIP_COUNT - 1 - IBL_MIP_OFFSET);
-}
-
-
-float burleyToMipApprox(float perceptualRoughness)
-{
-  const float scale = perceptualRoughness * (1.7 - 0.7 * perceptualRoughness);
-  return scale * (IBL_MIP_COUNT - 1 - IBL_MIP_OFFSET);
+  return max(roughness - IBL_MIN_ROUGHNESS, 0.0) 
+    / (1.0 - IBL_MIN_ROUGHNESS) * (IBL_MIP_COUNT - 1);
 }
 
 // Irradiance / SH
-// <-
 
 vec3 shDotProduct(in SH9 a, in SH9 b)
 {
@@ -176,24 +144,24 @@ vec3 shDotProduct(in SH9 a, in SH9 b)
 
 SH9 projectOntoSH9(in vec3 n, in vec3 color, in float A0, in float A1, in float A2)
 {
-    SH9 sh;
+  SH9 sh;
 
-    // Band 0
-    sh.L[0] = 0.282095 * A0 * color;
+  // Band 0
+  sh.L[0] = 0.282095 * A0 * color;
 
-    // Band 1
-    sh.L[1] = 0.488603 * n.y * A1 * color;
-    sh.L[2] = 0.488603 * n.z * A1 * color;
-    sh.L[3] = 0.488603 * n.x * A1 * color;
+  // Band 1
+  sh.L[1] = 0.488603 * n.y * A1 * color;
+  sh.L[2] = 0.488603 * n.z * A1 * color;
+  sh.L[3] = 0.488603 * n.x * A1 * color;
 
-    // Band 2
-    sh.L[4] = 1.092548 * n.x * n.y * A2 * color;
-    sh.L[5] = 1.092548 * n.y * n.z * A2 * color;
-    sh.L[6] = 0.315392 * (3.0 * n.z * n.z - 1.0) * A2 * color;
-    sh.L[7] = 1.092548 * n.x * n.z * A2 * color;
-    sh.L[8] = 0.546274 * (n.x * n.x - n.y * n.y) * A2 * color;
+  // Band 2
+  sh.L[4] = 1.092548 * n.x * n.y * A2 * color;
+  sh.L[5] = 1.092548 * n.y * n.z * A2 * color;
+  sh.L[6] = 0.315392 * (3.0 * n.z * n.z - 1.0) * A2 * color;
+  sh.L[7] = 1.092548 * n.x * n.z * A2 * color;
+  sh.L[8] = 0.546274 * (n.x * n.x - n.y * n.y) * A2 * color;
 
-    return sh;
+  return sh;
 }
 
 const float cosineA0 = MATH_PI;
@@ -212,7 +180,7 @@ vec3 sampleSH(vec4 data[7], vec3 dir)
 
 void initLightingDataFromGBuffer(inout LightingData d)
 {
-  const float adjRough = d.roughness * 0.95 + 0.05;
+  const float adjRough = d.roughness * (1.0 - IBL_MIN_ROUGHNESS) + IBL_MIN_ROUGHNESS;
   d.roughness2 = adjRough * adjRough;
 
   d.diffuseColor = d.baseColor - d.baseColor * d.metalMask;

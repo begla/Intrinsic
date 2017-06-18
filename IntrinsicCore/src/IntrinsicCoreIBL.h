@@ -20,6 +20,8 @@ namespace Core
 {
 namespace IBL
 {
+void initCubemapProcessing();
+
 // Struct defining a third order SH
 struct SH9
 {
@@ -112,6 +114,8 @@ _INTR_INLINE glm::vec3 mapXYSToDirection(const glm::uvec3& p_PixelPos,
     break;
   }
 
+  // TODO: Not sure why the cubemaps are mirrored...
+  dir *= glm::vec3(-1.0f, 1.0f, 1.0f);
   return dir;
 }
 
@@ -195,81 +199,77 @@ _INTR_INLINE glm::vec3 importanceSampleGGX(glm::vec2 p_Xi, float p_Roughness,
                                            glm::vec3 p_N)
 {
   float a = p_Roughness * p_Roughness;
-  float Phi = 2 * glm::pi<float>() * p_Xi.x;
-  float cosTheta = sqrt((1 - p_Xi.y) / (1 + (a * a - 1) * p_Xi.y));
-  float sinTheta = sqrt(1 - cosTheta * cosTheta);
+  float Phi = 2.0f * glm::pi<float>() * p_Xi.x;
+  float cosTheta = sqrt((1.0f - p_Xi.y) / (1.0f + (a * a - 1.0f) * p_Xi.y));
+  float sinTheta = sqrt(1.0f - cosTheta * cosTheta);
   glm::vec3 H;
   H.x = sinTheta * cos(Phi);
   H.y = sinTheta * sin(Phi);
   H.z = cosTheta;
-  glm::vec3 UpVector = abs(p_N.z) < 0.999f ? glm::vec3(0.0f, 0.0f, 1.0f)
-                                           : glm::vec3(1.0f, 0.0f, 0.0f);
-  glm::vec3 TangentX = normalize(cross(UpVector, p_N));
-  glm::vec3 TangentY = cross(p_N, TangentX);
+  glm::vec3 up = abs(p_N.z) < 0.999f ? glm::vec3(0.0f, 0.0f, 1.0f)
+                                     : glm::vec3(1.0f, 0.0f, 0.0f);
+  glm::vec3 tanX = normalize(cross(up, p_N));
+  glm::vec3 tanY = cross(p_N, tanX);
 
   // Tangent to world space
-  return TangentX * H.x + TangentY * H.y + p_N * H.z;
+  return tanX * H.x + tanY * H.y + p_N * H.z;
 }
 
-_INTR_INLINE void prefilterGGX(const gli::texture_cube& p_Input,
-                               gli::texture_cube& p_Output)
+void preFilterGGX(const gli::texture_cube& p_Input, gli::texture_cube& p_Output,
+                  const uint32_t* p_SampleCounts, float p_MinRoughness = 0.05f);
+
+_INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
+                                gli::texture_cube& p_Output, uint32_t p_FaceIdx,
+                                uint32_t p_MipIdx, glm::uvec2 p_RangeX,
+                                glm::uvec2 p_RangeY,
+                                const uint32_t* p_SampleCounts,
+                                float p_MinRoughness)
 {
   gli::fsamplerCube sourceSampler =
-      gli::fsamplerCube(p_Input, gli::WRAP_REPEAT);
+      gli::fsamplerCube(p_Input, gli::WRAP_CLAMP_TO_EDGE);
   gli::fsamplerCube targetSampler =
-      gli::fsamplerCube(p_Output, gli::WRAP_REPEAT);
-  // sourceSampler.generate_mipmaps(gli::FILTER_LINEAR);
+      gli::fsamplerCube(p_Output, gli::WRAP_CLAMP_TO_EDGE);
 
-  static const uint32_t sampleCount = 1024u;
-  static const uint32_t mipLevelOffset = 0u;
-  _INTR_ASSERT(mipLevelOffset <= p_Input.max_level());
+  glm::uvec2 extent = p_Output.extent(p_MipIdx);
+  const float roughness = p_MinRoughness + float(p_MipIdx) /
+                                               p_Output.max_level() *
+                                               (1.0f - p_MinRoughness);
+  const uint32_t sampleCount = p_SampleCounts[p_MipIdx];
 
-  uint32_t count = 0u;
-  for (uint32_t mipIdx = mipLevelOffset; mipIdx <= p_Input.max_level();
-       ++mipIdx)
+  for (uint32_t y = p_RangeY.x; y < p_RangeY.y; ++y)
   {
-    for (uint32_t faceIdx = 0u; faceIdx <= p_Input.max_face(); ++faceIdx)
+    for (uint32_t x = p_RangeX.x; x < p_RangeX.y; ++x)
     {
-      glm::uvec2 extent = p_Input.extent(mipIdx);
-      const float roughness =
-          glm::max((float)mipIdx - (float)mipLevelOffset, 0.0f) /
-          (p_Input.max_level() - mipLevelOffset);
+      const glm::uvec3 pixelPos = glm::uvec3(x, y, p_FaceIdx);
+      const glm::vec2 uv = (glm::vec2(pixelPos) + 0.5f) / glm::vec2(extent);
+      const glm::vec3 R = IBL::mapXYSToDirection(pixelPos, extent);
 
-      for (uint32_t y = 0u; y < (uint32_t)extent.y; ++y)
+      glm::vec3 prefilteredColor = glm::vec3(0.0f);
+
+      float totalWeight = 0.0f;
+      for (uint32_t i = 0; i < sampleCount; i++)
       {
-        for (uint32_t x = 0u; x < (uint32_t)extent.x; ++x)
+        glm::vec2 Xi = Math::hammersley(i, sampleCount);
+        glm::vec3 H = importanceSampleGGX(Xi, roughness, R);
+        glm::vec3 L = 2.0f * glm::dot(R, H) * H - R;
+        float NdL = glm::clamp(glm::dot(R, L), 0.0f, 1.0f);
+
+        if (NdL > 0.0f)
         {
-          const glm::uvec3 pixelPos = glm::uvec3(x, y, faceIdx);
-          const glm::vec2 uv = (glm::vec2(pixelPos) + 0.5f) / glm::vec2(extent);
-          const glm::vec3 R = IBL::mapXYSToDirection(pixelPos, extent);
+          const glm::vec3 uvs = mapDirectionToUVS(L);
+          const glm::vec2 pixelPosSource =
+              glm::vec2(uvs) * glm::vec2(p_Output.extent(0u)) - 0.5f;
 
-          glm::vec3 prefilteredColor = glm::vec3(0.0f);
-
-          float totalWeight = 0.0f;
-          for (uint32_t i = 0; i < sampleCount; i++)
-          {
-            glm::vec2 Xi = Math::hammersley(i, sampleCount);
-            glm::vec3 H = importanceSampleGGX(Xi, roughness, R);
-            glm::vec3 L = 2.0f * glm::dot(R, H) * H - R;
-            float NdL = glm::clamp(glm::dot(R, L), 0.0f, 1.0f);
-            if (NdL > 0.0f)
-            {
-              const glm::vec3 uvs = mapDirectionToUVS(L);
-              const glm::vec2 pixelPosSource =
-                  glm::vec2(uvs) * glm::vec2(p_Input.extent(0u)) - 0.5f;
-
-              prefilteredColor += glm::vec3(sourceSampler.texel_fetch(
-                                      pixelPosSource, faceIdx, 0u)) *
-                                  NdL;
-              totalWeight += NdL;
-            }
-          }
-
-          targetSampler.texel_write(
-              pixelPos, faceIdx, mipIdx,
-              glm::vec4(prefilteredColor / totalWeight, 1.0f));
+          prefilteredColor += glm::vec3(sourceSampler.texel_fetch(
+                                  pixelPosSource, (uint32_t)uvs.z, 0u)) *
+                              NdL;
+          totalWeight += NdL;
         }
       }
+
+      targetSampler.texel_write(
+          pixelPos, p_FaceIdx, p_MipIdx,
+          glm::vec4(prefilteredColor / totalWeight, 1.0f));
     }
   }
 }

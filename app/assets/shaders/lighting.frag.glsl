@@ -145,8 +145,8 @@ void main()
 
   // Specular
   {
-    const float specLod = burleyToMipApprox(d.roughness);
-    const vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
+    const float specMipIdx = roughnessToMipIdx(d.roughness);
+    const vec3 spec = d.specularColor * textureLod(specularTex, R, specMipIdx).rgb;
     outColor.rgb += uboPerInstance.data0.y * uboPerInstance.data0.z 
       * spec;    
   }
