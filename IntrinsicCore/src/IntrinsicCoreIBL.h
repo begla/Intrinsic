@@ -260,6 +260,7 @@ _INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
 
       float totalWeight = 0.0f;
 
+      for (uint32_t i = 0; i < sampleCount; i++)
       {
         glm::vec2 Xi = Math::hammersley(i, sampleCount);
         glm::vec3 H = importanceSampleGGX(Xi, roughness, R);
