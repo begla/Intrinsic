@@ -82,6 +82,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
   // Init. Intrinsic
   Application::init(GetModuleHandle(NULL), (void*)_ui.viewPort->winId());
+  IBL::initCubemapProcessing();
 
   // Activate editing game state
   GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
