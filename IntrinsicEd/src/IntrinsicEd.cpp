@@ -371,10 +371,10 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
       _dayNightSlider = new QSlider(Qt::Horizontal);
       _dayNightSlider->setMinimum(0);
-      _dayNightSlider->setMaximum(100);
+      _dayNightSlider->setMaximum(10000);
       _dayNightSlider->setSingleStep(1);
       _dayNightSlider->setToolTip("Day/Night");
-      _dayNightSlider->setValue(World::_currentTime);
+      _dayNightSlider->setValue(int(World::_currentTime * 10000.0f));
 
       editingViewLayout->addWidget(label, 3, 0);
       editingViewLayout->addWidget(_dayNightSlider, 3, 1);
@@ -724,7 +724,7 @@ void IntrinsicEd::onGridSizeChanged(double p_Value)
 
 void IntrinsicEd::onDayNightSliderChanged(int p_Value)
 {
-  World::_currentTime = p_Value * 0.01f;
+  World::_currentTime = p_Value * 0.0001f;
 }
 
 void IntrinsicEd::onGizmoSizeChanged(double p_Value)
@@ -872,7 +872,7 @@ void IntrinsicEd::updateUI()
   if (!_dayNightSlider->hasFocus())
   {
     _dayNightSlider->blockSignals(true);
-    _dayNightSlider->setValue((int)(World::_currentTime * 100.0f));
+    _dayNightSlider->setValue((int)(World::_currentTime * 10000.0f));
     _dayNightSlider->blockSignals(false);
   }
 }
