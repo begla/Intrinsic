@@ -183,10 +183,11 @@ void IntrinsicEdManagerWindowBase::onCreateResource()
       makeResourceNameUnique(_resourceName.toStdString().c_str());
   Dod::Ref newResourceRef =
       _resourceManagerEntry.createFunction(newResourceName.c_str());
+
   if (_resourceManagerEntry.resetToDefaultFunction)
-  {
     _resourceManagerEntry.resetToDefaultFunction(newResourceRef);
-  }
+  if (_resourceManagerEntry.createResourcesFunction)
+    _resourceManagerEntry.createResourcesFunction({newResourceRef});
   onPopulateResourceTree();
 }
 
@@ -216,10 +217,7 @@ void IntrinsicEdManagerWindowBase::onCloneResource()
     _propertyCompilerEntry.initFunction(cloneedResourceRef, false, properties);
 
     if (_resourceManagerEntry.createResourcesFunction)
-    {
-      Dod::RefArray resourcesToCreate = {cloneedResourceRef};
-      _resourceManagerEntry.createResourcesFunction(resourcesToCreate);
-    }
+      _resourceManagerEntry.createResourcesFunction({cloneedResourceRef});
 
     onPopulateResourceTree();
   }
@@ -231,7 +229,10 @@ void IntrinsicEdManagerWindowBase::onDestroyResource()
 
   if (resource.isValid())
   {
-    _resourceManagerEntry.destroyFunction(resource);
+    if (_resourceManagerEntry.destroyResourcesFunction)
+      _resourceManagerEntry.destroyResourcesFunction({resource});
+    if (_resourceManagerEntry.destroyFunction)
+      _resourceManagerEntry.destroyFunction(resource);
 
     onPopulateResourceTree();
 
