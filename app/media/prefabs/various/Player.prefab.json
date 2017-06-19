@@ -1,0 +1,67 @@
+[
+    {
+        "name": "Player",
+        "offsetToParent": 0,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -948.2645874023438,
+                        566.5059814453125,
+                        -288.026611328125
+                    ],
+                    "localOrient": [
+                        0.0,
+                        -0.17418387532234193,
+                        0.0,
+                        -0.9847131967544556
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        -948.2645874023438,
+                        566.5059814453125,
+                        -288.026611328125
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        -0.17418387532234193,
+                        0.0,
+                        -0.9847131967544556
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "CharacterController",
+                "properties": {}
+            },
+            {
+                "type": "Player",
+                "properties": {
+                    "playerId": 0
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "rabbit",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    }
+]
