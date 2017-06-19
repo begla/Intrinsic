@@ -18,4 +18,3 @@ copy ..\\Intrinsic_Dependencies\\dependencies\\fbx\\bin\\debug\\libfbxsdk.dll ap
 
 cd scripts_win32
 
-timeout 2

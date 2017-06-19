@@ -221,7 +221,7 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs,
 
     Components::NodeManager::_position(camNodeRef) =
         Components::NodeManager::_worldPosition(nodeRef);
-    Components::NodeRefArray nodesToUpdate = {camNodeRef};
+    const Components::NodeRefArray nodesToUpdate = {camNodeRef};
     Components::NodeManager::updateTransforms(nodesToUpdate);
 
     // Render a couple of frames so everything is correctly faded in/out
