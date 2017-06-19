@@ -34,7 +34,6 @@ layout (binding = 8) buffer AvgLum
 {
   float avgLum[];
 };
-layout (binding = 9) uniform sampler2D vignetteTex;
 
 layout (location = 0) in vec2 inUV0;
 layout (location = 0) out vec4 outColor;
@@ -112,7 +111,7 @@ void main()
   // Lens dirt
   outColor.rgb += lensDirtIntens * lensDirt.rgb * clamp(bloom.a - lensDirtLumThreshold, 0.0, 1.0);
   // Vignette
-  outColor.rgb *= textureLod(vignetteTex, inUV0, 0.0).rrr;
+  outColor.rgb *= clamp(1.0 - 0.6 * smoothstep(0.6, 1.2, length(inUV0.xy * 2.0 - 1.0)), 0.0, 1.0);
 
   // Tonemapping
   outColor.rgb *= exposure;
