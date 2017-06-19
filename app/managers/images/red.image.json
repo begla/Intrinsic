@@ -3,7 +3,7 @@
     "properties": {
         "name": "red",
         "imageType": 1,
-        "imageFormat": 10,
+        "imageFormat": 8,
         "fileName": "red.dds",
         "avgNormLength": 1.0
     }

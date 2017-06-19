@@ -5,6 +5,6 @@
         "imageType": 1,
         "imageFormat": 7,
         "fileName": "default_NRM.dds",
-        "avgNormLength": 1.0
+        "avgNormLength": 0.9999999403953552
     }
 }

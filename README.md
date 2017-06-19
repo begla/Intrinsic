@@ -73,7 +73,7 @@ Intrinsic uses the following proprietary libraries:
 
 ... and the following tools in binary format:
 
-* NVTT (see https://developer.nvidia.com/gpu-accelerated-texture-compression)
+* DirectXTex (see https://github.com/Microsoft/DirectXTex)
 * Cloc (see http://cloc.sourceforge.net)
 * 7za (see http://www.7-zip.org/download.html)
 

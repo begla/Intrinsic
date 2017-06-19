@@ -3,7 +3,7 @@
     "properties": {
         "name": "water",
         "imageType": 1,
-        "imageFormat": 10,
+        "imageFormat": 8,
         "fileName": "water.dds",
         "avgNormLength": 1.0
     }

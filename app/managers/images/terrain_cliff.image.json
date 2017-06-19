@@ -3,7 +3,7 @@
     "properties": {
         "name": "terrain_cliff",
         "imageType": 1,
-        "imageFormat": 10,
+        "imageFormat": 8,
         "fileName": "terrain_cliff.dds",
         "avgNormLength": 1.0
     }

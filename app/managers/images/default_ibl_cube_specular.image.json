@@ -3,7 +3,7 @@
     "properties": {
         "name": "default_ibl_cube_specular",
         "imageType": 1,
-        "imageFormat": 3,
+        "imageFormat": 15,
         "fileName": "default_ibl_cube_specular.dds",
         "avgNormLength": 1.0
     }

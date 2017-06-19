@@ -92,10 +92,9 @@ _INTR_INLINE void replace(_INTR_STRING& p_String,
                           const _INTR_STRING& p_StringToReplace,
                           const _INTR_STRING& p_Replacement)
 {
-  size_t start_pos = p_String.find(p_StringToReplace);
-  if (start_pos == std::string::npos)
-    return;
-  p_String.replace(start_pos, p_StringToReplace.length(), p_Replacement);
+  size_t start_pos = std::string::npos;
+  while ((start_pos = p_String.find(p_StringToReplace)) != std::string::npos)
+    p_String.replace(start_pos, p_StringToReplace.length(), p_Replacement);
 }
 }
 }

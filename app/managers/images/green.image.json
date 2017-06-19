@@ -3,7 +3,7 @@
     "properties": {
         "name": "green",
         "imageType": 1,
-        "imageFormat": 10,
+        "imageFormat": 8,
         "fileName": "green.dds",
         "avgNormLength": 1.0
     }

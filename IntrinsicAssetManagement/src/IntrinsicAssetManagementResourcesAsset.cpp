@@ -99,7 +99,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     else if (_descAssetType(assetRef) == AssetType::kAlbedoTexture)
     {
       ImporterTexture::init();
-      ImporterTexture::importAlebdoAlphaTextureFromFile(
+      ImporterTexture::importAlbedoTextureFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
@@ -109,7 +109,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     else if (_descAssetType(assetRef) == AssetType::kAlbedoAlphaTexture)
     {
       ImporterTexture::init();
-      ImporterTexture::importAlebdoAlphaTextureFromFile(
+      ImporterTexture::importAlbedoAlphaTextureFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
