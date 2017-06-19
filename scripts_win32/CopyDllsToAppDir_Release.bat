@@ -33,4 +33,3 @@ copy dependencies\\bugsplat\\bin\\BugSplatRc64.dll app\\BugSplatRc64.dll
 
 cd scripts_win32
 
-timeout 2
