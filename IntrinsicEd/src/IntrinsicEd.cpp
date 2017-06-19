@@ -143,6 +143,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     stringToIconPathMapping["Light"] = ":Icons/icons/various/idea.png";
     stringToIconPathMapping["IrradianceProbe"] =
         ":/Icons/icons/weather/clouds-and-sun.png";
+    stringToIconPathMapping["SpecularProbe"] =
+      ":/Icons/icons/weather/clouds-and-sun.png";
     stringToIconPathMapping["NodeLocalTransform"] =
         ":/Icons/icons/cad/rotate-1.png";
     stringToIconPathMapping["NodeWorldTransform"] =
@@ -237,6 +239,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    SLOT(onCreateLight()));
   QObject::connect(_ui.actionCreateIrradProbe, SIGNAL(triggered()), this,
                    SLOT(onCreateIrradProbe()));
+  QObject::connect(_ui.actionCreateSpecProbe, SIGNAL(triggered()), this,
+                   SLOT(onCreateSpecProbe()));
   QObject::connect(_ui.actionCreateDecal, SIGNAL(triggered()), this,
                    SLOT(onCreateDecal()));
 
@@ -706,6 +710,13 @@ void IntrinsicEd::onCreateIrradProbe()
 {
   Entity::EntityRef entityRef = spawnDefaultEntity(_N(IrradianceProbe));
   Dod::Ref compRef = addComponentToEntity(entityRef, _N(IrradianceProbe));
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+}
+
+void IntrinsicEd::onCreateSpecProbe()
+{
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(SpecularProbe));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(SpecularProbe));
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
 }
 

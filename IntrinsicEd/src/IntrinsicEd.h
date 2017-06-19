@@ -95,6 +95,7 @@ public slots:
   void onCreateRigidBodySphere();
   void onCreateLight();
   void onCreateIrradProbe();
+  void onCreateSpecProbe();
   void onCreateDecal();
   void onShowDebugGeometryContextMenu();
   void onDebugGeometryChanged();

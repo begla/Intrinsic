@@ -212,6 +212,9 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs,
     Components::NodeRef irradProbeRef =
         Components::IrradianceProbeManager::getComponentForEntity(
             currentEntity);
+    Components::NodeRef specProbeRef =
+      Components::SpecularProbeManager::getComponentForEntity(
+                                                                currentEntity);
 
     if (p_Clear)
     {
@@ -318,8 +321,7 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs,
 #endif // STORE_ATLAS_DDS
       }
 
-      // TODO: WIP specular probes
-      if (/*specularProbeRef.isValid()*/false)
+      if (specProbeRef.isValid())
       {
         // Output texture
         gli::texture_cube filteredTexCube =

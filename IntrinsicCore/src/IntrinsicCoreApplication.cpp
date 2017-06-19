@@ -118,6 +118,7 @@ void Application::initManagers()
     Components::PlayerManager::init();
     Components::LightManager::init();
     Components::IrradianceProbeManager::init();
+    Components::SpecularProbeManager::init();
     Components::DecalManager::init();
   }
 
