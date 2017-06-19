@@ -219,6 +219,10 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
     {
       if (irradProbeRef.isValid())
         Components::IrradianceProbeManager::_descSHs(irradProbeRef).clear();
+      if (specProbeRef.isValid())
+        Components::SpecularProbeManager::_descSpecularTextureNames(
+            specProbeRef)
+            .clear();
     }
 
     Components::NodeManager::_position(camNodeRef) =
@@ -310,10 +314,10 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
         _INTR_STRING timeString = StringUtil::toString(p_Time);
         StringUtil::replace(timeString, ".", "-");
 
-        const _INTR_STRING filePath =
-            "media/specular_probes/" +
+        const _INTR_STRING fileName =
             Entity::EntityManager::_name(currentEntity).getString() +
-            "_cube_filtered_" + timeString + ".dds";
+            timeString + ".dds";
+        const _INTR_STRING filePath = "media/specular_probes/" + fileName;
         gli::save_dds(filteredTexCube, filePath.c_str());
 
         // Compress to BCH6
@@ -326,6 +330,10 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
               "tools\\dxtexconv\\texconv.exe -y " + adjustedArgs;
           std::system(cmd.c_str());
         }
+
+        Components::SpecularProbeManager::_descSpecularTextureNames(
+            specProbeRef)
+            .push_back(fileName);
       }
 
       if (irradProbeRef.isValid())

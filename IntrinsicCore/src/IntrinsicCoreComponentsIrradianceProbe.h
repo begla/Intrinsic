@@ -111,15 +111,18 @@ struct IrradianceProbeManager
                           _N(float), _descPriority(p_Ref), false, false),
         p_Document.GetAllocator());
 
-    rapidjson::Value shs = rapidjson::Value(rapidjson::kArrayType);
-    for (uint32_t i = 0u; i < _descSHs(p_Ref).size(); ++i)
+    if (!p_GenerateDesc)
     {
-      shs.PushBack(_INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                     _N(IrradianceProbe), _N(sh),
-                                     _descSHs(p_Ref)[i], false, false),
-                   p_Document.GetAllocator());
+      rapidjson::Value shs = rapidjson::Value(rapidjson::kArrayType);
+      for (uint32_t i = 0u; i < _descSHs(p_Ref).size(); ++i)
+      {
+        shs.PushBack(_INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                       _N(IrradianceProbe), _N(sh),
+                                       _descSHs(p_Ref)[i], false, false),
+                     p_Document.GetAllocator());
+      }
+      p_Properties.AddMember("shs", shs, p_Document.GetAllocator());
     }
-    p_Properties.AddMember("shs", shs, p_Document.GetAllocator());
   }
 
   // <-
@@ -141,13 +144,16 @@ struct IrradianceProbeManager
       _descPriority(p_Ref) =
           (uint32_t)JsonHelper::readPropertyFloat(p_Properties["priority"]);
 
-    if (p_Properties.HasMember("shs"))
+    if (!p_GenerateDesc)
     {
-      _descSHs(p_Ref).clear();
-      const rapidjson::Value& shs = p_Properties["shs"];
-      for (uint32_t i = 0u; i < shs.Size(); ++i)
+      if (p_Properties.HasMember("shs"))
       {
-        _descSHs(p_Ref).push_back(JsonHelper::readPropertySH(shs[i]));
+        _descSHs(p_Ref).clear();
+        const rapidjson::Value& shs = p_Properties["shs"];
+        for (uint32_t i = 0u; i < shs.Size(); ++i)
+        {
+          _descSHs(p_Ref).push_back(JsonHelper::readPropertySH(shs[i]));
+        }
       }
     }
   }
