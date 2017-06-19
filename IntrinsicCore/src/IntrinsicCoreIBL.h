@@ -348,6 +348,10 @@ _INTR_INLINE SH9 project(const gli::texture_cube& p_CubeMap)
   result *= (4.0f * glm::pi<float>()) / weightSum;
   return result;
 }
+
+// <-
+
+void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear, float p_Time);
 }
 }
 }
