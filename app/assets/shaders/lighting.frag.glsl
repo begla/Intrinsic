@@ -76,7 +76,7 @@ void main()
 
   // Pass through sky
   if (depth >= 1.0)
-  { 
+  {
     outColor.rgba = albedoSample;
     return;
   }
@@ -132,7 +132,7 @@ void main()
     for (uint pi=0; pi<irradProbeCount; pi+=2)
     {
       const uint packedProbeIndices = irradProbeIndices[clusterIdx + pi / 2 + 1];
-      
+
       IrradProbe probe = irradProbes[packedProbeIndices & 0xFFFF];
       calcLocalIrradiance(probe, d, normalWS, irrad, 1.0);
 
@@ -147,8 +147,8 @@ void main()
   {
     const float specMipIdx = roughnessToMipIdx(d.roughness);
     const vec3 spec = d.specularColor * textureLod(specularTex, R, specMipIdx).rgb;
-    outColor.rgb += uboPerInstance.data0.y * uboPerInstance.data0.z 
-      * spec;    
+    outColor.rgb += uboPerInstance.data0.y * uboPerInstance.data0.z
+      * spec;
   }
 
   // Emissive
@@ -156,18 +156,18 @@ void main()
 
   // Cloud shadows
   const vec4 posWS = uboPerFrame.invViewMatrix * vec4(d.posVS, 1.0);
-  const float cloudShadows = mix(1.0, clamp(texture(noiseTex, 
-    clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0 
+  const float cloudShadows = mix(1.0, clamp(texture(noiseTex,
+    clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0
     + uboPerInstance.data0.x * 0.025).r * 3.0 - 0.5, 0.1, 1.0), uboPerFrame.postParams0.w);
 
   // Sunlight
   {
    const vec4 sunLightColorAndIntensity = uboPerFrame.sunLightColorAndIntensity;
-    float shadowAttenuation = cloudShadows 
+    float shadowAttenuation = cloudShadows
       * calcShadowAttenuation(d.posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
     outColor.rgb += shadowAttenuation * sunLightColorAndIntensity.rgb * calcLighting(d);
-    
-    calcTransl(d, matParams, 
+
+    calcTransl(d, matParams,
       clamp(uboPerFrame.sunLightDirWS.y - 0.3, 0.0, 1.0), // Dim for low sun
       sunLightColorAndIntensity, outColor);
   }
@@ -196,7 +196,7 @@ void main()
 
       light = lights[packedLightIndices >> 16];
       light.colorAndIntensity.w *= float(li + 1 < lightCount);
-        calcPointLightLighting(light, 
+        calcPointLightLighting(light,
           d, matParams, outColor);
     }
   }
