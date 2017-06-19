@@ -249,7 +249,7 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs,
       {
         Components::NodeManager::_orientation(camNodeRef) =
             rotationsPerAtlasIdx[atlasIdx];
-        Components::NodeManager::updateTransforms({camNodeRef});
+        Components::NodeManager::updateTransforms(nodesToUpdate);
 
         // Render face
         Components::PostEffectVolumeManager::blendPostEffects(
