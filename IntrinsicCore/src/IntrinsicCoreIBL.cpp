@@ -140,8 +140,8 @@ void preFilterGGX(const gli::texture_cube& p_Input, gli::texture_cube& p_Output,
   _preFilterParallelTaskSets.clear();
 }
 
-void captureProbes(const Components::NodeRefArray& p_NodeRefs,
-                        bool p_Clear, float p_Time)
+void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
+                   float p_Time)
 {
   using namespace RV;
 
@@ -213,8 +213,7 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs,
         Components::IrradianceProbeManager::getComponentForEntity(
             currentEntity);
     Components::NodeRef specProbeRef =
-      Components::SpecularProbeManager::getComponentForEntity(
-                                                                currentEntity);
+        Components::SpecularProbeManager::getComponentForEntity(currentEntity);
 
     if (p_Clear)
     {
@@ -345,10 +344,12 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs,
 
         // Compress to BCH6
         {
-          _INTR_STRING adjustedArgs = "-f BC6H_UF16 -o media/specular_probes " + filePath;
+          _INTR_STRING adjustedArgs =
+              "-f BC6H_UF16 -o media/specular_probes " + filePath;
           StringUtil::replace(adjustedArgs, "/", "\\\\");
 
-          const _INTR_STRING cmd = "tools\\dxtexconv\\texconv.exe -y " + adjustedArgs;
+          const _INTR_STRING cmd =
+              "tools\\dxtexconv\\texconv.exe -y " + adjustedArgs;
           std::system(cmd.c_str());
         }
       }

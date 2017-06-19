@@ -174,6 +174,18 @@ void displayDebugLineGeometryForSelectedObject()
           glm::vec3(1.0f, 0.0f, 0.0f));
     }
 
+    Components::SpecularProbeRef specProbeRef =
+        Components::SpecularProbeManager::getComponentForEntity(
+            GameStates::Editing::_currentlySelectedEntity);
+
+    if (specProbeRef.isValid())
+    {
+      Debug::renderSphere(
+          Components::NodeManager::_worldPosition(nodeRef),
+          Components::SpecularProbeManager::_descRadius(specProbeRef),
+          glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+
     Components::DecalRef decalRef =
         Components::DecalManager::getComponentForEntity(
             GameStates::Editing::_currentlySelectedEntity);
