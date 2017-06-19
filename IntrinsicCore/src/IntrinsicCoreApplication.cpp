@@ -40,8 +40,6 @@ bool Application::_running = true;
 
 void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
 {
-  std::isnan(1234.0f);
-
   // Init. physics
   Physics::System::init();
 

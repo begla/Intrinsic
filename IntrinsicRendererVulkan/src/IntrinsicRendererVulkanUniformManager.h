@@ -34,7 +34,6 @@ struct UniformManager
                                _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
 
     MemoryBlock block;
-
     if (p_Size < _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES)
     {
       block = _perInstanceAllocatorSmall[bufferIdx].allocate();
