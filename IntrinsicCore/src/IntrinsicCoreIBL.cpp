@@ -237,13 +237,6 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
     }
 
     {
-#if defined(STORE_ATLAS_DDS)
-      gli::texture2d tex = gli::texture2d(
-          gli::FORMAT_RGBA16_SFLOAT_PACK16,
-          gli::texture2d::extent_type(cubeMapRes.x * 4u, cubeMapRes.y * 3u),
-          1u);
-#endif // STORE_ATLAS_DDS
-
       gli::texture_cube texCube =
           gli::texture_cube(gli::FORMAT_RGBA16_SFLOAT_PACK16, cubeMapRes, 1u);
 
@@ -299,25 +292,6 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
 
         memcpy(texCube.data(0u, atlasIndexToFaceIdx[atlasIdx], 0u), sceneMemory,
                faceSizeInBytes);
-
-#if defined(STORE_ATLAS_DDS)
-        const glm::uvec2 atlasIndex = atlasIndices[atlasIdx];
-        for (uint32_t scanLineIdx = 0u; scanLineIdx < cubeMapRes.y;
-             ++scanLineIdx)
-        {
-          const uint32_t memOffsetInBytes =
-              ((atlasIndex.y * cubeMapRes.y * (cubeMapRes.x * 4u)) +
-               scanLineIdx * (cubeMapRes.x * 4u) +
-               atlasIndex.x * cubeMapRes.x) *
-              sizeof(uint32_t) * 2u;
-
-          const uint32_t scanLineSizeInBytes =
-              sizeof(uint32_t) * 2u * cubeMapRes.x;
-          memcpy((uint8_t*)tex.data() + memOffsetInBytes,
-                 sceneMemory + scanLineIdx * scanLineSizeInBytes,
-                 scanLineSizeInBytes);
-        }
-#endif // STORE_ATLAS_DDS
       }
 
       if (specProbeRef.isValid())
@@ -356,30 +330,6 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
 
       if (irradProbeRef.isValid())
       {
-#if defined(STORE_ATLAS_DDS)
-        {
-          const _INTR_STRING filePath =
-              "media/irradiance_probes/" +
-              Entity::EntityManager::_name(currentEntity).getString() +
-              "_cube_atlas_" + timeString + ".dds";
-          gli::save_dds(tex, filePath.c_str());
-        }
-
-#endif // STORE_ATLAS_DDS
-
-#if defined(STORE_CUBE_DDS)
-        {
-          _INTR_STRING timeString = StringUtil::toString(p_Time);
-          StringUtil::replace(timeString, ".", "-");
-
-          const _INTR_STRING filePath =
-              "media/irradiance_probes/" +
-              Entity::EntityManager::_name(currentEntity).getString() +
-              "_cube_" + timeString + ".dds";
-          gli::save_dds(texCube, filePath.c_str());
-        }
-#endif // STORE_CUBE_DDS
-
         // Generate and store SH irrad.
         Components::IrradianceProbeManager::_descSHs(irradProbeRef)
             .push_back(IBL::project(texCube));
