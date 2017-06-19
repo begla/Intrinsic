@@ -724,7 +724,7 @@ void IntrinsicEdNodeViewTreeWidget::onCurrentlySelectedEntityChanged(
   }
 }
 
-const uint32_t _shTimeSamples = 8u;
+const uint32_t _probeTimeSamples = 8u;
 
 void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
 {
@@ -744,8 +744,8 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
     RenderSystem::_customBackbufferDimensions = cubeMapRes;
     RenderSystem::resizeSwapChain(true);
 
-    for (uint32_t i = 0u; i < _shTimeSamples; ++i)
-      IBL::captureProbes({probeNodeRef}, i == 0, i / (float)_shTimeSamples);
+    for (uint32_t i = 0u; i < _probeTimeSamples; ++i)
+      IBL::captureProbes({probeNodeRef}, i == 0, i / (float)_probeTimeSamples);
 
     RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
     RenderSystem::resizeSwapChain(true);
@@ -774,8 +774,8 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureAllProbes()
       probeNodes.push_back(nodeRef);
   }
 
-  for (uint32_t i = 0u; i < _shTimeSamples; ++i)
-    IBL::captureProbes(probeNodes, i == 0, i / (float)_shTimeSamples);
+  for (uint32_t i = 0u; i < _probeTimeSamples; ++i)
+    IBL::captureProbes(probeNodes, i == 0, i / (float)_probeTimeSamples);
 
   RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
   RenderSystem::resizeSwapChain(true);
