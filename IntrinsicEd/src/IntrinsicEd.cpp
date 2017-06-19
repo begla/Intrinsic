@@ -144,7 +144,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     stringToIconPathMapping["IrradianceProbe"] =
         ":/Icons/icons/weather/clouds-and-sun.png";
     stringToIconPathMapping["SpecularProbe"] =
-      ":/Icons/icons/weather/clouds-and-sun.png";
+        ":/Icons/icons/weather/clouds-and-sun.png";
     stringToIconPathMapping["NodeLocalTransform"] =
         ":/Icons/icons/cad/rotate-1.png";
     stringToIconPathMapping["NodeWorldTransform"] =

@@ -362,11 +362,9 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
         Components::IrradianceProbeManager::getComponentForEntity(
             currentEntity);
     Components::SpecularProbeRef specProbeRef =
-      Components::SpecularProbeManager::getComponentForEntity(
-                                                                currentEntity);
+        Components::SpecularProbeManager::getComponentForEntity(currentEntity);
 
-    if (irradProbeRef.isValid()
-        || specProbeRef.isValid())
+    if (irradProbeRef.isValid() || specProbeRef.isValid())
     {
       contextMenu->addSeparator();
 
