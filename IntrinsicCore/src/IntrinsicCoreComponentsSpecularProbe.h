@@ -34,12 +34,16 @@ struct SpecularProbeData : Dod::Components::ComponentDataBase
     descPriority.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
     descFalloffRangePerc.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
     descFalloffExponent.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+
+    descSpecularTextureNames.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
   }
 
   _INTR_ARRAY(float) descRadius;
   _INTR_ARRAY(float) descFalloffRangePerc;
   _INTR_ARRAY(float) descFalloffExponent;
   _INTR_ARRAY(uint32_t) descPriority;
+
+  _INTR_ARRAY(_INTR_ARRAY(Name)) descSpecularTextureNames;
 };
 
 struct SpecularProbeManager
@@ -106,6 +110,22 @@ struct SpecularProbeManager
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(SpecularProbe),
                           _N(float), _descPriority(p_Ref), false, false),
         p_Document.GetAllocator());
+
+    if (!p_GenerateDesc)
+    {
+      rapidjson::Value specularTextureNames =
+          rapidjson::Value(rapidjson::kArrayType);
+      for (uint32_t i = 0u; i < _descSpecularTextureNames(p_Ref).size(); ++i)
+      {
+        specularTextureNames.PushBack(
+            _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(SpecularProbe),
+                              _N(string), _descSpecularTextureNames(p_Ref)[i],
+                              false, false),
+            p_Document.GetAllocator());
+      }
+      p_Properties.AddMember("specularTextureNames", specularTextureNames,
+                             p_Document.GetAllocator());
+    }
   }
 
   // <-
@@ -126,6 +146,21 @@ struct SpecularProbeManager
     if (p_Properties.HasMember("priority"))
       _descPriority(p_Ref) =
           (uint32_t)JsonHelper::readPropertyFloat(p_Properties["priority"]);
+
+    if (!p_GenerateDesc)
+    {
+      if (p_Properties.HasMember("specularTextureNames"))
+      {
+        _descSpecularTextureNames(p_Ref).clear();
+        const rapidjson::Value& specularTextureNames =
+            p_Properties["specularTextureNames"];
+        for (uint32_t i = 0u; i < specularTextureNames.Size(); ++i)
+        {
+          _descSpecularTextureNames(p_Ref).push_back(
+              JsonHelper::readPropertyName(specularTextureNames[i]));
+        }
+      }
+    }
   }
 
   // <-
@@ -163,6 +198,12 @@ struct SpecularProbeManager
   _INTR_INLINE static float& _descFalloffExp(SpecularProbeRef p_Ref)
   {
     return _data.descFalloffExponent[p_Ref._id];
+  }
+
+  _INTR_INLINE static _INTR_ARRAY(Name) &
+      _descSpecularTextureNames(SpecularProbeRef p_Ref)
+  {
+    return _data.descSpecularTextureNames[p_Ref._id];
   }
 };
 }
