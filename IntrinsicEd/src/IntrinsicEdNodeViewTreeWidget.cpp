@@ -757,13 +757,25 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureAllProbes()
   using namespace RV;
 
   const glm::uvec2 cubeMapRes =
-      RV::RenderSystem::getAbsoluteRenderSize(RV::RenderSize::kCubemap);
+      RenderSystem::getAbsoluteRenderSize(RenderSize::kCubemap);
   RenderSystem::_customBackbufferDimensions = cubeMapRes;
   RenderSystem::resizeSwapChain(true);
 
+  Components::NodeRefArray probeNodes;
+  for (uint32_t i = 0u;
+       i < (uint32_t)Components::NodeManager::_activeRefs.size(); ++i)
+  {
+    Components::NodeRef nodeRef = Components::NodeManager::_activeRefs[i];
+    Entity::EntityRef entityRef = Components::NodeManager::_entity(nodeRef);
+    Components::IrradianceProbeRef irradProbeRef =
+        Components::IrradianceProbeManager::getComponentForEntity(entityRef);
+
+    if (irradProbeRef.isValid())
+      probeNodes.push_back(nodeRef);
+  }
+
   for (uint32_t i = 0u; i < _shTimeSamples; ++i)
-    IBL::captureProbes(Components::IrradianceProbeManager::_activeRefs, i == 0,
-                       i / (float)_shTimeSamples);
+    IBL::captureProbes(probeNodes, i == 0, i / (float)_shTimeSamples);
 
   RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
   RenderSystem::resizeSwapChain(true);
