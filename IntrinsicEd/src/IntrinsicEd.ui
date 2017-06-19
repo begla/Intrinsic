@@ -176,6 +176,7 @@
    <addaction name="actionCreateLight"/>
    <addaction name="actionCreateDecal"/>
    <addaction name="actionCreateIrradProbe"/>
+   <addaction name="actionCreateSpecProbe"/>
   </widget>
   <widget class="QToolBar" name="devToolBar">
    <property name="enabled">
@@ -745,6 +746,18 @@
    </property>
    <property name="toolTip">
     <string>Create Irradiance Probe</string>
+   </property>
+  </action>
+  <action name="actionCreateSpecProbe">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/weather/clouds-and-sun.png</normaloff>:/Icons/icons/weather/clouds-and-sun.png</iconset>
+   </property>
+   <property name="text">
+    <string>Spec. Probe</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Specular Probe</string>
    </property>
   </action>
  </widget>

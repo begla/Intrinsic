@@ -186,6 +186,7 @@ namespace CComponents = Intrinsic::Core::Components;
 #include "IntrinsicCoreComponentsPlayer.h"
 #include "IntrinsicCoreComponentsLight.h"
 #include "IntrinsicCoreComponentsIrradianceProbe.h"
+#include "IntrinsicCoreComponentsSpecularProbe.h"
 #include "IntrinsicCoreComponentsDecal.h"
 
 #include "IntrinsicCoreWorld.h"
