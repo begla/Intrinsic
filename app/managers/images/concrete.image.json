@@ -3,7 +3,7 @@
     "properties": {
         "name": "concrete",
         "imageType": 1,
-        "imageFormat": 10,
+        "imageFormat": 8,
         "fileName": "concrete.dds",
         "avgNormLength": 1.0
     }

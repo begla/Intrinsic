@@ -3,7 +3,7 @@
     "properties": {
         "name": "white",
         "imageType": 1,
-        "imageFormat": 10,
+        "imageFormat": 8,
         "fileName": "white.dds",
         "avgNormLength": 1.0
     }

@@ -3,7 +3,7 @@
     "properties": {
         "name": "lens_dirt",
         "imageType": 1,
-        "imageFormat": 10,
+        "imageFormat": 8,
         "fileName": "lens_dirt.dds",
         "avgNormLength": 1.0
     }

@@ -3,7 +3,7 @@
     "properties": {
         "name": "checkerboard",
         "imageType": 1,
-        "imageFormat": 10,
+        "imageFormat": 8,
         "fileName": "checkerboard.dds",
         "avgNormLength": 1.0
     }

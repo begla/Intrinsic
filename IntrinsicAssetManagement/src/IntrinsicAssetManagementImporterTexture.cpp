@@ -35,7 +35,10 @@ void ImporterTexture::destroy() {}
 
 void compressTexture(const _INTR_STRING& p_Args)
 {
-  const _INTR_STRING cmd = "tools\\nvtt\\nvcompress.exe " + p_Args;
+  _INTR_STRING adjustedArgs = p_Args;
+  StringUtil::replace(adjustedArgs, "/", "\\\\");
+
+  const _INTR_STRING cmd = "tools\\dxtexconv\\texconv.exe -y " + adjustedArgs;
   std::system(cmd.c_str());
 }
 
@@ -89,34 +92,33 @@ void ImporterTexture::importColorTextureFromFile(const _INTR_STRING& p_FilePath)
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
-  compressTexture("-bc1 " + p_FilePath + " " + mediaPath + "/" + fileName +
-                  ".dds");
+  compressTexture("-f BC1_UNORM -o " + mediaPath + " " + p_FilePath);
   ImageRef imgRef = createTexture(fileName, RV::Format::kBC1RGBUNorm);
 }
 
 // <-
 
-void ImporterTexture::importAlebdoTextureFromFile(
+void ImporterTexture::importAlbedoTextureFromFile(
     const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
-  compressTexture("-bc1 " + p_FilePath + " " + mediaPath + "/" + fileName +
-                  ".dds");
+  compressTexture("-f BC1_UNORM_SRGB -srgbi -o " + mediaPath + " " +
+                  p_FilePath);
   ImageRef imgRef = createTexture(fileName, RV::Format::kBC1RGBSrgb);
 }
 
 // <-
 
-void ImporterTexture::importAlebdoAlphaTextureFromFile(
+void ImporterTexture::importAlbedoAlphaTextureFromFile(
     const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
-  compressTexture("-bc2 " + p_FilePath + " " + mediaPath + "/" + fileName +
-                  ".dds");
+  compressTexture("-f BC2_UNORM_SRGB -srgbi -o " + mediaPath + " " +
+                  p_FilePath);
   ImageRef imgRef = createTexture(fileName, RV::Format::kBC2Srgb);
 }
 
@@ -128,8 +130,7 @@ void ImporterTexture::importNormalMapTextureFromFile(
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
-  compressTexture("-bc1 " + p_FilePath + " " + mediaPath + "/" + fileName +
-                  ".dds");
+  compressTexture("-f BC1_UNORM -o " + mediaPath + " " + p_FilePath);
   ImageRef imgRef = createTexture(fileName, RV::Format::kBC1RGBUNorm);
 
   // Calc. avg. normal length for specular AA

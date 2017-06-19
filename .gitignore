@@ -38,5 +38,7 @@ app/media/shaders/*
 app/crash_dumps
 app/media/irradiance_probes/*
 !app/media/irradiance_probes/KEEP_ME
+app/media/specular_probes/*
+!app/media/specular_probes/KEEP_ME
 
 app/Intrinsic.log

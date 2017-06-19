@@ -3,7 +3,7 @@
     "properties": {
         "name": "house_01",
         "imageType": 1,
-        "imageFormat": 10,
+        "imageFormat": 8,
         "fileName": "house_01.dds",
         "avgNormLength": 1.0
     }

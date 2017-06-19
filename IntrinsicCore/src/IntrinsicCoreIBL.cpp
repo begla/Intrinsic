@@ -319,7 +319,7 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs,
       }
 
       // TODO: WIP specular probes
-      if (/*specularProbeRef.isValid()*/ false)
+      if (/*specularProbeRef.isValid()*/false)
       {
         // Output texture
         gli::texture_cube filteredTexCube =
@@ -336,10 +336,19 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs,
         StringUtil::replace(timeString, ".", "-");
 
         const _INTR_STRING filePath =
-            "media/irradiance_probes/" +
+            "media/specular_probes/" +
             Entity::EntityManager::_name(currentEntity).getString() +
             "_cube_filtered_" + timeString + ".dds";
         gli::save_dds(filteredTexCube, filePath.c_str());
+
+        // Compress to BCH6
+        {
+          _INTR_STRING adjustedArgs = "-f BC6H_UF16 -o media/specular_probes " + filePath;
+          StringUtil::replace(adjustedArgs, "/", "\\\\");
+
+          const _INTR_STRING cmd = "tools\\dxtexconv\\texconv.exe -y " + adjustedArgs;
+          std::system(cmd.c_str());
+        }
       }
 
       if (irradProbeRef.isValid())
