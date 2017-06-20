@@ -258,6 +258,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   QObject::connect(_ui.actionShow_Debug_Geometry_Context_Menu,
                    SIGNAL(triggered()), this,
                    SLOT(onShowDebugGeometryContextMenu()));
+  QObject::connect(_ui.actionCaptureAllProbes, SIGNAL(triggered()), this, SLOT(onCaptureAllProbes()));
 
   QObject::connect(_ui.actionCompile_Shaders, SIGNAL(triggered()), this,
                    SLOT(onCompileShaders()));
@@ -912,3 +913,38 @@ int IntrinsicEd::enterMainLoop()
 }
 
 void IntrinsicEd::tickMainLoop() { TaskManager::executeTasks(); }
+
+void IntrinsicEd::onCaptureAllProbes()
+{
+  using namespace RV;
+
+  static const uint32_t _probeTimeSamples = 8u;
+
+  const glm::uvec2 cubeMapRes =
+      RenderSystem::getAbsoluteRenderSize(RenderSize::kCubemap);
+  RenderSystem::_customBackbufferDimensions = cubeMapRes;
+  RenderSystem::resizeSwapChain(true);
+
+  Components::NodeRefArray probeNodes;
+  for (uint32_t i = 0u;
+       i < (uint32_t)Components::NodeManager::_activeRefs.size(); ++i)
+  {
+    Components::NodeRef nodeRef = Components::NodeManager::_activeRefs[i];
+    Entity::EntityRef entityRef = Components::NodeManager::_entity(nodeRef); 
+
+    Components::IrradianceProbeRef irradProbeRef =
+        Components::IrradianceProbeManager::getComponentForEntity(entityRef);
+    Components::SpecularProbeRef specProbeRef =
+      Components::SpecularProbeManager::getComponentForEntity(entityRef);
+
+    if (irradProbeRef.isValid()
+        || specProbeRef.isValid())
+      probeNodes.push_back(nodeRef);
+  }
+
+  for (uint32_t i = 0u; i < _probeTimeSamples; ++i)
+    IBL::captureProbes(probeNodes, i == 0, i / (float)_probeTimeSamples);
+
+  RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
+  RenderSystem::resizeSwapChain(true);
+}

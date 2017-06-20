@@ -200,6 +200,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionCaptureAllProbes"/>
+   <addaction name="separator"/>
    <addaction name="actionShow_Debug_Geometry_Context_Menu"/>
    <addaction name="actionOpen_Microprofile"/>
   </widget>
@@ -758,6 +760,18 @@
    </property>
    <property name="toolTip">
     <string>Create Specular Probe</string>
+   </property>
+  </action>
+  <action name="actionCaptureAllProbes">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/weather/clouds-and-sun.png</normaloff>:/Icons/icons/weather/clouds-and-sun.png</iconset>
+   </property>
+   <property name="text">
+    <string>Capture Probes</string>
+   </property>
+   <property name="toolTip">
+    <string>Capture (All) Probes</string>
    </property>
   </action>
  </widget>

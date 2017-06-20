@@ -373,12 +373,6 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
       contextMenu->addAction(captureProbe);
       QObject::connect(captureProbe, SIGNAL(triggered()), this,
                        SLOT(onCaptureProbe()));
-
-      QAction* captureAllProbes = new QAction(
-          QIcon(":/Icons/icons/various/idea.png"), "Capture ALL Probes", this);
-      contextMenu->addAction(captureAllProbes);
-      QObject::connect(captureAllProbes, SIGNAL(triggered()), this,
-                       SLOT(onCaptureAllProbes()));
     }
 
     contextMenu->addSeparator();
@@ -725,7 +719,6 @@ void IntrinsicEdNodeViewTreeWidget::onCurrentlySelectedEntityChanged(
   }
 }
 
-const uint32_t _probeTimeSamples = 8u;
 
 void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
 {
@@ -734,6 +727,8 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
   Components::IrradianceProbeRef irradProbeRef;
   Components::NodeRef probeNodeRef;
   Entity::EntityRef currentEntity;
+
+  static const uint32_t _probeTimeSamples = 8u;
 
   QTreeWidgetItem* currIt = currentItem();
   if (currIt)
@@ -753,35 +748,3 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
   }
 }
 
-void IntrinsicEdNodeViewTreeWidget::onCaptureAllProbes()
-{
-  using namespace RV;
-
-  const glm::uvec2 cubeMapRes =
-      RenderSystem::getAbsoluteRenderSize(RenderSize::kCubemap);
-  RenderSystem::_customBackbufferDimensions = cubeMapRes;
-  RenderSystem::resizeSwapChain(true);
-
-  Components::NodeRefArray probeNodes;
-  for (uint32_t i = 0u;
-       i < (uint32_t)Components::NodeManager::_activeRefs.size(); ++i)
-  {
-    Components::NodeRef nodeRef = Components::NodeManager::_activeRefs[i];
-    Entity::EntityRef entityRef = Components::NodeManager::_entity(nodeRef); 
-
-    Components::IrradianceProbeRef irradProbeRef =
-        Components::IrradianceProbeManager::getComponentForEntity(entityRef);
-    Components::SpecularProbeRef specProbeRef =
-      Components::SpecularProbeManager::getComponentForEntity(entityRef);
-
-    if (irradProbeRef.isValid()
-        || specProbeRef.isValid())
-      probeNodes.push_back(nodeRef);
-  }
-
-  for (uint32_t i = 0u; i < _probeTimeSamples; ++i)
-    IBL::captureProbes(probeNodes, i == 0, i / (float)_probeTimeSamples);
-
-  RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
-  RenderSystem::resizeSwapChain(true);
-}
