@@ -22,16 +22,17 @@
 
 #define KERNEL_RADIUS uboPerInstance.blurParams.x
 
-layout (binding = 0) uniform PerInstance
+layout(binding = 0) uniform PerInstance
 {
   vec4 blurParams;
   uvec4 arrayIdx;
-} uboPerInstance;
+}
+uboPerInstance;
 
-layout (binding = 1) uniform sampler2DArray inputTex;
+layout(binding = 1) uniform sampler2DArray inputTex;
 
-layout (location = 0) in vec2 inUV0;
-layout (location = 0) out vec4 outColor;
+layout(location = 0) in vec2 inUV0;
+layout(location = 0) out vec4 outColor;
 
 vec4 blur(vec2 uv, inout float w_total)
 {
@@ -41,25 +42,25 @@ vec4 blur(vec2 uv, inout float w_total)
 
 void main()
 {
-	vec4 center_c = texture(inputTex, vec3(inUV0, uboPerInstance.arrayIdx.x));
+  vec4 center_c = texture(inputTex, vec3(inUV0, uboPerInstance.arrayIdx.x));
 
   vec2 resDir = textureSize(inputTex, 0).xy;
   resDir = 1.0 / resDir * uboPerInstance.blurParams.zw;
-  
-  vec4  c_total = center_c;
+
+  vec4 c_total = center_c;
   float w_total = 1.0;
-  
+
   for (float r = 1; r <= KERNEL_RADIUS; ++r)
   {
     vec2 uv = inUV0 + resDir * r;
-    c_total += blur(uv, w_total);  
+    c_total += blur(uv, w_total);
   }
-  
+
   for (float r = 1; r <= KERNEL_RADIUS; ++r)
   {
     vec2 uv = inUV0 - resDir * r;
-    c_total += blur(uv, w_total);  
+    c_total += blur(uv, w_total);
   }
 
-  outColor = c_total/w_total;
+  outColor = c_total / w_total;
 }

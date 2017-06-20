@@ -16,17 +16,22 @@
 #define VOLUME_DIMENSIONS vec3(160.0, 90.0, VOLUME_DEPTH)
 #define VOLUMETRIC_LIGHTING_RANGE_NEAR 1.0
 #define VOLUMETRIC_LIGHTING_RANGE_FAR 500.0
-#define VOLUMETRIC_LIGHTING_RANGE (VOLUMETRIC_LIGHTING_RANGE_FAR - VOLUMETRIC_LIGHTING_RANGE_NEAR)
+#define VOLUMETRIC_LIGHTING_RANGE                                              \
+  (VOLUMETRIC_LIGHTING_RANGE_FAR - VOLUMETRIC_LIGHTING_RANGE_NEAR)
 #define DEPTH_EXP 3.0
 
 vec3 screenSpacePosToCellIndex(vec3 ssPos)
 {
-  return clamp(ssPos, 0.0, 1.0) * vec3((VOLUME_DIMENSIONS.x - 1) / VOLUME_DIMENSIONS.x, 
-    (VOLUME_DIMENSIONS.y - 1) / VOLUME_DIMENSIONS.y, (VOLUME_DIMENSIONS.z - 1) / VOLUME_DIMENSIONS.z) 
-  + vec3(0.5 / VOLUME_DIMENSIONS.x, 0.5 / VOLUME_DIMENSIONS.y, 0.5 / VOLUME_DIMENSIONS.z);
+  return clamp(ssPos, 0.0, 1.0) *
+             vec3((VOLUME_DIMENSIONS.x - 1) / VOLUME_DIMENSIONS.x,
+                  (VOLUME_DIMENSIONS.y - 1) / VOLUME_DIMENSIONS.y,
+                  (VOLUME_DIMENSIONS.z - 1) / VOLUME_DIMENSIONS.z) +
+         vec3(0.5 / VOLUME_DIMENSIONS.x, 0.5 / VOLUME_DIMENSIONS.y,
+              0.5 / VOLUME_DIMENSIONS.z);
 }
 
-vec3 screenToViewSpacePos(vec2 ssPos, vec3 eyeX, vec3 eyeY, vec3 eyeZ, float linDepth, mat4 projMatrix)
+vec3 screenToViewSpacePos(vec2 ssPos, vec3 eyeX, vec3 eyeY, vec3 eyeZ,
+                          float linDepth, mat4 projMatrix)
 {
   const vec3 eyeRay = eyeX.xyz * ssPos.xxx + eyeY.xyz * ssPos.yyy + eyeZ.xyz;
   return eyeRay * linDepth;
@@ -34,15 +39,20 @@ vec3 screenToViewSpacePos(vec2 ssPos, vec3 eyeX, vec3 eyeY, vec3 eyeZ, float lin
 
 vec3 cellIndexToScreenSpacePos(vec3 cellIdx)
 {
-  return cellIdx * vec3(2.0 / VOLUME_DIMENSIONS.x, 2.0 / VOLUME_DIMENSIONS.y, 1.0 / VOLUME_DIMENSIONS.z) + vec3(-1.0, -1.0, 0.0);
+  return cellIdx * vec3(2.0 / VOLUME_DIMENSIONS.x, 2.0 / VOLUME_DIMENSIONS.y,
+                        1.0 / VOLUME_DIMENSIONS.z) +
+         vec3(-1.0, -1.0, 0.0);
 }
 
 float volumeZToDepth(float volumePosZ)
 {
-    return pow(volumePosZ, DEPTH_EXP) * VOLUMETRIC_LIGHTING_RANGE + VOLUMETRIC_LIGHTING_RANGE_NEAR;
+  return pow(volumePosZ, DEPTH_EXP) * VOLUMETRIC_LIGHTING_RANGE +
+         VOLUMETRIC_LIGHTING_RANGE_NEAR;
 }
 
 float depthToVolumeZ(float depth)
 {
-    return pow((abs(depth) - VOLUMETRIC_LIGHTING_RANGE_NEAR) / VOLUMETRIC_LIGHTING_RANGE, 1.0 / DEPTH_EXP);
+  return pow((abs(depth) - VOLUMETRIC_LIGHTING_RANGE_NEAR) /
+                 VOLUMETRIC_LIGHTING_RANGE,
+             1.0 / DEPTH_EXP);
 }

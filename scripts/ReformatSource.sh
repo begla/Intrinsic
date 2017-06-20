@@ -15,5 +15,6 @@ clang-format -style=file -i \
  ../IntrinsicAssetManagement/src/stdafx_assets.h \
  ../IntrinsicAssetManagement/src/IntrinsicAssetManagement*.h \
  ../IntrinsicAssetManagement/src/IntrinsicAssetManagement*.cpp \
+ ../app/assets/shaders/*.glsl \
 
 sleep 1

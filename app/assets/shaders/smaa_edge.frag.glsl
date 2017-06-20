@@ -18,11 +18,11 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
-layout (binding = 2) uniform sampler2D inputTex;
+layout(binding = 2) uniform sampler2D inputTex;
 
-layout (location = 0) in vec2 inUV0;
-layout (location = 1) in vec4 inOffsets[3];
-layout (location = 0) out vec4 outColor;
+layout(location = 0) in vec2 inUV0;
+layout(location = 1) in vec4 inOffsets[3];
+layout(location = 0) out vec4 outColor;
 
 #include "ubos.inc.glsl"
 
@@ -34,5 +34,6 @@ PER_INSTANCE_DATA_SMAA_FRAG;
 
 void main()
 {
-  outColor = vec4(SMAAColorEdgeDetectionPS(inUV0, inOffsets, inputTex), 0.0, 0.0);
+  outColor =
+      vec4(SMAAColorEdgeDetectionPS(inUV0, inOffsets, inputTex), 0.0, 0.0);
 }

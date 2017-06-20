@@ -18,12 +18,12 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
-layout (binding = 2) uniform sampler2D inputTex;
-layout (binding = 3) uniform sampler2D blendTex;
+layout(binding = 2) uniform sampler2D inputTex;
+layout(binding = 3) uniform sampler2D blendTex;
 
-layout (location = 0) in vec2 inUV0;
-layout (location = 1) in vec4 inOffset;
-layout (location = 0) out vec4 outColor;
+layout(location = 0) in vec2 inUV0;
+layout(location = 1) in vec4 inOffset;
+layout(location = 0) out vec4 outColor;
 
 #include "ubos.inc.glsl"
 

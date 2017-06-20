@@ -17,22 +17,20 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-out gl_PerVertex
-{
-  vec4 gl_Position;
-};
+out gl_PerVertex { vec4 gl_Position; };
 
-layout (location = 0) in vec3 inPosition;
-layout (location = 1) in vec4 inColor;
+layout(location = 0) in vec3 inPosition;
+layout(location = 1) in vec4 inColor;
 
-layout (location = 0) out vec3 outNormal;
-layout (location = 1) out vec3 outColor;
+layout(location = 0) out vec3 outNormal;
+layout(location = 1) out vec3 outColor;
 
-layout (binding = 0) uniform PerInstance
+layout(binding = 0) uniform PerInstance
 {
   mat4 worldViewProjMatrix;
   mat4 viewMatrix;
-} uboPerInstance;
+}
+uboPerInstance;
 
 void main()
 {

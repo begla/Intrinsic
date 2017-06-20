@@ -21,34 +21,32 @@
 #define AVG_LUM_THREADS 16u
 #define LUM_AND_BRIGHT_THREADS 8u
 
-layout (binding = 0) uniform PerInstance
+layout(binding = 0) uniform PerInstance
 {
   uvec4 dim;
   vec4 data;
-} uboPerInstance;
+}
+uboPerInstance;
 
-layout (binding = 1, r32f) uniform image2D inOutLumTex;
-layout (binding = 2) buffer AvgLum
-{
-  float avgLum[];
-};
+layout(binding = 1, r32f) uniform image2D inOutLumTex;
+layout(binding = 2) buffer AvgLum { float avgLum[]; };
 
 shared float temp0[AVG_LUM_THREADS];
 
-layout (local_size_x = AVG_LUM_THREADS, local_size_y = 1) in;
+layout(local_size_x = AVG_LUM_THREADS, local_size_y = 1) in;
 void main()
 {
   float totalLuminance = 0.0f;
 
-  for(uint i=0; i<ceil(float(uboPerInstance.dim.x) / AVG_LUM_THREADS); ++i)
+  for (uint i = 0; i < ceil(float(uboPerInstance.dim.x) / AVG_LUM_THREADS); ++i)
   {
-    for(uint j=0; j<uboPerInstance.dim.y; ++j)
+    for (uint j = 0; j < uboPerInstance.dim.y; ++j)
     {
       uint x = gl_GlobalInvocationID.x + AVG_LUM_THREADS * i;
 
       if (x < uboPerInstance.dim.x)
       {
-        totalLuminance += imageLoad(inOutLumTex, ivec2(x, j)).x;   
+        totalLuminance += imageLoad(inOutLumTex, ivec2(x, j)).x;
       }
     }
   }
@@ -58,14 +56,18 @@ void main()
   groupMemoryBarrier();
   barrier();
 
-  if(gl_GlobalInvocationID.x == 0)
+  if (gl_GlobalInvocationID.x == 0)
   {
-    for(uint i=1; i<AVG_LUM_THREADS; ++i)
+    for (uint i = 1; i < AVG_LUM_THREADS; ++i)
     {
       totalLuminance += temp0[i];
     }
 
-    const float blendFactor = uboPerInstance.data.y > 0.0 ? uboPerInstance.data.y : uboPerInstance.data.x * 1.0;
-    avgLum[0] = (1.0 - blendFactor) * avgLum[0] + blendFactor * (totalLuminance / (uboPerInstance.dim.x * uboPerInstance.dim.y));
+    const float blendFactor = uboPerInstance.data.y > 0.0
+                                  ? uboPerInstance.data.y
+                                  : uboPerInstance.data.x * 1.0;
+    avgLum[0] = (1.0 - blendFactor) * avgLum[0] +
+                blendFactor * (totalLuminance /
+                               (uboPerInstance.dim.x * uboPerInstance.dim.y));
   }
 }

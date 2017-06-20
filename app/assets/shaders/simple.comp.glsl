@@ -18,8 +18,6 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
-layout (local_size_x = 1, local_size_y = 1) in;
+layout(local_size_x = 1, local_size_y = 1) in;
 
-void main()
-{
-}
+void main() {}

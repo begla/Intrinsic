@@ -20,10 +20,7 @@
 
 #include "gbuffer_vertex.inc.glsl"
 
-out gl_PerVertex
-{
-  vec4 gl_Position;
-};
+out gl_PerVertex { vec4 gl_Position; };
 
 // Ubos
 PER_INSTANCE_UBO;
@@ -32,24 +29,24 @@ PER_INSTANCE_UBO;
 INPUT();
 
 // Output
-layout (location = 0) out vec2 outUV0;
+layout(location = 0) out vec2 outUV0;
 
 const float maxNormalLen = 200.0;
 
 void main()
 {
   const vec3 localPos = inPosition;
-  vec3 worldNormal = (uboPerInstance.worldMatrix 
-    * vec4(inNormal.xyz, 0.0)).xyz;
+  vec3 worldNormal = (uboPerInstance.worldMatrix * vec4(inNormal.xyz, 0.0)).xyz;
 
   const float worldNormalLen = length(worldNormal);
   if (worldNormalLen > maxNormalLen)
   {
     worldNormal = worldNormal / worldNormalLen * maxNormalLen;
   }
-  
-  const vec3 worldPos = (uboPerInstance.worldMatrix 
-    * vec4(localPos.xyz, 1.0)).xyz - worldNormal * 0.07; // Shadow bias
+
+  const vec3 worldPos =
+      (uboPerInstance.worldMatrix * vec4(localPos.xyz, 1.0)).xyz -
+      worldNormal * 0.07; // Shadow bias
   gl_Position = uboPerInstance.viewProjMatrix * vec4(worldPos, 1.0);
   outUV0 = inUV0;
 }

@@ -17,26 +17,30 @@
 
 // https://github.com/playdeadgames/temporal/blob/master/Assets/Shaders/IncNoise.cginc
 // Normalized random: [0,1[
-float PDnrand(vec2 n) 
+float PDnrand(vec2 n)
 {
-  return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* 43758.5453);
+  return fract(sin(dot(n.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
-vec2 PDnrand2(vec2 n) 
+vec2 PDnrand2(vec2 n)
 {
-  return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* vec2(43758.5453, 28001.8384));
+  return fract(sin(dot(n.xy, vec2(12.9898, 78.233))) *
+               vec2(43758.5453, 28001.8384));
 }
-vec3 PDnrand3(vec2 n) 
+vec3 PDnrand3(vec2 n)
 {
-  return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* vec3(43758.5453, 28001.8384, 50849.4141));
+  return fract(sin(dot(n.xy, vec2(12.9898, 78.233))) *
+               vec3(43758.5453, 28001.8384, 50849.4141));
 }
-vec4 PDnrand4(vec2 n) 
+vec4 PDnrand4(vec2 n)
 {
-  return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* vec4(43758.5453, 28001.8384, 50849.4141, 12996.89));
+  return fract(sin(dot(n.xy, vec2(12.9898, 78.233))) *
+               vec4(43758.5453, 28001.8384, 50849.4141, 12996.89));
 }
 
 // <-
 
-float calcScreenSpaceScale(vec3 worldPosition, mat4 viewProjMatrix, float height)
+float calcScreenSpaceScale(vec3 worldPosition, mat4 viewProjMatrix,
+                           float height)
 {
   vec4 p0Proj = viewProjMatrix * vec4(worldPosition, 1.0f);
   p0Proj /= p0Proj.w;

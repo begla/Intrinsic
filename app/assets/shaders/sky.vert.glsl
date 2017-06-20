@@ -20,10 +20,7 @@
 
 #include "gbuffer_vertex.inc.glsl"
 
-out gl_PerVertex
-{
-  vec4 gl_Position;
-};
+out gl_PerVertex { vec4 gl_Position; };
 
 // Ubos
 PER_INSTANCE_UBO;
@@ -32,10 +29,10 @@ PER_INSTANCE_UBO;
 INPUT();
 
 // Output
-layout (location = 0) out vec2 outUV0;
-layout (location = 1) out vec3 outNormal;
-layout (location = 2) out vec3 outPosVS;
-layout (location = 3) out vec3 outUpVS;
+layout(location = 0) out vec2 outUV0;
+layout(location = 1) out vec3 outNormal;
+layout(location = 2) out vec3 outPosVS;
+layout(location = 3) out vec3 outUpVS;
 
 void main()
 {

@@ -17,22 +17,19 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-out gl_PerVertex
-{
-  vec4 gl_Position;
-};
+out gl_PerVertex { vec4 gl_Position; };
 
-layout (location = 0) in vec3 inPosition;
-layout (location = 1) in vec2 inUV0;
-layout (location = 2) in vec3 inNormal;
-layout (location = 3) in vec3 inTangent;
-layout (location = 4) in vec3 inBinormal;
-layout (location = 5) in vec4 inColor;
+layout(location = 0) in vec3 inPosition;
+layout(location = 1) in vec2 inUV0;
+layout(location = 2) in vec3 inNormal;
+layout(location = 3) in vec3 inTangent;
+layout(location = 4) in vec3 inBinormal;
+layout(location = 5) in vec4 inColor;
 
-layout (location = 0) out vec3 outNormal;
-layout (location = 1) out vec3 outColor;
+layout(location = 0) out vec3 outNormal;
+layout(location = 1) out vec3 outColor;
 
-layout (binding = 0) uniform PerInstance
+layout(binding = 0) uniform PerInstance
 {
   mat4 worldMatrix;
   mat4 worldViewProjMatrix;
@@ -41,7 +38,8 @@ layout (binding = 0) uniform PerInstance
   vec4 colorTintX;
   vec4 colorTintY;
   vec4 colorTintZ;
-} uboPerInstance;
+}
+uboPerInstance;
 
 void main()
 {
@@ -49,21 +47,17 @@ void main()
 
   outColor = inColor.xyz;
 
-  if (abs(localPos.x) > 0.1
-    && abs(localPos.y) < 0.25
-    && abs(localPos.y) < 0.25)
+  if (abs(localPos.x) > 0.1 && abs(localPos.y) < 0.25 && abs(localPos.y) < 0.25)
   {
     outColor *= uboPerInstance.colorTintX.xyz;
   }
-  else if (abs(localPos.y) > 0.1
-    && abs(localPos.x) < 0.25
-    && abs(localPos.z) < 0.25)
+  else if (abs(localPos.y) > 0.1 && abs(localPos.x) < 0.25 &&
+           abs(localPos.z) < 0.25)
   {
     outColor *= uboPerInstance.colorTintY.xyz;
   }
-  else if (abs(localPos.z) > 0.1
-    && abs(localPos.x) < 0.25
-    && abs(localPos.y) < 0.25)
+  else if (abs(localPos.z) > 0.1 && abs(localPos.x) < 0.25 &&
+           abs(localPos.y) < 0.25)
   {
     outColor *= uboPerInstance.colorTintZ.xyz;
   }

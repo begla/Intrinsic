@@ -18,13 +18,10 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
-out gl_PerVertex
-{
-  vec4 gl_Position;
-};
+out gl_PerVertex { vec4 gl_Position; };
 
-layout (location = 0) out vec2 outUV0;
-layout (location = 1) out vec4 outOffsets[3];
+layout(location = 0) out vec2 outUV0;
+layout(location = 1) out vec4 outOffsets[3];
 
 #include "ubos.inc.glsl"
 
@@ -36,9 +33,10 @@ PER_INSTANCE_DATA_SMAA_VERT;
 
 void main()
 {
-  outUV0 = vec2(float(gl_VertexIndex / 2) * 2.0, float(gl_VertexIndex % 2) * 2.0);
-  gl_Position= vec4(float(gl_VertexIndex / 2) * 4.0 - 1.0, float(gl_VertexIndex % 2) 
-  	* 4.0 - 1.0, 0.0, 1.0);
-  
+  outUV0 =
+      vec2(float(gl_VertexIndex / 2) * 2.0, float(gl_VertexIndex % 2) * 2.0);
+  gl_Position = vec4(float(gl_VertexIndex / 2) * 4.0 - 1.0,
+                     float(gl_VertexIndex % 2) * 4.0 - 1.0, 0.0, 1.0);
+
   SMAAEdgeDetectionVS(outUV0, outOffsets);
 }
