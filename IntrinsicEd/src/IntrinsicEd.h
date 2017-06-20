@@ -103,6 +103,7 @@ public slots:
   void onCompileShaders();
   void onRecompileShaders();
   void onSettingsFileChanged(const QString&);
+  void onCaptureAllProbes();
 
 private:
   void updateSettingsChangeWatch();
