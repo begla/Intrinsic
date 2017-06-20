@@ -52,11 +52,11 @@ vec3 tonemap(vec3 x)
 }
 
 vec3 sampleColorOffsets(sampler2D scene, vec2 uv0, vec3 offsets, vec2 framebufferSize,
-     vec2 dir, float dirLen)
+     vec2 dir, float dirLen, float pixelScale)
 {
   offsets *= clamp(smoothstep(0.4, 1.2, dirLen), 0.0, 1.0);
 
-  const vec2 pixelSize = 1.0 / framebufferSize;
+  const vec2 pixelSize = (1.0 / framebufferSize) * pixelScale;
 
   return vec3(textureLod(scene, uv0 - dir * offsets.x * pixelSize, 0.0).r, 
     textureLod(scene, uv0 - dir * offsets.y * pixelSize, 0.0).g, 
@@ -73,7 +73,7 @@ const float filmGrainBlackLimit = 0.5 * pow(filmGrainQuantStepsRcp, 2.0);
 const float filmGrainAmount = 0.75 * (pow(1.0 + filmGrainQuantStepsRcp, 2.0) - 1.0);
 const float lensFlareFactor = 3.0;
 const float chromaticAbFactor = 8.0;
-const vec3 chromaticAbOffsets = vec3(2.0, 1.0, 1.0);
+const vec3 chromaticAbOffsets = vec3(2.5, 1.0, 1.0);
 
 void main()
 {
@@ -85,9 +85,9 @@ void main()
 
   // Chromatic aberration
   const vec3 colorOffsets = chromaticAbFactor * chromaticAbOffsets;
-  vec3 scene = sampleColorOffsets(sceneTex, inUV0, colorOffsets, framebufferSize, dir, dirLen);
+  vec3 scene = sampleColorOffsets(sceneTex, inUV0, colorOffsets, framebufferSize, dir, dirLen, 0.5);
   const vec3 sceneBlurred = sampleColorOffsets(sceneBlurredTex, inUV0, colorOffsets,
-        framebufferSize, dir, dirLen);
+        framebufferSize, dir, dirLen, 0.5);
 
   const float depth = textureLod(depthBufferTex, inUV0, 0.0).r;
   const float linDepth = linearizeDepth(depth, uboPerInstance.camParams.x, uboPerInstance.camParams.y) 
