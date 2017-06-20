@@ -767,11 +767,15 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureAllProbes()
        i < (uint32_t)Components::NodeManager::_activeRefs.size(); ++i)
   {
     Components::NodeRef nodeRef = Components::NodeManager::_activeRefs[i];
-    Entity::EntityRef entityRef = Components::NodeManager::_entity(nodeRef);
+    Entity::EntityRef entityRef = Components::NodeManager::_entity(nodeRef); 
+
     Components::IrradianceProbeRef irradProbeRef =
         Components::IrradianceProbeManager::getComponentForEntity(entityRef);
+    Components::SpecularProbeRef specProbeRef =
+      Components::SpecularProbeManager::getComponentForEntity(entityRef);
 
-    if (irradProbeRef.isValid())
+    if (irradProbeRef.isValid()
+        || specProbeRef.isValid())
       probeNodes.push_back(nodeRef);
   }
 
