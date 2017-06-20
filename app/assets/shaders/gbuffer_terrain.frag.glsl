@@ -29,18 +29,19 @@ PER_INSTANCE_UBO;
 BINDINGS_TERRAIN;
 
 // Input
-layout (location = 0) in vec3 inNormal;
-layout (location = 1) in vec3 inTangent;
-layout (location = 2) in vec3 inBinormal;
-layout (location = 3) in vec3 inColor;
-layout (location = 4) in vec2 inUV0;
+layout(location = 0) in vec3 inNormal;
+layout(location = 1) in vec3 inTangent;
+layout(location = 2) in vec3 inBinormal;
+layout(location = 3) in vec3 inColor;
+layout(location = 4) in vec2 inUV0;
 
 // Output
 OUTPUT
 
 vec3 blend(vec3 grass0, vec3 stone0, vec3 stone1, vec3 blendMask, float noise)
 {
-  return mix(grass0, mix(stone0, stone1, 1.0 - noise), clamp(blendMask.b * 3.0, 0.0, 1.0));
+  return mix(grass0, mix(stone0, stone1, 1.0 - noise),
+             clamp(blendMask.b * 3.0, 0.0, 1.0));
 }
 
 vec3 contrast(vec3 color, float contrast)
@@ -54,7 +55,7 @@ float contrast(float color, float contrast)
 }
 
 void main()
-{ 
+{
   const mat3 TBN = mat3(inTangent, inBinormal, inNormal);
 
   const vec2 uv0 = UV0_TRANSFORM_ANIMATED(inUV0);
@@ -67,7 +68,7 @@ void main()
   const vec4 albedo1 = texture(albedoTex1, uv0 * 0.5);
   const vec4 normal1 = texture(normalTex1, uv0 * 0.5);
   const vec4 pbr1 = texture(pbrTex1, uv0 * 0.1);
-  
+
   const vec4 albedo2 = texture(albedoTex2, uv0 * 0.25);
   const vec4 normal2 = texture(normalTex2, uv0 * 0.25);
   const vec4 pbr2 = texture(pbrTex2, uv0 * 0.1);
@@ -79,8 +80,12 @@ void main()
   vec3 normal = blend(normal0.rgb, normal1.rgb, normal2.rgb, blendMask, noise);
   vec3 pbr = blend(pbr0.rgb, pbr1.rgb, pbr2.rgb, blendMask, noise);
 
-  float occlusion = clamp(mix(clamp(noise * 5.0, 0.0, 1.0) * blendMask.b, 1.0 - blendMask.r, 
-  clamp((1.0 - blendMask.g) * 2.0 - 0.9, 0.0, 1.0)) * 2.0 + 0.2, 0.0, 1.0);
+  float occlusion =
+      clamp(mix(clamp(noise * 5.0, 0.0, 1.0) * blendMask.b, 1.0 - blendMask.r,
+                clamp((1.0 - blendMask.g) * 2.0 - 0.9, 0.0, 1.0)) *
+                    2.0 +
+                0.2,
+            0.0, 1.0);
   albedo *= occlusion;
 
   GBuffer gbuffer;

@@ -26,27 +26,25 @@
 
 const float alphaThreshold = 0.2;
 
-layout (binding = 0) uniform PerInstance
+layout(binding = 0) uniform PerInstance
 {
   vec4 nearFarWidthHeight;
   vec4 nearFar;
-} uboPerInstance;
+}
+uboPerInstance;
 
 PER_FRAME_DATA(1);
 
-layout (binding = 2) uniform sampler2D depthTex;
+layout(binding = 2) uniform sampler2D depthTex;
 
-layout (std430, binding = 3) buffer readonly DecalBuffer
-{
-  Decal decals[];
-};
-layout (std430, binding = 4) buffer readonly DecalIndexBuffer
+layout(std430, binding = 3) buffer readonly DecalBuffer { Decal decals[]; };
+layout(std430, binding = 4) buffer readonly DecalIndexBuffer
 {
   uint decalIndices[];
 };
-layout (set = 1, binding = 0) uniform sampler2D globalTextures[4095];
+layout(set = 1, binding = 0) uniform sampler2D globalTextures[4095];
 
-layout (location = 0) in vec2 inUV0;
+layout(location = 0) in vec2 inUV0;
 
 OUTPUT
 
@@ -58,7 +56,7 @@ void main()
 
   // Ignore sky
   if (depth >= 1.0)
-  { 
+  {
     discard;
   }
 
@@ -68,22 +66,22 @@ void main()
   vec3 normal = vec3(0.0);
   vec4 pbr = vec4(0.0);
 
-  const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, 
-    uboPerInstance.nearFarWidthHeight);
+  const uvec3 gridPos = calcGridPosForViewPos(
+      posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
 
-  const uint clusterIdx = calcClusterIndex(gridPos, maxDecalCountPerCluster) / 2;
+  const uint clusterIdx =
+      calcClusterIndex(gridPos, maxDecalCountPerCluster) / 2;
   const uint decalCount = decalIndices[clusterIdx];
 
-  for (uint di=0; di<decalCount; di+=2)
+  for (uint di = 0; di < decalCount; di += 2)
   {
     uint packedDecalIndices = decalIndices[clusterIdx + di / 2 + 1];
 
     Decal decal = decals[packedDecalIndices & 0xFFFF];
-    calcDecal(decal, posVS, globalTextures, albedo, 
-      normal, pbr, 1.0);
+    calcDecal(decal, posVS, globalTextures, albedo, normal, pbr, 1.0);
     decal = decals[packedDecalIndices >> 16];
-    calcDecal(decal, posVS, globalTextures, albedo, 
-      normal, pbr, float(di + 1 < decalCount)); 
+    calcDecal(decal, posVS, globalTextures, albedo, normal, pbr,
+              float(di + 1 < decalCount));
   }
 
   if (albedo.a < alphaThreshold)
@@ -96,7 +94,7 @@ void main()
     gbuffer.albedo = albedo;
     gbuffer.normal = normal;
     gbuffer.metalMask = pbr.r;
-    gbuffer.specular = pbr.g; 
+    gbuffer.specular = pbr.g;
     gbuffer.roughness = pbr.b;
     gbuffer.materialBufferIdx = 0u;
     gbuffer.emissive = 0.0;

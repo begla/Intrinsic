@@ -70,7 +70,7 @@ struct LightingData
   float metalMask;
   float specular;
   float roughness;
-  
+
   // Result
   float invDistToLight;
 
@@ -120,8 +120,8 @@ float D_GGX(float NdH, float roughness2)
 
 float roughnessToMipIdx(float roughness)
 {
-  return max(roughness - IBL_MIN_ROUGHNESS, 0.0) 
-    / (1.0 - IBL_MIN_ROUGHNESS) * (IBL_MIP_COUNT - 1);
+  return max(roughness - IBL_MIN_ROUGHNESS, 0.0) / (1.0 - IBL_MIN_ROUGHNESS) *
+         (IBL_MIP_COUNT - 1);
 }
 
 // Irradiance / SH
@@ -142,7 +142,8 @@ vec3 shDotProduct(in SH9 a, in SH9 b)
   return result;
 }
 
-SH9 projectOntoSH9(in vec3 n, in vec3 color, in float A0, in float A1, in float A2)
+SH9 projectOntoSH9(in vec3 n, in vec3 color, in float A0, in float A1,
+                   in float A2)
 {
   SH9 sh;
 
@@ -180,7 +181,8 @@ vec3 sampleSH(vec4 data[7], vec3 dir)
 
 void initLightingDataFromGBuffer(inout LightingData d)
 {
-  const float adjRough = d.roughness * (1.0 - IBL_MIN_ROUGHNESS) + IBL_MIN_ROUGHNESS;
+  const float adjRough =
+      d.roughness * (1.0 - IBL_MIN_ROUGHNESS) + IBL_MIN_ROUGHNESS;
   d.roughness2 = adjRough * adjRough;
 
   d.diffuseColor = d.baseColor - d.baseColor * d.metalMask;
@@ -190,14 +192,14 @@ void initLightingDataFromGBuffer(inout LightingData d)
 void calculateLightingDataBase(inout LightingData d)
 {
   d.V = -normalize(d.posVS);
-  d.R = reflect(-d.V, d.N);  
+  d.R = reflect(-d.V, d.N);
   d.lobeEnergy = vec2(d.energy);
 }
 
 void calculateLightingData(inout LightingData d)
 {
   d.H = normalize(d.L + d.V);
-  d.NdL = clamp(dot(d.N, d.L), 0.0, 1.0); 
+  d.NdL = clamp(dot(d.N, d.L), 0.0, 1.0);
   d.NdV = clamp(abs(dot(d.N, d.V)) + 1.0e-5, 0.0, 1.0);
   d.NdH = clamp(dot(d.N, d.H), 0.0, 1.0);
   d.VdH = clamp(dot(d.V, d.H), 0.0, 1.0);
@@ -216,13 +218,17 @@ void calculateDiscL(inout LightingData d, float discRadius)
   d.invDistToLight = 1.0 / discD;
 }
 
-void calculateSpehereL(inout LightingData d, float sphereRadius, vec3 lightDistVec)
+void calculateSpehereL(inout LightingData d, float sphereRadius,
+                       vec3 lightDistVec)
 {
   const vec3 closestPointRay = dot(lightDistVec, d.R) * d.R;
   const vec3 centerToRay = closestPointRay - lightDistVec;
-  const vec3 cloestPointSphere = lightDistVec + centerToRay 
-    * clamp(sphereRadius * (1.0 / sqrt(dot(centerToRay, centerToRay))), 0.0, 1.0);
-  
+  const vec3 cloestPointSphere =
+      lightDistVec +
+      centerToRay *
+          clamp(sphereRadius * (1.0 / sqrt(dot(centerToRay, centerToRay))), 0.0,
+                1.0);
+
   d.L = normalize(cloestPointSphere);
   d.invDistToLight = 1.0 / length(lightDistVec);
 }
@@ -230,7 +236,8 @@ void calculateSpehereL(inout LightingData d, float sphereRadius, vec3 lightDistV
 void calculateLobeEnergySphere(inout LightingData d, float sphereRadius)
 {
   const float sphereAngle = clamp(sphereRadius * d.invDistToLight, 0.0, 1.0);
-  float energ = d.roughness2 / clamp(d.roughness2 + 0.5 * sphereAngle, 0.0, 1.0);
+  float energ =
+      d.roughness2 / clamp(d.roughness2 + 0.5 * sphereAngle, 0.0, 1.0);
   energ *= energ;
   d.lobeEnergy *= energ;
 }
@@ -245,9 +252,9 @@ vec3 calcSpecular(LightingData d)
   const float D = D_GGX(d.NdH, d.roughness2) * d.lobeEnergy.y;
   const float V = V_GGX(d.NdL, d.NdV, d.roughness2);
   const float FHelper = F_Schlick(d.roughness2, d.VdH);
-  const vec3 F = clamp(50.0 * d.specularColor.g, 0.0, 1.0) * FHelper 
-    + (1.0 - FHelper) * d.specularColor;
-  
+  const vec3 F = clamp(50.0 * d.specularColor.g, 0.0, 1.0) * FHelper +
+                 (1.0 - FHelper) * d.specularColor;
+
   return D * F * V;
 }
 
@@ -267,13 +274,15 @@ float calcInverseSqrFalloff(float lightRadius, float dist)
 
 vec3 kelvinToRGB(float kelvin, sampler2D kelvinLutTex)
 {
-  return texture(kelvinLutTex, vec2(max(kelvin - 1000.0, 0.0) / 30000.0, 0.0)).rgb;
+  return texture(kelvinLutTex, vec2(max(kelvin - 1000.0, 0.0) / 30000.0, 0.0))
+      .rgb;
 }
 
 // Shadows
 // ->
 
-vec4 calcPosLS(vec3 posVS, uint shadowMapIdx, in mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT])
+vec4 calcPosLS(vec3 posVS, uint shadowMapIdx,
+               in mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT])
 {
   vec4 posLS = shadowViewProjMatrix[shadowMapIdx] * vec4(posVS, 1.0);
 
@@ -283,14 +292,14 @@ vec4 calcPosLS(vec3 posVS, uint shadowMapIdx, in mat4 shadowViewProjMatrix[MAX_S
   return posLS;
 }
 
-uint findBestFittingSplit(vec3 posVS, out vec4 posLS, in mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT])
+uint findBestFittingSplit(vec3 posVS, out vec4 posLS,
+                          in mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT])
 {
-  for (uint i=0u; i<PSSM_SPLIT_COUNT; ++i)
+  for (uint i = 0u; i < PSSM_SPLIT_COUNT; ++i)
   {
     posLS = calcPosLS(posVS, i, shadowViewProjMatrix);
 
-    if (posLS.x <= 1.0 && posLS.x >= 0.0
-      && posLS.y <= 1.0 && posLS.y >= 0.0)
+    if (posLS.x <= 1.0 && posLS.x >= 0.0 && posLS.y <= 1.0 && posLS.y >= 0.0)
     {
       return i;
     }
@@ -302,13 +311,16 @@ uint findBestFittingSplit(vec3 posVS, out vec4 posLS, in mat4 shadowViewProjMatr
 // Ordinary shadow mapping / PCF
 // ->
 
-float sampleShadowMap(vec2 base_uv, float u, float v, vec2 shadowMapSizeInv, float depth, uint shadowMapIdx, sampler2DArrayShadow shadowTex) 
+float sampleShadowMap(vec2 base_uv, float u, float v, vec2 shadowMapSizeInv,
+                      float depth, uint shadowMapIdx,
+                      sampler2DArrayShadow shadowTex)
 {
   const vec2 uv = base_uv + vec2(u, v) * shadowMapSizeInv;
   return texture(shadowTex, vec4(uv, shadowMapIdx, depth));
-} 
+}
 
-float witnessPCF(vec3 shadowPos, uint shadowMapIdx, sampler2DArrayShadow shadowTex)
+float witnessPCF(vec3 shadowPos, uint shadowMapIdx,
+                 sampler2DArrayShadow shadowTex)
 {
   float lightDepth = shadowPos.z;
 
@@ -345,44 +357,59 @@ float witnessPCF(vec3 shadowPos, uint shadowMapIdx, sampler2DArrayShadow shadowT
   float v1 = (3 + t) / vw1;
   float v2 = t / vw2 + 2;
 
-  sum += uw0 * vw0 * sampleShadowMap(base_uv, u0, v0, shadowMapSizeInv, lightDepth, shadowMapIdx, shadowTex);
-  sum += uw1 * vw0 * sampleShadowMap(base_uv, u1, v0, shadowMapSizeInv, lightDepth, shadowMapIdx, shadowTex);
-  sum += uw2 * vw0 * sampleShadowMap(base_uv, u2, v0, shadowMapSizeInv, lightDepth, shadowMapIdx, shadowTex);
+  sum += uw0 * vw0 * sampleShadowMap(base_uv, u0, v0, shadowMapSizeInv,
+                                     lightDepth, shadowMapIdx, shadowTex);
+  sum += uw1 * vw0 * sampleShadowMap(base_uv, u1, v0, shadowMapSizeInv,
+                                     lightDepth, shadowMapIdx, shadowTex);
+  sum += uw2 * vw0 * sampleShadowMap(base_uv, u2, v0, shadowMapSizeInv,
+                                     lightDepth, shadowMapIdx, shadowTex);
 
-  sum += uw0 * vw1 * sampleShadowMap(base_uv, u0, v1, shadowMapSizeInv, lightDepth, shadowMapIdx, shadowTex);
-  sum += uw1 * vw1 * sampleShadowMap(base_uv, u1, v1, shadowMapSizeInv, lightDepth, shadowMapIdx, shadowTex);
-  sum += uw2 * vw1 * sampleShadowMap(base_uv, u2, v1, shadowMapSizeInv, lightDepth, shadowMapIdx, shadowTex);
+  sum += uw0 * vw1 * sampleShadowMap(base_uv, u0, v1, shadowMapSizeInv,
+                                     lightDepth, shadowMapIdx, shadowTex);
+  sum += uw1 * vw1 * sampleShadowMap(base_uv, u1, v1, shadowMapSizeInv,
+                                     lightDepth, shadowMapIdx, shadowTex);
+  sum += uw2 * vw1 * sampleShadowMap(base_uv, u2, v1, shadowMapSizeInv,
+                                     lightDepth, shadowMapIdx, shadowTex);
 
-  sum += uw0 * vw2 * sampleShadowMap(base_uv, u0, v2, shadowMapSizeInv, lightDepth, shadowMapIdx, shadowTex);
-  sum += uw1 * vw2 * sampleShadowMap(base_uv, u1, v2, shadowMapSizeInv, lightDepth, shadowMapIdx, shadowTex);
-  sum += uw2 * vw2 * sampleShadowMap(base_uv, u2, v2, shadowMapSizeInv, lightDepth, shadowMapIdx, shadowTex);
+  sum += uw0 * vw2 * sampleShadowMap(base_uv, u0, v2, shadowMapSizeInv,
+                                     lightDepth, shadowMapIdx, shadowTex);
+  sum += uw1 * vw2 * sampleShadowMap(base_uv, u1, v2, shadowMapSizeInv,
+                                     lightDepth, shadowMapIdx, shadowTex);
+  sum += uw2 * vw2 * sampleShadowMap(base_uv, u2, v2, shadowMapSizeInv,
+                                     lightDepth, shadowMapIdx, shadowTex);
 
   return sum * 1.0 / 144.0;
 }
 
-float calcShadowAttenuation(vec3 posVS, in mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT], sampler2DArrayShadow shadowTex)
+float calcShadowAttenuation(vec3 posVS,
+                            in mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT],
+                            sampler2DArrayShadow shadowTex)
 {
   float shadowAttenuation = 1.0;
 
   vec4 posLS;
-  const uint shadowMapIdx = findBestFittingSplit(posVS, posLS, shadowViewProjMatrix);
+  const uint shadowMapIdx =
+      findBestFittingSplit(posVS, posLS, shadowViewProjMatrix);
 
   if (shadowMapIdx != uint(-1))
   {
     const float fadeDist = 0.1;
     const float fadeStart = 1.0 - fadeDist;
 
-    const float fade = max(clamp(length(posLS.xy * 2.0 -1.0), 0.0, 1.0) - fadeStart, 0.0) / fadeDist;
+    const float fade =
+        max(clamp(length(posLS.xy * 2.0 - 1.0), 0.0, 1.0) - fadeStart, 0.0) /
+        fadeDist;
     float shadowAttenuation2 = 1.0;
 
     if (shadowMapIdx < PSSM_SPLIT_COUNT - 1)
     {
-      shadowAttenuation2 = witnessPCF(calcPosLS(posVS, shadowMapIdx + 1, shadowViewProjMatrix).xyz, shadowMapIdx + 1, shadowTex);
+      shadowAttenuation2 = witnessPCF(
+          calcPosLS(posVS, shadowMapIdx + 1, shadowViewProjMatrix).xyz,
+          shadowMapIdx + 1, shadowTex);
     }
 
-    shadowAttenuation = mix(
-      witnessPCF(posLS.xyz, shadowMapIdx, shadowTex), 
-      shadowAttenuation2, fade);
+    shadowAttenuation = mix(witnessPCF(posLS.xyz, shadowMapIdx, shadowTex),
+                            shadowAttenuation2, fade);
   }
 
   return shadowAttenuation;

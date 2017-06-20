@@ -19,7 +19,10 @@ struct MaterialParameters
   float emissiveIntensity;
 };
 
-#define MATERIAL_BUFFER buffer MaterialBuffer \
-{ \
-  MaterialParameters materialParameters[]; \
+#define MATERIAL_BUFFER                                                        \
+  buffer MaterialBuffer                                                        \
+  \
+{                                                                         \
+    MaterialParameters materialParameters[];                                   \
+  \
 }

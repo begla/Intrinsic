@@ -23,10 +23,7 @@
 #include "lib_noise.glsl"
 #include "gbuffer_vertex.inc.glsl"
 
-out gl_PerVertex
-{
-  vec4 gl_Position;
-};
+out gl_PerVertex { vec4 gl_Position; };
 
 // Ubos
 PER_INSTANCE_UBO;
@@ -35,30 +32,31 @@ PER_INSTANCE_UBO;
 INPUT();
 
 // Output
-layout (location = 0) out vec2 outUV0;
+layout(location = 0) out vec2 outUV0;
 
 void main()
 {
   vec3 localPos = inPosition;
-  const vec3 initialWorldPos = (uboPerInstance.worldMatrix 
-  	* vec4(inPosition.xyz, 1.0)).xyz;
-  const vec3 worldNormalUnorm = (uboPerInstance.worldMatrix 
-  	* vec4(inNormal.xyz, 0.0)).xyz;
+  const vec3 initialWorldPos =
+      (uboPerInstance.worldMatrix * vec4(inPosition.xyz, 1.0)).xyz;
+  const vec3 worldNormalUnorm =
+      (uboPerInstance.worldMatrix * vec4(inNormal.xyz, 0.0)).xyz;
   const vec3 worldNormal = normalize(worldNormalUnorm);
   const vec2 windStrength = calcWindStrength(uboPerInstance.data0.w);
   const vec3 pivotWS = vec3(uboPerInstance.worldMatrix[3]);
-  
-#if defined (GRASS)
-  applyGrassWind(localPos, initialWorldPos,
-    uboPerInstance.data0.w, windStrength);
+
+#if defined(GRASS)
+  applyGrassWind(localPos, initialWorldPos, uboPerInstance.data0.w,
+                 windStrength);
 #else
-  applyTreeWind(localPos, initialWorldPos, pivotWS, worldNormal, inColor.r, 
-    uboPerInstance.data0.w, windStrength);
+  applyTreeWind(localPos, initialWorldPos, pivotWS, worldNormal, inColor.r,
+                uboPerInstance.data0.w, windStrength);
 #endif // GRASS
 
-  const vec3 worldPos = (uboPerInstance.worldMatrix 
-    * vec4(localPos.xyz, 1.0)).xyz - worldNormalUnorm.xyz * 0.03; // Shadow bias
+  const vec3 worldPos =
+      (uboPerInstance.worldMatrix * vec4(localPos.xyz, 1.0)).xyz -
+      worldNormalUnorm.xyz * 0.03; // Shadow bias
   gl_Position = uboPerInstance.viewProjMatrix * vec4(worldPos, 1.0);
 
-  outUV0 = inUV0; 
+  outUV0 = inUV0;
 }

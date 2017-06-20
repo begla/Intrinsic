@@ -20,12 +20,12 @@
 
 #include "lib_math.glsl"
 
-layout (location = 0) in vec3 inNormal;
-layout (location = 1) in vec3 inColor;
+layout(location = 0) in vec3 inNormal;
+layout(location = 1) in vec3 inColor;
 
-layout (location = 0) out vec4 outAlbedo;
-layout (location = 1) out vec4 outNormal;
-layout (location = 2) out vec4 outParameter0;
+layout(location = 0) out vec4 outAlbedo;
+layout(location = 1) out vec4 outNormal;
+layout(location = 2) out vec4 outParameter0;
 
 void main()
 {

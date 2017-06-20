@@ -29,7 +29,7 @@ PER_INSTANCE_UBO;
 OUTPUT
 
 void main()
-{ 
+{
   GBuffer gbuffer;
   {
     gbuffer.albedo = vec4(0.0, 0.5, 0.5, 1.0);

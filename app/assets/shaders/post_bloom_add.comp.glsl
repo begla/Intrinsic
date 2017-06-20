@@ -21,20 +21,25 @@
 #define ADD_THREADS_X 64
 #define ADD_THREADS_Y 2
 
-layout (binding = 0) uniform PerInstance
+layout(binding = 0) uniform PerInstance
 {
   uvec4 dim;
   ivec4 mipLevel;
-} uboPerInstance;
+}
+uboPerInstance;
 
-layout (binding = 1) uniform sampler2D input0Tex;
-layout (binding = 2) uniform sampler2D input1Tex;
-layout (binding = 3, rgba16f) uniform image2D output0Tex;
+layout(binding = 1) uniform sampler2D input0Tex;
+layout(binding = 2) uniform sampler2D input1Tex;
+layout(binding = 3, rgba16f) uniform image2D output0Tex;
 
-layout (local_size_x = ADD_THREADS_X, local_size_y = ADD_THREADS_Y) in;
+layout(local_size_x = ADD_THREADS_X, local_size_y = ADD_THREADS_Y) in;
 void main()
 {
   imageStore(output0Tex, ivec2(gl_GlobalInvocationID.xy),
-    0.5 * (texelFetch(input0Tex, ivec2(gl_GlobalInvocationID.xy), uboPerInstance.mipLevel.x) 
-      + textureLod(input1Tex, vec2((gl_GlobalInvocationID.xy + 0.5) / uboPerInstance.dim.xy), uboPerInstance.mipLevel.y)));
+             0.5 *
+                 (texelFetch(input0Tex, ivec2(gl_GlobalInvocationID.xy),
+                             uboPerInstance.mipLevel.x) +
+                  textureLod(input1Tex, vec2((gl_GlobalInvocationID.xy + 0.5) /
+                                             uboPerInstance.dim.xy),
+                             uboPerInstance.mipLevel.y)));
 }

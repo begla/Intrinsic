@@ -26,13 +26,13 @@ PER_MATERIAL_UBO;
 PER_INSTANCE_UBO;
 
 // Bindings
-layout (binding = 3) uniform sampler2D albedoTex;
+layout(binding = 3) uniform sampler2D albedoTex;
 
 // Input
-layout (location = 0) in vec2 inUV0;
+layout(location = 0) in vec2 inUV0;
 
 void main()
-{ 
+{
   const vec2 uv0 = UV0_TRANSFORM_ANIMATED(inUV0);
   vec4 albedo = texture(albedoTex, uv0);
 

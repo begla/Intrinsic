@@ -23,52 +23,46 @@
 
 #define BLUR_THREADS 128
 
-const float blurWeights[] = {
-  0.0,
-  0.0,
-  0.000003,
-  0.000229,
-  0.005977,
-  0.060598,
-  0.24173,
-  0.382925,
-  0.24173,
-  0.060598,
-  0.005977,
-  0.000229,
-  0.000003,
-  0.0,
-  0.0
-};
+const float blurWeights[] = {0.0,      0.0,      0.000003, 0.000229, 0.005977,
+                             0.060598, 0.24173,  0.382925, 0.24173,  0.060598,
+                             0.005977, 0.000229, 0.000003, 0.0,      0.0};
 
-layout (binding = 0) uniform PerInstance
-{
-  ivec4 mipLevel;
-} uboPerInstance;
+layout(binding = 0) uniform PerInstance { ivec4 mipLevel; }
+uboPerInstance;
 
-layout (binding = 1, rgba16f) uniform image2D outTex;
-layout (binding = 2) uniform sampler2D inTex;
+layout(binding = 1, rgba16f) uniform image2D outTex;
+layout(binding = 2) uniform sampler2D inTex;
 
 shared vec4 temp[BLUR_THREADS];
 
-layout (local_size_x = BLUR_THREADS, local_size_y = 1) in;
+layout(local_size_x = BLUR_THREADS, local_size_y = 1) in;
 void main()
 {
-  ivec2 coord = ivec2(gl_LocalInvocationIndex - HALF_BLUR_WIDTH + (BLUR_THREADS - HALF_BLUR_WIDTH * 2) 
-    * gl_WorkGroupID.x, gl_WorkGroupID.y).yx;
-  temp[gl_LocalInvocationIndex] = texelFetch(inTex, coord, uboPerInstance.mipLevel.x);
+  ivec2 coord =
+      ivec2(gl_LocalInvocationIndex - HALF_BLUR_WIDTH +
+                (BLUR_THREADS - HALF_BLUR_WIDTH * 2) * gl_WorkGroupID.x,
+            gl_WorkGroupID.y)
+          .yx;
+  temp[gl_LocalInvocationIndex] =
+      texelFetch(inTex, coord, uboPerInstance.mipLevel.x);
 
   barrier();
-  
+
   if (gl_LocalInvocationIndex >= HALF_BLUR_WIDTH &&
-        gl_LocalInvocationIndex < (BLUR_THREADS - HALF_BLUR_WIDTH))
+      gl_LocalInvocationIndex < (BLUR_THREADS - HALF_BLUR_WIDTH))
   {
     vec4 out0 = vec4(0.0);
 
     for (int i = -HALF_BLUR_WIDTH; i <= HALF_BLUR_WIDTH; ++i)
-      out0 += temp[gl_LocalInvocationIndex + i] * blurWeights[i + HALF_BLUR_WIDTH];
+      out0 +=
+          temp[gl_LocalInvocationIndex + i] * blurWeights[i + HALF_BLUR_WIDTH];
 
-    imageStore(outTex, ivec2(gl_LocalInvocationIndex - HALF_BLUR_WIDTH 
-      + (BLUR_THREADS - HALF_BLUR_WIDTH * 2) * gl_WorkGroupID.x, gl_GlobalInvocationID.y).yx, out0);
+    imageStore(
+        outTex,
+        ivec2(gl_LocalInvocationIndex - HALF_BLUR_WIDTH +
+                  (BLUR_THREADS - HALF_BLUR_WIDTH * 2) * gl_WorkGroupID.x,
+              gl_GlobalInvocationID.y)
+            .yx,
+        out0);
   }
 }

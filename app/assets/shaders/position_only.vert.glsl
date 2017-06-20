@@ -20,10 +20,7 @@
 
 #include "gbuffer_vertex.inc.glsl"
 
-out gl_PerVertex
-{
-  vec4 gl_Position;
-};
+out gl_PerVertex { vec4 gl_Position; };
 
 PER_INSTANCE_UBO;
 INPUT();
