@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,16 +14,18 @@
 
 #pragma once
 
+// Core related includes
+#include "stdafx.h"
+
 // Qt related includes
 #include <QtWidgets>
 #include <QtWidgets/QMainWindow>
 
-// Core related includes
-#include "stdafx.h"
-
 // ->Ed related includes
 #include "IntrinsicEdViewport.h"
 #include "IntrinsicEd.h"
+#include "IntrinsicEdPrefabsView.h"
+#include "IntrinsicEdPrefabsBrowser.h"
 #include "IntrinsicEdNodeViewTreeWidget.h"
 #include "IntrinsicEdNodeView.h"
 #include "IntrinsicEdPropertyEditorBase.h"

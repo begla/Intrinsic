@@ -1,0 +1,30 @@
+{
+    "name": "concrete",
+    "properties": {
+        "name": "concrete",
+        "materialPassMask": [
+            "GBufferDefault",
+            "GBufferWireframe",
+            "PerPixelPicking"
+        ],
+        "albedoTextureName": "concrete",
+        "emissiveTextureName": "white",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            150.0,
+            150.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 1.0,
+        "emissiveIntensity": 0.0,
+        "normalTextureName": "concrete_NRM",
+        "pbrTextureName": "concrete_PBR",
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.0,
+        "specularBias": 0.0
+    }
+}

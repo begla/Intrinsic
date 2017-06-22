@@ -1,0 +1,63 @@
+[
+    {
+        "name": "RotatingTorus",
+        "offsetToParent": 0,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -1022.25,
+                        571.5,
+                        -231.75
+                    ],
+                    "localOrient": [
+                        -0.17733365297317506,
+                        -0.8332138657569885,
+                        -0.3798128664493561,
+                        0.3890205919742584
+                    ],
+                    "localSize": [
+                        3.0,
+                        3.0,
+                        3.0
+                    ],
+                    "worldPos": [
+                        -1022.25,
+                        571.5,
+                        -231.75
+                    ],
+                    "worldOrient": [
+                        -0.17733365297317506,
+                        -0.8332138657569885,
+                        -0.3798128664493561,
+                        0.3890205919742584
+                    ],
+                    "worldSize": [
+                        3.0,
+                        3.0,
+                        3.0
+                    ]
+                }
+            },
+            {
+                "type": "Script",
+                "properties": {
+                    "scriptName": "rotate"
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "metal_torus",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    }
+]

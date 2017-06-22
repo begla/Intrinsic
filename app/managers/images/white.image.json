@@ -3,15 +3,8 @@
     "properties": {
         "name": "white",
         "imageType": 1,
-        "imageFormat": 10,
-        "flags": 16,
-        "dimensions": [
-            1.0,
-            1.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 1,
-        "fileName": "white.dds"
+        "imageFormat": 8,
+        "fileName": "white.dds",
+        "avgNormLength": 1.0
     }
 }

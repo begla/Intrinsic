@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 
 #pragma once
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -23,17 +25,15 @@ namespace Vulkan
 struct UniformManager
 {
   static void init();
-  static void resetPerInstanceAllocators();
+  static void onFrameEnded();
 
   _INTR_INLINE static uint8_t* allocatePerInstanceDataMemory(uint32_t p_Size,
                                                              uint32_t& p_Offset)
   {
-    const uint32_t bufferIdx =
-        Renderer::Vulkan::RenderSystem::_backbufferIndex %
-        _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
+    const uint32_t bufferIdx = RV::RenderSystem::_backbufferIndex %
+                               _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
 
     MemoryBlock block;
-
     if (p_Size < _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES)
     {
       block = _perInstanceAllocatorSmall[bufferIdx].allocate();
@@ -70,8 +70,6 @@ struct UniformManager
   _INTR_INLINE static void
   updatePerMaterialDataMemory(void* p_Data, uint32_t p_Size, uint32_t p_Offset)
   {
-    using namespace Resources;
-
     // Update staging memory
     {
       memcpy(BufferManager::getGpuMemory(_perMaterialStagingUniformBuffer),
@@ -99,9 +97,11 @@ struct UniformManager
 
   // Static members
   static uint8_t* _perInstanceMemory;
+  static uint8_t* _perFrameMemory;
 
-  static Resources::BufferRef _perInstanceUniformBuffer;
-  static Resources::BufferRef _perMaterialUniformBuffer;
+  static BufferRef _perInstanceUniformBuffer;
+  static BufferRef _perMaterialUniformBuffer;
+  static BufferRef _perFrameUniformBuffer;
 
 private:
   static LockFreeFixedBlockAllocator<
@@ -116,7 +116,7 @@ private:
                                      _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES>
       _perMaterialAllocator;
 
-  static Resources::BufferRef _perMaterialStagingUniformBuffer;
+  static BufferRef _perMaterialStagingUniformBuffer;
 };
 }
 }

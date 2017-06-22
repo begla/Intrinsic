@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+using namespace CResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -26,16 +29,15 @@ namespace RenderPass
 {
 namespace
 {
-Resources::ImageRef _shadowBufferImageRef;
-_INTR_ARRAY(Resources::FramebufferRef) _framebufferRefs;
-Resources::RenderPassRef _renderPassRef;
+ImageRef _shadowBufferImageRef;
+_INTR_ARRAY(FramebufferRef) _framebufferRefs;
+RenderPassRef _renderPassRef;
 
 // <-
 
-_INTR_INLINE void
-calculateFrustumForSplit(uint32_t p_SplitIdx,
-                         Core::Resources::FrustumRef p_FrustumRef,
-                         Components::CameraRef p_CameraRef)
+_INTR_INLINE void calculateFrustumForSplit(uint32_t p_SplitIdx,
+                                           FrustumRef p_FrustumRef,
+                                           Components::CameraRef p_CameraRef)
 {
   _INTR_PROFILE_CPU("Render Pass", "Calc. Shadow Map Matrices");
 
@@ -52,15 +54,15 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
   const float worldBoundsHalfExtentLength = glm::length(worldBoundsHalfExtent);
   const glm::vec3 worldBoundsCenter = Math::calcAABBCenter(worldBounds);
 
-  const glm::vec3 eye =
-      worldBoundsHalfExtentLength *
-      (Core::Resources::PostEffectManager::_descMainLightOrientation(
-           Core::Resources::PostEffectManager::_blendTargetRef) *
-       glm::vec3(0.0f, 0.0f, 1.0f));
+  glm::vec3 euler =
+      glm::eulerAngles(PostEffectManager::calcActualSunOrientation(
+          PostEffectManager::_blendTargetRef));
+  const glm::vec3 sunDir = glm::quat(euler) * glm::vec3(0.0f, 0.0f, 1.0f);
+
+  const glm::vec3 eye = worldBoundsHalfExtentLength * sunDir;
   const glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f);
 
-  glm::mat4& shadowViewMatrix =
-      Core::Resources::FrustumManager::_descViewMatrix(p_FrustumRef);
+  glm::mat4& shadowViewMatrix = FrustumManager::_descViewMatrix(p_FrustumRef);
   shadowViewMatrix = glm::lookAt(eye, center, glm::vec3(0.0f, 1.0f, 0.0f));
 
   const float nearPlane =
@@ -125,7 +127,7 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
   float orthoNear = FLT_MAX;
   float orthoFar = -FLT_MAX;
 
-  // Calc. near/fear
+  // Calculate near/fear
   {
     glm::vec3 aabbCorners[8];
     Math::calcAABBCorners(worldBounds, aabbCorners);
@@ -140,27 +142,24 @@ calculateFrustumForSplit(uint32_t p_SplitIdx,
     }
   }
 
-  Core::Resources::FrustumManager::_descProjectionType(p_FrustumRef) =
-      Core::Resources::ProjectionType::kOrthographic;
-  Core::Resources::FrustumManager::_descNearFarPlaneDistances(p_FrustumRef) =
+  FrustumManager::_descProjectionType(p_FrustumRef) =
+      ProjectionType::kOrthographic;
+  FrustumManager::_descNearFarPlaneDistances(p_FrustumRef) =
       glm::vec2(orthoNear, orthoFar);
-  Core::Resources::FrustumManager::_descProjectionMatrix(p_FrustumRef) =
-      glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, orthoNear,
-                 orthoFar);
+  FrustumManager::_descProjectionMatrix(p_FrustumRef) = glm::ortho(
+      orthoLeft, orthoRight, orthoBottom, orthoTop, orthoNear, orthoFar);
 }
 }
 
 // <-
 
 // Static members
-glm::uvec2 Shadow::_shadowMapSize = glm::uvec2(1024u, 1024u);
+glm::uvec2 Shadow::_shadowMapSize = glm::uvec2(1536u, 1536u);
 
 // <-
 
 void Shadow::init()
 {
-  using namespace Resources;
-
   RenderPassRefArray renderPassesToCreate;
   ImageRefArray imagesToCreate;
 
@@ -232,22 +231,20 @@ void Shadow::destroy() {}
 // <-
 
 void Shadow::prepareFrustums(Components::CameraRef p_CameraRef,
-                             _INTR_ARRAY(Core::Resources::FrustumRef) &
-                                 p_ShadowFrustums)
+                             _INTR_ARRAY(FrustumRef) & p_ShadowFrustums)
 {
   _INTR_PROFILE_CPU("Render Pass", "Prepare Shadow Frustums");
 
   for (uint32_t i = 0u; i < p_ShadowFrustums.size(); ++i)
   {
-    Core::Resources::FrustumManager::destroyFrustum(p_ShadowFrustums[i]);
+    FrustumManager::destroyFrustum(p_ShadowFrustums[i]);
   }
   p_ShadowFrustums.clear();
 
   for (uint32_t shadowMapIdx = 0u; shadowMapIdx < _INTR_PSSM_SPLIT_COUNT;
        ++shadowMapIdx)
   {
-    Core::Resources::FrustumRef frustumRef =
-        Core::Resources::FrustumManager::createFrustum(_N(ShadowFrustum));
+    FrustumRef frustumRef = FrustumManager::createFrustum(_N(ShadowFrustum));
 
     calculateFrustumForSplit(shadowMapIdx, frustumRef, p_CameraRef);
 
@@ -259,15 +256,13 @@ void Shadow::prepareFrustums(Components::CameraRef p_CameraRef,
 
 void Shadow::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
-  using namespace Resources;
-
   _INTR_PROFILE_CPU("Render Pass", "Render Shadows");
   _INTR_PROFILE_GPU("Render Shadows");
 
   _INTR_PROFILE_COUNTER_SET("Dispatched Draw Calls (Shadows)",
                             DrawCallDispatcher::_dispatchedDrawCallCount);
 
-  const _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
+  const _INTR_ARRAY(FrustumRef)& shadowFrustums =
       RenderProcess::Default::_shadowFrustums[p_CameraRef];
   for (uint32_t shadowMapIdx = 0u; shadowMapIdx < shadowFrustums.size();
        ++shadowMapIdx)
@@ -275,7 +270,7 @@ void Shadow::render(float p_DeltaT, Components::CameraRef p_CameraRef)
     _INTR_PROFILE_CPU("Render Pass", "Render Shadow Map");
     _INTR_PROFILE_GPU("Render Shadow Map");
 
-    Core::Resources::FrustumRef frustumRef = shadowFrustums[shadowMapIdx];
+    FrustumRef frustumRef = shadowFrustums[shadowMapIdx];
 
     ImageManager::insertImageMemoryBarrierSubResource(
         _shadowBufferImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
@@ -293,13 +288,17 @@ void Shadow::render(float p_DeltaT, Components::CameraRef p_CameraRef)
         p_CameraRef, frustumIdx,
         MaterialManager::getMaterialPassId(_N(ShadowFoliage)))
         .copy(visibleDrawCalls);
+    RenderProcess::Default::getVisibleDrawCalls(
+        p_CameraRef, frustumIdx,
+        MaterialManager::getMaterialPassId(_N(ShadowGrass)))
+        .copy(visibleDrawCalls);
 
     DrawCallManager::sortDrawCallsFrontToBack(visibleDrawCalls);
 
     // Update per mesh uniform data
     {
       Components::MeshManager::updatePerInstanceData(p_CameraRef, frustumIdx);
-      Core::Components::MeshManager::updateUniformData(visibleDrawCalls);
+      CComponents::MeshManager::updateUniformData(visibleDrawCalls);
     }
 
     VkClearValue clearValues[1] = {};

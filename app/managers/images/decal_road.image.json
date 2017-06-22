@@ -1,0 +1,10 @@
+{
+    "name": "decal_road",
+    "properties": {
+        "name": "decal_road",
+        "imageType": 1,
+        "imageFormat": 10,
+        "fileName": "decal_road.dds",
+        "avgNormLength": 1.0
+    }
+}

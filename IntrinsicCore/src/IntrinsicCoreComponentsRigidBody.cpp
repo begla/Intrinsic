@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -255,7 +255,7 @@ physx::PxRigidActor* createTriangleMeshStaticKinematic(RigidBodyRef p_Ref,
 
 void RigidBodyManager::createResources(const RigidBodyRefArray& p_RigidBodies)
 {
-  Renderer::Vulkan::Resources::DrawCallRefArray drawCallsToCreate;
+  RVResources::DrawCallRefArray drawCallsToCreate;
 
   for (uint32_t rigidBodyIdx = 0u; rigidBodyIdx < p_RigidBodies.size();
        ++rigidBodyIdx)
@@ -284,8 +284,9 @@ void RigidBodyManager::createResources(const RigidBodyRefArray& p_RigidBodies)
                  RigidBodyType::kTriangleMeshKinematic)
     {
       _pxRigidActor(rigidBodyRef) = createTriangleMeshStaticKinematic(
-          rigidBodyRef, _descRigidBodyType(rigidBodyRef) ==
-                            RigidBodyType::kTriangleMeshKinematic);
+          rigidBodyRef,
+          _descRigidBodyType(rigidBodyRef) ==
+              RigidBodyType::kTriangleMeshKinematic);
     }
   }
 }

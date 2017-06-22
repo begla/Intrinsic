@@ -4,14 +4,7 @@
         "name": "default_PBR",
         "imageType": 1,
         "imageFormat": 7,
-        "flags": 16,
-        "dimensions": [
-            512.0,
-            512.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 10,
-        "fileName": "default_PBR.dds"
+        "fileName": "default_PBR.dds",
+        "avgNormLength": 1.0
     }
 }

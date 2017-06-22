@@ -51,39 +51,44 @@
         </property>
         <property name="icon">
          <iconset resource="../IntrinsicEd.qrc">
-          <normaloff>:/Icons/plus</normaloff>:/Icons/plus</iconset>
+          <normaloff>:/Icons/icons/essential/plus.png</normaloff>:/Icons/icons/essential/plus.png</iconset>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="refreshManager">
+        <property name="toolTip">
+         <string>Refresh</string>
+        </property>
         <property name="text">
          <string/>
         </property>
         <property name="icon">
          <iconset resource="../IntrinsicEd.qrc">
-          <normaloff>:/Icons/refresh</normaloff>:/Icons/refresh</iconset>
+          <normaloff>:/Icons/icons/arrows/redo.png</normaloff>:/Icons/icons/arrows/redo.png</iconset>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line">
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="saveManager">
+        <property name="toolTip">
+         <string>Save Manager</string>
+        </property>
         <property name="text">
          <string>...</string>
         </property>
         <property name="icon">
          <iconset resource="../IntrinsicEd.qrc">
-          <normaloff>:/Icons/save</normaloff>:/Icons/save</iconset>
+          <normaloff>:/Icons/icons/various/diskette.png</normaloff>:/Icons/icons/various/diskette.png</iconset>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

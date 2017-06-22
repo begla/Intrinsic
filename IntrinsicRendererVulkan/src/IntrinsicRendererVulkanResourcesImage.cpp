@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
-// Lib. includes
-#include "gli.hpp"
+#define MAX_GLOBAL_DESCRIPTORS 4096u
 
 namespace Intrinsic
 {
@@ -27,6 +26,47 @@ namespace Vulkan
 {
 namespace Resources
 {
+namespace
+{
+VkDescriptorSetLayout _globalDescriptorSetLayout;
+VkDescriptorPool _globalDescriptorPool;
+VkDescriptorSet _globalDescriptorSet;
+uint32_t _globalTextureId = 0u;
+
+_INTR_INLINE void updateGlobalDescriptorSetForSingleImage(ImageRef p_ImageRef)
+{
+  VkDescriptorImageInfo imageInfo;
+  {
+    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imageInfo.imageView = ImageManager::_vkImageView(p_ImageRef);
+    imageInfo.sampler = Samplers::samplers[Samplers::kLinearRepeat];
+  }
+
+  uint32_t textureId = ImageManager::getTextureId(p_ImageRef);
+  if (textureId == (uint32_t)-1)
+  {
+    textureId = _globalTextureId++;
+    ImageManager::_globalTextureIdMapping[p_ImageRef] = textureId;
+  }
+
+  VkWriteDescriptorSet write;
+  {
+    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write.pNext = nullptr;
+    write.dstSet = _globalDescriptorSet;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write.descriptorCount = 1u;
+    write.pImageInfo = &imageInfo;
+    write.dstBinding = 0u;
+    write.dstArrayElement = textureId;
+  }
+  vkUpdateDescriptorSets(RenderSystem::_vkDevice, 1u, &write, 0u, nullptr);
+}
+}
+
+// Static members
+_INTR_HASH_MAP(Dod::Ref, uint32_t) ImageManager::_globalTextureIdMapping;
+
 void ImageManager::init()
 {
   _INTR_LOG_INFO("Inititializing Image Manager...");
@@ -63,6 +103,65 @@ void ImageManager::init()
   }
 
   _defaultResourceName = _N(checkerboard);
+
+  // Init. global descriptor sets
+  {
+    VkDescriptorSetLayoutBinding globalImageBinding = {};
+    {
+      globalImageBinding.binding = 0u;
+      globalImageBinding.descriptorType =
+          VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+      globalImageBinding.descriptorCount = MAX_GLOBAL_DESCRIPTORS;
+      globalImageBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+      globalImageBinding.pImmutableSamplers = nullptr;
+    }
+
+    VkDescriptorSetLayoutCreateInfo descGlobalLayout = {};
+    {
+      descGlobalLayout.sType =
+          VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+      descGlobalLayout.pNext = nullptr;
+      descGlobalLayout.bindingCount = 1u;
+      descGlobalLayout.pBindings = &globalImageBinding;
+
+      VkResult result = vkCreateDescriptorSetLayout(
+          RenderSystem::_vkDevice, &descGlobalLayout, nullptr,
+          &_globalDescriptorSetLayout);
+      _INTR_VK_CHECK_RESULT(result);
+    }
+
+    VkDescriptorPoolSize poolSize;
+    {
+      poolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+      poolSize.descriptorCount = MAX_GLOBAL_DESCRIPTORS;
+    }
+
+    VkDescriptorPoolCreateInfo descriptorPool = {};
+    descriptorPool.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    descriptorPool.pNext = nullptr;
+    descriptorPool.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+    descriptorPool.maxSets = 1u;
+    descriptorPool.poolSizeCount = 1u;
+    descriptorPool.pPoolSizes = &poolSize;
+
+    VkResult result =
+        vkCreateDescriptorPool(RenderSystem::_vkDevice, &descriptorPool,
+                               nullptr, &_globalDescriptorPool);
+    _INTR_VK_CHECK_RESULT(result);
+
+    VkDescriptorSetAllocateInfo allocInfo = {};
+    {
+      allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+      allocInfo.pNext = nullptr;
+      allocInfo.descriptorPool = _globalDescriptorPool;
+      allocInfo.descriptorSetCount = 1u;
+      allocInfo.pSetLayouts = &_globalDescriptorSetLayout;
+
+      VkResult result = vkAllocateDescriptorSets(
+          RenderSystem::_vkDevice, &allocInfo, &_globalDescriptorSet);
+      _INTR_VK_CHECK_RESULT(result);
+    }
+  }
 }
 
 // <-
@@ -98,6 +197,9 @@ void createTexture(ImageRef p_Ref)
   VkImage& vkImage = ImageManager::_vkImage(p_Ref);
   VkFormat vkFormat =
       Helper::mapFormatToVkFormat(ImageManager::_descImageFormat(p_Ref));
+  const bool isSrgbFormat = vkFormat == VK_FORMAT_B8G8R8A8_SRGB ||
+                            vkFormat == VK_FORMAT_B8G8R8A8_UNORM;
+
   GpuMemoryAllocationInfo& memoryAllocationInfo =
       ImageManager::_memoryAllocationInfo(p_Ref);
   MemoryPoolType::Enum memoryPoolType =
@@ -121,6 +223,9 @@ void createTexture(ImageRef p_Ref)
   VkImageViewType vkImageViewType = arrayLayerCount == 1u
                                         ? VK_IMAGE_VIEW_TYPE_1D
                                         : VK_IMAGE_VIEW_TYPE_1D_ARRAY;
+  ImageManager::_imageTextureType(p_Ref) = arrayLayerCount == 1u
+                                               ? ImageTextureType::k1D
+                                               : ImageTextureType::k1DArray;
 
   if (dimensions.y >= 2.0f && dimensions.z == 1.0f)
   {
@@ -128,6 +233,9 @@ void createTexture(ImageRef p_Ref)
     vkImageViewTypeSubResource = VK_IMAGE_VIEW_TYPE_2D;
     vkImageViewType = arrayLayerCount == 1u ? VK_IMAGE_VIEW_TYPE_2D
                                             : VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+    ImageManager::_imageTextureType(p_Ref) = arrayLayerCount == 1u
+                                                 ? ImageTextureType::k2D
+                                                 : ImageTextureType::k2DArray;
   }
   else if (dimensions.y >= 2.0f && dimensions.z >= 2.0f)
   {
@@ -135,6 +243,7 @@ void createTexture(ImageRef p_Ref)
     vkImageType = VK_IMAGE_TYPE_3D;
     vkImageViewTypeSubResource = VK_IMAGE_VIEW_TYPE_3D;
     vkImageViewType = VK_IMAGE_VIEW_TYPE_3D;
+    ImageManager::_imageTextureType(p_Ref) = ImageTextureType::k3D;
   }
 
   VkImageCreateInfo imageCreateInfo = {};
@@ -228,7 +337,8 @@ void createTexture(ImageRef p_Ref)
     imageCreateInfo.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
   }
 
-  imageCreateInfo.flags = 0u;
+  imageCreateInfo.flags =
+      isSrgbFormat ? VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT : 0u;
 
   VkResult result = vkCreateImage(RenderSystem::_vkDevice, &imageCreateInfo,
                                   nullptr, &vkImage);
@@ -307,6 +417,19 @@ void createTexture(ImageRef p_Ref)
 
   result = vkCreateImageView(RenderSystem::_vkDevice, &imageViewCreateInfo,
                              nullptr, &ImageManager::_vkImageView(p_Ref));
+
+  if (isSrgbFormat)
+  {
+    imageViewCreateInfo.format = VK_FORMAT_B8G8R8A8_SRGB;
+    result =
+        vkCreateImageView(RenderSystem::_vkDevice, &imageViewCreateInfo,
+                          nullptr, &ImageManager::_vkImageViewGamma(p_Ref));
+    imageViewCreateInfo.format = VK_FORMAT_B8G8R8A8_UNORM;
+    result =
+        vkCreateImageView(RenderSystem::_vkDevice, &imageViewCreateInfo,
+                          nullptr, &ImageManager::_vkImageViewLinear(p_Ref));
+  }
+
   _INTR_VK_CHECK_RESULT(result);
 }
 
@@ -394,6 +517,14 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
     }
   }
 
+  VkFormatProperties props;
+  vkGetPhysicalDeviceFormatProperties(RenderSystem::_vkPhysicalDevice, vkFormat,
+                                      &props);
+
+  _INTR_ASSERT((props.optimalTilingFeatures &
+                VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) > 0u &&
+               "Format does not support optimal tiling");
+
   VkImageCreateInfo imageCreateInfo = {};
   {
     imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -474,6 +605,7 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
   _INTR_VK_CHECK_RESULT(result);
 
   ImageManager::_vkImageView(p_Ref) = vkImageView;
+  ImageManager::_imageTextureType(p_Ref) = ImageTextureType::kCube;
 }
 
 // <-
@@ -557,6 +689,13 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
     offset += static_cast<uint32_t>(tex2D[i].size());
   }
 
+  VkFormatProperties props;
+  vkGetPhysicalDeviceFormatProperties(RenderSystem::_vkPhysicalDevice, vkFormat,
+                                      &props);
+  _INTR_ASSERT((props.optimalTilingFeatures &
+                VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) > 0u &&
+               "Format does not support optimal tiling");
+
   VkImageCreateInfo imageCreateInfo = {};
   {
     imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -637,6 +776,9 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
   _INTR_VK_CHECK_RESULT(result);
 
   ImageManager::_vkImageView(p_Ref) = vkImageView;
+  ImageManager::_imageTextureType(p_Ref) = ImageTextureType::k2D;
+
+  updateGlobalDescriptorSetForSingleImage(p_Ref);
 }
 
 // <-
@@ -694,6 +836,69 @@ void ImageManager::createResources(const ImageRefArray& p_Images)
       createTextureFromFile(ref);
     }
   }
+}
+
+void ImageManager::updateGlobalDescriptorSet()
+{
+  // Write to global descriptor set
+  _INTR_ARRAY(VkDescriptorImageInfo) imageInfos;
+  imageInfos.resize(MAX_GLOBAL_DESCRIPTORS);
+
+  VkDescriptorImageInfo defaultImageInfo;
+  {
+    defaultImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    defaultImageInfo.imageView = ImageManager::_vkImageView(
+        ImageManager::getResourceByName(_N(checkerboard)));
+    defaultImageInfo.sampler = Samplers::samplers[Samplers::kLinearRepeat];
+  }
+  std::fill(imageInfos.begin(), imageInfos.end(), defaultImageInfo);
+
+  _globalTextureIdMapping.clear();
+  _globalTextureId = 0u;
+  for (uint32_t i = 0u; i < _activeRefs.size(); ++i)
+  {
+    ImageRef imgRef = _activeRefs[i];
+
+    if (_imageTextureType(imgRef) != ImageTextureType::k2D ||
+        _descImageType(imgRef) != ImageType::kTextureFromFile)
+    {
+      continue;
+    }
+
+    // Update mapping
+    const uint32_t id = _globalTextureId++;
+    _globalTextureIdMapping[imgRef] = id;
+
+    VkDescriptorImageInfo& imageInfo = imageInfos[id];
+    {
+      imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+      imageInfo.imageView = ImageManager::_vkImageView(imgRef);
+      imageInfo.sampler = Samplers::samplers[Samplers::kLinearRepeat];
+    }
+  }
+
+  VkWriteDescriptorSet write;
+  {
+    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write.pNext = nullptr;
+    write.dstSet = _globalDescriptorSet;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write.descriptorCount = (uint32_t)imageInfos.size();
+    write.pImageInfo = imageInfos.data();
+    write.dstBinding = 0u;
+    write.dstArrayElement = 0u;
+  }
+  vkUpdateDescriptorSets(RenderSystem::_vkDevice, 1u, &write, 0u, nullptr);
+}
+
+VkDescriptorSetLayout ImageManager::getGlobalDescriptorSetLayout()
+{
+  return _globalDescriptorSetLayout;
+}
+
+VkDescriptorSet ImageManager::getGlobalDescriptorSet()
+{
+  return _globalDescriptorSet;
 }
 }
 }

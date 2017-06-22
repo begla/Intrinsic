@@ -1,0 +1,10 @@
+{
+    "name": "gbuffer_grass.vert",
+    "properties": {
+        "name": "gbuffer_grass.vert",
+        "gpuProgramName": "gbuffer_foliage.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "#define GRASS",
+        "gpuProgramType": 0
+    }
+}

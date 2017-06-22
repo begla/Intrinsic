@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref DrawCallRef;
 typedef _INTR_ARRAY(DrawCallRef) DrawCallRefArray;
 
@@ -49,6 +50,7 @@ struct DrawCallData : Dod::Resources::ResourceDataBase
     sortingHash.resize(_INTR_MAX_DRAW_CALL_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(uint32_t) descVertexCount;
   _INTR_ARRAY(uint32_t) descIndexCount;
   _INTR_ARRAY(uint32_t) descInstanceCount;
@@ -61,7 +63,7 @@ struct DrawCallData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(uint8_t) descMaterialPass;
   _INTR_ARRAY(Dod::Ref) descMeshComponent;
 
-  // GPU resources
+  // Resources
   _INTR_ARRAY(_INTR_ARRAY(uint32_t)) dynamicOffsets;
   _INTR_ARRAY(VkDescriptorSet) vkDescriptorSet;
   _INTR_ARRAY(_INTR_ARRAY(VkDeviceSize)) vertexBufferOffsets;
@@ -96,6 +98,9 @@ struct DrawCallManager
   _INTR_INLINE static void allocateUniformMemory(DrawCallRef p_DrawCall)
   {
     _INTR_ARRAY(BindingInfo)& bindInfos = _descBindInfos(p_DrawCall);
+    static const uint32_t perFrameRangeSizeInBytes =
+        sizeof(RenderProcess::PerFrameDataVertex) +
+        sizeof(RenderProcess::PerFrameDataFrament);
 
     uint32_t dynamicOffsetIndex = 0u;
     for (uint32_t bIdx = 0u; bIdx < bindInfos.size(); ++bIdx)
@@ -127,6 +132,16 @@ struct DrawCallManager
           _dynamicOffsets(p_DrawCall)[dynamicOffsetIndex] =
               MaterialManager::_perMaterialDataFragmentOffset(
                   _descMaterial(p_DrawCall));
+        }
+        else if (bindInfo.bufferData.uboType == UboType::kPerFrameVertex)
+        {
+          _dynamicOffsets(p_DrawCall)[dynamicOffsetIndex] = RenderProcess::
+              UniformManager::getDynamicOffsetForPerFrameDataVertex();
+        }
+        else if (bindInfo.bufferData.uboType == UboType::kPerFrameFragment)
+        {
+          _dynamicOffsets(p_DrawCall)[dynamicOffsetIndex] = RenderProcess::
+              UniformManager::getDynamicOffsetForPerFrameDataFragment();
         }
 
         ++dynamicOffsetIndex;
@@ -267,11 +282,13 @@ struct DrawCallManager
   }
 
   _INTR_INLINE static void initFromDescriptor(DrawCallRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         DrawCallData,
-        _INTR_MAX_DRAW_CALL_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
+        _INTR_MAX_DRAW_CALL_COUNT>::_initFromDescriptor(p_Ref, p_GenerateDesc,
+                                                        p_Properties);
   }
 
   _INTR_INLINE static void saveToSingleFile(const char* p_FileName)
@@ -414,13 +431,7 @@ struct DrawCallManager
                          uint8_t p_UboType, uint32_t p_RangeInBytes,
                          uint32_t p_OffsetInBytes = 0u);
 
-  // <-
-
-  // Member refs.
-  // ->
-
   // Description
-
   _INTR_INLINE static uint32_t& _descVertexCount(DrawCallRef p_Ref)
   {
     return _data.descVertexCount[p_Ref._id];
@@ -468,7 +479,6 @@ struct DrawCallManager
   }
 
   // Resources
-
   _INTR_INLINE static uint32_t& _sortingHash(DrawCallRef p_Ref)
   {
     return _data.sortingHash[p_Ref._id];
@@ -494,8 +504,6 @@ struct DrawCallManager
   {
     return _data.vkDescriptorSet[p_Ref._id];
   }
-
-  // <-
 
   // Static members
   static _INTR_ARRAY(_INTR_ARRAY(DrawCallRef)) _drawCallsPerMaterialPass;

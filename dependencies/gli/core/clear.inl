@@ -25,7 +25,7 @@ namespace gli
 		for(size_t FaceIndex = 0, FaceCount = Texture.faces(); FaceIndex < FaceCount; ++FaceIndex)
 		for(size_t LevelIndex = 0; LevelIndex < LevelCount; ++LevelIndex)
 		{
-			Texture.clear<gen_type>(LayerIndex, FaceIndex, BaseLevel + LevelIndex, BlockData);
+			Texture.template clear<gen_type>(LayerIndex, FaceIndex, BaseLevel + LevelIndex, BlockData);
 		}
 	}
 
@@ -42,7 +42,7 @@ namespace gli
 		for(size_t FaceIndex = 0; FaceIndex < FaceCount; ++FaceIndex)
 		for(size_t LevelIndex = 0, LevelCount = Texture.levels(); LevelIndex < LevelCount; ++LevelIndex)
 		{
-			Texture.clear<gen_type>(LayerIndex, BaseFace + FaceIndex, LevelIndex, BlockData);
+			Texture.template clear<gen_type>(LayerIndex, BaseFace + FaceIndex, LevelIndex, BlockData);
 		}
 	}
 
@@ -59,7 +59,7 @@ namespace gli
 		for(size_t FaceIndex = 0, FaceCount = Texture.faces(); FaceIndex < FaceCount; ++FaceIndex)
 		for(size_t LevelIndex = 0, LevelCount = Texture.levels(); LevelIndex < LevelCount; ++LevelIndex)
 		{
-			Texture.clear<gen_type>(LayerIndex + BaseLayer, FaceIndex, LevelIndex, BlockData);
+			Texture.template clear<gen_type>(LayerIndex + BaseLayer, FaceIndex, LevelIndex, BlockData);
 		}
 	}
 

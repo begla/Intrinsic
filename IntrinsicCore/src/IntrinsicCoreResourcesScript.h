@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref ScriptRef;
 typedef _INTR_ARRAY(ScriptRef) ScriptRefArray;
 
@@ -30,8 +31,7 @@ struct ScriptData : Dod::Resources::ResourceDataBase
     descScriptFileName.resize(_INTR_MAX_SCRIPT_COUNT);
   }
 
-  // <-
-
+  // Description
   _INTR_ARRAY(_INTR_STRING) descScriptFileName;
 };
 
@@ -87,10 +87,12 @@ struct ScriptManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(ScriptRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         ScriptData, _INTR_MAX_SCRIPT_COUNT>::_initFromDescriptor(p_Ref,
+                                                                 p_GenerateDesc,
                                                                  p_Properties);
 
     if (p_Properties.HasMember("scriptFileName"))
@@ -159,13 +161,6 @@ struct ScriptManager
                              float p_DeltaT);
   static void callOnCreate(ScriptRef p_ScriptRef, Dod::Ref p_ScriptCompRef);
   static void callOnDestroy(ScriptRef p_Script, Dod::Ref p_ScriptCompRef);
-
-  // <-
-
-  // Getter/Setter
-  // ->
-
-  // <-
 
   // Description
   _INTR_INLINE static _INTR_STRING& _descScriptFileName(ScriptRef p_Ref)

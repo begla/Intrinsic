@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 #include "stdafx.h"
 #include "stdafx_editor.h"
 
+using namespace RVResources;
+
 IntrinsicEdManagerWindowGpuProgram::IntrinsicEdManagerWindowGpuProgram(
     QWidget* parent)
     : IntrinsicEdManagerWindowBase(parent)
@@ -24,7 +26,6 @@ IntrinsicEdManagerWindowGpuProgram::IntrinsicEdManagerWindowGpuProgram(
   _propertyCompilerEntry =
       Application::_resourcePropertyCompilerMapping[_N(GpuProgram)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(GpuProgram)];
-  _resourceIcon = QIcon(":/Icons/calendar");
   _managerPath = "managers/gpu_programs/";
   _managerExtension = ".gpu_program.json";
   _resourceName = "GpuProgram";
@@ -47,15 +48,12 @@ void IntrinsicEdManagerWindowGpuProgram::onShaderChanged(
     const QString& p_FileName)
 {
   // Recompile shaders
-  for (uint32_t i = 0u;
-       i < Vulkan::Resources::GpuProgramManager::getActiveResourceCount(); ++i)
+  for (uint32_t i = 0u; i < GpuProgramManager::getActiveResourceCount(); ++i)
   {
-    Vulkan::Resources::GpuProgramRef ref =
-        Vulkan::Resources::GpuProgramManager::getActiveResourceAtIndex(i);
+    GpuProgramRef ref = GpuProgramManager::getActiveResourceAtIndex(i);
     if (strcmp(p_FileName.toStdString().c_str(),
                (_shaderAssetPath +
-                Vulkan::Resources::GpuProgramManager::_descGpuProgramName(ref)
-                    .c_str())
+                GpuProgramManager::_descGpuProgramName(ref).c_str())
                    .toStdString()
                    .c_str()) == 0u)
     {
@@ -77,20 +75,17 @@ void IntrinsicEdManagerWindowGpuProgram::onResourceTreePopulated()
   if (!files.empty())
     _shaderChangeWatch->removePaths(files);
 
-  for (uint32_t i = 0u;
-       i < Vulkan::Resources::GpuProgramManager::getActiveResourceCount(); ++i)
+  for (uint32_t i = 0u; i < GpuProgramManager::getActiveResourceCount(); ++i)
   {
-    Vulkan::Resources::GpuProgramRef ref =
-        Vulkan::Resources::GpuProgramManager::getActiveResourceAtIndex(i);
+    GpuProgramRef ref = GpuProgramManager::getActiveResourceAtIndex(i);
     _shaderChangeWatch->addPath(
-        _shaderAssetPath +
-        Vulkan::Resources::GpuProgramManager::_descGpuProgramName(ref).c_str());
+        _shaderAssetPath + GpuProgramManager::_descGpuProgramName(ref).c_str());
   }
 }
 
 void IntrinsicEdManagerWindowGpuProgram::onCompileQueuedShaders()
 {
-  Vulkan::Resources::GpuProgramManager::compileShaders(_shadersToRecompile);
+  GpuProgramManager::compileShaders(_shadersToRecompile);
   _shadersToRecompile.clear();
 
   onResourceTreePopulated();

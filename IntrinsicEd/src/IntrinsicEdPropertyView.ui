@@ -12,8 +12,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>100</width>
-    <height>100</height>
+    <width>154</width>
+    <height>147</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
     <item alignment="Qt::AlignLeft">
      <widget class="QFrame" name="frame">
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
@@ -52,17 +52,10 @@
          </property>
          <property name="icon">
           <iconset resource="../IntrinsicEd.qrc">
-           <normaloff>:/Icons/refresh</normaloff>:/Icons/refresh</iconset>
+           <normaloff>:/Icons/icons/arrows/redo.png</normaloff>:/Icons/icons/arrows/redo.png</iconset>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Line" name="line_2">
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+         <property name="autoRaise">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -76,7 +69,10 @@
          </property>
          <property name="icon">
           <iconset resource="../IntrinsicEd.qrc">
-           <normaloff>:/Icons/plus</normaloff>:/Icons/plus</iconset>
+           <normaloff>:/Icons/icons/arrows/expand.png</normaloff>:/Icons/icons/arrows/expand.png</iconset>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -90,17 +86,10 @@
          </property>
          <property name="icon">
           <iconset resource="../IntrinsicEd.qrc">
-           <normaloff>:/Icons/minus</normaloff>:/Icons/minus</iconset>
+           <normaloff>:/Icons/icons/arrows/shrink.png</normaloff>:/Icons/icons/arrows/shrink.png</iconset>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Line" name="line">
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+         <property name="autoRaise">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -114,7 +103,10 @@
          </property>
          <property name="icon">
           <iconset resource="../IntrinsicEd.qrc">
-           <normaloff>:/Icons/doc</normaloff>:/Icons/doc</iconset>
+           <normaloff>:/Icons/icons/arrows/down-arrow-1.png</normaloff>:/Icons/icons/arrows/down-arrow-1.png</iconset>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -141,7 +133,7 @@
          <x>0</x>
          <y>0</y>
          <width>380</width>
-         <height>522</height>
+         <height>524</height>
         </rect>
        </property>
        <property name="layoutDirection">

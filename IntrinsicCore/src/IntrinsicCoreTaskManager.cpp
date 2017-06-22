@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,6 +47,8 @@ void TaskManager::executeTasks()
 
   if (_frameCounter > 0u)
   {
+    _INTR_PROFILE_CPU("TaskManager", "Limit To Max FPS");
+
     _lastDeltaT = std::min(
         (TimingHelper::getMicroseconds() - _lastUpdate) * 0.000001f, 0.3f);
     _lastActualFrameDuration = _lastDeltaT;
@@ -68,6 +70,8 @@ void TaskManager::executeTasks()
 
     // Events and input
     {
+      _INTR_PROFILE_CPU("TaskManager", "Pump Events");
+
       Input::System::reset();
       SystemEventProvider::SDL::pumpEvents();
     }
@@ -112,6 +116,11 @@ void TaskManager::executeTasks()
           Components::SwarmManager::_activeRefs, modDeltaT);
     }
 
+    // Update the day/night cycle
+    {
+      World::updateDayNightCycle(modDeltaT);
+    }
+
     // Post effect system
     {
       Components::PostEffectVolumeManager::blendPostEffects(
@@ -128,7 +137,7 @@ void TaskManager::executeTasks()
     _INTR_PROFILE_CPU("TaskManager", "Rendering Tasks");
 
     // Rendering
-    Renderer::Vulkan::RenderProcess::Default::renderFrame(modDeltaT);
+    RV::RenderProcess::Default::renderFrame(modDeltaT);
   }
 
   {

@@ -51,8 +51,8 @@ TParseContext::TParseContext(TSymbolTable& symbolTable, TIntermediate& interm, b
                              int version, EProfile profile, const SpvVersion& spvVersion, EShLanguage language,
                              TInfoSink& infoSink, bool forwardCompatible, EShMessages messages) :
             TParseContextBase(symbolTable, interm, parsingBuiltins, version, profile, spvVersion, language, infoSink, forwardCompatible, messages),
-            contextPragma(true, false), loopNestingLevel(0), structNestingLevel(0), controlFlowNestingLevel(0), statementNestingLevel(0),
-            inMain(false), postMainReturn(false), currentFunctionType(nullptr), blockName(nullptr),
+            inMain(false),
+            blockName(nullptr),
             limits(resources.limits),
             atomicUintOffsets(nullptr), anyIndexLimits(false)
 {
@@ -912,7 +912,7 @@ TIntermAggregate* TParseContext::handleFunctionDefinition(const TSourceLoc& loc,
     loopNestingLevel = 0;
     statementNestingLevel = 0;
     controlFlowNestingLevel = 0;
-    postMainReturn = false;
+    postEntryPointReturn = false;
 
     return paramNodes;
 }
@@ -1193,7 +1193,7 @@ void TParseContext::checkLocation(const TSourceLoc& loc, TOperator op)
                 error(loc, "tessellation control barrier() cannot be placed within flow control", "", "");
             if (! inMain)
                 error(loc, "tessellation control barrier() must be in main()", "", "");
-            else if (postMainReturn)
+            else if (postEntryPointReturn)
                 error(loc, "tessellation control barrier() cannot be placed after a return from main()", "", "");
         }
         break;
@@ -1442,8 +1442,55 @@ void TParseContext::builtInOpCheck(const TSourceLoc& loc, const TFunction& fnCan
                 error(loc, "must be a compile-time constant:", feature, "component argument");
         }
 
+#ifdef AMD_EXTENSIONS
+        bool bias = false;
+        if (callNode.getOp() == EOpTextureGather)
+            bias = fnCandidate.getParamCount() > 3;
+        else if (callNode.getOp() == EOpTextureGatherOffset ||
+                 callNode.getOp() == EOpTextureGatherOffsets)
+            bias = fnCandidate.getParamCount() > 4;
+
+        if (bias) {
+            TString biasFeatureString = fnCandidate.getName() + "with bias argument";
+            const char* feature = biasFeatureString.c_str();
+            profileRequires(loc, ~EEsProfile, 450, nullptr, feature);
+            requireExtensions(loc, 1, &E_GL_AMD_texture_gather_bias_lod, feature);
+        }
+#endif
+
         break;
     }
+
+#ifdef AMD_EXTENSIONS
+    case EOpSparseTextureGather:
+    case EOpSparseTextureGatherOffset:
+    case EOpSparseTextureGatherOffsets:
+    {
+        bool bias = false;
+        if (callNode.getOp() == EOpSparseTextureGather)
+            bias = fnCandidate.getParamCount() > 4;
+        else if (callNode.getOp() == EOpSparseTextureGatherOffset ||
+                 callNode.getOp() == EOpSparseTextureGatherOffsets)
+            bias = fnCandidate.getParamCount() > 5;
+
+        if (bias) {
+            TString featureString = fnCandidate.getName() + "with bias argument";
+            const char* feature = featureString.c_str();
+            profileRequires(loc, ~EEsProfile, 450, nullptr, feature);
+            requireExtensions(loc, 1, &E_GL_AMD_texture_gather_bias_lod, feature);
+        }
+
+        break;
+    }
+
+    case EOpSparseTextureGatherLod:
+    case EOpSparseTextureGatherLodOffset:
+    case EOpSparseTextureGatherLodOffsets:
+    {
+        requireExtensions(loc, 1, &E_GL_ARB_sparse_texture2, fnCandidate.getName().c_str());
+        break;
+    }
+#endif
 
     case EOpTextureOffset:
     case EOpTextureFetchOffset:
@@ -2102,6 +2149,17 @@ bool TParseContext::constructorError(const TSourceLoc& loc, TIntermNode* node, T
     case EOpConstructDMat4x2:
     case EOpConstructDMat4x3:
     case EOpConstructDMat4x4:
+#ifdef AMD_EXTENSIONS
+    case EOpConstructF16Mat2x2:
+    case EOpConstructF16Mat2x3:
+    case EOpConstructF16Mat2x4:
+    case EOpConstructF16Mat3x2:
+    case EOpConstructF16Mat3x3:
+    case EOpConstructF16Mat3x4:
+    case EOpConstructF16Mat4x2:
+    case EOpConstructF16Mat4x3:
+    case EOpConstructF16Mat4x4:
+#endif
         constructingMatrix = true;
         break;
     default:
@@ -4334,6 +4392,25 @@ void TParseContext::layoutObjectCheck(const TSourceLoc& loc, const TSymbol& symb
         }
     }
 
+    // user-variable location check, which are required for SPIR-V in/out:
+    //  - variables have it directly,
+    //  - blocks have it on each member (already enforced), so check first one
+    if (spvVersion.spv > 0 && !parsingBuiltins && qualifier.builtIn == EbvNone &&
+        !qualifier.hasLocation() && !intermediate.getAutoMapLocations()) {
+
+        switch (qualifier.storage) {
+        case EvqVaryingIn:
+        case EvqVaryingOut:
+            if (type.getBasicType() != EbtBlock || 
+                (!(*type.getStruct())[0].type->getQualifier().hasLocation() && 
+                  (*type.getStruct())[0].type->getQualifier().builtIn == EbvNone))
+                error(loc, "SPIR-V requires location for user input/output", "location", "");
+            break;
+        default:
+            break;
+        }
+    }
+
     // Check packing and matrix
     if (qualifier.hasUniformLayout()) {
         switch (qualifier.storage) {
@@ -4358,6 +4435,22 @@ void TParseContext::layoutObjectCheck(const TSourceLoc& loc, const TSymbol& symb
             // these were already filtered by layoutTypeCheck() (or its callees)
             break;
         }
+    }
+}
+
+// "For some blocks declared as arrays, the location can only be applied at the block level:
+// When a block is declared as an array where additional locations are needed for each member
+// for each block array element, it is a compile-time error to specify locations on the block
+// members.  That is, when locations would be under specified by applying them on block members,
+// they are not allowed on block members.  For arrayed interfaces (those generally having an
+// extra level of arrayness due to interface expansion), the outer array is stripped before
+// applying this rule."
+void TParseContext::layoutMemberLocationArrayCheck(const TSourceLoc& loc, bool memberWithLocation, TArraySizes* arraySizes)
+{
+    if (memberWithLocation && arraySizes != nullptr) {
+        if (arraySizes->getNumDims() > (currentBlockQualifier.isArrayedIo(language) ? 1 : 0))
+            error(loc, "cannot use in a block array where new locations are needed for each block element",
+                       "location", "");
     }
 }
 
@@ -5022,6 +5115,8 @@ TIntermNode* TParseContext::declareVariable(const TSourceLoc& loc, TString& iden
 
     // look for errors in layout qualifier use
     layoutObjectCheck(loc, *symbol);
+
+    // fix up
     fixOffset(loc, *symbol);
 
     return initNode;
@@ -5661,6 +5756,8 @@ void TParseContext::declareBlock(const TSourceLoc& loc, TTypeList& typeList, con
         memberQualifier = newMemberQualification;
     }
 
+    layoutMemberLocationArrayCheck(loc, memberWithLocation, arraySizes);
+
     // Process the members
     fixBlockLocations(loc, currentBlockQualifier, typeList, memberWithLocation, memberWithoutLocation);
     fixBlockXfbOffsets(currentBlockQualifier, typeList);
@@ -5728,6 +5825,7 @@ void TParseContext::declareBlock(const TSourceLoc& loc, TTypeList& typeList, con
     // Check for general layout qualifier errors
     layoutObjectCheck(loc, variable);
 
+    // fix up
     if (isIoResizeArray(blockType)) {
         ioArraySymbolResizeList.push_back(&variable);
         checkIoArraysConsistency(loc, true);
@@ -5842,7 +5940,7 @@ void TParseContext::fixBlockLocations(const TSourceLoc& loc, TQualifier& qualifi
                     if (nextLocation >= (int)TQualifier::layoutLocationEnd)
                         error(memberLoc, "location is too large", "location", "");
                     memberQualifier.layoutLocation = nextLocation;
-                    memberQualifier.layoutComponent = 0;
+                    memberQualifier.layoutComponent = TQualifier::layoutComponentEnd;
                 }
                 nextLocation = memberQualifier.layoutLocation + intermediate.computeTypeLocationSize(*typeList[member].type);
             }

@@ -11,8 +11,11 @@
 // Ui
 #include "ui_IntrinsicEd.h"
 
+using namespace RVResources;
+
 IntrinsicEdNodeView* IntrinsicEd::_nodeView = nullptr;
 IntrinsicEdPropertyView* IntrinsicEd::_propertyView = nullptr;
+IntrinsicEdPrefabsBrowser* IntrinsicEd::_prefabsBrowser = nullptr;
 IntrinsicEdManagerWindowGpuProgram* IntrinsicEd::_managerWindowGpuProgram =
     nullptr;
 IntrinsicEdManagerWindowScript* IntrinsicEd::_managerWindowScript = nullptr;
@@ -25,8 +28,12 @@ IntrinsicEdManagerWindowPostEffect* IntrinsicEd::_managerWindowPostEffect =
 IntrinsicEd* IntrinsicEd::_mainWindow = nullptr;
 IntrinsicEdViewport* IntrinsicEd::_viewport = nullptr;
 
-_INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) IntrinsicEd::_categoryToIconMapping;
-_INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) IntrinsicEd::_componentToIconMapping;
+QDockWidget* _editingView = nullptr;
+
+_INTR_ARRAY(QIcon) IntrinsicEd::_icons;
+_INTR_ARRAY(QPixmap) IntrinsicEd::_pixmaps;
+_INTR_HASH_MAP(_INTR_STRING, uint32_t) IntrinsicEd::_stringToIconMapping;
+_INTR_HASH_MAP(_INTR_STRING, uint32_t) IntrinsicEd::_stringToPixmapMapping;
 
 SDL_Window* _sdlMainWindow = nullptr;
 SDL_Window* _sdlViewport = nullptr;
@@ -75,14 +82,15 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
   // Init. Intrinsic
   Application::init(GetModuleHandle(NULL), (void*)_ui.viewPort->winId());
+  IBL::initCubemapProcessing();
 
   // Activate editing game state
   GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
 
   // Init. resources
   {
-    Intrinsic::AssetManagement::Resources::AssetManager::init();
-    Intrinsic::AssetManagement::Resources::AssetManager::loadFromMultipleFiles(
+    AssetManagement::Resources::AssetManager::init();
+    AssetManagement::Resources::AssetManager::loadFromMultipleFiles(
         "managers/assets/", ".asset.json");
   }
 
@@ -111,53 +119,89 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
   // Setup category/component mappings
   {
-    _categoryToIconMapping["NodeLocalTransform"] = ":Icons/drawArrow";
-    _categoryToIconMapping["NodeWorldTransform"] = ":Icons/globe";
-    _categoryToIconMapping["Entity"] = ":Icons/lightbulb";
-    _categoryToIconMapping["Mesh"] = ":Icons/user";
-    _categoryToIconMapping["GpuProgram"] = ":Icons/calendar";
-    _categoryToIconMapping["Resource"] = ":Icons/case";
-    _categoryToIconMapping["PBR"] = ":Icons/lightbulb";
-    _categoryToIconMapping["Emissive"] = ":Icons/lightbulb";
-    _categoryToIconMapping["Textures"] = ":Icons/picture";
-    _categoryToIconMapping["Translucency"] = ":Icons/picture";
-    _categoryToIconMapping["UV"] = ":Icons/picture";
-    _categoryToIconMapping["Transparency"] = ":Icons/picture";
-    _categoryToIconMapping["Material"] = ":Icons/brush";
-    _categoryToIconMapping["Camera"] = ":Icons/film";
-    _categoryToIconMapping["CameraController"] = ":Icons/film";
-    _categoryToIconMapping["CharacterController"] = ":Icons/user";
-    _categoryToIconMapping["Swarm"] = ":Icons/users";
-    _categoryToIconMapping["Player"] = ":Icons/user";
-    _categoryToIconMapping["RigidBody"] = ":Icons/cube";
-    _categoryToIconMapping["PostEffectVolume"] = ":Icons/picture";
-    _categoryToIconMapping["Light"] = ":Icons/lightbulb";
-    _categoryToIconMapping["IrradianceProbe"] = ":Icons/lightbulb";
-  }
+    _INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) stringToIconPathMapping;
 
-  {
-    _componentToIconMapping["Camera"] = ":Icons/film";
-    _componentToIconMapping["CameraController"] = ":Icons/film";
-    _componentToIconMapping["CharacterController"] = ":Icons/user";
-    _componentToIconMapping["Swarm"] = ":Icons/users";
-    _componentToIconMapping["Player"] = ":Icons/user";
-    _componentToIconMapping["Node"] = ":Icons/target";
-    _componentToIconMapping["Mesh"] = ":Icons/user";
-    _componentToIconMapping["Script"] = ":Icons/script";
-    _componentToIconMapping["RigidBody"] = ":Icons/cube";
-    _componentToIconMapping["PostEffectVolume"] = ":Icons/picture";
-    _componentToIconMapping["Light"] = ":Icons/lightbulb";
-    _componentToIconMapping["IrradianceProbe"] = ":Icons/lightbulb";
+    stringToIconPathMapping["Camera"] =
+        ":Icons/icons/essential/photo-camera-1.png";
+    stringToIconPathMapping["CameraController"] =
+        ":Icons/icons/essential/controls-1.png";
+    stringToIconPathMapping["CharacterController"] =
+        ":Icons/icons/cad/cylinder.png";
+    stringToIconPathMapping["Swarm"] = ":Icons/icons/birds/bird-2.png";
+    stringToIconPathMapping["Player"] =
+        ":Icons/icons/tech/game-controller-5.png";
+    stringToIconPathMapping["RootNode"] = ":/Icons/icons/cad/circle-1.png";
+    stringToIconPathMapping["Node"] = ":/Icons/icons/cad/cube-1.png";
+    stringToIconPathMapping["Mesh"] = ":/Icons/icons/cad/cone.png";
+    stringToIconPathMapping["Script"] =
+        ":/Icons/icons/business/051-certificate.png";
+    stringToIconPathMapping["RigidBody"] = ":/Icons/icons/cad/corner.png";
+    stringToIconPathMapping["PostEffectVolume"] =
+        ":/Icons/icons/weather/rainbow-2.png";
+    stringToIconPathMapping["PostEffect"] =
+        ":/Icons/icons/weather/rainbow-2.png";
+    stringToIconPathMapping["Light"] = ":Icons/icons/various/idea.png";
+    stringToIconPathMapping["IrradianceProbe"] =
+        ":/Icons/icons/weather/clouds-and-sun.png";
+    stringToIconPathMapping["SpecularProbe"] =
+        ":/Icons/icons/weather/clouds-and-sun.png";
+    stringToIconPathMapping["NodeLocalTransform"] =
+        ":/Icons/icons/cad/rotate-1.png";
+    stringToIconPathMapping["NodeWorldTransform"] =
+        ":/Icons/icons/cad/rotate-1.png";
+    stringToIconPathMapping["Entity"] = ":/Icons/icons/essential/archive.png";
+    stringToIconPathMapping["Mesh"] = ":/Icons/icons/cad/cone.png";
+    stringToIconPathMapping["GpuProgram"] =
+        ":/Icons/icons/business/051-coding-1.png";
+    stringToIconPathMapping["Resource"] = ":/Icons/icons/essential/archive.png";
+    stringToIconPathMapping["Asset"] = ":/Icons/icons/essential/archive-3.png";
+    stringToIconPathMapping["PBR"] = ":Icons/icons/various/idea.png";
+    stringToIconPathMapping["Emissive"] = ":Icons/icons/various/idea.png";
+    stringToIconPathMapping["Textures"] = ":/Icons/icons/essential/picture.png";
+    stringToIconPathMapping["Texture"] = ":/Icons/icons/essential/picture.png";
+    stringToIconPathMapping["Image"] = ":/Icons/icons/essential/picture.png";
+    stringToIconPathMapping["Translucency"] = ":Icons/icons/various/idea.png";
+    stringToIconPathMapping["UV"] = ":/Icons/icons/essential/picture.png";
+    stringToIconPathMapping["Transparency"] = ":/Icons/icons/geometry/cube.png";
+    stringToIconPathMapping["Material"] = ":/Icons/icons/essential/layers.png";
+    stringToIconPathMapping["Lighting"] = ":Icons/icons/various/idea.png";
+    stringToIconPathMapping["VolumetricLighting"] =
+        ":/Icons/icons/weather/clouds.png";
+    stringToIconPathMapping["Water"] = ":/Icons/icons/weather/raindrops.png";
+    stringToIconPathMapping["DepthOfField"] =
+        ":Icons/icons/essential/photo-camera-1.png";
+    stringToIconPathMapping["Decal"] = ":Icons/icons/essential/picture-2.png";
+    stringToIconPathMapping["Folder"] = ":Icons/icons/essential/folder-8.png";
+    stringToIconPathMapping["File"] = ":Icons/icons/essential/file.png";
+    stringToIconPathMapping["Prefab"] = ":/Icons/icons/essential/compose.png";
+
+    for (auto it = stringToIconPathMapping.begin();
+         it != stringToIconPathMapping.end(); ++it)
+    {
+      _icons.push_back(QIcon(it->second.c_str()));
+      _stringToIconMapping[it->first] = (uint32_t)_icons.size() - 1u;
+    }
+    for (auto it = stringToIconPathMapping.begin();
+         it != stringToIconPathMapping.end(); ++it)
+    {
+      const QPixmap pixmap = QPixmap(it->second.c_str());
+      _pixmaps.push_back(pixmap.scaledToWidth(20u, Qt::SmoothTransformation));
+      _stringToPixmapMapping[it->first] = (uint32_t)_pixmaps.size() - 1u;
+    }
   }
 
   QObject::connect(_ui.actionExit, SIGNAL(triggered()), this, SLOT(onExit()));
   QObject::connect(_ui.actionLoad_World, SIGNAL(triggered()), this,
                    SLOT(onLoadWorld()));
+  QObject::connect(_ui.actionReload_World, SIGNAL(triggered()), this,
+                   SLOT(onReloadWorld()));
   QObject::connect(_ui.actionReload_Settings_And_Renderer_Config,
                    SIGNAL(triggered()), this,
                    SLOT(onReloadSettingsAndRendererConfig()));
   QObject::connect(_ui.actionSave_World, SIGNAL(triggered()), this,
                    SLOT(onSaveWorld()));
+  QObject::connect(_ui.actionSave_World_As, SIGNAL(triggered()), this,
+                   SLOT(onSaveWorldAs()));
   QObject::connect(_ui.actionSave_Editor_Settings, SIGNAL(triggered()), this,
                    SLOT(onSaveEditorSettings()));
   QObject::connect(_ui.actionLoad_Editor_Settings, SIGNAL(triggered()), this,
@@ -193,6 +237,12 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    SLOT(onCreateSphere()));
   QObject::connect(_ui.actionCreateLight, SIGNAL(triggered()), this,
                    SLOT(onCreateLight()));
+  QObject::connect(_ui.actionCreateIrradProbe, SIGNAL(triggered()), this,
+                   SLOT(onCreateIrradProbe()));
+  QObject::connect(_ui.actionCreateSpecProbe, SIGNAL(triggered()), this,
+                   SLOT(onCreateSpecProbe()));
+  QObject::connect(_ui.actionCreateDecal, SIGNAL(triggered()), this,
+                   SLOT(onCreateDecal()));
 
   QObject::connect(_ui.actionShow_PhysX_Debug_Geometry, SIGNAL(triggered()),
                    this, SLOT(onDebugGeometryChanged()));
@@ -202,14 +252,14 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
                    this, SLOT(onDebugGeometryChanged()));
   QObject::connect(_ui.actionShow_Benchmark_Paths, SIGNAL(triggered()), this,
                    SLOT(onDebugGeometryChanged()));
+  QObject::connect(_ui.actionWireframe_Rendering, SIGNAL(triggered()), this,
+                   SLOT(onDebugGeometryChanged()));
 
-  QObject::connect(_ui.actionShow_Create_Context_Menu, SIGNAL(triggered()),
-                   this, SLOT(onShowCreateContextMenu()));
-  QObject::connect(_ui.actionShow_Debug_Context_Menu, SIGNAL(triggered()), this,
-                   SLOT(onShowDebugContextMenu()));
   QObject::connect(_ui.actionShow_Debug_Geometry_Context_Menu,
                    SIGNAL(triggered()), this,
                    SLOT(onShowDebugGeometryContextMenu()));
+  QObject::connect(_ui.actionCaptureAllProbes, SIGNAL(triggered()), this,
+                   SLOT(onCaptureAllProbes()));
 
   QObject::connect(_ui.actionCompile_Shaders, SIGNAL(triggered()), this,
                    SLOT(onCompileShaders()));
@@ -217,11 +267,18 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   QObject::connect(_ui.actionRecompile_Shaders, SIGNAL(triggered()), this,
                    SLOT(onRecompileShaders()));
 
+  _editingView = new QDockWidget();
+  _editingView->setObjectName("editingView");
+  addDockWidget(Qt::RightDockWidgetArea, _editingView);
+
   _propertyView = new IntrinsicEdPropertyView();
-  addDockWidget(Qt::RightDockWidgetArea, _propertyView);
+  tabifyDockWidget(_editingView, _propertyView);
+
+  _prefabsBrowser = new IntrinsicEdPrefabsBrowser();
+  tabifyDockWidget(_propertyView, _prefabsBrowser);
 
   _nodeView = new IntrinsicEdNodeView();
-  addDockWidget(Qt::LeftDockWidgetArea, _nodeView);
+  tabifyDockWidget(_prefabsBrowser, _nodeView);
 
   _managerWindowGpuProgram = new IntrinsicEdManagerWindowGpuProgram(nullptr);
   _managerWindowScript = new IntrinsicEdManagerWindowScript(nullptr);
@@ -250,98 +307,113 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   QObject::connect(_ui.actionPostEffects, SIGNAL(triggered()),
                    _managerWindowPostEffect, SLOT(show()));
 
-  // Editing toolbar
+  // Setup editing view
   {
-    QLabel* label = new QLabel("Grid Size:");
-    label->setMargin(3);
-    label->setStyleSheet("font: 8pt");
+    QGridLayout* editingViewLayout = new QGridLayout();
+    QWidget* editingViewContainer = new QWidget();
+    _editingView->setWidget(editingViewContainer);
 
-    QDoubleSpinBox* gridSizeSpinBox = new QDoubleSpinBox();
-    gridSizeSpinBox->setMinimum(0.01f);
-    gridSizeSpinBox->setSingleStep(0.5f);
-    gridSizeSpinBox->setToolTip("Grid Size");
+    editingViewContainer->setLayout(editingViewLayout);
+    _editingView->setWindowTitle("Editing View");
 
-    gridSizeSpinBox->setValue(GameStates::Editing::_gridSize);
+    {
+      QLabel* label = new QLabel("Grid Size:");
+      label->setMargin(3);
 
-    _ui.gridToolBar->addWidget(label);
-    _ui.gridToolBar->addWidget(gridSizeSpinBox);
+      QDoubleSpinBox* gridSizeSpinBox = new QDoubleSpinBox();
+      gridSizeSpinBox->setMinimum(0.01f);
+      gridSizeSpinBox->setSingleStep(0.5f);
+      gridSizeSpinBox->setToolTip("Grid Size");
 
-    QObject::connect(gridSizeSpinBox, SIGNAL(valueChanged(double)), this,
-                     SLOT(onGridSizeChanged(double)));
-  }
+      gridSizeSpinBox->setValue(GameStates::Editing::_gridSize);
 
-  {
-    QLabel* label = new QLabel("Gizmo Size:");
-    label->setMargin(3);
-    label->setStyleSheet("font: 8pt");
+      editingViewLayout->addWidget(label, 0, 0);
+      editingViewLayout->addWidget(gridSizeSpinBox, 0, 1);
 
-    QDoubleSpinBox* gizmoSizeSpinBox = new QDoubleSpinBox();
-    gizmoSizeSpinBox->setMinimum(0.05f);
-    gizmoSizeSpinBox->setSingleStep(0.05f);
-    gizmoSizeSpinBox->setToolTip("Gizmo Size");
+      QObject::connect(gridSizeSpinBox, SIGNAL(valueChanged(double)), this,
+                       SLOT(onGridSizeChanged(double)));
+    }
 
-    gizmoSizeSpinBox->setValue(GameStates::Editing::_gizmoSize);
+    {
+      QLabel* label = new QLabel("Gizmo Size:");
+      label->setMargin(3);
 
-    _ui.gridToolBar->addWidget(label);
-    _ui.gridToolBar->addWidget(gizmoSizeSpinBox);
+      QDoubleSpinBox* gizmoSizeSpinBox = new QDoubleSpinBox();
+      gizmoSizeSpinBox->setMinimum(0.05f);
+      gizmoSizeSpinBox->setSingleStep(0.05f);
+      gizmoSizeSpinBox->setToolTip("Gizmo Size");
 
-    QObject::connect(gizmoSizeSpinBox, SIGNAL(valueChanged(double)), this,
-                     SLOT(onGizmoSizeChanged(double)));
-  }
+      gizmoSizeSpinBox->setValue(GameStates::Editing::_gizmoSize);
 
-  {
-    QLabel* label = new QLabel("Camera Speed:");
-    label->setMargin(3);
-    label->setStyleSheet("font: 8pt");
+      editingViewLayout->addWidget(label, 1, 0);
+      editingViewLayout->addWidget(gizmoSizeSpinBox, 1, 1);
 
-    QDoubleSpinBox* cameraSpeedSpinBox = new QDoubleSpinBox();
-    cameraSpeedSpinBox->setMinimum(0.05f);
-    cameraSpeedSpinBox->setMaximum(1000.0f);
-    cameraSpeedSpinBox->setSingleStep(0.05f);
-    cameraSpeedSpinBox->setToolTip("Camera Speed");
+      QObject::connect(gizmoSizeSpinBox, SIGNAL(valueChanged(double)), this,
+                       SLOT(onGizmoSizeChanged(double)));
+    }
 
-    cameraSpeedSpinBox->setValue(GameStates::Editing::_cameraSpeed);
+    {
+      QLabel* label = new QLabel("Camera Speed:");
+      label->setMargin(3);
 
-    _ui.gridToolBar->addWidget(label);
-    _ui.gridToolBar->addWidget(cameraSpeedSpinBox);
+      QDoubleSpinBox* cameraSpeedSpinBox = new QDoubleSpinBox();
+      cameraSpeedSpinBox->setMinimum(0.05f);
+      cameraSpeedSpinBox->setMaximum(1000.0f);
+      cameraSpeedSpinBox->setSingleStep(0.05f);
+      cameraSpeedSpinBox->setToolTip("Camera Speed");
 
-    QObject::connect(cameraSpeedSpinBox, SIGNAL(valueChanged(double)), this,
-                     SLOT(onCameraSpeedChanged(double)));
-  }
+      cameraSpeedSpinBox->setValue(GameStates::Editing::_cameraSpeed);
 
-  _ui.gridToolBar->addSeparator();
+      editingViewLayout->addWidget(label, 2, 0);
+      editingViewLayout->addWidget(cameraSpeedSpinBox, 2, 1);
 
-  {
+      QObject::connect(cameraSpeedSpinBox, SIGNAL(valueChanged(double)), this,
+                       SLOT(onCameraSpeedChanged(double)));
+    }
 
-    QLabel* label = new QLabel("Time Mod.:");
-    label->setMargin(3);
-    label->setStyleSheet("font: 8pt");
+    {
+      QLabel* label = new QLabel("Day/Night:");
+      label->setMargin(3);
 
-    QDoubleSpinBox* timeModSpinBox = new QDoubleSpinBox();
-    timeModSpinBox->setMinimum(0.0f);
-    timeModSpinBox->setMaximum(10.0f);
-    timeModSpinBox->setSingleStep(0.05f);
-    timeModSpinBox->setToolTip("Time Modulator");
+      _dayNightSlider = new QSlider(Qt::Horizontal);
+      _dayNightSlider->setMinimum(0);
+      _dayNightSlider->setMaximum(10000);
+      _dayNightSlider->setSingleStep(1);
+      _dayNightSlider->setToolTip("Day/Night");
+      _dayNightSlider->setValue(int(World::_currentTime * 10000.0f));
 
-    timeModSpinBox->setValue(TaskManager::_timeModulator);
+      editingViewLayout->addWidget(label, 3, 0);
+      editingViewLayout->addWidget(_dayNightSlider, 3, 1);
 
-    _ui.gridToolBar->addWidget(label);
-    _ui.gridToolBar->addWidget(timeModSpinBox);
+      QObject::connect(_dayNightSlider, SIGNAL(valueChanged(int)), this,
+                       SLOT(onDayNightSliderChanged(int)));
+    }
 
-    QObject::connect(timeModSpinBox, SIGNAL(valueChanged(double)), this,
-                     SLOT(onTimeModChanged(double)));
+    {
+      QLabel* label = new QLabel("Time Mod.:");
+      label->setMargin(3);
+
+      QDoubleSpinBox* timeModSpinBox = new QDoubleSpinBox();
+      timeModSpinBox->setMinimum(0.0f);
+      timeModSpinBox->setMaximum(999.0f);
+      timeModSpinBox->setSingleStep(0.1f);
+      timeModSpinBox->setToolTip("Time Modulator");
+
+      timeModSpinBox->setValue(TaskManager::_timeModulator);
+
+      editingViewLayout->addWidget(label, 4, 0);
+      editingViewLayout->addWidget(timeModSpinBox, 4, 1);
+
+      QObject::connect(timeModSpinBox, SIGNAL(valueChanged(double)), this,
+                       SLOT(onTimeModChanged(double)));
+    }
+
+    editingViewLayout->setRowStretch(5, 1);
   }
 
   // Context menus
   {
-    _createContextMenu.addAction(_ui.actionCreateCube);
-    _createContextMenu.addAction(_ui.actionCreateSphere);
-    _createContextMenu.addSeparator();
-    _createContextMenu.addAction(_ui.actionCreateLight);
-    _createContextMenu.addSeparator();
-    _createContextMenu.addAction(_ui.actionCreateRigidBody);
-    _createContextMenu.addAction(_ui.actionCreateRigidBody_Sphere);
-
+    _debugGeometryContextMenu.addAction(_ui.actionWireframe_Rendering);
     _debugGeometryContextMenu.addAction(_ui.actionShow_World_Bounding_Spheres);
     _debugGeometryContextMenu.addAction(_ui.actionShow_Benchmark_Paths);
     _debugGeometryContextMenu.addSeparator();
@@ -363,16 +435,16 @@ IntrinsicEd::~IntrinsicEd() {}
 
 void IntrinsicEd::onSaveEditorSettings()
 {
-  QSettings settings;
-  settings.setValue("mainWindowGeometry", saveGeometry());
-  settings.setValue("mainWindowState", saveState());
+  QSettings* settings = new QSettings("IntrinsicEd.ini", QSettings::IniFormat);
+  settings->setValue("mainWindowGeometry", saveGeometry());
+  settings->setValue("mainWindowState", saveState());
 }
 
 void IntrinsicEd::onLoadEditorSettings()
 {
-  QSettings settings;
-  restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-  restoreState(settings.value("mainWindowState").toByteArray());
+  QSettings* settings = new QSettings("IntrinsicEd.ini", QSettings::IniFormat);
+  restoreGeometry(settings->value("mainWindowGeometry").toByteArray());
+  restoreState(settings->value("mainWindowState").toByteArray());
 }
 
 void IntrinsicEd::onExit() { exit(0); }
@@ -386,17 +458,27 @@ void IntrinsicEd::onLoadWorld()
   if (fileName.size() > 0u)
   {
     World::load(fileName.toStdString().c_str());
+    GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
     _nodeView->populateNodeTree();
   }
+}
+
+void IntrinsicEd::onReloadWorld()
+{
+  World::load(World::_filePath);
+  GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
+  _nodeView->populateNodeTree();
 }
 
 void IntrinsicEd::onReloadSettingsAndRendererConfig()
 {
   Settings::Manager::loadSettings();
-  Vulkan::RenderSystem::onViewportChanged();
+  RV::RenderSystem::onViewportChanged();
 }
 
-void IntrinsicEd::onSaveWorld()
+void IntrinsicEd::onSaveWorld() { World::save(World::_filePath); }
+
+void IntrinsicEd::onSaveWorldAs()
 {
   const QString fileName =
       QFileDialog::getSaveFileName(this, tr("Save World"), QString("worlds"),
@@ -506,183 +588,156 @@ void IntrinsicEd::onBenchmarkGameState()
   SDL_SetRelativeMouseMode(SDL_FALSE);
 }
 
+namespace
+{
+_INTR_INLINE Entity::EntityRef
+spawnDefaultEntity(const Name& p_Name,
+                   const glm::quat& p_InitialOrientation = glm::quat())
+{
+  Entity::EntityRef entityRef = Entity::EntityManager::createEntity(p_Name);
+  {
+
+    Components::NodeRef nodeRef =
+        Components::NodeManager::createNode(entityRef);
+    Components::NodeManager::attachChild(World::_rootNode, nodeRef);
+
+    Components::CameraRef activeCamera = World::_activeCamera;
+    Components::NodeRef cameraNode =
+        Components::NodeManager::getComponentForEntity(
+            Components::CameraManager::_entity(activeCamera));
+
+    Math::Ray worldRay = {Components::NodeManager::_worldPosition(cameraNode),
+                          Components::CameraManager::_forward(activeCamera)};
+
+    // Spawn the object close to the ground
+    physx::PxRaycastHit hit;
+    if (PhysxHelper::raycast(worldRay, hit, 50.0f, physx::PxQueryFlag::eSTATIC))
+    {
+      Components::NodeManager::_position(nodeRef) =
+          Components::NodeManager::_worldPosition(cameraNode) +
+          Components::CameraManager::_forward(activeCamera) * hit.distance *
+              0.9f;
+    }
+    else
+    {
+      Components::NodeManager::_position(nodeRef) =
+          Components::NodeManager::_worldPosition(cameraNode) +
+          Components::CameraManager::_forward(activeCamera) * 10.0f;
+    }
+
+    Components::NodeManager::_orientation(nodeRef) = p_InitialOrientation;
+    GameStates::Editing::_currentlySelectedEntity = entityRef;
+  }
+
+  return entityRef;
+}
+
+_INTR_INLINE Dod::Ref addComponentToEntity(Entity::EntityRef p_EntityRef,
+                                           const Name& p_ComponentName)
+{
+  Dod::Components::ComponentManagerEntry& entry =
+      Application::_componentManagerMapping[p_ComponentName];
+
+  _INTR_ASSERT(entry.createFunction);
+  Dod::Ref compRef = entry.createFunction(p_EntityRef);
+
+  if (entry.resetToDefaultFunction)
+  {
+    entry.resetToDefaultFunction(compRef);
+  }
+
+  return compRef;
+}
+}
+
 void IntrinsicEd::onCreateCube()
 {
-  Components::MeshRefArray meshComponentsToCreate;
-
-  {
-    Entity::EntityRef entityRef = Entity::EntityManager::createEntity(_N(Cube));
-    Components::NodeRef nodeRef =
-        Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
-    Components::MeshRef meshRef =
-        Components::MeshManager::createMesh(entityRef);
-    meshComponentsToCreate.push_back(meshRef);
-    Components::MeshManager::resetToDefault(meshRef);
-
-    Components::MeshManager::_descMeshName(meshRef) = _N(cube);
-
-    Components::CameraRef activeCamera = World::getActiveCamera();
-    Components::NodeRef cameraNode =
-        Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCamera));
-
-    Components::NodeManager::_position(nodeRef) =
-        Components::NodeManager::_worldPosition(cameraNode) +
-        Components::CameraManager::_forward(activeCamera) * 10.0f;
-    GameStates::Editing::_currentlySelectedEntity = entityRef;
-  }
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(Cube));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(Mesh));
+  Components::MeshManager::_descMeshName(compRef) = _N(cube);
 
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
-  Components::MeshManager::createResources(meshComponentsToCreate);
-}
-
-void IntrinsicEd::onCreateRigidBody()
-{
-  Components::MeshRefArray meshComponentsToCreate;
-  Components::RigidBodyRefArray rigidBodyComponentsToCreate;
-
-  {
-    Entity::EntityRef entityRef =
-        Entity::EntityManager::createEntity(_N(RigidBody));
-    Components::NodeRef nodeRef =
-        Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
-    Components::MeshRef meshRef =
-        Components::MeshManager::createMesh(entityRef);
-    meshComponentsToCreate.push_back(meshRef);
-    Components::MeshManager::resetToDefault(meshRef);
-    Components::MeshManager::_descMeshName(meshRef) = _N(cube);
-
-    Components::RigidBodyRef rigidBodyRef =
-        Components::RigidBodyManager::createRigidBody(entityRef);
-    rigidBodyComponentsToCreate.push_back(rigidBodyRef);
-    Components::RigidBodyManager::resetToDefault(rigidBodyRef);
-    Components::RigidBodyManager::_descRigidBodyType(rigidBodyRef) =
-        Components::RigidBodyType::kBoxDynamic;
-
-    Components::CameraRef activeCamera = World::getActiveCamera();
-    Components::NodeRef cameraNode =
-        Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCamera));
-
-    Components::NodeManager::_position(nodeRef) =
-        Components::NodeManager::_worldPosition(cameraNode) +
-        Components::CameraManager::_forward(activeCamera) * 10.0f;
-    GameStates::Editing::_currentlySelectedEntity = entityRef;
-  }
-
-  Components::NodeManager::rebuildTreeAndUpdateTransforms();
-
-  Components::MeshManager::createResources(meshComponentsToCreate);
-  Components::RigidBodyManager::createResources(rigidBodyComponentsToCreate);
-}
-
-void IntrinsicEd::onCreateRigidBodySphere()
-{
-  Components::MeshRefArray meshComponentsToCreate;
-  Components::RigidBodyRefArray rigidBodyComponentsToCreate;
-
-  {
-    Entity::EntityRef entityRef =
-        Entity::EntityManager::createEntity(_N(RigidBody));
-    Components::NodeRef nodeRef =
-        Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
-    Components::MeshRef meshRef =
-        Components::MeshManager::createMesh(entityRef);
-    meshComponentsToCreate.push_back(meshRef);
-    Components::MeshManager::resetToDefault(meshRef);
-    Components::MeshManager::_descMeshName(meshRef) = _N(sphere);
-
-    Components::RigidBodyRef rigidBodyRef =
-        Components::RigidBodyManager::createRigidBody(entityRef);
-    rigidBodyComponentsToCreate.push_back(rigidBodyRef);
-    Components::RigidBodyManager::resetToDefault(rigidBodyRef);
-    Components::RigidBodyManager::_descRigidBodyType(rigidBodyRef) =
-        Components::RigidBodyType::kSphereDynamic;
-
-    Components::CameraRef activeCamera = World::getActiveCamera();
-    Components::NodeRef cameraNode =
-        Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCamera));
-
-    Components::NodeManager::_position(nodeRef) =
-        Components::NodeManager::_worldPosition(cameraNode) +
-        Components::CameraManager::_forward(activeCamera) * 10.0f;
-    GameStates::Editing::_currentlySelectedEntity = entityRef;
-  }
-
-  Components::NodeManager::rebuildTreeAndUpdateTransforms();
-
-  Components::MeshManager::createResources(meshComponentsToCreate);
-  Components::RigidBodyManager::createResources(rigidBodyComponentsToCreate);
+  Components::MeshManager::createResources(compRef);
 }
 
 void IntrinsicEd::onCreateSphere()
 {
-  Components::MeshRefArray meshComponentsToCreate;
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(Sphere));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(Mesh));
 
-  {
-    Entity::EntityRef entityRef =
-        Entity::EntityManager::createEntity(_N(Sphere));
-    Components::NodeRef nodeRef =
-        Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
-    Components::MeshRef meshRef =
-        Components::MeshManager::createMesh(entityRef);
-    meshComponentsToCreate.push_back(meshRef);
-    Components::MeshManager::resetToDefault(meshRef);
-
-    Components::MeshManager::_descMeshName(meshRef) = _N(sphere);
-
-    Components::CameraRef activeCamera = World::getActiveCamera();
-    Components::NodeRef cameraNode =
-        Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCamera));
-
-    Components::NodeManager::_position(nodeRef) =
-        Components::NodeManager::_worldPosition(cameraNode) +
-        Components::CameraManager::_forward(activeCamera) * 10.0f;
-    GameStates::Editing::_currentlySelectedEntity = entityRef;
-  }
+  Components::MeshManager::_descMeshName(compRef) = _N(sphere);
 
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
-  Components::MeshManager::createResources(meshComponentsToCreate);
+  Components::MeshManager::createResources(compRef);
+}
+
+void IntrinsicEd::onCreateRigidBody()
+{
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(RigidCube));
+  Dod::Ref meshCompRef = addComponentToEntity(entityRef, _N(Mesh));
+  Dod::Ref rigidBodyRef = addComponentToEntity(entityRef, _N(RigidBody));
+
+  Components::MeshManager::_descMeshName(meshCompRef) = _N(cube);
+  Components::RigidBodyManager::_descRigidBodyType(rigidBodyRef) =
+      Components::RigidBodyType::kBoxDynamic;
+
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+  Components::MeshManager::createResources(meshCompRef);
+  Components::RigidBodyManager::createResources(rigidBodyRef);
+}
+
+void IntrinsicEd::onCreateRigidBodySphere()
+{
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(RigidSphere));
+  Dod::Ref meshCompRef = addComponentToEntity(entityRef, _N(Mesh));
+  Dod::Ref rigidBodyRef = addComponentToEntity(entityRef, _N(RigidBody));
+
+  Components::MeshManager::_descMeshName(meshCompRef) = _N(sphere);
+  Components::RigidBodyManager::_descRigidBodyType(rigidBodyRef) =
+      Components::RigidBodyType::kSphereDynamic;
+
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+  Components::MeshManager::createResources(meshCompRef);
+  Components::RigidBodyManager::createResources(rigidBodyRef);
 }
 
 void IntrinsicEd::onCreateLight()
 {
-  Components::LightRefArray lightComponentsToCreate;
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(Light));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(Light));
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+}
 
-  {
-    Entity::EntityRef entityRef =
-        Entity::EntityManager::createEntity(_N(Light));
-    Components::NodeRef nodeRef =
-        Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
-    Components::LightRef lightRef =
-        Components::LightManager::createLight(entityRef);
-    lightComponentsToCreate.push_back(lightRef);
-    Components::LightManager::resetToDefault(lightRef);
+void IntrinsicEd::onCreateIrradProbe()
+{
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(IrradianceProbe));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(IrradianceProbe));
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+}
 
-    Components::CameraRef activeCamera = World::getActiveCamera();
-    Components::NodeRef cameraNode =
-        Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCamera));
+void IntrinsicEd::onCreateSpecProbe()
+{
+  Entity::EntityRef entityRef = spawnDefaultEntity(_N(SpecularProbe));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(SpecularProbe));
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+}
 
-    Components::NodeManager::_position(nodeRef) =
-        Components::NodeManager::_worldPosition(cameraNode) +
-        Components::CameraManager::_forward(activeCamera) * 10.0f;
-    GameStates::Editing::_currentlySelectedEntity = entityRef;
-  }
-
+void IntrinsicEd::onCreateDecal()
+{
+  Entity::EntityRef entityRef = spawnDefaultEntity(
+      _N(Decal), glm::quat(glm::vec3(-glm::half_pi<float>(), 0.0f, 0.0f)));
+  Dod::Ref compRef = addComponentToEntity(entityRef, _N(Decal));
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
 }
 
 void IntrinsicEd::onGridSizeChanged(double p_Value)
 {
   GameStates::Editing::_gridSize = (float)p_Value;
+}
+
+void IntrinsicEd::onDayNightSliderChanged(int p_Value)
+{
+  World::_currentTime = p_Value * 0.0001f;
 }
 
 void IntrinsicEd::onGizmoSizeChanged(double p_Value)
@@ -717,6 +772,7 @@ void updateStatusBar(QStatusBar* p_StatusBar)
     smoothedDeltaT = (smoothedDeltaT + TaskManager::_lastDeltaT) / 2.0f;
 
     const float fps = std::round(1.0f / smoothedDeltaT);
+    const float ms = std::round(smoothedDeltaT * 1000.0f);
 
     if (fps >= 60.0f)
       color.setRgb(0, 255, 0);
@@ -730,8 +786,7 @@ void updateStatusBar(QStatusBar* p_StatusBar)
     p_StatusBar->setPalette(palette);
 
     _INTR_STRING statucBarText = StringUtil::toString<float>(fps) + " FPS / " +
-                                 StringUtil::toString<float>(smoothedDeltaT) +
-                                 " ms";
+                                 StringUtil::toString<float>(ms) + " ms";
     p_StatusBar->showMessage(statucBarText.c_str());
     timeSinceLastStatusBarUpdate = 0.0f;
   }
@@ -748,19 +803,9 @@ void IntrinsicEd::closeEvent(QCloseEvent*)
   Application::shutdown();
 }
 
-void IntrinsicEd::onShowDebugContextMenu()
-{
-  _debugContextMenu.popup(QCursor::pos());
-}
-
 void IntrinsicEd::onShowDebugGeometryContextMenu()
 {
   _debugGeometryContextMenu.popup(QCursor::pos());
-}
-
-void IntrinsicEd::onShowCreateContextMenu()
-{
-  _createContextMenu.popup(QCursor::pos());
 }
 
 void IntrinsicEd::onDebugGeometryChanged()
@@ -777,41 +822,43 @@ void IntrinsicEd::onDebugGeometryChanged()
 
   if (_ui.actionShow_World_Bounding_Spheres->isChecked())
   {
-    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags |=
-        Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
-            kWorldBoundingSpheres;
+    RV::RenderPass::Debug::_activeDebugStageFlags |=
+        RV::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
   }
   else
   {
-    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags &=
-        ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
-            kWorldBoundingSpheres;
+    RV::RenderPass::Debug::_activeDebugStageFlags &=
+        ~RV::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
   }
 
   if (_ui.actionShow_Benchmark_Paths->isChecked())
   {
-    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags |=
-        Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
-            kBenchmarkPaths;
+    RV::RenderPass::Debug::_activeDebugStageFlags |=
+        RV::RenderPass::DebugStageFlags::kBenchmarkPaths;
   }
   else
   {
-    Intrinsic::Renderer::Vulkan::RenderPass::Debug::_activeDebugStageFlags &=
-        ~Intrinsic::Renderer::Vulkan::RenderPass::DebugStageFlags::
-            kBenchmarkPaths;
+    RV::RenderPass::Debug::_activeDebugStageFlags &=
+        ~RV::RenderPass::DebugStageFlags::kBenchmarkPaths;
+  }
+
+  if (_ui.actionWireframe_Rendering->isChecked())
+  {
+    RV::RenderPass::Debug::_activeDebugStageFlags |=
+        RV::RenderPass::DebugStageFlags::kWireframeRendering;
+  }
+  else
+  {
+    RV::RenderPass::Debug::_activeDebugStageFlags &=
+        ~RV::RenderPass::DebugStageFlags::kWireframeRendering;
   }
 }
 
-void IntrinsicEd::onCompileShaders()
-{
-  Intrinsic::Renderer::Vulkan::Resources::GpuProgramManager::
-      compileAllShaders();
-}
+void IntrinsicEd::onCompileShaders() { GpuProgramManager::compileAllShaders(); }
 
 void IntrinsicEd::onRecompileShaders()
 {
-  Intrinsic::Renderer::Vulkan::Resources::GpuProgramManager::compileAllShaders(
-      true);
+  GpuProgramManager::compileAllShaders(true);
 }
 
 void IntrinsicEd::onSettingsFileChanged(const QString&)
@@ -832,24 +879,72 @@ void IntrinsicEd::updateSettingsChangeWatch()
                                 Settings::Manager::_materialPassConfig.c_str());
 }
 
+void IntrinsicEd::updateUI()
+{
+  updateStatusBar(_ui.statusBar);
+  if (!_dayNightSlider->hasFocus())
+  {
+    _dayNightSlider->blockSignals(true);
+    _dayNightSlider->setValue((int)(World::_currentTime * 10000.0f));
+    _dayNightSlider->blockSignals(false);
+  }
+}
+
 int IntrinsicEd::enterMainLoop()
 {
   while (Application::_running)
   {
-    qApp->processEvents();
-
-    TaskManager::executeTasks();
-    updateStatusBar(_ui.statusBar);
+    updateUI();
+    {
+      qApp->processEvents();
+      tickMainLoop();
+    }
     _propertyView->updatePropertyView();
 
     if (_settingsUpdatePending)
     {
       Settings::Manager::loadSettings();
       updateSettingsChangeWatch();
-      Vulkan::RenderSystem::onViewportChanged();
+      RV::RenderSystem::onViewportChanged();
       _settingsUpdatePending = false;
     }
   }
 
   return 0;
+}
+
+void IntrinsicEd::tickMainLoop() { TaskManager::executeTasks(); }
+
+void IntrinsicEd::onCaptureAllProbes()
+{
+  using namespace RV;
+
+  static const uint32_t _probeTimeSamples = 8u;
+
+  const glm::uvec2 cubeMapRes =
+      RenderSystem::getAbsoluteRenderSize(RenderSize::kCubemap);
+  RenderSystem::_customBackbufferDimensions = cubeMapRes;
+  RenderSystem::resizeSwapChain(true);
+
+  Components::NodeRefArray probeNodes;
+  for (uint32_t i = 0u;
+       i < (uint32_t)Components::NodeManager::_activeRefs.size(); ++i)
+  {
+    Components::NodeRef nodeRef = Components::NodeManager::_activeRefs[i];
+    Entity::EntityRef entityRef = Components::NodeManager::_entity(nodeRef);
+
+    Components::IrradianceProbeRef irradProbeRef =
+        Components::IrradianceProbeManager::getComponentForEntity(entityRef);
+    Components::SpecularProbeRef specProbeRef =
+        Components::SpecularProbeManager::getComponentForEntity(entityRef);
+
+    if (irradProbeRef.isValid() || specProbeRef.isValid())
+      probeNodes.push_back(nodeRef);
+  }
+
+  for (uint32_t i = 0u; i < _probeTimeSamples; ++i)
+    IBL::captureProbes(probeNodes, i == 0, i / (float)_probeTimeSamples);
+
+  RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
+  RenderSystem::resizeSwapChain(true);
 }

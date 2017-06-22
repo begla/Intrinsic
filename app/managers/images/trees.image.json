@@ -1,0 +1,10 @@
+{
+    "name": "trees",
+    "properties": {
+        "name": "trees",
+        "imageType": 1,
+        "imageFormat": 10,
+        "fileName": "trees.dds",
+        "avgNormLength": 1.0
+    }
+}

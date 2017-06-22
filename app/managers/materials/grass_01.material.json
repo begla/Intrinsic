@@ -3,10 +3,11 @@
     "properties": {
         "name": "grass_01",
         "materialPassMask": [
-            "GBufferFoliage",
-            "ShadowFoliage",
+            "GBufferWireframe",
+            "GBufferGrass",
+            "ShadowGrass",
             "PerPixelPicking",
-            "GBufferFoliagePrePass"
+            "GBufferGrassPrePass"
         ],
         "albedoTextureName": "grass_atlas_01",
         "emissiveTextureName": "white",
@@ -22,11 +23,11 @@
         ],
         "translucencyThickness": 2.5,
         "emissiveIntensity": 0.0,
-        "normalTextureName": "grass_atlas_01_NRM",
+        "normalTextureName": "default_NRM",
         "pbrTextureName": "default_PBR",
         "metalMaskBias": 0.0,
         "roughnessBias": 0.0,
-        "specularBias": -1.0,
+        "specularBias": -0.5,
         "blendMaskTextureName": "foliage_blend_mask_01"
     }
 }

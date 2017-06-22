@@ -4,14 +4,7 @@
         "name": "lens_flare",
         "imageType": 1,
         "imageFormat": 7,
-        "flags": 16,
-        "dimensions": [
-            256.0,
-            1.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 9,
-        "fileName": "lens_flare.dds"
+        "fileName": "lens_flare.dds",
+        "avgNormLength": 1.0
     }
 }

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace AssetManagement
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref AssetRef;
 typedef _INTR_ARRAY(AssetRef) AssetRefArray;
 
@@ -49,8 +50,7 @@ struct AssetData : Dod::Resources::ResourceDataBase
     descAssetType.resize(_INTR_MAX_ASSET_COUNT);
   }
 
-  // <-
-
+  // Description
   _INTR_ARRAY(_INTR_STRING) descAssetFileName;
   _INTR_ARRAY(AssetType::Enum) descAssetType;
 };
@@ -116,10 +116,12 @@ struct AssetManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(AssetRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         AssetData, _INTR_MAX_ASSET_COUNT>::_initFromDescriptor(p_Ref,
+                                                               p_GenerateDesc,
                                                                p_Properties);
 
     if (p_Properties.HasMember("assetFileName"))
@@ -154,11 +156,6 @@ struct AssetManager
   // <-
 
   static void compileAssets(AssetRefArray& p_Refs);
-
-  // Getter/Setter
-  // ->
-
-  // <-
 
   // Description
   _INTR_INLINE static _INTR_STRING& _descAssetFileName(AssetRef p_Ref)

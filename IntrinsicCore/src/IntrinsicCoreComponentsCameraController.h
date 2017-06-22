@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref CameraControllerRef;
 typedef _INTR_ARRAY(CameraControllerRef) CameraControllerRefArray;
 
@@ -62,10 +63,12 @@ struct CameraControllerData : Dod::Components::ComponentDataBase
         _INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(Name) descTargetObjectName;
   _INTR_ARRAY(CameraControllerType::Enum) descCameraControllerType;
   _INTR_ARRAY(glm::vec3) descTargetEulerAngles;
 
+  // Resources
   _INTR_ARRAY(glm::vec3) lastTargetEulerAngles;
   _INTR_ARRAY(float) timeSinceLastOrientationChange;
 };
@@ -158,6 +161,7 @@ struct CameraControllerManager
   /// Initializes all properties from a JSON descriptor.
   ///
   _INTR_INLINE static void initFromDescriptor(CameraControllerRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("cameraControllerType"))
@@ -183,9 +187,6 @@ struct CameraControllerManager
 
   // <-
 
-  // Members refs
-  // ->
-
   // Description
 
   /// The target orientation of the Camera Controller Component described in
@@ -208,6 +209,7 @@ struct CameraControllerManager
   }
 
   // Resources
+
   /// The euler angles seen during the last update call.
   _INTR_INLINE static glm::vec3&
   _lastTargetEulerAngles(CameraControllerRef p_Ref)

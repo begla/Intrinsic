@@ -1,0 +1,10 @@
+{
+    "name": "trees_NRM",
+    "properties": {
+        "name": "trees_NRM",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "trees_NRM.dds",
+        "avgNormLength": 0.9088003635406494
+    }
+}

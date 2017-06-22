@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
 #include "lib_math.glsl"
 #include "gbuffer.inc.glsl"
 
-#if defined (PRE_PASS)
-# undef OUTPUT
-# define OUTPUT
+#if defined(PRE_PASS)
+#undef OUTPUT
+#define OUTPUT
 #endif // PRE_PASS
 
 // Ubos
@@ -34,33 +34,35 @@ PER_INSTANCE_UBO;
 
 // Bindings
 BINDINGS_GBUFFER;
-layout (binding = 6) uniform sampler2D blendMaskTex;
+layout(binding = 6) uniform sampler2D blendMaskTex;
 
 // Input
-layout (location = 0) in vec3 inNormal;
-layout (location = 1) in vec3 inTangent;
-layout (location = 2) in vec3 inBinormal;
-layout (location = 3) in vec3 inColor;
-layout (location = 4) in vec2 inUV0;
-layout (location = 5) in vec3 inWorldPosition;
+layout(location = 0) in vec3 inNormal;
+layout(location = 1) in vec3 inTangent;
+layout(location = 2) in vec3 inBinormal;
+layout(location = 3) in vec3 inColor;
+layout(location = 4) in vec2 inUV0;
+layout(location = 5) in vec3 inWorldPosition;
 
 // Output
 OUTPUT
 
 void main()
-{ 
+{
   float ns = 1.0;
   if (!gl_FrontFacing)
   {
     ns = -1.0;
   }
 
+  const vec2 pixelOffset = 1.0 / textureSize(albedoTex, 0).xy * 50.0;
   const mat3 TBN = mat3(inTangent, inBinormal, ns * inNormal);
 
-  const vec2 uv0 = clamp(UV0_TRANSFORMED, 0.01, 0.99);
+  vec2 uv0 = UV0_TRANSFORM((inUV0 * (1.0 - pixelOffset) + 0.5 * pixelOffset));
 
   const vec2 blendScale = vec2(25.0);
-  const vec2 blendLookupUV = mod(abs(inWorldPosition.xz), blendScale) / blendScale;
+  const vec2 blendLookupUV =
+      mod(abs(inWorldPosition.xz), blendScale) / blendScale;
   const vec4 blendMask = texture(blendMaskTex, blendLookupUV);
 
   vec4 albedo = texture(albedoTex, uv0);
@@ -74,14 +76,15 @@ void main()
     discard;
   }
 
-#if !defined (PRE_PASS)
+#if !defined(PRE_PASS)
   GBuffer gbuffer;
   {
     gbuffer.albedo = albedo * uboPerInstance.colorTint;
     gbuffer.normal = normalize(TBN * (normal * 2.0 - 1.0));
     gbuffer.metalMask = pbr.r + uboPerMaterial.pbrBias.r;
     gbuffer.specular = pbr.g + uboPerMaterial.pbrBias.g;
-    gbuffer.roughness = pbr.b + uboPerMaterial.pbrBias.b;
+    gbuffer.roughness = adjustRoughness(pbr.b + uboPerMaterial.pbrBias.b,
+                                        uboPerMaterial.data1.x);
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
     gbuffer.occlusion = 1.0;
     gbuffer.emissive = 0.0;

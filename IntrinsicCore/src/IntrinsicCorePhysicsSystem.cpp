@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -103,7 +103,7 @@ void System::updatePvdCamera()
 {
   _INTR_PROFILE_CPU("Physics", "Update PVD Camera");
 
-  Components::CameraRef activeCameraRef = World::getActiveCamera();
+  Components::CameraRef activeCameraRef = World::_activeCamera;
 
   if (activeCameraRef.isValid() && _pxPhysics->getVisualDebugger())
   {
@@ -137,9 +137,9 @@ void System::renderLineDebugGeometry()
     for (uint32_t i = 0; i < rb.getNbLines(); i++)
     {
       const physx::PxDebugLine& line = rb.getLines()[i];
-      Renderer::Vulkan::RenderPass::Debug::renderLine(
-          PhysxHelper::convert(line.pos0), PhysxHelper::convert(line.pos1),
-          line.color0, line.color1);
+      RV::RenderPass::Debug::renderLine(PhysxHelper::convert(line.pos0),
+                                        PhysxHelper::convert(line.pos1),
+                                        line.color0, line.color1);
     }
   }
 }

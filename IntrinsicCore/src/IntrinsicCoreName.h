@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -54,12 +54,9 @@ struct Name
 
 namespace std
 {
-template <> class hash<Intrinsic::Core::Name>
+template <> class hash<Name>
 {
 public:
-  size_t operator()(const Intrinsic::Core::Name& p_Name) const
-  {
-    return p_Name._hash;
-  }
+  size_t operator()(const Name& p_Name) const { return p_Name._hash; }
 };
 };

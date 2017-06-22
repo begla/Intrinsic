@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,15 +26,14 @@ PER_MATERIAL_UBO;
 PER_INSTANCE_UBO;
 
 // Bindings
-layout (binding = 3) uniform sampler2D albedoTex;
+layout(binding = 3) uniform sampler2D albedoTex;
 
 // Input
-layout (location = 0) in vec2 inUV0;
+layout(location = 0) in vec2 inUV0;
 
 void main()
-{ 
-  const vec2 uv0 = UV0_TRANSFORMED_ANIMATED;
-
+{
+  const vec2 uv0 = UV0_TRANSFORM_ANIMATED(inUV0);
   vec4 albedo = texture(albedoTex, uv0);
 
   albedo.rgb /= albedo.a;

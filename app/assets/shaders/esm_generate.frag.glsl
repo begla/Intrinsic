@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,26 +21,24 @@
 #include "lib_math.glsl"
 #include "lib_lighting.glsl"
 
-layout (binding = 0) uniform PerInstance
-{
-  uvec4 arrayIdx;
-} uboPerInstance;
+layout(binding = 0) uniform PerInstance { uvec4 arrayIdx; }
+uboPerInstance;
 
-layout (binding = 1) uniform sampler2DArray inputTex;
+layout(binding = 1) uniform sampler2DArray inputTex;
 
-layout (location = 0) in vec2 inUV0;
-layout (location = 0) out vec4 outColor;
+layout(location = 0) in vec2 inUV0;
+layout(location = 0) out vec4 outColor;
 
 void main()
 {
   vec4 depth = textureGather(inputTex, vec3(inUV0, uboPerInstance.arrayIdx), 0);
-    
+
   vec2 warpedDepth[4];
   warpedDepth[0] = warpDepth(depth.x);
   warpedDepth[1] = warpDepth(depth.y);
   warpedDepth[2] = warpDepth(depth.z);
   warpedDepth[3] = warpDepth(depth.w);
-  
+
   vec4 outputEVSM[4];
   outputEVSM[0] = vec4(warpedDepth[0], warpedDepth[0] * warpedDepth[0]);
   outputEVSM[1] = vec4(warpedDepth[1], warpedDepth[1] * warpedDepth[1]);

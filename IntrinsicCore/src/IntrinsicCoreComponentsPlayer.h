@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref PlayerRef;
 typedef _INTR_ARRAY(PlayerRef) PlayerRefArray;
 
@@ -31,6 +32,7 @@ struct PlayerData : Dod::Components::ComponentDataBase
     descPlayerId.resize(_INTR_MAX_PLAYER_COMPONENT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(uint32_t) descPlayerId;
 };
 
@@ -83,17 +85,13 @@ struct PlayerManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(PlayerRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("playerId"))
       _descPlayerId(p_Ref) =
           JsonHelper::readPropertyUint(p_Properties["playerId"]);
   }
-
-  // <-
-
-  // Getter/Setter
-  // ->
 
   // Description
   _INTR_INLINE static uint32_t& _descPlayerId(PlayerRef p_Ref)

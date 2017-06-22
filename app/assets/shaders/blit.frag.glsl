@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,17 +20,9 @@
 
 #include "lib_math.glsl"
 
-layout (binding = 0) uniform PerInstance
-{
-  vec4 cameraWorldPosition;
-} uboPerInstance;
+layout(binding = 0) uniform sampler2D inputTex;
 
-layout (binding = 1) uniform sampler2D inputTex;
+layout(location = 0) in vec2 inUV0;
+layout(location = 0) out vec4 outColor;
 
-layout (location = 0) in vec2 inUV0;
-layout (location = 0) out vec4 outColor;
-
-void main()
-{
-  outColor = textureLod(inputTex, inUV0, 0.0).rgba;
-}
+void main() { outColor = textureLod(inputTex, inUV0, 0.0).rgba; }

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ void Main::update(float p_DeltaT)
 
     if (Components::PlayerManager::_descPlayerId(playerRef) == 0u)
     {
-      Components::CameraRef camRef = World::getActiveCamera();
+      Components::CameraRef camRef = World::_activeCamera;
       Components::NodeRef camNodeRef =
           Components::NodeManager::getComponentForEntity(
               Components::CameraManager::_entity(camRef));
@@ -86,8 +86,8 @@ void Main::update(float p_DeltaT)
 
       if (camCtrlRef.isValid())
       {
-        static const float camSpeed = 2.0f;
-        static const float camSpeedMouse = 0.75f;
+        static const float camSpeed = 3.0f;
+        static const float camSpeedMouse = 0.075f;
 
         glm::vec3& targetEulerAngles =
             Components::CameraControllerManager::_descTargetEulerAngles(
@@ -107,8 +107,9 @@ void Main::update(float p_DeltaT)
       static const float jumpSpeed = 20.0f;
 
       const float actualMovedSpeed =
-          moveSpeed * (1.0f + runMultiplier * Input::System::getVirtualKeyState(
-                                                  Input::VirtualKey::kRun));
+          moveSpeed * (1.0f +
+                       runMultiplier * Input::System::getVirtualKeyState(
+                                           Input::VirtualKey::kRun));
 
       glm::vec3 moveVector = glm::vec3(0.0f);
       {

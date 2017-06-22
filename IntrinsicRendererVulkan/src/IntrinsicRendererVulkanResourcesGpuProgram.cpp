@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -231,8 +231,12 @@ void GpuProgramManager::reflectPipelineLayout(
     {
       spirv_cross::Resource& res = resources.uniform_buffers[i];
 
-      const bool isDynamic =
-          res.name == "PerInstance" || res.name == "PerMaterial";
+      if (glsl.get_decoration(res.id, spv::DecorationDescriptorSet) != 0u)
+        continue;
+
+      const bool isDynamic = res.name == "PerInstance" ||
+                             res.name == "PerMaterial" ||
+                             res.name == "PerFrame";
 
       BindingDescription bd;
       {
@@ -252,6 +256,9 @@ void GpuProgramManager::reflectPipelineLayout(
     {
       spirv_cross::Resource& res = resources.sampled_images[i];
 
+      if (glsl.get_decoration(res.id, spv::DecorationDescriptorSet) != 0u)
+        continue;
+
       BindingDescription bd;
       {
         bd.name = res.name.c_str();
@@ -269,6 +276,9 @@ void GpuProgramManager::reflectPipelineLayout(
     {
       spirv_cross::Resource& res = resources.storage_images[i];
 
+      if (glsl.get_decoration(res.id, spv::DecorationDescriptorSet) != 0u)
+        continue;
+
       BindingDescription bd;
       {
         bd.name = res.name.c_str();
@@ -285,6 +295,9 @@ void GpuProgramManager::reflectPipelineLayout(
     for (uint32_t i = 0u; i < resources.storage_buffers.size(); ++i)
     {
       spirv_cross::Resource& res = resources.storage_buffers[i];
+
+      if (glsl.get_decoration(res.id, spv::DecorationDescriptorSet) != 0u)
+        continue;
 
       BindingDescription bd;
       {
@@ -310,7 +323,8 @@ void GpuProgramManager::reflectPipelineLayout(
 }
 
 void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
-                                       bool p_ForceRecompile)
+                                       bool p_ForceRecompile,
+                                       bool p_UpdateResources)
 {
   _INTR_LOG_INFO("Loading/Compiling GPU Programs...");
 
@@ -452,23 +466,28 @@ void GpuProgramManager::compileShaders(GpuProgramRefArray p_Refs,
     }
   }
 
-  PipelineManager::destroyResources(changedPipelines);
-  GpuProgramManager::destroyResources(changedGpuPrograms);
+  if (p_UpdateResources)
+  {
+    PipelineManager::destroyResources(changedPipelines);
+    GpuProgramManager::destroyResources(changedGpuPrograms);
 
-  GpuProgramManager::createResources(changedGpuPrograms);
-  PipelineManager::createResources(changedPipelines);
+    GpuProgramManager::createResources(changedGpuPrograms);
+    PipelineManager::createResources(changedPipelines);
+  }
 }
 
 void GpuProgramManager::compileShader(GpuProgramRef p_Ref,
-                                      bool p_ForceRecompile)
+                                      bool p_ForceRecompile,
+                                      bool p_UpdateResources)
 {
   GpuProgramRefArray refs = {p_Ref};
-  compileShaders(refs, p_ForceRecompile);
+  compileShaders(refs, p_ForceRecompile, p_UpdateResources);
 }
 
-void GpuProgramManager::compileAllShaders(bool p_ForceRecompile)
+void GpuProgramManager::compileAllShaders(bool p_ForceRecompile,
+                                          bool p_UpdateResources)
 {
-  compileShaders(_activeRefs, p_ForceRecompile);
+  compileShaders(_activeRefs, p_ForceRecompile, p_UpdateResources);
 }
 
 // <-
@@ -483,7 +502,11 @@ void GpuProgramManager::createResources(const GpuProgramRefArray& p_Refs)
     // No spirv buffer? Retrieve it from the cache or compile the shader
     if (spirvBuffer.empty())
     {
-      compileShader(ref);
+      compileShader(ref, false, false);
+      if (spirvBuffer.empty())
+      {
+        continue;
+      }
     }
 
     VkShaderModule& module = _vkShaderModule(ref);

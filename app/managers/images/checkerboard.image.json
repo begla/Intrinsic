@@ -3,15 +3,8 @@
     "properties": {
         "name": "checkerboard",
         "imageType": 1,
-        "imageFormat": 10,
-        "flags": 16,
-        "dimensions": [
-            64.0,
-            64.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 7,
-        "fileName": "checkerboard.dds"
+        "imageFormat": 8,
+        "fileName": "checkerboard.dds",
+        "avgNormLength": 1.0
     }
 }

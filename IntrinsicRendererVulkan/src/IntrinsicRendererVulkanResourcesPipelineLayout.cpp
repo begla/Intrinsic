@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ void PipelineLayoutManager::createResources(
     _INTR_ARRAY(VkDescriptorSetLayoutBinding) layoutBindings;
     layoutBindings.resize(bindingInfos.size());
 
+    _INTR_ARRAY(VkDescriptorSetLayout) descSetLayouts;
+
     for (uint32_t biIdx = 0u; biIdx < bindingInfos.size(); ++biIdx)
     {
       BindingDescription& info = bindingInfos[biIdx];
@@ -65,7 +67,11 @@ void PipelineLayoutManager::createResources(
       VkResult result = vkCreateDescriptorSetLayout(
           RenderSystem::_vkDevice, &descLayout, nullptr, &descriptorSetLayout);
       _INTR_VK_CHECK_RESULT(result);
+      descSetLayouts.push_back(descriptorSetLayout);
     }
+
+    // Add global image descriptor set
+    descSetLayouts.push_back(ImageManager::getGlobalDescriptorSetLayout());
 
     {
       VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo = {};
@@ -74,8 +80,9 @@ void PipelineLayoutManager::createResources(
       pPipelineLayoutCreateInfo.pNext = nullptr;
       pPipelineLayoutCreateInfo.pushConstantRangeCount = 0;
       pPipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
-      pPipelineLayoutCreateInfo.setLayoutCount = 1u;
-      pPipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
+      pPipelineLayoutCreateInfo.setLayoutCount =
+          (uint32_t)descSetLayouts.size();
+      pPipelineLayoutCreateInfo.pSetLayouts = descSetLayouts.data();
 
       VkResult result = vkCreatePipelineLayout(RenderSystem::_vkDevice,
                                                &pPipelineLayoutCreateInfo,
@@ -226,8 +233,22 @@ VkDescriptorSet PipelineLayoutManager::allocateAndWriteDescriptorSet(
         {
           if ((info.bindingFlags & BindingFlags::kAdressSubResource) == 0u)
           {
-            imageInfo.imageView =
-                Resources::ImageManager::_vkImageView(info.resource);
+            if ((info.bindingFlags & BindingFlags::kForceGammaSampling) > 0u)
+            {
+              imageInfo.imageView =
+                  Resources::ImageManager::_vkImageViewGamma(info.resource);
+            }
+            else if ((info.bindingFlags & BindingFlags::kForceLinearSampling) >
+                     0u)
+            {
+              imageInfo.imageView =
+                  Resources::ImageManager::_vkImageViewLinear(info.resource);
+            }
+            else
+            {
+              imageInfo.imageView =
+                  Resources::ImageManager::_vkImageView(info.resource);
+            }
           }
           else
           {

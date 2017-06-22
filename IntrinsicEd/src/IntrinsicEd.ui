@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1600</width>
+    <width>1280</width>
     <height>720</height>
    </rect>
   </property>
@@ -37,7 +37,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1600</width>
+     <width>1280</width>
      <height>21</height>
     </rect>
    </property>
@@ -46,7 +46,9 @@
      <string>File</string>
     </property>
     <addaction name="actionLoad_World"/>
+    <addaction name="actionReload_World"/>
     <addaction name="actionSave_World"/>
+    <addaction name="actionSave_World_As"/>
     <addaction name="separator"/>
     <addaction name="actionLoad_Editor_Settings"/>
     <addaction name="actionSave_Editor_Settings"/>
@@ -82,6 +84,8 @@
     </property>
     <addaction name="actionCompile_Shaders"/>
     <addaction name="actionRecompile_Shaders"/>
+    <addaction name="separator"/>
+    <addaction name="actionReload_Settings_And_Renderer_Config"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -98,23 +102,33 @@
      <height>24</height>
     </size>
    </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionExit"/>
-   <addaction name="separator"/>
    <addaction name="actionLoad_World"/>
    <addaction name="actionSave_World"/>
    <addaction name="separator"/>
-   <addaction name="actionReload_Settings_And_Renderer_Config"/>
+   <addaction name="actionReload_World"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="editingToolBar">
    <property name="windowTitle">
     <string>Transformation Toolbar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>LeftToolBarArea</enum>
@@ -124,32 +138,45 @@
    </attribute>
    <addaction name="actionEditingModeDefault"/>
    <addaction name="actionEditingModeSelection"/>
+   <addaction name="separator"/>
    <addaction name="actionEditingModeTranslation"/>
    <addaction name="actionEditingModeRotation"/>
    <addaction name="actionEditingModeScale"/>
   </widget>
-  <widget class="QToolBar" name="gridToolBar">
+  <widget class="QToolBar" name="creationToolBar">
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
    <property name="windowTitle">
-    <string>Editing Toolbar</string>
+    <string>Creation Toolbar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>false</bool>
+    <bool>true</bool>
    </attribute>
-  </widget>
-  <widget class="QToolBar" name="creationToolBar">
-   <property name="windowTitle">
-    <string>Creation Toolbar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>LeftToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionShow_Create_Context_Menu"/>
+   <addaction name="actionCreateCube"/>
+   <addaction name="actionCreateRigidBody"/>
+   <addaction name="actionCreateSphere"/>
+   <addaction name="actionCreateRigidBody_Sphere"/>
+   <addaction name="separator"/>
+   <addaction name="actionCreateLight"/>
+   <addaction name="actionCreateDecal"/>
+   <addaction name="actionCreateIrradProbe"/>
+   <addaction name="actionCreateSpecProbe"/>
   </widget>
   <widget class="QToolBar" name="devToolBar">
    <property name="enabled">
@@ -158,19 +185,44 @@
    <property name="windowTitle">
     <string>Development Toolbar</string>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionShow_Debug_Context_Menu"/>
+   <addaction name="actionCaptureAllProbes"/>
+   <addaction name="separator"/>
    <addaction name="actionShow_Debug_Geometry_Context_Menu"/>
    <addaction name="actionOpen_Microprofile"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
    <property name="windowTitle">
     <string>Game State Toolbar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -185,7 +237,7 @@
   <action name="actionExit">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/eject</normaloff>:/Icons/eject</iconset>
+     <normaloff>:/Icons/icons/essential/exit-2.png</normaloff>:/Icons/icons/essential/exit-2.png</iconset>
    </property>
    <property name="text">
     <string>Exit</string>
@@ -194,7 +246,7 @@
   <action name="actionSave_World">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/save</normaloff>:/Icons/save</iconset>
+     <normaloff>:/Icons/icons/various/diskette.png</normaloff>:/Icons/icons/various/diskette.png</iconset>
    </property>
    <property name="text">
     <string>Save World</string>
@@ -203,7 +255,7 @@
   <action name="actionLoad_World">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/arrowUp</normaloff>:/Icons/arrowUp</iconset>
+     <normaloff>:/Icons/icons/essential/folder-1.png</normaloff>:/Icons/icons/essential/folder-1.png</iconset>
    </property>
    <property name="text">
     <string>Load World</string>
@@ -212,7 +264,7 @@
   <action name="actionNode_View">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/target</normaloff>:/Icons/target</iconset>
+     <normaloff>:/Icons/icons/arrows/expand.png</normaloff>:/Icons/icons/arrows/expand.png</iconset>
    </property>
    <property name="text">
     <string>Node View</string>
@@ -224,7 +276,7 @@
   <action name="actionSave_Editor_Settings">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/save</normaloff>:/Icons/save</iconset>
+     <normaloff>:/Icons/icons/various/diskette.png</normaloff>:/Icons/icons/various/diskette.png</iconset>
    </property>
    <property name="text">
     <string>Save Editor Settings</string>
@@ -233,7 +285,7 @@
   <action name="actionLoad_Editor_Settings">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/arrowUp</normaloff>:/Icons/arrowUp</iconset>
+     <normaloff>:/Icons/icons/essential/folder-1.png</normaloff>:/Icons/icons/essential/folder-1.png</iconset>
    </property>
    <property name="text">
     <string>Load Editor Settings</string>
@@ -242,7 +294,7 @@
   <action name="actionProperty_View">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/grid</normaloff>:/Icons/grid</iconset>
+     <normaloff>:/Icons/icons/business/051-puzzle.png</normaloff>:/Icons/icons/business/051-puzzle.png</iconset>
    </property>
    <property name="text">
     <string>Property View</string>
@@ -251,7 +303,7 @@
   <action name="actionGPU_Programs">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/calendar</normaloff>:/Icons/calendar</iconset>
+     <normaloff>:/Icons/icons/business/051-coding-1.png</normaloff>:/Icons/icons/business/051-coding-1.png</iconset>
    </property>
    <property name="text">
     <string>GPU Programs</string>
@@ -260,7 +312,7 @@
   <action name="actionFullscreen">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/fullscreen</normaloff>:/Icons/fullscreen</iconset>
+     <normaloff>:/Icons/icons/cad/fullscreen.png</normaloff>:/Icons/icons/cad/fullscreen.png</iconset>
    </property>
    <property name="text">
     <string>Fullscreen</string>
@@ -275,10 +327,10 @@
    </property>
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/wand</normaloff>:/Icons/wand</iconset>
+     <normaloff>:/Icons/icons/cursor/clicker-1.png</normaloff>:/Icons/icons/cursor/clicker-1.png</iconset>
    </property>
    <property name="text">
-    <string>editingModeSelection</string>
+    <string>Selection</string>
    </property>
    <property name="toolTip">
     <string>Editing Mode: Selection</string>
@@ -293,10 +345,10 @@
    </property>
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/drawArrow</normaloff>:/Icons/drawArrow</iconset>
+     <normaloff>:/Icons/icons/cad/move-1.png</normaloff>:/Icons/icons/cad/move-1.png</iconset>
    </property>
    <property name="text">
-    <string>editingModeTranslation</string>
+    <string>Transl.</string>
    </property>
    <property name="toolTip">
     <string>Editing Mode: Translation</string>
@@ -308,10 +360,10 @@
    </property>
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/scale</normaloff>:/Icons/scale</iconset>
+     <normaloff>:/Icons/icons/cad/scale.png</normaloff>:/Icons/icons/cad/scale.png</iconset>
    </property>
    <property name="text">
-    <string>editingModeScale</string>
+    <string>Scale</string>
    </property>
    <property name="toolTip">
     <string>Editing Mode: Scale</string>
@@ -323,10 +375,10 @@
    </property>
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/rotate</normaloff>:/Icons/rotate</iconset>
+     <normaloff>:/Icons/icons/cad/rotate-1.png</normaloff>:/Icons/icons/cad/rotate-1.png</iconset>
    </property>
    <property name="text">
-    <string>EditingModeRotation</string>
+    <string>Rotate</string>
    </property>
    <property name="toolTip">
     <string>Editing Mode: Rotation</string>
@@ -335,7 +387,7 @@
   <action name="actionScripts">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/script</normaloff>:/Icons/script</iconset>
+     <normaloff>:/Icons/icons/business/051-certificate.png</normaloff>:/Icons/icons/business/051-certificate.png</iconset>
    </property>
    <property name="text">
     <string>Scripts</string>
@@ -344,7 +396,7 @@
   <action name="actionAssets">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/asset</normaloff>:/Icons/asset</iconset>
+     <normaloff>:/Icons/icons/essential/archive-3.png</normaloff>:/Icons/icons/essential/archive-3.png</iconset>
    </property>
    <property name="text">
     <string>Assets</string>
@@ -353,7 +405,7 @@
   <action name="actionImages">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/picture</normaloff>:/Icons/picture</iconset>
+     <normaloff>:/Icons/icons/essential/picture.png</normaloff>:/Icons/icons/essential/picture.png</iconset>
    </property>
    <property name="text">
     <string>Images</string>
@@ -362,7 +414,7 @@
   <action name="actionMeshes">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/truck</normaloff>:/Icons/truck</iconset>
+     <normaloff>:/Icons/icons/cad/cone.png</normaloff>:/Icons/icons/cad/cone.png</iconset>
    </property>
    <property name="text">
     <string>Meshes</string>
@@ -371,7 +423,7 @@
   <action name="actionMaterials">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/brush</normaloff>:/Icons/brush</iconset>
+     <normaloff>:/Icons/icons/essential/layers.png</normaloff>:/Icons/icons/essential/layers.png</iconset>
    </property>
    <property name="text">
     <string>Materials</string>
@@ -380,10 +432,10 @@
   <action name="actionCreateCube">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/cube</normaloff>:/Icons/cube</iconset>
+     <normaloff>:/Icons/icons/cad/cube-1.png</normaloff>:/Icons/icons/cad/cube-1.png</iconset>
    </property>
    <property name="text">
-    <string>Create Cube</string>
+    <string>Cube</string>
    </property>
    <property name="toolTip">
     <string>Create Cube</string>
@@ -392,31 +444,13 @@
   <action name="actionCreateSphere">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/globe</normaloff>:/Icons/globe</iconset>
+     <normaloff>:/Icons/icons/cad/circle-2.png</normaloff>:/Icons/icons/cad/circle-2.png</iconset>
    </property>
    <property name="text">
-    <string>Create Sphere</string>
+    <string>Sphere</string>
    </property>
    <property name="toolTip">
     <string>Create Sphere</string>
-   </property>
-  </action>
-  <action name="actionSpawn_Vegetation">
-   <property name="icon">
-    <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/target</normaloff>:/Icons/target</iconset>
-   </property>
-   <property name="text">
-    <string>Spawn Vegetation</string>
-   </property>
-  </action>
-  <action name="actionSpawn_Grass">
-   <property name="icon">
-    <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/target</normaloff>:/Icons/target</iconset>
-   </property>
-   <property name="text">
-    <string>Spawn Grass</string>
    </property>
   </action>
   <action name="actionEditingModeDefault">
@@ -431,10 +465,10 @@
    </property>
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/cursor</normaloff>:/Icons/cursor</iconset>
+     <normaloff>:/Icons/icons/cursor/clicker.png</normaloff>:/Icons/icons/cursor/clicker.png</iconset>
    </property>
    <property name="text">
-    <string>editingModeDefault</string>
+    <string>Default</string>
    </property>
    <property name="toolTip">
     <string>Editing Mode: Default</string>
@@ -443,10 +477,10 @@
   <action name="actionCreateRigidBody">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/cube</normaloff>:/Icons/cube</iconset>
+     <normaloff>:/Icons/icons/cad/cube-2.png</normaloff>:/Icons/icons/cad/cube-2.png</iconset>
    </property>
    <property name="text">
-    <string>Create Rigid Body (Dyn. Cube)</string>
+    <string>Rigid Cube</string>
    </property>
    <property name="toolTip">
     <string>Create Rigid Body (Dyn. Cube)</string>
@@ -464,10 +498,10 @@
    </property>
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/wrench</normaloff>:/Icons/wrench</iconset>
+     <normaloff>:/Icons/icons/cad/trim.png</normaloff>:/Icons/icons/cad/trim.png</iconset>
    </property>
    <property name="text">
-    <string>Editing Game State</string>
+    <string>Editing</string>
    </property>
    <property name="toolTip">
     <string>Editing Game State</string>
@@ -485,46 +519,22 @@
    </property>
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/gamepad</normaloff>:/Icons/gamepad</iconset>
+     <normaloff>:/Icons/icons/tech/game-controller-5.png</normaloff>:/Icons/icons/tech/game-controller-5.png</iconset>
    </property>
    <property name="text">
-    <string>Main Game State</string>
+    <string>Main</string>
    </property>
    <property name="toolTip">
     <string>Main Game State</string>
-   </property>
-  </action>
-  <action name="actionShow_Create_Context_Menu">
-   <property name="icon">
-    <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/cube</normaloff>:/Icons/cube</iconset>
-   </property>
-   <property name="text">
-    <string>Show Create Context Menu</string>
-   </property>
-   <property name="toolTip">
-    <string>Show Create Context Menu</string>
-   </property>
-  </action>
-  <action name="actionShow_Debug_Context_Menu">
-   <property name="icon">
-    <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/lightbulb</normaloff>:/Icons/lightbulb</iconset>
-   </property>
-   <property name="text">
-    <string>Show Debug Context Menu</string>
-   </property>
-   <property name="toolTip">
-    <string>Show Debug Context Menu</string>
    </property>
   </action>
   <action name="actionCreateRigidBody_Sphere">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/globe</normaloff>:/Icons/globe</iconset>
+     <normaloff>:/Icons/icons/cad/circle-1.png</normaloff>:/Icons/icons/cad/circle-1.png</iconset>
    </property>
    <property name="text">
-    <string>Create Rigid Body (Dyn. Sphere)</string>
+    <string>Rigid Sphere</string>
    </property>
    <property name="toolTip">
     <string>Create Rigid Body (Dyn. Sphere)</string>
@@ -536,10 +546,10 @@
    </property>
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/icons/cc/white/png/lighting_icon&amp;16.png</normaloff>:/Icons/icons/cc/white/png/lighting_icon&amp;16.png</iconset>
+     <normaloff>:/Icons/icons/geometry/pyramid.png</normaloff>:/Icons/icons/geometry/pyramid.png</iconset>
    </property>
    <property name="text">
-    <string>Show Debug Geometry Context Menu</string>
+    <string>Debug Geom.</string>
    </property>
    <property name="toolTip">
     <string>Show Debug Geometry Context Menu</string>
@@ -548,6 +558,10 @@
   <action name="actionShow_PhysX_Debug_Geometry">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/geometry/tetrahedron.png</normaloff>:/Icons/icons/geometry/tetrahedron.png</iconset>
    </property>
    <property name="text">
     <string>Show PhysX Debug Geometry</string>
@@ -560,6 +574,10 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/geometry/circles-2.png</normaloff>:/Icons/icons/geometry/circles-2.png</iconset>
+   </property>
    <property name="text">
     <string>Show World Bounding Spheres</string>
    </property>
@@ -570,7 +588,7 @@
   <action name="actionPostEffects">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/picture</normaloff>:/Icons/picture</iconset>
+     <normaloff>:/Icons/icons/weather/rainbow-2.png</normaloff>:/Icons/icons/weather/rainbow-2.png</iconset>
    </property>
    <property name="text">
     <string>Post Effects</string>
@@ -582,10 +600,10 @@
   <action name="actionReload_Settings_And_Renderer_Config">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/refresh</normaloff>:/Icons/refresh</iconset>
+     <normaloff>:/Icons/icons/arrows/redo.png</normaloff>:/Icons/icons/arrows/redo.png</iconset>
    </property>
    <property name="text">
-    <string>Reload Settings and Renderer Config</string>
+    <string>Reload Configs</string>
    </property>
    <property name="toolTip">
     <string>Reload Settings and Renderer Config</string>
@@ -594,10 +612,10 @@
   <action name="actionOpen_Microprofile">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/tacho</normaloff>:/Icons/tacho</iconset>
+     <normaloff>:/Icons/icons/essential/hourglass.png</normaloff>:/Icons/icons/essential/hourglass.png</iconset>
    </property>
    <property name="text">
-    <string>Open Microprofile</string>
+    <string>Profile</string>
    </property>
    <property name="toolTip">
     <string>Open Microprofile</string>
@@ -606,7 +624,7 @@
   <action name="actionCompile_Shaders">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</iconset>
+     <normaloff>:/Icons/icons/business/051-coding-1.png</normaloff>:/Icons/icons/business/051-coding-1.png</iconset>
    </property>
    <property name="text">
     <string>Compile Shaders</string>
@@ -615,7 +633,7 @@
   <action name="actionRecompile_Shaders">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</normaloff>:/Icons/icons/cc/white/png/calendar_2_icon&amp;24.png</iconset>
+     <normaloff>:/Icons/icons/business/051-coding-1.png</normaloff>:/Icons/icons/business/051-coding-1.png</iconset>
    </property>
    <property name="text">
     <string>Recompile Shaders</string>
@@ -633,10 +651,10 @@
    </property>
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/icons/cc/white/png/chart_bar_icon&amp;16.png</normaloff>:/Icons/icons/cc/white/png/chart_bar_icon&amp;16.png</iconset>
+     <normaloff>:/Icons/icons/business/051-analysis.png</normaloff>:/Icons/icons/business/051-analysis.png</iconset>
    </property>
    <property name="text">
-    <string>Benchmark Game State</string>
+    <string>Benchmark</string>
    </property>
    <property name="toolTip">
     <string>Benchmark Game State</string>
@@ -645,6 +663,10 @@
   <action name="actionShow_Benchmark_Paths">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/cad/surface.png</normaloff>:/Icons/icons/cad/surface.png</iconset>
    </property>
    <property name="text">
     <string>Show Benchmark Paths</string>
@@ -656,13 +678,100 @@
   <action name="actionCreateLight">
    <property name="icon">
     <iconset resource="../IntrinsicEd.qrc">
-     <normaloff>:/Icons/lightbulb</normaloff>:/Icons/lightbulb</iconset>
+     <normaloff>:/Icons/icons/various/idea.png</normaloff>:/Icons/icons/various/idea.png</iconset>
    </property>
    <property name="text">
-    <string>Create Light</string>
+    <string>Light</string>
    </property>
    <property name="toolTip">
     <string>Create Light</string>
+   </property>
+  </action>
+  <action name="actionSave_World_As">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/various/diskette.png</normaloff>:/Icons/icons/various/diskette.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save World As...</string>
+   </property>
+   <property name="toolTip">
+    <string>Save World As...</string>
+   </property>
+  </action>
+  <action name="actionReload_World">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/arrows/redo.png</normaloff>:/Icons/icons/arrows/redo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reload World</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload World</string>
+   </property>
+  </action>
+  <action name="actionWireframe_Rendering">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/geometry/tetrahedron.png</normaloff>:/Icons/icons/geometry/tetrahedron.png</iconset>
+   </property>
+   <property name="text">
+    <string>Wireframe Rendering</string>
+   </property>
+   <property name="toolTip">
+    <string>Wireframe Rendering</string>
+   </property>
+  </action>
+  <action name="actionCreateDecal">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/essential/picture-2.png</normaloff>:/Icons/icons/essential/picture-2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Decal</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Decal</string>
+   </property>
+  </action>
+  <action name="actionCreateIrradProbe">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/weather/clouds-and-sun.png</normaloff>:/Icons/icons/weather/clouds-and-sun.png</iconset>
+   </property>
+   <property name="text">
+    <string>Irrad. Probe</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Irradiance Probe</string>
+   </property>
+  </action>
+  <action name="actionCreateSpecProbe">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/weather/clouds-and-sun.png</normaloff>:/Icons/icons/weather/clouds-and-sun.png</iconset>
+   </property>
+   <property name="text">
+    <string>Spec. Probe</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Specular Probe</string>
+   </property>
+  </action>
+  <action name="actionCaptureAllProbes">
+   <property name="icon">
+    <iconset resource="../IntrinsicEd.qrc">
+     <normaloff>:/Icons/icons/weather/clouds-and-sun.png</normaloff>:/Icons/icons/weather/clouds-and-sun.png</iconset>
+   </property>
+   <property name="text">
+    <string>Capture Probes</string>
+   </property>
+   <property name="toolTip">
+    <string>Capture (All) Probes</string>
    </property>
   </action>
  </widget>

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,6 +98,8 @@ void initInputAssemblyStates()
 
 void initRasterizationStates()
 {
+  static const float lineWidth = 3.0f;
+
   {
     VkPipelineRasterizationStateCreateInfo& rs =
         RenderStates::rasterizationStates[RasterizationStates::kDefault];
@@ -113,7 +115,7 @@ void initRasterizationStates()
     rs.depthBiasConstantFactor = 0.0f;
     rs.depthBiasClamp = 0.0f;
     rs.depthBiasSlopeFactor = 0.0f;
-    rs.lineWidth = 1.0f;
+    rs.lineWidth = lineWidth;
   }
 
   {
@@ -131,7 +133,7 @@ void initRasterizationStates()
     rs.depthBiasConstantFactor = 0.0f;
     rs.depthBiasClamp = 0.0f;
     rs.depthBiasSlopeFactor = 0.0f;
-    rs.lineWidth = 1.0f;
+    rs.lineWidth = lineWidth;
   }
 
   {
@@ -149,7 +151,25 @@ void initRasterizationStates()
     rs.depthBiasConstantFactor = 0.0f;
     rs.depthBiasClamp = 0.0f;
     rs.depthBiasSlopeFactor = 0.0f;
-    rs.lineWidth = 1.0f;
+    rs.lineWidth = lineWidth;
+  }
+
+  {
+    VkPipelineRasterizationStateCreateInfo& rs =
+        RenderStates::rasterizationStates[RasterizationStates::kWireframe];
+    rs.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rs.pNext = nullptr;
+    rs.flags = 0;
+    rs.polygonMode = VK_POLYGON_MODE_LINE;
+    rs.cullMode = VK_CULL_MODE_BACK_BIT;
+    rs.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    rs.depthClampEnable = VK_FALSE;
+    rs.rasterizerDiscardEnable = VK_FALSE;
+    rs.depthBiasEnable = VK_TRUE;
+    rs.depthBiasConstantFactor = -2.0f;
+    rs.depthBiasClamp = 0.0f;
+    rs.depthBiasSlopeFactor = 0.0f;
+    rs.lineWidth = lineWidth;
   }
 }
 

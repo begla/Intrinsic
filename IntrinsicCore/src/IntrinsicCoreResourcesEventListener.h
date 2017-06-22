@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref EventListenerRef;
 typedef _INTR_ARRAY(EventListenerRef) EventListenerRefArray;
 
@@ -89,9 +90,7 @@ struct EventListenerManager
         _INTR_MAX_EVENT_LISTENER_COUNT>::_destroyResource(p_Ref);
   }
 
-  // Getter/Setter
-  // ->
-
+  // Resources
   _INTR_INLINE static EventCallbackFunction&
   _descEventCallbackFunction(EventListenerRef p_Ref)
   {

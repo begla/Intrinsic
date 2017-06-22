@@ -1,0 +1,891 @@
+[
+    {
+        "name": "MaterialTest",
+        "offsetToParent": 0,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "Plane",
+        "offsetToParent": -1,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        0.0,
+                        -12.75,
+                        0.0
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        150.0,
+                        1.0,
+                        150.0
+                    ],
+                    "worldPos": [
+                        0.0,
+                        -12.75,
+                        0.0
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "worldSize": [
+                        150.0,
+                        1.0,
+                        150.0
+                    ]
+                }
+            },
+            {
+                "type": "RigidBody",
+                "properties": {
+                    "rigidBodyType": 2,
+                    "density": 1.0
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "plane_concrete",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "MainCamera",
+        "offsetToParent": -2,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        8.207942008972168,
+                        79.92366790771485,
+                        268.9534912109375
+                    ],
+                    "localOrient": [
+                        -0.017848113551735879,
+                        0.9763482213020325,
+                        -0.19633667171001435,
+                        -0.08875557035207749
+                    ],
+                    "localSize": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "worldPos": [
+                        8.207942008972168,
+                        79.92366790771485,
+                        268.9534912109375
+                    ],
+                    "worldOrient": [
+                        -0.017848113551735879,
+                        0.9763482213020325,
+                        -0.19633667171001435,
+                        -0.08875557035207749
+                    ],
+                    "worldSize": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                }
+            },
+            {
+                "type": "Camera",
+                "properties": {
+                    "fov": 70.0,
+                    "nearPlane": 1.0,
+                    "farPlane": 10000.0
+                }
+            }
+        ]
+    },
+    {
+        "name": "GameCamera",
+        "offsetToParent": -3,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -938.4696044921875,
+                        574.0117797851563,
+                        -288.30108642578127
+                    ],
+                    "localOrient": [
+                        0.07182473689317703,
+                        -0.6936193108558655,
+                        0.0698389932513237,
+                        0.7133413553237915
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        -938.4696044921875,
+                        574.0117797851563,
+                        -288.30108642578127
+                    ],
+                    "worldOrient": [
+                        0.07182473689317703,
+                        -0.6936193108558655,
+                        0.0698389932513237,
+                        0.7133413553237915
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "CameraController",
+                "properties": {
+                    "cameraControllerType": 0,
+                    "targetObjectName": "Player",
+                    "targetEulerAngles": [
+                        0.200699120759964,
+                        -1.542762041091919,
+                        0.0
+                    ]
+                }
+            },
+            {
+                "type": "Camera",
+                "properties": {
+                    "fov": 80.0,
+                    "nearPlane": 1.0,
+                    "farPlane": 10000.0
+                }
+            }
+        ]
+    },
+    {
+        "name": "Sky",
+        "offsetToParent": -4,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        5000.0,
+                        5000.0,
+                        5000.0
+                    ],
+                    "worldPos": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "worldSize": [
+                        5000.0,
+                        5000.0,
+                        5000.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "sky",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "PostEffectVolume",
+                "properties": {
+                    "postEffectName": "MaterialTest",
+                    "radius": 5000.0,
+                    "blendRange": 50.0
+                }
+            }
+        ]
+    },
+    {
+        "name": "Materials",
+        "offsetToParent": -5,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -25.0,
+                        0.0,
+                        -51.5
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.4059165120124817,
+                        0.0,
+                        0.9139101505279541
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        -25.0,
+                        0.0,
+                        -51.5
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.4059165120124817,
+                        0.0,
+                        0.9139101505279541
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "Decal1",
+        "offsetToParent": -6,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -31.677764892578126,
+                        -11.75,
+                        161.94998168945313
+                    ],
+                    "localOrient": [
+                        -0.6211917996406555,
+                        -0.3378176987171173,
+                        -0.3378176987171173,
+                        0.6211917996406555
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        -31.677764892578126,
+                        -11.75,
+                        161.94998168945313
+                    ],
+                    "worldOrient": [
+                        -0.6211917996406555,
+                        -0.3378176987171173,
+                        -0.3378176987171173,
+                        0.6211917996406555
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "Decal",
+                "properties": {
+                    "albedoTextureName": "decal_pothole",
+                    "normalTextureName": "decal_pothole_NRM",
+                    "pbrTextureName": "decal_pothole_PBR",
+                    "uvTransform": [
+                        1.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    "halfExtent": [
+                        50.0,
+                        50.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "Decal2",
+        "offsetToParent": -1,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -34.918548583984378,
+                        179.18382263183595,
+                        0.0
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.7716245651245117,
+                        0.6360782384872437
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        99.75001525878906,
+                        -11.750015258789063,
+                        35.249969482421878
+                    ],
+                    "worldOrient": [
+                        -0.6557949781417847,
+                        0.264448344707489,
+                        0.264448344707489,
+                        0.6557949781417847
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "Decal",
+                "properties": {
+                    "albedoTextureName": "decal_pothole",
+                    "normalTextureName": "decal_pothole_NRM",
+                    "pbrTextureName": "decal_pothole_PBR",
+                    "uvTransform": [
+                        1.0,
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    "halfExtent": [
+                        50.0,
+                        50.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "MatMetalT",
+        "offsetToParent": -3,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        74.0,
+                        20.75,
+                        102.75
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ],
+                    "worldPos": [
+                        100.84888458251953,
+                        20.75,
+                        -37.51361083984375
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.4059165120124817,
+                        0.0,
+                        0.9139101505279541
+                    ],
+                    "worldSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "metal_torus",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "MatWater",
+        "offsetToParent": -4,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -154.5,
+                        20.75,
+                        102.75
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ],
+                    "worldPos": [
+                        -52.35204315185547,
+                        20.75,
+                        132.02023315429688
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.4059165120124817,
+                        0.0,
+                        0.9139101505279541
+                    ],
+                    "worldSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "water_sphere",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "MatWhite",
+        "offsetToParent": -5,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -83.75,
+                        20.75,
+                        102.75
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ],
+                    "worldPos": [
+                        -4.916748046875,
+                        20.75,
+                        79.52780151367188
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.4059165120124817,
+                        0.0,
+                        0.9139101505279541
+                    ],
+                    "worldSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "sphere_white",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "MatEmissive",
+        "offsetToParent": -6,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -119.75,
+                        20.75,
+                        102.75
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ],
+                    "worldPos": [
+                        -29.053436279296876,
+                        20.75,
+                        106.23773193359375
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.4059165120124817,
+                        0.0,
+                        0.9139101505279541
+                    ],
+                    "worldSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "sphere_emissive",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "MatEffect",
+        "offsetToParent": -7,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -13.25,
+                        20.75,
+                        102.75
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ],
+                    "worldPos": [
+                        42.35093688964844,
+                        20.75,
+                        27.220870971679689
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.4059165120124817,
+                        0.0,
+                        0.9139101505279541
+                    ],
+                    "worldSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "effect_sphere",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "MatDefaultT",
+        "offsetToParent": -8,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        116.75,
+                        20.75,
+                        102.75
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ],
+                    "worldPos": [
+                        129.51119995117188,
+                        20.75,
+                        -69.23164367675781
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.4059165120124817,
+                        0.0,
+                        0.9139101505279541
+                    ],
+                    "worldSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "torus",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "MatDefault",
+        "offsetToParent": -9,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -48.5,
+                        20.75,
+                        102.75
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ],
+                    "worldPos": [
+                        18.71709442138672,
+                        20.75,
+                        53.37434387207031
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.4059165120124817,
+                        0.0,
+                        0.9139101505279541
+                    ],
+                    "worldSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "sphere",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "name": "MatCube",
+        "offsetToParent": -10,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        30.75,
+                        20.75,
+                        102.75
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ],
+                    "worldPos": [
+                        71.85133361816406,
+                        20.75,
+                        -5.424598693847656
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.4059165120124817,
+                        0.0,
+                        0.9139101505279541
+                    ],
+                    "worldSize": [
+                        15.0,
+                        15.0,
+                        15.0
+                    ]
+                }
+            },
+            {
+                "type": "Mesh",
+                "properties": {
+                    "meshName": "cube",
+                    "colorTint": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            }
+        ]
+    }
+]

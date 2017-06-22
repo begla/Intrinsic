@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref VertexLayoutRef;
 typedef Dod::RefArray VertexLayoutRefArray;
 
@@ -38,10 +39,11 @@ struct VertexLayoutData : Dod::Resources::ResourceDataBase
     vkPipelineVertexInputStateCreateInfo.resize(_INTR_MAX_VERTEX_LAYOUT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(_INTR_ARRAY(VertexBinding)) descVertexBindings;
   _INTR_ARRAY(_INTR_ARRAY(VertexAttribute)) descVertexAttributes;
 
-  // GPU resources
+  // Resources
   _INTR_ARRAY(_INTR_ARRAY(VkVertexInputBindingDescription))
   vkVertexInputBindingDescs;
   _INTR_ARRAY(_INTR_ARRAY(VkVertexInputAttributeDescription))
@@ -97,11 +99,13 @@ struct VertexLayoutManager
   }
 
   _INTR_INLINE static void initFromDescriptor(VertexLayoutRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         VertexLayoutData,
         _INTR_MAX_VERTEX_LAYOUT_COUNT>::_initFromDescriptor(p_Ref,
+                                                            p_GenerateDesc,
                                                             p_Properties);
   }
 
@@ -144,9 +148,7 @@ struct VertexLayoutManager
     }
   }
 
-  // Getter/Setter
-  // ->
-
+  // Description
   _INTR_INLINE static _INTR_ARRAY(VertexAttribute) &
       _descVertexAttributes(VertexLayoutRef p_Ref)
   {
@@ -158,7 +160,7 @@ struct VertexLayoutManager
     return _data.descVertexBindings[p_Ref._id];
   }
 
-  // GPU Resources
+  // Resources
   _INTR_INLINE static _INTR_ARRAY(VkVertexInputAttributeDescription) &
       _vkVertexInputAttributeDescs(VertexLayoutRef p_Ref)
   {

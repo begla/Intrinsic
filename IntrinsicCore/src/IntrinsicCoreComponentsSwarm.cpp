@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace Components
 {
 void SwarmManager::init()
 {
-  _INTR_LOG_INFO("Inititializing Character Controller Component Manager...");
+  _INTR_LOG_INFO("Inititializing Swarm Component Manager...");
 
   Dod::Components::ComponentManagerBase<
       SwarmData, _INTR_MAX_SWARM_COMPONENT_COUNT>::_initComponentManager();
@@ -58,6 +58,8 @@ void SwarmManager::init()
         propCompilerSwarm;
   }
 }
+
+// <-
 
 void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
 {
@@ -98,6 +100,7 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
         NodeRef nodeRef = nodes[boidIdx];
         Boid& boid = boids[boidIdx];
 
+        // TODO: Add properties for those
         static const float boidAcc = 10.0f;
         static const float boidMinDistSqr = 8.0f * 8.0f;
         static const float distanceRuleWeight = 0.3f;
@@ -187,12 +190,6 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
 
         // Update lights and mesh color
         glm::vec4 boidColor = glm::vec4(boid.color, 1.0f);
-
-        /*  const float lightFactor =
-              1.0f - glm::clamp(boidToCenterDist / 15.0f, 0.0f, 1.0f);
-          boidColor =
-              glm::mix(boidColor, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
-          lightFactor);*/
         boidColor *=
             (std::sin(2.0f * TaskManager::_totalTimePassed * glm::pi<float>() +
                       boidIdx * glm::quarter_pi<float>()) *
@@ -213,6 +210,8 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
   }
 }
 
+// <-
+
 void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
 {
   Components::MeshRefArray meshComponentsToCreate;
@@ -227,7 +226,7 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
           Entity::EntityManager::createEntity(_N(Boid));
       Components::NodeRef nodeRef =
           Components::NodeManager::createNode(entityRef);
-      Components::NodeManager::attachChild(World::getRootNode(), nodeRef);
+      Components::NodeManager::attachChild(World::_rootNode, nodeRef);
 
       Components::NodeManager::_flags(nodeRef) |=
           Components::NodeFlags::kSpawned;
@@ -268,6 +267,8 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
   Components::MeshManager::createResources(meshComponentsToCreate);
 }
 
+// <-
+
 void SwarmManager::destroyResources(const SwarmRefArray& p_Swarms)
 {
   for (uint32_t swarmIdx = 0u; swarmIdx < p_Swarms.size(); ++swarmIdx)
@@ -279,11 +280,11 @@ void SwarmManager::destroyResources(const SwarmRefArray& p_Swarms)
     Dod::RefArray& lights = Components::SwarmManager::_lights(swarmRef);
     Dod::RefArray& meshes = Components::SwarmManager::_meshes(swarmRef);
 
-    if (World::getRootNode().isValid())
+    if (World::_rootNode
+            .isValid()) // Check if the world is currently being destroyed
     {
       for (uint32_t i = 0u; i < nodes.size(); ++i)
       {
-
         World::destroyNodeFull(nodes[i]);
       }
     }

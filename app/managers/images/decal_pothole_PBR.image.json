@@ -1,0 +1,10 @@
+{
+    "name": "decal_pothole_PBR",
+    "properties": {
+        "name": "decal_pothole_PBR",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "decal_pothole_PBR.dds",
+        "avgNormLength": 1.0
+    }
+}

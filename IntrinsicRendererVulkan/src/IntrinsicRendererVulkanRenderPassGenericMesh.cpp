@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -26,8 +28,6 @@ namespace RenderPass
 {
 void GenericMesh::init(const rapidjson::Value& p_RenderPassDesc)
 {
-  using namespace Resources;
-
   Base::init(p_RenderPassDesc);
 
   const rapidjson::Value& materialPassDescs =
@@ -56,8 +56,6 @@ void GenericMesh::init(const rapidjson::Value& p_RenderPassDesc)
 
 void GenericMesh::destroy()
 {
-  using namespace Resources;
-
   Base::destroy();
 
   _materialPassIds.clear();
@@ -68,8 +66,6 @@ void GenericMesh::destroy()
 
 void GenericMesh::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
-  using namespace Resources;
-
   _INTR_PROFILE_CPU_DEFINE(GenericMeshCPU, "Render Pass", _name.c_str());
   _INTR_PROFILE_CPU_CUSTOM(GenericMeshCPU);
   _INTR_PROFILE_GPU_DEFINE(GenericMeshGPU, _name.c_str());
@@ -105,7 +101,7 @@ void GenericMesh::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 
   // Update per mesh uniform data
   {
-    Core::Components::MeshManager::updateUniformData(visibleDrawCalls);
+    CComponents::MeshManager::updateUniformData(visibleDrawCalls);
   }
 
   VkCommandBuffer primaryCmdBuffer = RenderSystem::getPrimaryCommandBuffer();

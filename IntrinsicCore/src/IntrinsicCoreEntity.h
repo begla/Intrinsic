@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Entity
 {
+// Typedefs
 typedef Dod::Ref EntityRef;
 typedef _INTR_ARRAY(EntityRef) EntityRefArray;
 
@@ -27,6 +28,7 @@ struct EntityData
 {
   EntityData() { name.resize(_INTR_MAX_ENTITY_COUNT); }
 
+  // Resources
   _INTR_ARRAY(Name) name;
 };
 
@@ -57,14 +59,14 @@ struct EntityManager : Dod::ManagerBase<_INTR_MAX_ENTITY_COUNT, EntityData>
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember("name",
-                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(Entity), _N(string),
-                                             _name(p_Ref), false, false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "name", _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Entity),
+                                  _N(string), _name(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   _INTR_INLINE static void initFromDescriptor(EntityRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("name"))
@@ -89,10 +91,8 @@ struct EntityManager : Dod::ManagerBase<_INTR_MAX_ENTITY_COUNT, EntityData>
       {
         const _INTR_STRING nameWithoutSuffix =
             StringUtil::stripNumberSuffix(p_Name);
-        newEntityName =
-            nameWithoutSuffix +
-            Intrinsic::Core::StringUtil::toString<uint32_t>(nodexIndex++)
-                .c_str();
+        newEntityName = nameWithoutSuffix +
+                        StringUtil::toString<uint32_t>(nodexIndex++).c_str();
       }
       else
       {
@@ -119,9 +119,7 @@ struct EntityManager : Dod::ManagerBase<_INTR_MAX_ENTITY_COUNT, EntityData>
     _nameResourceMap[_data.name[p_Ref._id]] = p_Ref;
   }
 
-  // Getter/Setter
-  // ->
-
+  // Resources
   _INTR_INLINE static const Name& _name(EntityRef p_Ref)
   {
     return _data.name[p_Ref._id];

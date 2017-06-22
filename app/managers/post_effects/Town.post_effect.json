@@ -2,20 +2,22 @@
     "name": "Town",
     "properties": {
         "name": "Town",
-        "scattering": 0.05000000074505806,
-        "mainLightIntensity": 0.05000000074505806,
-        "mainLightTemperature": 6500.0,
-        "mainLightOrientation": [
-            -0.20322129130363465,
-            0.649418830871582,
-            0.18621791899204255,
-            0.708716630935669
+        "scatteringDayNight": [
+            0.0005000000237487257,
+            0.00800000037997961
         ],
-        "mainLightColor": [
-            1.0,
-            1.0,
+        "sunOrientation": [
+            0.0,
+            0.0,
+            0.0,
             1.0
         ],
-        "ambientFactor": 0.029999999329447748
+        "dayNightFactor": 1.0,
+        "skyLightIntensity": 0.05000000074505806,
+        "skyTurbidity": 2.0,
+        "skyAlbedo": 0.0,
+        "sunIntensity": 10.0,
+        "cloudShadowsIntensity": 1.0,
+        "dofStartDistance": 100.0
     }
 }

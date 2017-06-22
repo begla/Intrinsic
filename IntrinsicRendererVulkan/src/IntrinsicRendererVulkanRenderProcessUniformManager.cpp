@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,12 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+// Sky model
+#include "IntrinsicCoreSkyModel.h"
+
 #define HALTON_SAMPLE_COUNT 1024
+
+using namespace CResources;
 
 namespace Intrinsic
 {
@@ -48,9 +53,9 @@ _INTR_INLINE void initStaticUniformData()
   }
 
   UniformManager::_uniformDataSource.blurParamsXNormal =
-      glm::vec4(3.0f, 0.0f, 1.0f, 0.0f);
+      glm::vec4(2.0f, 0.0f, 1.0f, 0.0f);
   UniformManager::_uniformDataSource.blurParamsYNormal =
-      glm::vec4(3.0f, 0.0f, 0.0f, 1.0f);
+      glm::vec4(2.0f, 0.0f, 0.0f, 1.0f);
   UniformManager::_uniformDataSource.blurParamsXMedium =
       glm::vec4(6.0f, 0.0f, 1.0f, 0.0f);
   UniformManager::_uniformDataSource.blurParamsYMedium =
@@ -99,11 +104,11 @@ _uniformOffsetMapping = {
     {"ViewMatrix",
      UniformDataRef(&UniformManager::_uniformDataSource.viewMatrix,
                     sizeof(glm::mat4))},
+    {"InverseViewMatrix",
+     UniformDataRef(&UniformManager::_uniformDataSource.inverseViewMatrix,
+                    sizeof(glm::mat4))},
     {"PrevViewMatrix",
      UniformDataRef(&UniformManager::_uniformDataSource.prevViewMatrix,
-                    sizeof(glm::mat4))},
-    {"NormalMatrix",
-     UniformDataRef(&UniformManager::_uniformDataSource.normalMatrix,
                     sizeof(glm::mat4))},
     {"InverseProjectionMatrix",
      UniformDataRef(&UniformManager::_uniformDataSource.inverseProjectionMatrix,
@@ -138,6 +143,9 @@ _uniformOffsetMapping = {
                     sizeof(glm::vec4))},
     {"PostParams0",
      UniformDataRef(&UniformManager::_uniformDataSource.postParams0,
+                    sizeof(glm::vec4))},
+    {"BackbufferSize",
+     UniformDataRef(&UniformManager::_uniformDataSource.backbufferSize,
                     sizeof(glm::vec4))},
     {"HaltonSamples",
      UniformDataRef(&UniformManager::_uniformDataSource.haltonSamples,
@@ -190,45 +198,158 @@ void UniformManager::load(const rapidjson::Value& p_UniformBuffers)
 
 void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 {
-  UniformManager::_uniformDataSource.postParams0.x =
-      Core::Resources::PostEffectManager::_descAmbientFactor(
-          Core::Resources::PostEffectManager::_blendTargetRef);
+  _INTR_PROFILE_CPU("General", "Update Per Frame Uniform Buffer Data");
 
-  UniformManager::_uniformDataSource.cameraParameters.x =
-      Components::CameraManager::_descNearPlane(p_Camera);
-  UniformManager::_uniformDataSource.cameraParameters.y =
-      Components::CameraManager::_descFarPlane(p_Camera);
-  UniformManager::_uniformDataSource.cameraParameters.z =
-      1.0f / UniformManager::_uniformDataSource.cameraParameters.x;
-  UniformManager::_uniformDataSource.cameraParameters.w =
-      1.0f / UniformManager::_uniformDataSource.cameraParameters.y;
-  UniformManager::_uniformDataSource.projectionMatrix =
-      Components::CameraManager::_projectionMatrix(p_Camera);
-  UniformManager::_uniformDataSource.prevViewMatrix =
-      Components::CameraManager::_prevViewMatrix(p_Camera);
-  UniformManager::_uniformDataSource.viewMatrix =
-      Components::CameraManager::_viewMatrix(p_Camera);
-  UniformManager::_uniformDataSource.normalMatrix =
-      Components::CameraManager::_viewMatrix(p_Camera);
-  UniformManager::_uniformDataSource.inverseProjectionMatrix =
-      Components::CameraManager::_inverseProjectionMatrix(p_Camera);
-  UniformManager::_uniformDataSource.inverseViewProjectionMatrix =
-      Components::CameraManager::_inverseViewProjectionMatrix(p_Camera);
+  // Uniforms for the render passes
+  {
+    UniformManager::_uniformDataSource.postParams0.x =
+        RenderPass::Clustering::_globalAmbientFactor;
+    UniformManager::_uniformDataSource.postParams0.y =
+        World::_currentDayNightFactor;
+    UniformManager::_uniformDataSource.postParams0.z =
+        PostEffectManager::_descDoFStartDistance(
+            PostEffectManager::_blendTargetRef);
+    UniformManager::_uniformDataSource.postParams0.w =
+        PostEffectManager::_descCloudShadowsIntensity(
+            PostEffectManager::_blendTargetRef);
 
-  Components::NodeRef cameraNode =
-      Components::NodeManager::getComponentForEntity(
-          Components::CameraManager::_entity(p_Camera));
-  UniformManager::_uniformDataSource.cameraWorldPosition =
-      glm::vec4(Components::NodeManager::_worldPosition(cameraNode), 0.0f);
+    UniformManager::_uniformDataSource.cameraParameters.x =
+        Components::CameraManager::_descNearPlane(p_Camera);
+    UniformManager::_uniformDataSource.cameraParameters.y =
+        Components::CameraManager::_descFarPlane(p_Camera);
+    UniformManager::_uniformDataSource.cameraParameters.z =
+        1.0f / UniformManager::_uniformDataSource.cameraParameters.x;
+    UniformManager::_uniformDataSource.cameraParameters.w =
+        1.0f / UniformManager::_uniformDataSource.cameraParameters.y;
+    UniformManager::_uniformDataSource.inverseViewMatrix =
+        Components::CameraManager::_inverseViewMatrix(p_Camera);
+    UniformManager::_uniformDataSource.projectionMatrix =
+        Components::CameraManager::_projectionMatrix(p_Camera);
+    UniformManager::_uniformDataSource.prevViewMatrix =
+        Components::CameraManager::_prevViewMatrix(p_Camera);
+    UniformManager::_uniformDataSource.viewMatrix =
+        Components::CameraManager::_viewMatrix(p_Camera);
+    UniformManager::_uniformDataSource.inverseProjectionMatrix =
+        Components::CameraManager::_inverseProjectionMatrix(p_Camera);
+    UniformManager::_uniformDataSource.inverseViewProjectionMatrix =
+        Components::CameraManager::_inverseViewProjectionMatrix(p_Camera);
 
-  UniformManager::_uniformDataSource.haltonSamples = glm::vec4(
-      _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].x,
-      _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].y,
-      _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].z, 0.0f);
-  UniformManager::_uniformDataSource.haltonSamples32 =
-      glm::vec4(_haltonSamples[TaskManager::_frameCounter % 32].x,
-                _haltonSamples[TaskManager::_frameCounter % 32].y,
-                _haltonSamples[TaskManager::_frameCounter % 32].z, 0.0f);
+    Components::NodeRef cameraNode =
+        Components::NodeManager::getComponentForEntity(
+            Components::CameraManager::_entity(p_Camera));
+    UniformManager::_uniformDataSource.cameraWorldPosition =
+        glm::vec4(Components::NodeManager::_worldPosition(cameraNode), 0.0f);
+
+    UniformManager::_uniformDataSource.haltonSamples = glm::vec4(
+        _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].x,
+        _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].y,
+        _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].z,
+        0.0f);
+    UniformManager::_uniformDataSource.haltonSamples32 =
+        glm::vec4(_haltonSamples[TaskManager::_frameCounter % 32].x,
+                  _haltonSamples[TaskManager::_frameCounter % 32].y,
+                  _haltonSamples[TaskManager::_frameCounter % 32].z, 0.0f);
+
+    glm::vec2 backbufferSize = glm::vec2(RenderSystem::_backbufferDimensions);
+    UniformManager::_uniformDataSource.backbufferSize =
+        glm::vec4(backbufferSize, 1.0f / backbufferSize);
+  }
+
+  // Global per frame data
+  {
+    static const uint32_t perFrameRangeSizeInBytes =
+        sizeof(RenderProcess::PerFrameDataVertex) +
+        sizeof(RenderProcess::PerFrameDataFrament);
+
+    uint8_t* perFrameVertexMemory =
+        Vulkan::UniformManager::_perFrameMemory +
+        RenderProcess::UniformManager::getDynamicOffsetForPerFrameDataVertex();
+    ;
+    uint8_t* perFrameFragmentMemory =
+        Vulkan::UniformManager::_perFrameMemory +
+        RenderProcess::UniformManager::
+            getDynamicOffsetForPerFrameDataFragment();
+
+    _INTR_ASSERT(sizeof(RenderProcess::PerFrameDataVertex) <
+                     _INTR_VK_PER_FRAME_BLOCK_SIZE_IN_BYTES &&
+                 sizeof(RenderProcess::PerFrameDataFrament) <
+                     _INTR_VK_PER_FRAME_BLOCK_SIZE_IN_BYTES &&
+                 "Per frame memory block too small");
+
+    PerFrameDataVertex vertexData;
+    {
+      // TODO: Nothing here yet
+    }
+    memcpy(perFrameVertexMemory, &vertexData, sizeof(vertexData));
+
+    PerFrameDataFrament fragmentData;
+    {
+      fragmentData.postParams0 = UniformManager::_uniformDataSource.postParams0;
+
+      fragmentData.viewMatrix = UniformManager::_uniformDataSource.viewMatrix;
+      fragmentData.invProjectionMatrix =
+          UniformManager::_uniformDataSource.inverseProjectionMatrix;
+      fragmentData.invViewMatrix =
+          UniformManager::_uniformDataSource.inverseViewMatrix;
+
+      // Sky
+      const glm::vec3 sunDir = PostEffectManager::calcActualSunOrientation(
+                                   PostEffectManager::_blendTargetRef) *
+                               glm::vec3(0.0f, 0.0f, 1.0f);
+      fragmentData.sunLightDirWS = glm::vec4(sunDir, 0.0f);
+      fragmentData.sunLightDirVS =
+          UniformManager::_uniformDataSource.viewMatrix *
+          fragmentData.sunLightDirWS;
+      fragmentData.sunLightColorAndIntensity =
+          World::_currentSunLightColorAndIntensity;
+      fragmentData.sunLightColorAndIntensity.w *=
+          PostEffectManager::_descSunIntensity(
+              PostEffectManager::_blendTargetRef);
+
+      const float elevation =
+          glm::half_pi<float>() -
+          std::acos(std::max(glm::dot(sunDir, glm::vec3(0.0f, 1.0f, 0.0f)),
+                             0.00001f));
+
+      // TODO: Move params to post effect
+      SkyModel::ArHosekSkyModelState skyModel =
+          SkyModel::createSkyModelStateRGB(
+              PostEffectManager::_descSkyTurbidity(
+                  PostEffectManager::_blendTargetRef),
+              PostEffectManager::_descSkyAlbedo(
+                  PostEffectManager::_blendTargetRef),
+              elevation);
+      const float radianceFactor = World::_currentDayNightFactor *
+                                   PostEffectManager::_descSkyLightIntensity(
+                                       PostEffectManager::_blendTargetRef);
+      skyModel.radiances[0] *= radianceFactor;
+      skyModel.radiances[1] *= radianceFactor;
+      skyModel.radiances[2] *= radianceFactor;
+
+      // Project sky light SH
+      {
+        IBL::SH9 skyLightSH = SkyModel::project(skyModel, sunDir, 64u);
+        memcpy(fragmentData.skyLightSH, &skyLightSH, sizeof(IBL::SH9));
+      }
+
+      // Pack sky model configs/radiance for sky sampling
+      for (uint32_t channelIdx = 0u; channelIdx < 3u; ++channelIdx)
+      {
+        for (uint32_t i = 0u; i < 9u; ++i)
+        {
+          const uint32_t idx = i + channelIdx * 9u;
+          const glm::uvec2 packedDataOffset = glm::uvec2(idx / 4u, idx % 4u);
+
+          fragmentData.skyModelConfigs[packedDataOffset.x][packedDataOffset.y] =
+              (float)skyModel.configs[channelIdx][i];
+        }
+
+        fragmentData.skyModelRadiances[channelIdx] =
+            (float)skyModel.radiances[channelIdx];
+      }
+      memcpy(perFrameFragmentMemory, &fragmentData, sizeof(fragmentData));
+    }
+  }
 }
 
 // <-
@@ -266,8 +387,14 @@ void UniformManager::resetAllocator() { _uniformBufferMemoryAllocator.reset(); }
 UniformBufferDataEntry
 UniformManager::requestUniformBufferData(const Name& p_Name)
 {
-  const UniformBuffer& buffer = _uniformBuffers[p_Name];
-  return UniformBufferDataEntry(buffer.data, buffer.dataSize);
+  auto it = _uniformBuffers.find(p_Name);
+  if (it != _uniformBuffers.end())
+  {
+    const UniformBuffer& buffer = it->second;
+    return UniformBufferDataEntry(buffer.data, buffer.dataSize);
+  }
+
+  return UniformBufferDataEntry(nullptr, 0u);
 }
 }
 }

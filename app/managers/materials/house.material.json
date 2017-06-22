@@ -4,6 +4,7 @@
         "name": "house",
         "materialPassMask": [
             "GBufferDefault",
+            "GBufferWireframe",
             "Shadow",
             "PerPixelPicking"
         ],

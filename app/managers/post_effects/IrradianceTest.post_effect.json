@@ -2,20 +2,22 @@
     "name": "IrradianceTest",
     "properties": {
         "name": "IrradianceTest",
-        "scattering": 0.0,
-        "mainLightIntensity": 0.0,
-        "mainLightTemperature": 3200.0,
-        "mainLightOrientation": [
+        "scatteringDayNight": [
+            0.0,
+            0.0
+        ],
+        "sunOrientation": [
             0.0,
             0.0,
             0.0,
             1.0
         ],
-        "mainLightColor": [
-            1.0,
-            1.0,
-            1.0
-        ],
-        "ambientFactor": 1.0
+        "dayNightFactor": 0.0,
+        "skyLightIntensity": 0.05000000074505806,
+        "skyTurbidity": 2.0,
+        "skyAlbedo": 0.0,
+        "sunIntensity": 0.0,
+        "cloudShadowsIntensity": 0.0,
+        "dofStartDistance": 10000.0
     }
 }

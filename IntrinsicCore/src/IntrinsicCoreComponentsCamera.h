@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref CameraRef;
 typedef _INTR_ARRAY(CameraRef) CameraRefArray;
 
@@ -38,10 +39,12 @@ struct CameraData : Dod::Components::ComponentDataBase
     up.resize(_INTR_MAX_CAMERA_COMPONENT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(float) descFov;
   _INTR_ARRAY(float) descNearPlane;
   _INTR_ARRAY(float) descFarPlane;
 
+  // Resources
   _INTR_ARRAY(Resources::FrustumRef) frustum;
   _INTR_ARRAY(glm::vec3) forward;
   _INTR_ARRAY(glm::vec3) up;
@@ -114,6 +117,7 @@ struct CameraManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(CameraRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("fov"))
@@ -135,9 +139,6 @@ struct CameraManager
 
   static glm::mat4 computeCustomProjMatrix(CameraRef p_Ref, float p_Near,
                                            float p_Far);
-
-  // Getter/Setter
-  // ->
 
   // Description
   _INTR_INLINE static float& _descNearPlane(CameraRef p_Ref)

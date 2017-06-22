@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,17 @@
 #define NOMINMAX
 #include "windows.h"
 #endif // _WIN32
+
+// GLM and GLI related includes
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <gli/gli.hpp>
 
 // Tinydir
 #include "tinydir/tinydir.h"
@@ -61,15 +72,6 @@
 #include <cfloat>
 #include <cmath>
 #include <thread>
-
-// GLM related includes
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-
-#include "glm/glm.hpp"
-#include "glm/gtc/quaternion.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/quaternion.hpp"
-#include "glm/gtx/rotate_vector.hpp"
 
 // Core related includes
 #include "IntrinsicCoreVersion.h"
@@ -118,9 +120,37 @@ namespace Intrinsic
 {
 namespace Core
 {
+namespace Resources
+{
+}
+namespace Components
+{
 }
 }
+}
+
+using namespace Intrinsic;
 using namespace Intrinsic::Core;
+
+namespace Intrinsic
+{
+namespace Renderer
+{
+namespace Vulkan
+{
+namespace Resources
+{
+}
+}
+}
+}
+
+// Namespace aliases
+namespace RV = Intrinsic::Renderer::Vulkan;
+namespace RVResources = RV::Resources;
+
+namespace CResources = Intrinsic::Core::Resources;
+namespace CComponents = Intrinsic::Core::Components;
 
 // Core related includes
 #include "IntrinsicCoreTriangleOptimizer.h"
@@ -133,9 +163,10 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreSimd.h"
 #include "IntrinsicCoreMath.h"
 #include "IntrinsicCoreName.h"
-#include "IntrinsicCoreJsonHelper.h"
 #include "IntrinsicCoreTimingHelper.h"
 #include "IntrinsicCoreDod.h"
+#include "IntrinsicCoreIBL.h"
+#include "IntrinsicCoreJsonHelper.h"
 #include "IntrinsicCoreEntity.h"
 #include "IntrinsicCoreDodResources.h"
 #include "IntrinsicCoreDodComponents.h"
@@ -145,7 +176,6 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreResourcesEvent.h"
 #include "IntrinsicCoreResourcesFrustum.h"
 #include "IntrinsicCoreResourcesMesh.h"
-#include "IntrinsicCoreResourcesPostEffect.h"
 #include "IntrinsicCoreComponentsNode.h"
 #include "IntrinsicCoreComponentsMesh.h"
 #include "IntrinsicCoreComponentsSwarm.h"
@@ -154,11 +184,15 @@ using namespace Intrinsic::Core;
 #include "IntrinsicCoreComponentsCameraController.h"
 #include "IntrinsicCoreComponentsCharacterController.h"
 #include "IntrinsicCoreComponentsPlayer.h"
-#include "IntrinsicCoreComponentsPostEffectVolume.h"
 #include "IntrinsicCoreComponentsLight.h"
 #include "IntrinsicCoreComponentsIrradianceProbe.h"
+#include "IntrinsicCoreComponentsSpecularProbe.h"
+#include "IntrinsicCoreComponentsDecal.h"
 
 #include "IntrinsicCoreWorld.h"
+#include "IntrinsicCoreResourcesPostEffect.h"
+#include "IntrinsicCoreComponentsPostEffectVolume.h"
+
 #include "IntrinsicCoreTaskManager.h"
 #include "IntrinsicCorePhysicsSystem.h"
 #include "IntrinsicCoreInputSystem.h"

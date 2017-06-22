@@ -1,0 +1,10 @@
+{
+    "name": "gbuffer_solid.frag",
+    "properties": {
+        "name": "gbuffer_solid.frag",
+        "gpuProgramName": "gbuffer_solid.frag.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 1
+    }
+}

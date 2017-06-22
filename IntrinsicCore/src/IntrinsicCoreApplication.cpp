@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,9 +14,7 @@
 
 // Precompiled header file
 #include "stdafx.h"
-
-// Renderer includes
-#include "IntrinsicRendererVulkanRenderSystem.h"
+#include <cmath>
 
 #pragma warning(disable : 4996)
 
@@ -24,17 +22,17 @@ namespace Intrinsic
 {
 namespace Core
 {
-_INTR_HASH_MAP(Name, Intrinsic::Core::Dod::Components::ComponentManagerEntry)
+_INTR_HASH_MAP(Name, Dod::Components::ComponentManagerEntry)
 Application::_componentManagerMapping;
-_INTR_HASH_MAP(Name, Intrinsic::Core::Dod::Resources::ResourceManagerEntry)
+_INTR_HASH_MAP(Name, Dod::Resources::ResourceManagerEntry)
 Application::_resourceManagerMapping;
 
-_INTR_HASH_MAP(Name, Intrinsic::Core::Dod::PropertyCompilerEntry)
+_INTR_HASH_MAP(Name, Dod::PropertyCompilerEntry)
 Application::_componentPropertyCompilerMapping;
-_INTR_HASH_MAP(Name, Intrinsic::Core::Dod::PropertyCompilerEntry)
+_INTR_HASH_MAP(Name, Dod::PropertyCompilerEntry)
 Application::_resourcePropertyCompilerMapping;
 
-_INTR_ARRAY(Intrinsic::Core::Dod::Components::ComponentManagerEntry)
+_INTR_ARRAY(Dod::Components::ComponentManagerEntry)
 Application::_orderedComponentManagers;
 
 enki::TaskScheduler Application::_scheduler;
@@ -46,13 +44,13 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
   Physics::System::init();
 
   // Threading
-  _scheduler.Initialize(std::max(enki::GetNumHardwareThreads() - 1u, 1u));
+  _scheduler.Initialize(std::min(enki::GetNumHardwareThreads(), 4u));
 
   // Init. managers
   initManagers();
 
   // Init. renderer
-  Renderer::Vulkan::RenderSystem::init(p_PlatformHandle, p_PlatformWindow);
+  RV::RenderSystem::init(p_PlatformHandle, p_PlatformWindow);
 
 // MicroProfile init.
 #if defined(_INTR_PROFILING_ENABLED)
@@ -66,11 +64,9 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
 #if defined(MICROPROFILE_GPU_TIMERS_VULKAN)
     MicroProfileGpuInitVulkan(
-        &Renderer::Vulkan::RenderSystem::_vkDevice,
-        &Renderer::Vulkan::RenderSystem::_vkPhysicalDevice,
-        &Renderer::Vulkan::RenderSystem::_vkQueue,
-        &Renderer::Vulkan::RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex,
-        1u);
+        &RV::RenderSystem::_vkDevice, &RV::RenderSystem::_vkPhysicalDevice,
+        &RV::RenderSystem::_vkQueue,
+        &RV::RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex, 1u);
 #endif // MICROPROFILE_GPU_TIMERS_VULKAN
   }
 #endif // _INTR_PROFILING_ENABLED
@@ -99,6 +95,10 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
   {
     GameStates::Editing::init();
   }
+
+  {
+    RV::RenderSystem::onViewportChanged();
+  }
 }
 
 void Application::initManagers()
@@ -118,6 +118,8 @@ void Application::initManagers()
     Components::PlayerManager::init();
     Components::LightManager::init();
     Components::IrradianceProbeManager::init();
+    Components::SpecularProbeManager::init();
+    Components::DecalManager::init();
   }
 
   // Init resource managers

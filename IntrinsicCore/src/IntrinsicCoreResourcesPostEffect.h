@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref PostEffectRef;
 typedef _INTR_ARRAY(PostEffectRef) PostEffectRefArray;
 
@@ -28,25 +29,35 @@ struct PostEffectData : Dod::Resources::ResourceDataBase
   PostEffectData()
       : Dod::Resources::ResourceDataBase(_INTR_MAX_POST_EFFECT_COUNT)
   {
-    descVolumetricLightingScattering.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descVolumetricLightingScatteringDayNight.resize(
+        _INTR_MAX_POST_EFFECT_COUNT);
 
-    descMainLightTemp.resize(_INTR_MAX_POST_EFFECT_COUNT);
-    descMainLightColor.resize(_INTR_MAX_POST_EFFECT_COUNT);
-    descMainLightOrientation.resize(_INTR_MAX_POST_EFFECT_COUNT);
-    descMainLightIntens.resize(_INTR_MAX_POST_EFFECT_COUNT);
-    descAmbientFactor.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descSunOrientation.resize(_INTR_MAX_POST_EFFECT_COUNT);
+
+    descDayNightFactor.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descSunIntensity.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descSkyAlbedo.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descSkyLightIntensity.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descSkyTurbidity.resize(_INTR_MAX_POST_EFFECT_COUNT);
+    descCloudShadowsIntensity.resize(_INTR_MAX_POST_EFFECT_COUNT);
+
+    descDoFStartDistance.resize(_INTR_MAX_POST_EFFECT_COUNT);
   }
 
   // <-
 
-  _INTR_ARRAY(float) descVolumetricLightingScattering;
+  _INTR_ARRAY(glm::vec2) descVolumetricLightingScatteringDayNight;
 
-  _INTR_ARRAY(float) descMainLightTemp;
-  _INTR_ARRAY(glm::vec3) descMainLightColor;
-  _INTR_ARRAY(glm::quat) descMainLightOrientation;
-  _INTR_ARRAY(float) descMainLightIntens;
+  _INTR_ARRAY(glm::quat) descSunOrientation;
 
-  _INTR_ARRAY(float) descAmbientFactor;
+  _INTR_ARRAY(float) descDayNightFactor;
+  _INTR_ARRAY(float) descSunIntensity;
+  _INTR_ARRAY(float) descSkyTurbidity;
+  _INTR_ARRAY(float) descSkyAlbedo;
+  _INTR_ARRAY(float) descSkyLightIntensity;
+  _INTR_ARRAY(float) descCloudShadowsIntensity;
+
+  _INTR_ARRAY(float) descDoFStartDistance;
 };
 
 struct PostEffectManager
@@ -68,12 +79,15 @@ struct PostEffectManager
 
   _INTR_INLINE static void resetToDefault(PostEffectRef p_Ref)
   {
-    _descVolumetricLightingScattering(p_Ref) = 0.0f;
-    _descMainLightColor(p_Ref) = glm::vec3(1.0f);
-    _descMainLightIntens(p_Ref) = 10.0f;
-    _descMainLightOrientation(p_Ref) = glm::quat();
-    _descMainLightTemp(p_Ref) = 3200.0f;
-    _descAmbientFactor(p_Ref) = 1.0f;
+    _descVolumetricLightingScatteringDayNight(p_Ref) = glm::vec2(0.0f);
+    _descSunOrientation(p_Ref) = glm::quat();
+    _descSunIntensity(p_Ref) = 20.0f;
+    _descDayNightFactor(p_Ref) = 1.0f;
+    _descSkyTurbidity(p_Ref) = 2.0f;
+    _descSkyAlbedo(p_Ref) = 0.0f;
+    _descSkyLightIntensity(p_Ref) = 0.05f;
+    _descDoFStartDistance(p_Ref) = 10000.0f;
+    _descCloudShadowsIntensity(p_Ref) = 0.0f;
   }
 
   // <-
@@ -98,68 +112,97 @@ struct PostEffectManager
                                                          p_Document);
 
     p_Properties.AddMember(
-        "scattering",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(VolumetricLighting),
-                          _N(float), _descVolumetricLightingScattering(p_Ref),
-                          false, false),
+        "scatteringDayNight",
+        _INTR_CREATE_PROP(
+            p_Document, p_GenerateDesc, _N(VolumetricLighting), _N(vec2),
+            _descVolumetricLightingScatteringDayNight(p_Ref), false, false),
         p_Document.GetAllocator());
 
-    p_Properties.AddMember(
-        "mainLightIntensity",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
-                          _descMainLightIntens(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "mainLightTemperature",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
-                          _descMainLightTemp(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember("mainLightOrientation",
+    p_Properties.AddMember("sunOrientation",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
                                              _N(Lighting), _N(rotation),
-                                             _descMainLightOrientation(p_Ref),
-                                             false, false),
+                                             _descSunOrientation(p_Ref), false,
+                                             false),
                            p_Document.GetAllocator());
     p_Properties.AddMember(
-        "mainLightColor",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(vec3),
-                          _descMainLightColor(p_Ref), false, false),
+        "dayNightFactor",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descDayNightFactor(p_Ref), false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember(
-        "ambientFactor",
+        "skyLightIntensity",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
-                          _descAmbientFactor(p_Ref), false, false),
+                          _descSkyLightIntensity(p_Ref), false, false),
         p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "skyTurbidity",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descSkyTurbidity(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "skyAlbedo",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descSkyAlbedo(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "sunIntensity",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descSunIntensity(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "cloudShadowsIntensity",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Lighting), _N(float),
+                          _descCloudShadowsIntensity(p_Ref), false, false),
+        p_Document.GetAllocator());
+
+    p_Properties.AddMember("dofStartDistance",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(DepthOfField), _N(float),
+                                             _descDoFStartDistance(p_Ref),
+                                             false, false),
+                           p_Document.GetAllocator());
   }
 
   // <-
 
   _INTR_INLINE static void initFromDescriptor(PostEffectRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         PostEffectData,
-        _INTR_MAX_POST_EFFECT_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
+        _INTR_MAX_POST_EFFECT_COUNT>::_initFromDescriptor(p_Ref, p_GenerateDesc,
+                                                          p_Properties);
 
-    if (p_Properties.HasMember("scattering"))
-      _descVolumetricLightingScattering(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["scattering"]);
+    if (p_Properties.HasMember("scatteringDayNight"))
+      _descVolumetricLightingScatteringDayNight(p_Ref) =
+          JsonHelper::readPropertyVec2(p_Properties["scatteringDayNight"]);
 
-    if (p_Properties.HasMember("mainLightIntensity"))
-      _descMainLightIntens(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["mainLightIntensity"]);
-    if (p_Properties.HasMember("mainLightTemperature"))
-      _descMainLightTemp(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["mainLightTemperature"]);
-    if (p_Properties.HasMember("mainLightOrientation"))
-      _descMainLightOrientation(p_Ref) =
-          JsonHelper::readPropertyQuat(p_Properties["mainLightOrientation"]);
-    if (p_Properties.HasMember("mainLightColor"))
-      _descMainLightColor(p_Ref) =
-          JsonHelper::readPropertyVec3(p_Properties["mainLightColor"]);
-    if (p_Properties.HasMember("ambientFactor"))
-      _descAmbientFactor(p_Ref) =
-          JsonHelper::readPropertyFloat(p_Properties["ambientFactor"]);
+    if (p_Properties.HasMember("sunOrientation"))
+      _descSunOrientation(p_Ref) =
+          JsonHelper::readPropertyQuat(p_Properties["sunOrientation"]);
+    if (p_Properties.HasMember("sunIntensity"))
+      _descSunIntensity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["sunIntensity"]);
+    if (p_Properties.HasMember("skyTurbidity"))
+      _descSkyTurbidity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["skyTurbidity"]);
+    if (p_Properties.HasMember("skyAlbedo"))
+      _descSkyAlbedo(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["skyAlbedo"]);
+    if (p_Properties.HasMember("skyLightIntensity"))
+      _descSkyLightIntensity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["skyLightIntensity"]);
+    if (p_Properties.HasMember("dayNightFactor"))
+      _descDayNightFactor(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["dayNightFactor"]);
+    if (p_Properties.HasMember("cloudShadowsIntensity"))
+      _descCloudShadowsIntensity(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["cloudShadowsIntensity"]);
+
+    if (p_Properties.HasMember("dofStartDistance"))
+      _descDoFStartDistance(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["dofStartDistance"]);
   }
 
   // <-
@@ -189,27 +232,45 @@ struct PostEffectManager
 
   // <-
 
+  _INTR_INLINE static glm::quat calcActualSunOrientation(PostEffectRef p_Ref)
+  {
+    return glm::slerp(_descSunOrientation(p_Ref),
+                      World::_currentSunLightOrientation,
+                      _descDayNightFactor(p_Ref));
+  }
+
+  // <-
+
   _INTR_INLINE static void blendPostEffect(Dod::Ref p_Target, Dod::Ref p_Left,
                                            Dod::Ref p_Right,
                                            float p_BlendFactor)
   {
-    _descVolumetricLightingScattering(p_Target) =
-        glm::mix(_descVolumetricLightingScattering(p_Left),
-                 _descVolumetricLightingScattering(p_Right), p_BlendFactor);
+    _descVolumetricLightingScatteringDayNight(p_Target) = glm::mix(
+        _descVolumetricLightingScatteringDayNight(p_Left),
+        _descVolumetricLightingScatteringDayNight(p_Right), p_BlendFactor);
 
-    _descMainLightColor(p_Target) =
-        glm::mix(_descMainLightColor(p_Left), _descMainLightColor(p_Right),
+    _descSunOrientation(p_Target) =
+        glm::slerp(_descSunOrientation(p_Left), _descSunOrientation(p_Right),
+                   p_BlendFactor);
+    _descDayNightFactor(p_Target) =
+        glm::mix(_descDayNightFactor(p_Left), _descDayNightFactor(p_Right),
                  p_BlendFactor);
-    _descMainLightIntens(p_Target) =
-        glm::mix(_descMainLightIntens(p_Left), _descMainLightIntens(p_Right),
+    _descSkyTurbidity(p_Target) = glm::mix(
+        _descSkyTurbidity(p_Left), _descSkyTurbidity(p_Right), p_BlendFactor);
+    _descSkyAlbedo(p_Target) = glm::mix(_descSkyAlbedo(p_Left),
+                                        _descSkyAlbedo(p_Right), p_BlendFactor);
+    _descSkyLightIntensity(p_Target) =
+        glm::mix(_descSkyLightIntensity(p_Left),
+                 _descSkyLightIntensity(p_Right), p_BlendFactor);
+    _descSunIntensity(p_Target) = glm::mix(
+        _descSunIntensity(p_Left), _descSunIntensity(p_Right), p_BlendFactor);
+    _descCloudShadowsIntensity(p_Target) =
+        glm::mix(_descCloudShadowsIntensity(p_Left),
+                 _descCloudShadowsIntensity(p_Right), p_BlendFactor);
+
+    _descDoFStartDistance(p_Target) =
+        glm::mix(_descDoFStartDistance(p_Left), _descDoFStartDistance(p_Right),
                  p_BlendFactor);
-    _descMainLightTemp(p_Target) = glm::mix(
-        _descMainLightTemp(p_Left), _descMainLightTemp(p_Right), p_BlendFactor);
-    _descMainLightOrientation(p_Target) =
-        glm::slerp(_descMainLightOrientation(p_Left),
-                   _descMainLightOrientation(p_Right), p_BlendFactor);
-    _descAmbientFactor(p_Target) = glm::mix(
-        _descAmbientFactor(p_Left), _descAmbientFactor(p_Right), p_BlendFactor);
   }
 
   // <-
@@ -218,31 +279,44 @@ struct PostEffectManager
   // ->
 
   // Description
-  _INTR_INLINE static float&
-  _descVolumetricLightingScattering(PostEffectRef p_Ref)
+  _INTR_INLINE static glm::vec2&
+  _descVolumetricLightingScatteringDayNight(PostEffectRef p_Ref)
   {
-    return _data.descVolumetricLightingScattering[p_Ref._id];
+    return _data.descVolumetricLightingScatteringDayNight[p_Ref._id];
   }
 
-  _INTR_INLINE static float& _descMainLightIntens(PostEffectRef p_Ref)
+  _INTR_INLINE static glm::quat& _descSunOrientation(PostEffectRef p_Ref)
   {
-    return _data.descMainLightIntens[p_Ref._id];
+    return _data.descSunOrientation[p_Ref._id];
   }
-  _INTR_INLINE static float& _descMainLightTemp(PostEffectRef p_Ref)
+  _INTR_INLINE static float& _descDayNightFactor(PostEffectRef p_Ref)
   {
-    return _data.descMainLightTemp[p_Ref._id];
+    return _data.descDayNightFactor[p_Ref._id];
   }
-  _INTR_INLINE static glm::vec3& _descMainLightColor(PostEffectRef p_Ref)
+  _INTR_INLINE static float& _descSkyLightIntensity(PostEffectRef p_Ref)
   {
-    return _data.descMainLightColor[p_Ref._id];
+    return _data.descSkyLightIntensity[p_Ref._id];
   }
-  _INTR_INLINE static glm::quat& _descMainLightOrientation(PostEffectRef p_Ref)
+  _INTR_INLINE static float& _descSkyAlbedo(PostEffectRef p_Ref)
   {
-    return _data.descMainLightOrientation[p_Ref._id];
+    return _data.descSkyAlbedo[p_Ref._id];
   }
-  _INTR_INLINE static float& _descAmbientFactor(PostEffectRef p_Ref)
+  _INTR_INLINE static float& _descSkyTurbidity(PostEffectRef p_Ref)
   {
-    return _data.descAmbientFactor[p_Ref._id];
+    return _data.descSkyTurbidity[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descSunIntensity(PostEffectRef p_Ref)
+  {
+    return _data.descSunIntensity[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descCloudShadowsIntensity(PostEffectRef p_Ref)
+  {
+    return _data.descCloudShadowsIntensity[p_Ref._id];
+  }
+
+  _INTR_INLINE static float& _descDoFStartDistance(PostEffectRef p_Ref)
+  {
+    return _data.descDoFStartDistance[p_Ref._id];
   }
 
   // Static members

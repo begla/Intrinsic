@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -73,6 +73,8 @@ void Manager::deactivateGameState()
 
 void Manager::update(float p_DeltaT)
 {
+  _INTR_PROFILE_CPU("General", "Game State Manager");
+
   switch (_activeGameState)
   {
   case GameState::kEditing:

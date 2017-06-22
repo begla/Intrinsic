@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ class IntrinsicEdManagerWindowMaterial;
 class IntrinsicEdManagerWindowImage;
 class IntrinsicEdManagerWindowPostEffect;
 class IntrinsicEdViewport;
+class IntrinsicEdPrefabsBrowser;
 
 class IntrinsicEd : public QMainWindow
 {
@@ -39,10 +40,12 @@ public:
 
   void closeEvent(QCloseEvent*) override;
   int enterMainLoop();
+  void tickMainLoop();
 
   static IntrinsicEd* _mainWindow;
   static IntrinsicEdNodeView* _nodeView;
   static IntrinsicEdPropertyView* _propertyView;
+  static IntrinsicEdPrefabsBrowser* _prefabsBrowser;
   static IntrinsicEdManagerWindowGpuProgram* _managerWindowGpuProgram;
   static IntrinsicEdManagerWindowScript* _managerWindowScript;
   static IntrinsicEdManagerWindowAsset* _managerWindowAsset;
@@ -52,16 +55,25 @@ public:
   static IntrinsicEdManagerWindowPostEffect* _managerWindowPostEffect;
   static IntrinsicEdViewport* _viewport;
 
-  static _INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) _categoryToIconMapping;
-  static _INTR_HASH_MAP(_INTR_STRING, _INTR_STRING) _componentToIconMapping;
+  static const QIcon& getIcon(const _INTR_STRING& p_String)
+  {
+    return _icons[_stringToIconMapping[p_String]];
+  }
+
+  static const QPixmap& getPixmap(const _INTR_STRING& p_Pixmap)
+  {
+    return _pixmaps[_stringToPixmapMapping[p_Pixmap]];
+  }
 
 public slots:
   void onSaveEditorSettings();
   void onLoadEditorSettings();
   void onExit();
   void onLoadWorld();
+  void onReloadWorld();
   void onReloadSettingsAndRendererConfig();
   void onSaveWorld();
+  void onSaveWorldAs();
   void onFullscreen();
   void onEndFullscreen();
   void onEditingModeDefault();
@@ -76,29 +88,37 @@ public slots:
   void onGizmoSizeChanged(double p_Value);
   void onCameraSpeedChanged(double p_Value);
   void onTimeModChanged(double p_Value);
+  void onDayNightSliderChanged(int p_Value);
   void onCreateCube();
+  void onCreateSphere();
   void onCreateRigidBody();
   void onCreateRigidBodySphere();
   void onCreateLight();
-  void onCreateSphere();
-  void onShowDebugContextMenu();
+  void onCreateIrradProbe();
+  void onCreateSpecProbe();
+  void onCreateDecal();
   void onShowDebugGeometryContextMenu();
-  void onShowCreateContextMenu();
   void onDebugGeometryChanged();
   void onOpenMicroprofile();
   void onCompileShaders();
   void onRecompileShaders();
   void onSettingsFileChanged(const QString&);
+  void onCaptureAllProbes();
 
 private:
   void updateSettingsChangeWatch();
+  void updateUI();
 
-  QMenu _createContextMenu;
-  QMenu _debugContextMenu;
   QMenu _debugGeometryContextMenu;
 
+  QSlider* _dayNightSlider;
   QFileSystemWatcher* _settingsChangeWatch;
   bool _settingsUpdatePending;
+
+  static _INTR_ARRAY(QIcon) _icons;
+  static _INTR_ARRAY(QPixmap) _pixmaps;
+  static _INTR_HASH_MAP(_INTR_STRING, uint32_t) _stringToIconMapping;
+  static _INTR_HASH_MAP(_INTR_STRING, uint32_t) _stringToPixmapMapping;
 
   Ui::IntrinsicEdClass _ui;
 };

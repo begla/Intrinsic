@@ -1,0 +1,10 @@
+{
+    "name": "smaa_edge.vert",
+    "properties": {
+        "name": "smaa_edge.vert",
+        "gpuProgramName": "smaa_edge.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 0
+    }
+}

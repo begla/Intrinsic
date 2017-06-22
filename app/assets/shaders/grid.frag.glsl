@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,24 +22,24 @@
 #include "lib_math.glsl"
 #include "gbuffer.inc.glsl"
 
-layout (location = 0) in vec3 inPosition;
+layout(location = 0) in vec3 inPosition;
 
 // Output
 OUTPUT
 
-layout (binding = 1) uniform PerInstance
+layout(binding = 1) uniform PerInstance
 {
   mat4 invWorldRotMatrix;
   vec4 invWorldPos;
   mat4 viewProjMatrix;
-  mat4 normalMatrix;
+  mat4 viewMatrix;
 
   vec4 planeNormal;
 
   float gridSize;
   float fade;
-
-} uboPerInstance;
+}
+uboPerInstance;
 
 #define GRID_RANGE 50.0
 #define GRID_FADE_RANGE 40.0
@@ -49,8 +49,8 @@ layout (binding = 1) uniform PerInstance
 
 bool isGridVisible(vec2 localPos, float lineWidth, float cellSize)
 {
-  return mod(localPos.x + lineWidth * 0.5, cellSize) <= lineWidth 
-    || mod(localPos.y + lineWidth * 0.5, cellSize) <= lineWidth;
+  return mod(localPos.x + lineWidth * 0.5, cellSize) <= lineWidth ||
+         mod(localPos.y + lineWidth * 0.5, cellSize) <= lineWidth;
 }
 
 void main()
@@ -74,8 +74,10 @@ void main()
 
   const float xzDist = length(projLocalPos);
 
-  const float gridRange = uboPerInstance.gridSize * uboPerInstance.fade * GRID_RANGE;
-  const float fadeRange = uboPerInstance.gridSize * uboPerInstance.fade * GRID_FADE_RANGE ;
+  const float gridRange =
+      uboPerInstance.gridSize * uboPerInstance.fade * GRID_RANGE;
+  const float fadeRange =
+      uboPerInstance.gridSize * uboPerInstance.fade * GRID_FADE_RANGE;
   const float fadeInterval = gridRange - fadeRange;
   const float noiseScale = 1.0 / uboPerInstance.gridSize * 0.4;
 
@@ -91,11 +93,15 @@ void main()
 
   const float bigGridCellSize = 5.0 * uboPerInstance.gridSize;
   const float tinyGridCellSize = uboPerInstance.gridSize;
-  const float bigGridLineWidth = calcScreenSpaceScale(inPosition.xyz, uboPerInstance.viewProjMatrix, 0.004);
-  const float tinyGridLineWidth = calcScreenSpaceScale(inPosition.xyz, uboPerInstance.viewProjMatrix, 0.0025);
+  const float bigGridLineWidth = calcScreenSpaceScale(
+      inPosition.xyz, uboPerInstance.viewProjMatrix, 0.004);
+  const float tinyGridLineWidth = calcScreenSpaceScale(
+      inPosition.xyz, uboPerInstance.viewProjMatrix, 0.0025);
 
-  const bool tinyGridVisible = isGridVisible(projWorldPos, tinyGridLineWidth, tinyGridCellSize);
-  const bool bigGridVisible = isGridVisible(projWorldPos, bigGridLineWidth, bigGridCellSize);
+  const bool tinyGridVisible =
+      isGridVisible(projWorldPos, tinyGridLineWidth, tinyGridCellSize);
+  const bool bigGridVisible =
+      isGridVisible(projWorldPos, bigGridLineWidth, bigGridCellSize);
 
   if (!tinyGridVisible && !bigGridVisible)
   {
@@ -111,7 +117,9 @@ void main()
   GBuffer gbuffer;
   {
     gbuffer.albedo = vec4(color, 1.0);
-    gbuffer.normal = normalize((uboPerInstance.normalMatrix * vec4(uboPerInstance.planeNormal.xyz, 0.0)).xyz);
+    gbuffer.normal = normalize(
+        (uboPerInstance.viewMatrix * vec4(uboPerInstance.planeNormal.xyz, 0.0))
+            .xyz);
     gbuffer.metalMask = 0.0;
     gbuffer.specular = 0.5;
     gbuffer.roughness = 0.5;

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref MaterialRef;
 typedef Dod::RefArray MaterialRefArray;
 typedef Name& (*MaterialResourceFunction)(Dod::Ref);
@@ -38,7 +39,8 @@ struct PerMaterialDataFragment
   glm::vec4 pbrBias;
   glm::vec4 waterParams;
 
-  uint32_t data0[4];
+  glm::uvec4 data0;
+  glm::vec4 data1;
 };
 
 namespace MaterialPass
@@ -260,6 +262,7 @@ struct MaterialManager
     if ((_materialPassMask(p_Ref) &
          (getMaterialPassFlag(_N(GBufferDefault)) |
           getMaterialPassFlag(_N(GBufferFoliage)) |
+          getMaterialPassFlag(_N(GBufferGrass)) |
           getMaterialPassFlag(_N(GBufferWater)) |
           getMaterialPassFlag(_N(GBufferTerrain)))) != 0u)
     {
@@ -291,7 +294,8 @@ struct MaterialManager
           p_Document.GetAllocator());
     }
 
-    if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferFoliage))) !=
+    if ((_materialPassMask(p_Ref) & (getMaterialPassFlag(_N(GBufferFoliage)) |
+                                     getMaterialPassFlag(_N(GBufferGrass)))) !=
         0u)
     {
       p_Properties.AddMember(
@@ -373,11 +377,13 @@ struct MaterialManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(MaterialRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         MaterialData,
-        _INTR_MAX_MATERIAL_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
+        _INTR_MAX_MATERIAL_COUNT>::_initFromDescriptor(p_Ref, p_GenerateDesc,
+                                                       p_Properties);
 
     if (p_Properties.HasMember("albedoTextureName"))
       _descAlbedoTextureName(p_Ref) =
@@ -503,9 +509,6 @@ struct MaterialManager
   }
 
   static void loadMaterialPassConfig();
-
-  // Getter/Setter
-  // ->
 
   // Description
   _INTR_INLINE static Name& _descAlbedoTextureName(MaterialRef p_Ref)

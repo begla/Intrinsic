@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,22 +27,22 @@ PER_INSTANCE_UBO;
 
 // Bindings
 BINDINGS_GBUFFER;
-layout (binding = 6) uniform sampler2D emissiveTex;
+layout(binding = 6) uniform sampler2D emissiveTex;
 
 // Input
-layout (location = 0) in vec3 inNormal;
-layout (location = 1) in vec3 inTangent;
-layout (location = 2) in vec3 inBinormal;
-layout (location = 3) in vec3 inColor;
-layout (location = 4) in vec2 inUV0;
+layout(location = 0) in vec3 inNormal;
+layout(location = 1) in vec3 inTangent;
+layout(location = 2) in vec3 inBinormal;
+layout(location = 3) in vec3 inColor;
+layout(location = 4) in vec2 inUV0;
 
 // Output
 OUTPUT
 
 void main()
-{ 
+{
   const mat3 TBN = mat3(inTangent, inBinormal, inNormal);
-  const vec2 uv0 = UV0_TRANSFORMED_ANIMATED;
+  const vec2 uv0 = UV0_TRANSFORM_ANIMATED(inUV0);
 
   GBuffer gbuffer;
   {
@@ -51,7 +51,8 @@ void main()
     const vec4 pbr = texture(pbrTex, uv0);
     gbuffer.metalMask = pbr.r + uboPerMaterial.pbrBias.r;
     gbuffer.specular = pbr.g + uboPerMaterial.pbrBias.g;
-    gbuffer.roughness = pbr.b + uboPerMaterial.pbrBias.b;
+    gbuffer.roughness = adjustRoughness(pbr.b + uboPerMaterial.pbrBias.b,
+                                        uboPerMaterial.data1.x);
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
     gbuffer.emissive = texture(emissiveTex, uv0).r;
     gbuffer.occlusion = 1.0;

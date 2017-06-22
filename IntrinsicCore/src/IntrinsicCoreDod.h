@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,31 +62,6 @@ struct Ref
   uint32_t _id : 24;
 };
 
-#define _INTR_REF_DEF(_type)                                                   \
-  struct _type                                                                 \
-  {                                                                            \
-    _INTR_INLINE _type() {}                                                    \
-    _INTR_INLINE _type(const Dod::Ref& val) { v = val; }                       \
-                                                                               \
-    _INTR_INLINE bool isValid() const { return v.isValid(); }                  \
-    _INTR_INLINE Dod::IdType _id() { return v._id; }                           \
-                                                                               \
-    Dod::Ref v;                                                                \
-  }
-#define _INTR_REF_ARRAY_DEF(_refType, _type)                                   \
-  struct _type                                                                 \
-  {                                                                            \
-    _INTR_INLINE _type() {}                                                    \
-    _INTR_INLINE _type(const _INTR_ARRAY(Dod::Ref) & val) { v = val; }         \
-                                                                               \
-    _INTR_INLINE Dod::Ref& operator[](int32_t i) { return v[i]; }              \
-    _INTR_INLINE const Dod::Ref& operator[](int32_t i) const { return v[i]; }  \
-    _INTR_INLINE uint32_t size() const { return (uint32_t)v.size(); }          \
-    _INTR_INLINE void push_back(const _refType& val) { v.push_back(val.v); }   \
-                                                                               \
-    _INTR_ARRAY(Dod::Ref) v;                                                   \
-  }
-
 // Typedefs
 typedef _INTR_ARRAY(Ref) RefArray;
 
@@ -95,7 +70,7 @@ typedef _INTR_ARRAY(Ref) RefArray;
 // Function ptr typedefs
 typedef void (*ManagerCompileDescriptorFunction)(Ref, bool, rapidjson::Value&,
                                                  rapidjson::Document&);
-typedef void (*ManagerInitFromDescriptorFunction)(Ref, rapidjson::Value&);
+typedef void (*ManagerInitFromDescriptorFunction)(Ref, bool, rapidjson::Value&);
 typedef Ref (*ManagerCreateFunction)(Ref);
 typedef void (*ManagerDestroyFunction)(Ref);
 typedef bool (*ManagerIsAliveFunction)(Ref);

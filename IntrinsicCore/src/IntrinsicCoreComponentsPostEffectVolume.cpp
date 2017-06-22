@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ void PostEffectVolumeManager::init()
 void PostEffectVolumeManager::blendPostEffects(
     const PostEffectVolumeRefArray& p_PostEffectVolumes)
 {
-  CameraRef camRef = World::getActiveCamera();
+  CameraRef camRef = World::_activeCamera;
   NodeRef camNodeRef =
       NodeManager::getComponentForEntity(CameraManager::_entity(camRef));
   const glm::vec3& camWorldPosition = NodeManager::_worldPosition(camNodeRef);

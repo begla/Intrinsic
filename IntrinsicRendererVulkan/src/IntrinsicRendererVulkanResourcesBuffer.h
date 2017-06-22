@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref BufferRef;
 typedef _INTR_ARRAY(BufferRef) BufferRefArray;
 
@@ -39,13 +40,13 @@ struct BufferData : Dod::Resources::ResourceDataBase
     memoryAllocationInfo.resize(_INTR_MAX_BUFFER_COUNT);
   }
 
-  // <-
-
+  // Description
   _INTR_ARRAY(BufferType::Enum) descBufferType;
   _INTR_ARRAY(MemoryPoolType::Enum) descMemoryPoolType;
   _INTR_ARRAY(uint32_t) descSizeInBytes;
   _INTR_ARRAY(void*) descInitialData;
 
+  // Resources
   _INTR_ARRAY(VkDescriptorBufferInfo) vkDescriptorBufferInfo;
   _INTR_ARRAY(VkBuffer) vkBuffer;
   _INTR_ARRAY(GpuMemoryAllocationInfo) memoryAllocationInfo;
@@ -106,10 +107,12 @@ struct BufferManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(BufferRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         BufferData, _INTR_MAX_BUFFER_COUNT>::_initFromDescriptor(p_Ref,
+                                                                 p_GenerateDesc,
                                                                  p_Properties);
   }
 
@@ -194,9 +197,7 @@ struct BufferManager
                                       p_SrcStages, p_DstStages);
   }
 
-  // Members refs.
-  // ->
-
+  // Description
   _INTR_INLINE static BufferType::Enum& _descBufferType(BufferRef p_Ref)
   {
     return _data.descBufferType[p_Ref._id];
@@ -214,7 +215,7 @@ struct BufferManager
     return _data.descSizeInBytes[p_Ref._id];
   }
 
-  // GPU resources
+  // Resources
   _INTR_INLINE static VkBuffer& _vkBuffer(BufferRef p_Ref)
   {
     return _data.vkBuffer[p_Ref._id];

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,25 +49,25 @@ struct PerInstanceDataAdd
 
 namespace
 {
-Resources::ImageRef _lumImageRef;
-Resources::ImageRef _blurPingPongImageRef;
-Resources::ImageRef _blurImageRef;
-Resources::ImageRef _summedImageRef;
-Resources::ImageRef _brightImageRef;
+ImageRef _lumImageRef;
+ImageRef _blurPingPongImageRef;
+ImageRef _blurImageRef;
+ImageRef _summedImageRef;
+ImageRef _brightImageRef;
 
-Resources::PipelineRef _brightLumPipelineRef;
-Resources::PipelineRef _avgLumPipelineRef;
-Resources::PipelineRef _blurXPipelineRef;
-Resources::PipelineRef _blurYPipelineRef;
-Resources::PipelineRef _addPipelineRef;
+PipelineRef _brightLumPipelineRef;
+PipelineRef _avgLumPipelineRef;
+PipelineRef _blurXPipelineRef;
+PipelineRef _blurYPipelineRef;
+PipelineRef _addPipelineRef;
 
-Resources::ComputeCallRef _lumComputeCallRef;
-Resources::ComputeCallRef _avgLumComputeCallRef;
-Resources::ComputeCallRefArray _blurXComputeCallRefs;
-Resources::ComputeCallRefArray _blurYComputeCallRefs;
-Resources::ComputeCallRefArray _addComputeCallRefs;
+ComputeCallRef _lumComputeCallRef;
+ComputeCallRef _avgLumComputeCallRef;
+ComputeCallRefArray _blurXComputeCallRefs;
+ComputeCallRefArray _blurYComputeCallRefs;
+ComputeCallRefArray _addComputeCallRefs;
 
-Resources::BufferRef _lumBuffer;
+BufferRef _lumBuffer;
 
 bool _initAvgLum = true;
 
@@ -79,15 +79,13 @@ _INTR_INLINE glm::uvec2 calcBloomBaseDim()
 
 _INTR_INLINE void dispatchLum(VkCommandBuffer p_CommandBuffer)
 {
-  using namespace Resources;
-
   const glm::uvec2 bloomBaseDim = calcBloomBaseDim();
 
   PerInstanceDataLumBright lumData = {};
   {
     lumData.dim[0] = bloomBaseDim.x;
     lumData.dim[1] = bloomBaseDim.y;
-    lumData.bloomThreshold.x = 0.5f;
+    lumData.bloomThreshold.x = 0.9f;
   }
 
   ComputeCallManager::updateUniformMemory({_lumComputeCallRef}, &lumData,
@@ -105,8 +103,6 @@ _INTR_INLINE void dispatchLum(VkCommandBuffer p_CommandBuffer)
 
 _INTR_INLINE void dispatchAvgLum(VkCommandBuffer p_CommandBuffer)
 {
-  using namespace Resources;
-
   const glm::uvec2 bloomBaseDim = calcBloomBaseDim();
 
   PerInstanceDataAvgLum avgLumData = {};
@@ -145,8 +141,6 @@ _INTR_INLINE void dispatchAvgLum(VkCommandBuffer p_CommandBuffer)
 _INTR_INLINE void dispatchBlur(VkCommandBuffer p_CommandBuffer,
                                uint32_t p_MipLevel0)
 {
-  using namespace Resources;
-
   PerInstanceDataBlur blurData = {};
   {
     blurData.mipLevel[0] = p_MipLevel0;
@@ -196,8 +190,6 @@ _INTR_INLINE void dispatchBlur(VkCommandBuffer p_CommandBuffer,
 _INTR_INLINE void dispatchAdd(VkCommandBuffer p_CommandBuffer,
                               uint32_t p_MipLevel0, uint32_t p_MipLevel1)
 {
-  using namespace Resources;
-
   const glm::uvec2 bloomBaseDim = calcBloomBaseDim();
 
   PerInstanceDataAdd addData = {};
@@ -212,8 +204,20 @@ _INTR_INLINE void dispatchAdd(VkCommandBuffer p_CommandBuffer,
   ComputeCallManager::updateUniformMemory({_addComputeCallRefs[p_MipLevel0]},
                                           &addData, sizeof(PerInstanceDataAdd));
 
+  ImageManager::insertImageMemoryBarrierSubResource(
+      _summedImageRef, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+      VK_IMAGE_LAYOUT_GENERAL, p_MipLevel0, 0u,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+
   RenderSystem::dispatchComputeCall(_addComputeCallRefs[p_MipLevel0],
                                     p_CommandBuffer);
+
+  ImageManager::insertImageMemoryBarrierSubResource(
+      _summedImageRef, VK_IMAGE_LAYOUT_GENERAL,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, p_MipLevel0, 0u,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
 }
 }
 
@@ -221,8 +225,6 @@ _INTR_INLINE void dispatchAdd(VkCommandBuffer p_CommandBuffer,
 
 void Bloom::init()
 {
-  using namespace Resources;
-
   PipelineRefArray pipelinesToCreate;
   BufferRefArray buffersToCreate;
   PipelineLayoutRefArray pipelineLayoutsToCreate;
@@ -252,8 +254,7 @@ void Bloom::init()
 
     GpuProgramManager::reflectPipelineLayout(
         32u,
-        {Resources::GpuProgramManager::getResourceByName(
-            "post_bloom_bright_lum.comp")},
+        {GpuProgramManager::getResourceByName("post_bloom_bright_lum.comp")},
         pipelineLayoutLumBright);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayoutLumBright);
@@ -265,9 +266,7 @@ void Bloom::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutAvgLum);
 
     GpuProgramManager::reflectPipelineLayout(
-        32u,
-        {Resources::GpuProgramManager::getResourceByName(
-            "post_bloom_avg_lum.comp")},
+        32u, {GpuProgramManager::getResourceByName("post_bloom_avg_lum.comp")},
         pipelineLayoutAvgLum);
   }
 
@@ -280,9 +279,7 @@ void Bloom::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutAdd);
 
     GpuProgramManager::reflectPipelineLayout(
-        32u,
-        {Resources::GpuProgramManager::getResourceByName(
-            "post_bloom_add.comp")},
+        32u, {GpuProgramManager::getResourceByName("post_bloom_add.comp")},
         pipelineLayoutAdd);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayoutAdd);
@@ -294,9 +291,7 @@ void Bloom::init()
     PipelineLayoutManager::resetToDefault(pipelineLayoutBlur);
 
     GpuProgramManager::reflectPipelineLayout(
-        128u,
-        {Resources::GpuProgramManager::getResourceByName(
-            "post_bloom_blur_x.comp")},
+        128u, {GpuProgramManager::getResourceByName("post_bloom_blur_x.comp")},
         pipelineLayoutBlur);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayoutBlur);
@@ -365,8 +360,6 @@ void Bloom::init()
 
 void Bloom::onReinitRendering()
 {
-  using namespace Resources;
-
   ImageRefArray imgsToDestroy;
   ImageRefArray imgsToCreate;
   ComputeCallRefArray computeCallsToDestroy;
@@ -539,13 +532,13 @@ void Bloom::onReinitRendering()
   _lumComputeCallRef =
       ComputeCallManager::createComputeCall(_N(BloomBrightLum));
   {
-    Vulkan::Resources::ComputeCallManager::resetToDefault(_lumComputeCallRef);
-    Vulkan::Resources::ComputeCallManager::addResourceFlags(
+    ComputeCallManager::resetToDefault(_lumComputeCallRef);
+    ComputeCallManager::addResourceFlags(
         _lumComputeCallRef, Dod::Resources::ResourceFlags::kResourceVolatile);
 
-    Vulkan::Resources::ComputeCallManager::_descPipeline(_lumComputeCallRef) =
+    ComputeCallManager::_descPipeline(_lumComputeCallRef) =
         _brightLumPipelineRef;
-    Vulkan::Resources::ComputeCallManager::_descDimensions(_lumComputeCallRef) =
+    ComputeCallManager::_descDimensions(_lumComputeCallRef) =
         glm::vec3(calculateThreadGroups(dim.x / 2u, LUM_AND_BRIGHT_THREADS),
                   calculateThreadGroups(dim.y / 2u, LUM_AND_BRIGHT_THREADS), 1);
 
@@ -582,13 +575,12 @@ void Bloom::onReinitRendering()
   _avgLumComputeCallRef =
       ComputeCallManager::createComputeCall(_N(BloomAvgLum));
   {
-    Vulkan::Resources::ComputeCallManager::resetToDefault(
-        _avgLumComputeCallRef);
-    Vulkan::Resources::ComputeCallManager::addResourceFlags(
+    ComputeCallManager::resetToDefault(_avgLumComputeCallRef);
+    ComputeCallManager::addResourceFlags(
         _avgLumComputeCallRef,
         Dod::Resources::ResourceFlags::kResourceVolatile);
-    Vulkan::Resources::ComputeCallManager::_descPipeline(
-        _avgLumComputeCallRef) = _avgLumPipelineRef;
+    ComputeCallManager::_descPipeline(_avgLumComputeCallRef) =
+        _avgLumPipelineRef;
 
     ComputeCallManager::bindBuffer(
         _avgLumComputeCallRef, _N(PerInstance), GpuProgramType::kCompute,
@@ -609,16 +601,14 @@ void Bloom::onReinitRendering()
     ComputeCallRef computeCallBlurXRef =
         ComputeCallManager::createComputeCall(_N(BloomBlurX));
     {
-      Vulkan::Resources::ComputeCallManager::resetToDefault(
-          computeCallBlurXRef);
-      Vulkan::Resources::ComputeCallManager::addResourceFlags(
+      ComputeCallManager::resetToDefault(computeCallBlurXRef);
+      ComputeCallManager::addResourceFlags(
           computeCallBlurXRef,
           Dod::Resources::ResourceFlags::kResourceVolatile);
-      Vulkan::Resources::ComputeCallManager::_descPipeline(
-          computeCallBlurXRef) = _blurXPipelineRef;
+      ComputeCallManager::_descPipeline(computeCallBlurXRef) =
+          _blurXPipelineRef;
 
-      Vulkan::Resources::ComputeCallManager::_descDimensions(
-          computeCallBlurXRef) =
+      ComputeCallManager::_descDimensions(computeCallBlurXRef) =
           glm::vec3(calculateThreadGroups(
                         dim.x >> i, BLUR_THREADS - 2u * BLUR_HALF_BLUR_WIDTH),
                     dim.y >> i, 1);
@@ -631,9 +621,18 @@ void Bloom::onReinitRendering()
           computeCallBlurXRef, _N(outTex), GpuProgramType::kCompute,
           _blurPingPongImageRef, Samplers::kInvalidSampler,
           BindingFlags::kAdressSubResource, 0u, i);
-      ComputeCallManager::bindImage(computeCallBlurXRef, _N(inTex),
-                                    GpuProgramType::kCompute, _brightImageRef,
-                                    Samplers::kLinearClamp);
+      if (i == 3u)
+      {
+        ComputeCallManager::bindImage(computeCallBlurXRef, _N(inTex),
+                                      GpuProgramType::kCompute, _brightImageRef,
+                                      Samplers::kLinearClamp);
+      }
+      else
+      {
+        ComputeCallManager::bindImage(computeCallBlurXRef, _N(inTex),
+                                      GpuProgramType::kCompute, _summedImageRef,
+                                      Samplers::kLinearClamp);
+      }
 
       computeCallsToCreate.push_back(computeCallBlurXRef);
       _blurXComputeCallRefs.push_back(computeCallBlurXRef);
@@ -641,16 +640,14 @@ void Bloom::onReinitRendering()
       ComputeCallRef computeCallBlurYRef =
           ComputeCallManager::createComputeCall(_N(BloomBlurY));
       {
-        Vulkan::Resources::ComputeCallManager::resetToDefault(
-            computeCallBlurYRef);
-        Vulkan::Resources::ComputeCallManager::addResourceFlags(
+        ComputeCallManager::resetToDefault(computeCallBlurYRef);
+        ComputeCallManager::addResourceFlags(
             computeCallBlurYRef,
             Dod::Resources::ResourceFlags::kResourceVolatile);
-        Vulkan::Resources::ComputeCallManager::_descPipeline(
-            computeCallBlurYRef) = _blurYPipelineRef;
+        ComputeCallManager::_descPipeline(computeCallBlurYRef) =
+            _blurYPipelineRef;
 
-        Vulkan::Resources::ComputeCallManager::_descDimensions(
-            computeCallBlurYRef) =
+        ComputeCallManager::_descDimensions(computeCallBlurYRef) =
             glm::vec3(calculateThreadGroups(
                           dim.y >> i, BLUR_THREADS - 2u * BLUR_HALF_BLUR_WIDTH),
                       dim.x >> i, 1);
@@ -676,16 +673,14 @@ void Bloom::onReinitRendering()
         ComputeCallRef computeCallAddRef =
             ComputeCallManager::createComputeCall(_N(BloomAdd));
         {
-          Vulkan::Resources::ComputeCallManager::resetToDefault(
-              computeCallAddRef);
-          Vulkan::Resources::ComputeCallManager::addResourceFlags(
+          ComputeCallManager::resetToDefault(computeCallAddRef);
+          ComputeCallManager::addResourceFlags(
               computeCallAddRef,
               Dod::Resources::ResourceFlags::kResourceVolatile);
-          Vulkan::Resources::ComputeCallManager::_descPipeline(
-              computeCallAddRef) = _addPipelineRef;
+          ComputeCallManager::_descPipeline(computeCallAddRef) =
+              _addPipelineRef;
 
-          Vulkan::Resources::ComputeCallManager::_descDimensions(
-              computeCallAddRef) =
+          ComputeCallManager::_descDimensions(computeCallAddRef) =
               glm::uvec3(calculateThreadGroups(dim.x >> i, ADD_THREADS_X),
                          calculateThreadGroups(dim.y >> i, ADD_THREADS_Y), 1u);
 
@@ -722,8 +717,6 @@ void Bloom::destroy() {}
 
 void Bloom::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
-  using namespace Resources;
-
   _INTR_PROFILE_CPU("Render Pass", "Render Bloom");
   _INTR_PROFILE_GPU("Render Bloom");
 
@@ -736,7 +729,8 @@ void Bloom::render(float p_DeltaT, Components::CameraRef p_CameraRef)
       _lumImageRef, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL,
       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   ImageManager::insertImageMemoryBarrier(
-      _summedImageRef, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL,
+      _summedImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
+      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   ImageManager::insertImageMemoryBarrier(
       _blurImageRef, VK_IMAGE_LAYOUT_UNDEFINED,
@@ -761,10 +755,6 @@ void Bloom::render(float p_DeltaT, Components::CameraRef p_CameraRef)
   dispatchAdd(primaryCmdBuffer, 0u, 1u);
   dispatchBlur(primaryCmdBuffer, 0u);
 
-  ImageManager::insertImageMemoryBarrier(
-      _summedImageRef, VK_IMAGE_LAYOUT_GENERAL,
-      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   ImageManager::insertImageMemoryBarrier(
       _lumImageRef, VK_IMAGE_LAYOUT_GENERAL,
       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,

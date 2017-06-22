@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,12 +60,14 @@ void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
 
   QTreeWidgetItem* volatileResourcesItem = new QTreeWidgetItem();
   volatileResourcesItem->setText(0, "Volatile");
-  volatileResourcesItem->setIcon(0, QIcon(":/Icons/folder"));
+  volatileResourcesItem->setIcon(0,
+                                 QIcon(":/Icons/icons/essential/folder-5.png"));
   _ui.resourceView->addTopLevelItem(volatileResourcesItem);
 
   QTreeWidgetItem* storedResourcesItem = new QTreeWidgetItem();
   storedResourcesItem->setText(0, "Stored");
-  storedResourcesItem->setIcon(0, QIcon(":/Icons/folder"));
+  storedResourcesItem->setIcon(0,
+                               QIcon(":/Icons/icons/essential/folder-5.png"));
   _ui.resourceView->addTopLevelItem(storedResourcesItem);
 
   for (uint32_t i = 0u; i < resourceCount; ++i)
@@ -79,7 +81,7 @@ void IntrinsicEdManagerWindowBase::onPopulateResourceTree()
 
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0, properties["name"]["value"].GetString());
-    item->setIcon(0, _resourceIcon);
+    item->setIcon(0, IntrinsicEd::getIcon(_resourceName.toStdString().c_str()));
     item->setFlags(item->flags() | Qt::ItemIsEditable);
 
     _itemToResourceMapping[item] = resource;
@@ -129,7 +131,7 @@ void IntrinsicEdManagerWindowBase::onItemChanged(QTreeWidgetItem* item,
                                             doc.GetAllocator());
       item->setText(0, newResourceName.c_str());
 
-      _propertyCompilerEntry.initFunction(resource, properties);
+      _propertyCompilerEntry.initFunction(resource, true, properties);
       _ui.propertyView->clearAndUpdatePropertyView();
     }
   }
@@ -181,10 +183,11 @@ void IntrinsicEdManagerWindowBase::onCreateResource()
       makeResourceNameUnique(_resourceName.toStdString().c_str());
   Dod::Ref newResourceRef =
       _resourceManagerEntry.createFunction(newResourceName.c_str());
+
   if (_resourceManagerEntry.resetToDefaultFunction)
-  {
     _resourceManagerEntry.resetToDefaultFunction(newResourceRef);
-  }
+  if (_resourceManagerEntry.createResourcesFunction)
+    _resourceManagerEntry.createResourcesFunction({newResourceRef});
   onPopulateResourceTree();
 }
 
@@ -206,18 +209,15 @@ void IntrinsicEdManagerWindowBase::onCloneResource()
     rapidjson::Document doc;
     rapidjson::Value properties = rapidjson::Value(rapidjson::kObjectType);
 
-    _propertyCompilerEntry.compileFunction(templateResourceRef, true,
+    _propertyCompilerEntry.compileFunction(templateResourceRef, false,
                                            properties, doc);
-    properties["name"]["value"].SetString(
-        makeResourceNameUnique(properties["name"]["value"].GetString()).c_str(),
+    properties["name"].SetString(
+        makeResourceNameUnique(properties["name"].GetString()).c_str(),
         doc.GetAllocator());
-    _propertyCompilerEntry.initFunction(cloneedResourceRef, properties);
+    _propertyCompilerEntry.initFunction(cloneedResourceRef, false, properties);
 
     if (_resourceManagerEntry.createResourcesFunction)
-    {
-      Dod::RefArray resourcesToCreate = {cloneedResourceRef};
-      _resourceManagerEntry.createResourcesFunction(resourcesToCreate);
-    }
+      _resourceManagerEntry.createResourcesFunction({cloneedResourceRef});
 
     onPopulateResourceTree();
   }
@@ -229,7 +229,10 @@ void IntrinsicEdManagerWindowBase::onDestroyResource()
 
   if (resource.isValid())
   {
-    _resourceManagerEntry.destroyFunction(resource);
+    if (_resourceManagerEntry.destroyResourcesFunction)
+      _resourceManagerEntry.destroyResourcesFunction({resource});
+    if (_resourceManagerEntry.destroyFunction)
+      _resourceManagerEntry.destroyFunction(resource);
 
     onPopulateResourceTree();
 
@@ -258,7 +261,8 @@ void IntrinsicEdManagerWindowBase::onSaveManager()
 void IntrinsicEdManagerWindowBase::initContextMenu(QMenu* p_ContextMenu)
 {
   QAction* createResource =
-      new QAction(QIcon(":/Icons/plus"), "Create " + _resourceName, this);
+      new QAction(QIcon(":/Icons/icons/essential/plus.png"),
+                  "Create " + _resourceName, this);
   p_ContextMenu->addAction(createResource);
   QObject::connect(createResource, SIGNAL(triggered()), this,
                    SLOT(onCreateResource()));
@@ -269,15 +273,16 @@ void IntrinsicEdManagerWindowBase::initContextMenu(QMenu* p_ContextMenu)
   if (resRef.isValid())
   {
     QAction* destroyResource =
-        new QAction(QIcon(":/Icons/minus"), "Delete " + _resourceName, this);
+        new QAction(QIcon(":/Icons/icons/essential/minus.png"),
+                    "Delete " + _resourceName, this);
     p_ContextMenu->addAction(destroyResource);
     QObject::connect(destroyResource, SIGNAL(triggered()), this,
                      SLOT(onDestroyResource()));
 
     p_ContextMenu->addSeparator();
 
-    QAction* cloneResource =
-        new QAction(QIcon(":/Icons/plus"), "Clone " + _resourceName, this);
+    QAction* cloneResource = new QAction(QIcon(":/Icons/icons/cad/layer.png"),
+                                         "Clone " + _resourceName, this);
     p_ContextMenu->addAction(cloneResource);
     QObject::connect(cloneResource, SIGNAL(triggered()), this,
                      SLOT(onCloneResource()));

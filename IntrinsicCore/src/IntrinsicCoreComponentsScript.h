@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref ScriptRef;
 typedef _INTR_ARRAY(ScriptRef) ScriptRefArray;
 
@@ -33,8 +34,10 @@ struct ScriptData : Dod::Components::ComponentDataBase
     script.resize(_INTR_MAX_SCRIPT_COMPONENT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(Name) descScriptName;
 
+  // Resources
   _INTR_ARRAY(Dod::Ref) script;
 };
 
@@ -122,6 +125,7 @@ struct ScriptManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(ScriptRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("scriptName"))
@@ -137,9 +141,6 @@ struct ScriptManager
   // <-
 
   static void tickScripts(ScriptRefArray& p_Scripts, float p_DeltaT);
-
-  // Getter/Setter
-  // ->
 
   // Description
   _INTR_INLINE static Name& _descScriptName(ScriptRef p_Ref)

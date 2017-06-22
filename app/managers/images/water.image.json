@@ -3,15 +3,8 @@
     "properties": {
         "name": "water",
         "imageType": 1,
-        "imageFormat": 10,
-        "flags": 16,
-        "dimensions": [
-            893.0,
-            893.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 10,
-        "fileName": "water.dds"
+        "imageFormat": 8,
+        "fileName": "water.dds",
+        "avgNormLength": 1.0
     }
 }

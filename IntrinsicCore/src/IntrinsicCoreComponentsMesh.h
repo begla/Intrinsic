@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref MeshRef;
 typedef _INTR_ARRAY(MeshRef) MeshRefArray;
 
@@ -28,8 +29,10 @@ typedef _INTR_ARRAY(_INTR_ARRAY(Dod::Ref)) DrawCallArray;
 struct MeshPerInstanceDataVertex
 {
   glm::mat4 worldMatrix;
-  glm::mat4 normalMatrix;
   glm::mat4 worldViewProjMatrix;
+  glm::mat4 worldViewMatrix;
+  glm::mat4 viewProjMatrix;
+  glm::mat4 viewMatrix;
 
   glm::vec4 data0;
 };
@@ -45,9 +48,11 @@ struct MeshData : Dod::Components::ComponentDataBase
 {
   MeshData();
 
+  // Description
   _INTR_ARRAY(Name) descMeshName;
   _INTR_ARRAY(glm::vec4) descColorTint;
 
+  // Resources
   _INTR_ARRAY(MeshPerInstanceDataVertex) perInstanceDataVertex;
   _INTR_ARRAY(MeshPerInstanceDataFragment) perInstanceDataFragment;
   _INTR_ARRAY(DrawCallArray) drawCalls;
@@ -103,6 +108,7 @@ struct MeshManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(MeshRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("meshName"))
@@ -146,9 +152,7 @@ struct MeshManager
 
   static void collectDrawCallsAndMeshComponents();
 
-  // Getter/Setter
-  // ->
-
+  // Scripting interface
   _INTR_INLINE static const Name& getMeshName(MeshRef p_Ref)
   {
     return _data.descMeshName[p_Ref._id];
@@ -157,11 +161,6 @@ struct MeshManager
   {
     _data.descMeshName[p_Ref._id] = p_Name;
   }
-
-  // <-
-
-  // Member refs
-  // ->
 
   // Description
   _INTR_INLINE static Name& _descMeshName(MeshRef p_Ref)
@@ -188,8 +187,6 @@ struct MeshManager
   {
     return _data.drawCalls[p_Ref._id];
   }
-
-  // Refs
   _INTR_INLINE static Components::NodeRef& _node(MeshRef p_Ref)
   {
     return _data.node[p_Ref._id];

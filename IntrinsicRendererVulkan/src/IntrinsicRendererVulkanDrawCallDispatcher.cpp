@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,12 +59,16 @@ struct DrawCallParallelTaskSet : enki::ITaskSet
         currentPipeline = newPipeline;
       }
 
+      VkDescriptorSet descSets[2] = {
+          Resources::DrawCallManager::_vkDescriptorSet(drawCallRef),
+          Resources::ImageManager::getGlobalDescriptorSet()};
+
       _INTR_ASSERT(Resources::DrawCallManager::_vkDescriptorSet(drawCallRef));
       vkCmdBindDescriptorSets(
           secondCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
           Resources::PipelineLayoutManager::_vkPipelineLayout(
               pipelineLayoutRef),
-          0u, 1u, &Resources::DrawCallManager::_vkDescriptorSet(drawCallRef),
+          0u, 2u, descSets,
           (uint32_t)Resources::DrawCallManager::_dynamicOffsets(drawCallRef)
               .size(),
           Resources::DrawCallManager::_dynamicOffsets(drawCallRef).data());
@@ -199,7 +203,7 @@ void DrawCallDispatcher::queueDrawCalls(Core::Dod::RefArray& p_DrawCalls,
 
 // <-
 
-void DrawCallDispatcher::reset()
+void DrawCallDispatcher::onFrameEnded()
 {
   _INTR_PROFILE_COUNTER_SET("Total Dispatched Draw Calls",
                             _totalDispatchedDrawCallCountPerFrame);

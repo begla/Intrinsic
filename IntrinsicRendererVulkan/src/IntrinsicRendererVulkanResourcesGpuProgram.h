@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,11 +43,13 @@ struct GpuProgramData : Dod::Resources::ResourceDataBase
     vkPipelineShaderStageCreateInfo.resize(_INTR_MAX_GPU_PROGRAM_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(_INTR_STRING) descGpuProgramName;
   _INTR_ARRAY(_INTR_STRING) descEntryPoint;
   _INTR_ARRAY(uint8_t) descGpuProgramType;
   _INTR_ARRAY(_INTR_STRING) descPreprocessorDefines;
 
+  // Resources
   _INTR_ARRAY(SpirvBuffer) spirvBuffer;
   _INTR_ARRAY(VkShaderModule) vkShaderModule;
   _INTR_ARRAY(VkPipelineShaderStageCreateInfo) vkPipelineShaderStageCreateInfo;
@@ -117,22 +119,23 @@ struct GpuProgramManager
                                              false, false),
                            p_Document.GetAllocator());
     p_Properties.AddMember(
-        "gpuProgramType",
-        _INTR_CREATE_PROP_ENUM(p_Document, p_GenerateDesc, _N(GpuProgram),
-                               _N(enum), _descGpuProgramType(p_Ref),
-                               "Vertex,Fragment,Geometry,Compute", false,
-                               false),
+        "gpuProgramType", _INTR_CREATE_PROP_ENUM(
+                              p_Document, p_GenerateDesc, _N(GpuProgram),
+                              _N(enum), _descGpuProgramType(p_Ref),
+                              "Vertex,Fragment,Geometry,Compute", false, false),
         p_Document.GetAllocator());
   }
 
   // <-
 
   _INTR_INLINE static void initFromDescriptor(GpuProgramRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         GpuProgramData,
-        _INTR_MAX_GPU_PROGRAM_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
+        _INTR_MAX_GPU_PROGRAM_COUNT>::_initFromDescriptor(p_Ref, p_GenerateDesc,
+                                                          p_Properties);
 
     if (p_Properties.HasMember("gpuProgramName"))
       _descGpuProgramName(p_Ref) =
@@ -177,9 +180,12 @@ struct GpuProgramManager
   // <-
 
   static void compileShaders(GpuProgramRefArray p_Refs,
-                             bool p_ForceRecompile = false);
-  static void compileShader(GpuProgramRef p_Ref, bool p_ForceRecompile = false);
-  static void compileAllShaders(bool p_ForceRecompile = false);
+                             bool p_ForceRecompile = false,
+                             bool p_UpdateResources = true);
+  static void compileShader(GpuProgramRef p_Ref, bool p_ForceRecompile = false,
+                            bool p_UpdateResources = true);
+  static void compileAllShaders(bool p_ForceRecompile = false,
+                                bool p_UpdateResources = true);
 
   // <-
 
@@ -212,6 +218,8 @@ struct GpuProgramManager
         VkShaderModule nullModule = VK_NULL_HANDLE;
         _vkShaderModule(ref) = nullModule;
       }
+
+      _spirvBuffer(ref).clear();
     }
   }
 
@@ -224,9 +232,6 @@ struct GpuProgramManager
   static void reflectPipelineLayout(uint32_t p_PoolCount,
                                     const Dod::RefArray& p_GpuPrograms,
                                     Dod::Ref p_PipelineLayoutToInit);
-
-  // Member refs
-  // ->
 
   // Description
   _INTR_INLINE static _INTR_STRING& _descGpuProgramName(GpuProgramRef p_Ref)
@@ -247,13 +252,11 @@ struct GpuProgramManager
     return _data.descPreprocessorDefines[p_Ref._id];
   }
 
-  // Int. resources
+  // Resources
   _INTR_INLINE static SpirvBuffer& _spirvBuffer(GpuProgramRef p_Ref)
   {
     return _data.spirvBuffer[p_Ref._id];
   }
-
-  // GPU resources
   _INTR_INLINE static VkShaderModule& _vkShaderModule(GpuProgramRef p_Ref)
   {
     return _data.vkShaderModule[p_Ref._id];
@@ -263,8 +266,6 @@ struct GpuProgramManager
   {
     return _data.vkPipelineShaderStageCreateInfo[p_Ref._id];
   }
-
-  // <-
 };
 }
 }

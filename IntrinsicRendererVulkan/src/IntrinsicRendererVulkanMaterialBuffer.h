@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 
 #pragma once
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -22,14 +24,9 @@ namespace Vulkan
 {
 struct MaterialBufferEntry
 {
-  // Water
   float refractionFactor;
-
-  // Translucency
   float translucencyThicknessFactor;
-
-  // Emissive
-  float emissveIntensity;
+  float emissiveIntensity;
 };
 
 struct MaterialBuffer
@@ -53,8 +50,6 @@ struct MaterialBuffer
   updateMaterialBufferEntry(const uint32_t p_Index,
                             const MaterialBufferEntry& p_MaterialBufferEntry)
   {
-    using namespace Resources;
-
     // Update staging buffer
     {
       memcpy(BufferManager::getGpuMemory(_materialStagingBuffer),
@@ -77,11 +72,11 @@ struct MaterialBuffer
     RenderSystem::flushTemporaryCommandBuffer();
   }
 
-  static Resources::BufferRef _materialBuffer;
+  static BufferRef _materialBuffer;
 
 private:
   static _INTR_ARRAY(uint32_t) _materialBufferEntries;
-  static Resources::BufferRef _materialStagingBuffer;
+  static BufferRef _materialStagingBuffer;
 };
 }
 }

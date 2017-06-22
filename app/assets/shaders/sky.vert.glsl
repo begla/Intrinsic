@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,12 +18,9 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
-#include "surface_vertex.inc.glsl"
+#include "gbuffer_vertex.inc.glsl"
 
-out gl_PerVertex
-{
-  vec4 gl_Position;
-};
+out gl_PerVertex { vec4 gl_Position; };
 
 // Ubos
 PER_INSTANCE_UBO;
@@ -32,12 +29,16 @@ PER_INSTANCE_UBO;
 INPUT();
 
 // Output
-layout (location = 0) out vec2 outUV0;
-layout (location = 1) out vec3 outNormal;
+layout(location = 0) out vec2 outUV0;
+layout(location = 1) out vec3 outNormal;
+layout(location = 2) out vec3 outPosVS;
+layout(location = 3) out vec3 outUpVS;
 
 void main()
 {
   gl_Position = uboPerInstance.worldViewProjMatrix * vec4(inPosition.xyz, 1.0);
+  outUpVS = (uboPerInstance.viewMatrix * vec4(vec3(0.0, 1.0, 0.0), 0.0)).xyz;
+  outPosVS = (uboPerInstance.worldViewMatrix * vec4(inPosition.xyz, 1.0)).xyz;
   outUV0 = inUV0;
   outNormal = inNormal;
 }

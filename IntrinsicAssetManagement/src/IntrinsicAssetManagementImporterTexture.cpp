@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
 
 // Precompiled header file
 #include "stdafx_assets.h"
-#include "stdafx.h"
 #include "stdafx_vulkan.h"
 
-using namespace Intrinsic::Renderer::Vulkan::Resources;
-using namespace Intrinsic::Renderer::Vulkan;
+using namespace RV::Resources;
+using namespace RV;
 
 namespace Intrinsic
 {
@@ -36,7 +35,10 @@ void ImporterTexture::destroy() {}
 
 void compressTexture(const _INTR_STRING& p_Args)
 {
-  const _INTR_STRING cmd = "tools\\nvtt\\nvcompress.exe " + p_Args;
+  _INTR_STRING adjustedArgs = p_Args;
+  StringUtil::replace(adjustedArgs, "/", "\\\\");
+
+  const _INTR_STRING cmd = "tools\\dxtexconv\\texconv.exe -y " + adjustedArgs;
   std::system(cmd.c_str());
 }
 
@@ -51,7 +53,7 @@ void copyFile(const _INTR_STRING& p_Source, _INTR_STRING& p_Target)
 }
 
 ImageRef createTexture(const _INTR_STRING& p_TextureName,
-                       Renderer::Vulkan::Format::Enum p_Format)
+                       RV::Format::Enum p_Format)
 {
   ImageRefArray imagesToCreate;
   ImageRefArray imagesToDestroy;
@@ -71,10 +73,9 @@ ImageRef createTexture(const _INTR_STRING& p_TextureName,
   {
     ImageManager::resetToDefault(imageRef);
 
-    ImageManager::_descImageType(imageRef) =
-        Renderer::Vulkan::ImageType::kTextureFromFile;
-    ImageManager::_descFileName(imageRef) = p_TextureName + ".dds";
+    ImageManager::_descImageType(imageRef) = RV::ImageType::kTextureFromFile;
     ImageManager::_descImageFormat(imageRef) = p_Format;
+    ImageManager::_descFileName(imageRef) = p_TextureName + ".dds";
 
     imagesToCreate.push_back(imageRef);
   }
@@ -91,37 +92,34 @@ void ImporterTexture::importColorTextureFromFile(const _INTR_STRING& p_FilePath)
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
-  compressTexture("-bc1 " + p_FilePath + " " + mediaPath + "/" + fileName +
-                  ".dds");
-  ImageRef imgRef =
-      createTexture(fileName, Renderer::Vulkan::Format::kBC1RGBUNorm);
+  compressTexture("-f BC1_UNORM -o " + mediaPath + " " + p_FilePath);
+  ImageRef imgRef = createTexture(fileName, RV::Format::kBC1RGBUNorm);
 }
 
 // <-
 
-void ImporterTexture::importAlebdoTextureFromFile(
+void ImporterTexture::importAlbedoTextureFromFile(
     const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
-  compressTexture("-bc1 " + p_FilePath + " " + mediaPath + "/" + fileName +
-                  ".dds");
-  ImageRef imgRef =
-      createTexture(fileName, Renderer::Vulkan::Format::kBC1RGBSrgb);
+  compressTexture("-f BC1_UNORM_SRGB -srgbi -o " + mediaPath + " " +
+                  p_FilePath);
+  ImageRef imgRef = createTexture(fileName, RV::Format::kBC1RGBSrgb);
 }
 
 // <-
 
-void ImporterTexture::importAlebdoAlphaTextureFromFile(
+void ImporterTexture::importAlbedoAlphaTextureFromFile(
     const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
-  compressTexture("-bc2 " + p_FilePath + " " + mediaPath + "/" + fileName +
-                  ".dds");
-  ImageRef imgRef = createTexture(fileName, Renderer::Vulkan::Format::kBC2Srgb);
+  compressTexture("-f BC2_UNORM_SRGB -srgbi -o " + mediaPath + " " +
+                  p_FilePath);
+  ImageRef imgRef = createTexture(fileName, RV::Format::kBC2Srgb);
 }
 
 // <-
@@ -132,10 +130,36 @@ void ImporterTexture::importNormalMapTextureFromFile(
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
-  compressTexture("-bc1 " + p_FilePath + " " + mediaPath + "/" + fileName +
-                  ".dds");
-  ImageRef imgRef =
-      createTexture(fileName, Renderer::Vulkan::Format::kBC1RGBUNorm);
+  compressTexture("-f BC1_UNORM -o " + mediaPath + " " + p_FilePath);
+  ImageRef imgRef = createTexture(fileName, RV::Format::kBC1RGBUNorm);
+
+  // Calc. avg. normal length for specular AA
+  float avgNormalLength = 1.0f;
+  {
+    _INTR_STRING texturePath = "media/textures/" + fileName + ".dds";
+
+    gli::texture2d normalTexture =
+        gli::texture2d(gli::load(texturePath.c_str()));
+    gli::texture2d normalTexDec =
+        gli::convert(normalTexture, gli::FORMAT_RGB32_SFLOAT_PACK32);
+
+    glm::vec3 avgNormal = glm::vec3(0.0f);
+    for (int32_t y = 0u; y < normalTexDec.extent().y; ++y)
+    {
+      for (int32_t x = 0u; x < normalTexDec.extent().x; ++x)
+      {
+        const gli::vec3 normal = gli::normalize(
+            normalTexDec.load<gli::vec3>(gli::extent2d(x, y), 0u) * 2.0f -
+            1.0f);
+
+        avgNormal += normal;
+      }
+    }
+
+    avgNormal /= normalTexDec.extent().x * normalTexDec.extent().y;
+    avgNormalLength = glm::length(avgNormal);
+  }
+  ImageManager::_descAvgNormLength(imgRef) = avgNormalLength;
 }
 
 // <-
@@ -146,8 +170,7 @@ void ImporterTexture::importHdrCubemapFromFile(const _INTR_STRING& p_FilePath)
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
   copyFile(p_FilePath, mediaPath + "/" + fileName + ".dds");
-  ImageRef imgRef =
-      createTexture(fileName, Renderer::Vulkan::Format::kBC6UFloat);
+  ImageRef imgRef = createTexture(fileName, RV::Format::kBC6UFloat);
 }
 }
 }

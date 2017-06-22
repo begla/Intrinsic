@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include "cooking/PxCooking.h"
 #include "common/PxTolerancesScale.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Core
@@ -40,6 +42,11 @@ _INTR_INLINE void createPxTriangleMesh(MeshRef p_MeshRef)
   params.meshCookingHint = physx::PxMeshCookingHint::eCOOKING_PERFORMANCE;
 
   Physics::System::_pxCooking->setParams(params);
+
+  // Don't even try to create empty triangle meshes
+  if (MeshManager::_descPositionsPerSubMesh(p_MeshRef).empty() ||
+      MeshManager::_descIndicesPerSubMesh(p_MeshRef).empty())
+    return;
 
   physx::PxTriangleMeshDesc meshDesc;
   meshDesc.points.count =
@@ -88,6 +95,8 @@ void MeshManager::init()
         MeshManager::loadFromMultipleFiles;
     managerEntry.saveToMultipleFilesFunction = MeshManager::saveToMultipleFiles;
     managerEntry.getResourceFlagsFunction = MeshManager::_resourceFlags;
+    managerEntry.onPropertyUpdateFinishedFunction =
+        MeshManager::updateDependentResources;
 
     Application::_resourceManagerMapping[_N(Mesh)] = managerEntry;
   }
@@ -106,11 +115,33 @@ void MeshManager::init()
 
 // <-
 
+_INTR_INLINE void MeshManager::updateDependentResources(MeshRef p_Ref)
+{
+  Components::MeshRefArray componentsToRecreate;
+
+  // Update mesh components using this mesh
+  for (uint32_t i = 0u; i < CComponents::MeshManager::getActiveResourceCount();
+       ++i)
+  {
+    Components::MeshRef meshCompRef =
+        CComponents::MeshManager::getActiveResourceAtIndex(i);
+
+    if (CComponents::MeshManager::_descMeshName(meshCompRef) ==
+        MeshManager::_name(p_Ref))
+    {
+      componentsToRecreate.push_back(meshCompRef);
+    }
+  }
+
+  CComponents::MeshManager::destroyResources(componentsToRecreate);
+  CComponents::MeshManager::createResources(componentsToRecreate);
+}
+
 void MeshManager::createResources(const MeshRefArray& p_Meshes)
 {
   // Create vertex/index buffers - we're using a separate buffer for each vertex
   // attribute
-  Renderer::Vulkan::Resources::BufferRefArray buffersToCreate;
+  BufferRefArray buffersToCreate;
   _INTR_ARRAY(void*) tempBuffersToRelease;
 
   for (uint32_t meshIdx = 0u; meshIdx < p_Meshes.size(); ++meshIdx)
@@ -150,25 +181,21 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
         }
       }
 
-      Renderer::Vulkan::Resources::BufferRef posVertexBuffer =
-          Renderer::Vulkan::Resources::BufferManager::createBuffer(
-              _N(MeshPositionVb));
+      BufferRef posVertexBuffer =
+          BufferManager::createBuffer(_N(MeshPositionVb));
       {
-        Renderer::Vulkan::Resources::BufferManager::resetToDefault(
-            posVertexBuffer);
+        BufferManager::resetToDefault(posVertexBuffer);
 
-        Renderer::Vulkan::Resources::BufferManager::addResourceFlags(
+        BufferManager::addResourceFlags(
             posVertexBuffer, Dod::Resources::ResourceFlags::kResourceVolatile);
-        Renderer::Vulkan::Resources::BufferManager::_descBufferType(
-            posVertexBuffer) = Renderer::Vulkan::BufferType::kVertex;
-        Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-            posVertexBuffer) =
+        BufferManager::_descBufferType(posVertexBuffer) =
+            RV::BufferType::kVertex;
+        BufferManager::_descSizeInBytes(posVertexBuffer) =
             (uint32_t)positions[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
         uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
-            Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-                posVertexBuffer));
+            BufferManager::_descSizeInBytes(posVertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
         for (uint32_t i = 0u; i < positions[subMeshIdx].size(); ++i)
@@ -182,32 +209,26 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
           tempBuffer[i * 3u + 1u] = packedPosition0 >> 16u;
           tempBuffer[i * 3u + 2u] = packedPosition1;
         }
-        Renderer::Vulkan::Resources::BufferManager::_descInitialData(
-            posVertexBuffer) = tempBuffer;
+        BufferManager::_descInitialData(posVertexBuffer) = tempBuffer;
 
         buffersToCreate.push_back(posVertexBuffer);
         vertexBuffers[subMeshIdx].push_back(posVertexBuffer);
       }
 
-      Renderer::Vulkan::Resources::BufferRef uv0VertexBuffer =
-          Renderer::Vulkan::Resources::BufferManager::createBuffer(
-              _N(MeshUv0Vb));
+      BufferRef uv0VertexBuffer = BufferManager::createBuffer(_N(MeshUv0Vb));
       {
-        Renderer::Vulkan::Resources::BufferManager::resetToDefault(
-            uv0VertexBuffer);
+        BufferManager::resetToDefault(uv0VertexBuffer);
 
-        Renderer::Vulkan::Resources::BufferManager::addResourceFlags(
+        BufferManager::addResourceFlags(
             uv0VertexBuffer, Dod::Resources::ResourceFlags::kResourceVolatile);
-        Renderer::Vulkan::Resources::BufferManager::_descBufferType(
-            uv0VertexBuffer) = Renderer::Vulkan::BufferType::kVertex;
-        Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-            uv0VertexBuffer) =
+        BufferManager::_descBufferType(uv0VertexBuffer) =
+            RV::BufferType::kVertex;
+        BufferManager::_descSizeInBytes(uv0VertexBuffer) =
             (uint32_t)uv0s[subMeshIdx].size() * sizeof(uint16_t) * 2u;
 
         // Convert to half
         uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
-            Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-                uv0VertexBuffer));
+            BufferManager::_descSizeInBytes(uv0VertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
         for (uint32_t i = 0u; i < uv0s[subMeshIdx].size(); ++i)
@@ -217,33 +238,28 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
           tempBuffer[i * 2u] = packedUv;
           tempBuffer[i * 2u + 1u] = packedUv >> 16u;
         }
-        Renderer::Vulkan::Resources::BufferManager::_descInitialData(
-            uv0VertexBuffer) = tempBuffer;
+        BufferManager::_descInitialData(uv0VertexBuffer) = tempBuffer;
 
         buffersToCreate.push_back(uv0VertexBuffer);
         vertexBuffers[subMeshIdx].push_back(uv0VertexBuffer);
       }
 
-      Renderer::Vulkan::Resources::BufferRef normalVertexBuffer =
-          Renderer::Vulkan::Resources::BufferManager::createBuffer(
-              _N(MeshNormalVb));
+      BufferRef normalVertexBuffer =
+          BufferManager::createBuffer(_N(MeshNormalVb));
       {
-        Renderer::Vulkan::Resources::BufferManager::resetToDefault(
-            normalVertexBuffer);
+        BufferManager::resetToDefault(normalVertexBuffer);
 
-        Renderer::Vulkan::Resources::BufferManager::addResourceFlags(
+        BufferManager::addResourceFlags(
             normalVertexBuffer,
             Dod::Resources::ResourceFlags::kResourceVolatile);
-        Renderer::Vulkan::Resources::BufferManager::_descBufferType(
-            normalVertexBuffer) = Renderer::Vulkan::BufferType::kVertex;
-        Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-            normalVertexBuffer) =
+        BufferManager::_descBufferType(normalVertexBuffer) =
+            RV::BufferType::kVertex;
+        BufferManager::_descSizeInBytes(normalVertexBuffer) =
             (uint32_t)normals[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
         uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
-            Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-                normalVertexBuffer));
+            BufferManager::_descSizeInBytes(normalVertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
         for (uint32_t i = 0u; i < normals[subMeshIdx].size(); ++i)
@@ -257,33 +273,28 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
           tempBuffer[i * 3u + 1u] = packedNormal0 >> 16u;
           tempBuffer[i * 3u + 2u] = packedNormal1;
         }
-        Renderer::Vulkan::Resources::BufferManager::_descInitialData(
-            normalVertexBuffer) = tempBuffer;
+        BufferManager::_descInitialData(normalVertexBuffer) = tempBuffer;
 
         buffersToCreate.push_back(normalVertexBuffer);
         vertexBuffers[subMeshIdx].push_back(normalVertexBuffer);
       }
 
-      Renderer::Vulkan::Resources::BufferRef tangentVertexBuffer =
-          Renderer::Vulkan::Resources::BufferManager::createBuffer(
-              _N(MeshTangentVb));
+      BufferRef tangentVertexBuffer =
+          BufferManager::createBuffer(_N(MeshTangentVb));
       {
-        Renderer::Vulkan::Resources::BufferManager::resetToDefault(
-            tangentVertexBuffer);
+        BufferManager::resetToDefault(tangentVertexBuffer);
 
-        Renderer::Vulkan::Resources::BufferManager::addResourceFlags(
+        BufferManager::addResourceFlags(
             tangentVertexBuffer,
             Dod::Resources::ResourceFlags::kResourceVolatile);
-        Renderer::Vulkan::Resources::BufferManager::_descBufferType(
-            tangentVertexBuffer) = Renderer::Vulkan::BufferType::kVertex;
-        Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-            tangentVertexBuffer) =
+        BufferManager::_descBufferType(tangentVertexBuffer) =
+            RV::BufferType::kVertex;
+        BufferManager::_descSizeInBytes(tangentVertexBuffer) =
             (uint32_t)tangents[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
         uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
-            Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-                tangentVertexBuffer));
+            BufferManager::_descSizeInBytes(tangentVertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
         for (uint32_t i = 0u; i < tangents[subMeshIdx].size(); ++i)
@@ -297,33 +308,28 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
           tempBuffer[i * 3u + 1u] = packedTangent0 >> 16u;
           tempBuffer[i * 3u + 2u] = packedTangent1;
         }
-        Renderer::Vulkan::Resources::BufferManager::_descInitialData(
-            tangentVertexBuffer) = tempBuffer;
+        BufferManager::_descInitialData(tangentVertexBuffer) = tempBuffer;
 
         buffersToCreate.push_back(tangentVertexBuffer);
         vertexBuffers[subMeshIdx].push_back(tangentVertexBuffer);
       }
 
-      Renderer::Vulkan::Resources::BufferRef binormalVertexBuffer =
-          Renderer::Vulkan::Resources::BufferManager::createBuffer(
-              _N(MeshBinormalVb));
+      BufferRef binormalVertexBuffer =
+          BufferManager::createBuffer(_N(MeshBinormalVb));
       {
-        Renderer::Vulkan::Resources::BufferManager::resetToDefault(
-            binormalVertexBuffer);
+        BufferManager::resetToDefault(binormalVertexBuffer);
 
-        Renderer::Vulkan::Resources::BufferManager::addResourceFlags(
+        BufferManager::addResourceFlags(
             binormalVertexBuffer,
             Dod::Resources::ResourceFlags::kResourceVolatile);
-        Renderer::Vulkan::Resources::BufferManager::_descBufferType(
-            binormalVertexBuffer) = Renderer::Vulkan::BufferType::kVertex;
-        Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-            binormalVertexBuffer) =
+        BufferManager::_descBufferType(binormalVertexBuffer) =
+            RV::BufferType::kVertex;
+        BufferManager::_descSizeInBytes(binormalVertexBuffer) =
             (uint32_t)binormals[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
         uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
-            Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-                binormalVertexBuffer));
+            BufferManager::_descSizeInBytes(binormalVertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
         for (uint32_t i = 0u; i < binormals[subMeshIdx].size(); ++i)
@@ -337,53 +343,46 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
           tempBuffer[i * 3u + 1u] = packedBinormal0 >> 16u;
           tempBuffer[i * 3u + 2u] = packedBinormal1;
         }
-        Renderer::Vulkan::Resources::BufferManager::_descInitialData(
-            binormalVertexBuffer) = tempBuffer;
+        BufferManager::_descInitialData(binormalVertexBuffer) = tempBuffer;
 
         buffersToCreate.push_back(binormalVertexBuffer);
         vertexBuffers[subMeshIdx].push_back(binormalVertexBuffer);
       }
 
-      Renderer::Vulkan::Resources::BufferRef vtxColorVertexBuffer =
-          Renderer::Vulkan::Resources::BufferManager::createBuffer(
-              _N(MeshVtxColorVb));
+      BufferRef vtxColorVertexBuffer =
+          BufferManager::createBuffer(_N(MeshVtxColorVb));
       {
-        Renderer::Vulkan::Resources::BufferManager::resetToDefault(
-            vtxColorVertexBuffer);
+        BufferManager::resetToDefault(vtxColorVertexBuffer);
 
-        Renderer::Vulkan::Resources::BufferManager::addResourceFlags(
+        BufferManager::addResourceFlags(
             vtxColorVertexBuffer,
             Dod::Resources::ResourceFlags::kResourceVolatile);
-        Renderer::Vulkan::Resources::BufferManager::_descBufferType(
-            vtxColorVertexBuffer) = Renderer::Vulkan::BufferType::kVertex;
+        BufferManager::_descBufferType(vtxColorVertexBuffer) =
+            RV::BufferType::kVertex;
 
-        Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-            vtxColorVertexBuffer) =
+        BufferManager::_descSizeInBytes(vtxColorVertexBuffer) =
             (uint32_t)vtxColors[subMeshIdx].size() * sizeof(uint32_t);
 
         // Convert color
         uint32_t* tempBuffer = (uint32_t*)Tlsf::MainAllocator::allocate(
-            Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-                vtxColorVertexBuffer));
+            BufferManager::_descSizeInBytes(vtxColorVertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
         for (uint32_t i = 0u; i < vtxColors[subMeshIdx].size(); ++i)
         {
           tempBuffer[i] = Math::convertColorToBGRA(vtxColors[subMeshIdx][i]);
         }
-        Renderer::Vulkan::Resources::BufferManager::_descInitialData(
-            vtxColorVertexBuffer) = tempBuffer;
+        BufferManager::_descInitialData(vtxColorVertexBuffer) = tempBuffer;
 
         buffersToCreate.push_back(vtxColorVertexBuffer);
         vertexBuffers[subMeshIdx].push_back(vtxColorVertexBuffer);
       }
 
-      Renderer::Vulkan::Resources::BufferRef indexBuffer =
-          Renderer::Vulkan::Resources::BufferManager::createBuffer(_N(MeshIb));
+      BufferRef indexBuffer = BufferManager::createBuffer(_N(MeshIb));
       {
-        Renderer::Vulkan::Resources::BufferManager::resetToDefault(indexBuffer);
+        BufferManager::resetToDefault(indexBuffer);
 
-        Renderer::Vulkan::Resources::BufferManager::addResourceFlags(
+        BufferManager::addResourceFlags(
             indexBuffer, Dod::Resources::ResourceFlags::kResourceVolatile);
 
         if (indices[subMeshIdx].size() <= 0xFFFF)
@@ -399,22 +398,19 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             tempIndexBuffer[i] = (uint16_t)indices[subMeshIdx][i];
           }
 
-          Renderer::Vulkan::Resources::BufferManager::_descBufferType(
-              indexBuffer) = Renderer::Vulkan::BufferType::kIndex16;
-          Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-              indexBuffer) = indexBufferSizeInBytes;
-          Renderer::Vulkan::Resources::BufferManager::_descInitialData(
-              indexBuffer) = tempIndexBuffer;
+          BufferManager::_descBufferType(indexBuffer) =
+              RV::BufferType::kIndex16;
+          BufferManager::_descSizeInBytes(indexBuffer) = indexBufferSizeInBytes;
+          BufferManager::_descInitialData(indexBuffer) = tempIndexBuffer;
         }
         else
         {
-          Renderer::Vulkan::Resources::BufferManager::_descBufferType(
-              indexBuffer) = Renderer::Vulkan::BufferType::kIndex32;
-          Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-              indexBuffer) =
+          BufferManager::_descBufferType(indexBuffer) =
+              RV::BufferType::kIndex32;
+          BufferManager::_descSizeInBytes(indexBuffer) =
               (uint32_t)indices[subMeshIdx].size() * sizeof(uint32_t);
-          Renderer::Vulkan::Resources::BufferManager::_descInitialData(
-              indexBuffer) = (void*)indices[subMeshIdx].data();
+          BufferManager::_descInitialData(indexBuffer) =
+              (void*)indices[subMeshIdx].data();
         }
 
         buffersToCreate.push_back(indexBuffer);
@@ -425,7 +421,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
     createPxTriangleMesh(meshRef);
   }
 
-  Renderer::Vulkan::Resources::BufferManager::createResources(buffersToCreate);
+  BufferManager::createResources(buffersToCreate);
 
   for (uint32_t i = 0u; i < tempBuffersToRelease.size(); ++i)
   {
@@ -438,7 +434,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
 
 void MeshManager::destroyResources(const MeshRefArray& p_Meshes)
 {
-  Renderer::Vulkan::Resources::BufferRefArray buffersToDestroy;
+  BufferRefArray buffersToDestroy;
 
   for (uint32_t i = 0u; i < p_Meshes.size(); ++i)
   {
@@ -453,8 +449,7 @@ void MeshManager::destroyResources(const MeshRefArray& p_Meshes)
     {
       for (uint32_t j = 0u; j < subMeshVtxBuffers[i].size(); ++j)
       {
-        Renderer::Vulkan::Resources::BufferRef bufferRef =
-            subMeshVtxBuffers[i][j];
+        BufferRef bufferRef = subMeshVtxBuffers[i][j];
         _INTR_ASSERT(bufferRef.isValid());
 
         buffersToDestroy.push_back(bufferRef);
@@ -463,7 +458,7 @@ void MeshManager::destroyResources(const MeshRefArray& p_Meshes)
 
     for (uint32_t i = 0u; i < subMeshIdxBuffers.size(); ++i)
     {
-      Renderer::Vulkan::Resources::BufferRef bufferRef = subMeshIdxBuffers[i];
+      BufferRef bufferRef = subMeshIdxBuffers[i];
       _INTR_ASSERT(bufferRef.isValid());
 
       buffersToDestroy.push_back(bufferRef);
@@ -473,13 +468,11 @@ void MeshManager::destroyResources(const MeshRefArray& p_Meshes)
     _indexBufferPerSubMesh(meshRef).clear();
   }
 
-  Renderer::Vulkan::Resources::BufferManager::destroyResources(
-      buffersToDestroy);
+  BufferManager::destroyResources(buffersToDestroy);
 
   for (uint32_t i = 0u; i < buffersToDestroy.size(); ++i)
   {
-    Renderer::Vulkan::Resources::BufferManager::destroyBuffer(
-        buffersToDestroy[i]);
+    BufferManager::destroyBuffer(buffersToDestroy[i]);
   }
 }
 }

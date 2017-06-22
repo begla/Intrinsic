@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ IntrinsicEdManagerWindowMaterial::IntrinsicEdManagerWindowMaterial(
   _propertyCompilerEntry =
       Application::_resourcePropertyCompilerMapping[_N(Material)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(Material)];
-  _resourceIcon = QIcon(":/Icons/brush");
   _managerPath = "managers/materials/";
   _managerExtension = ".material.json";
   _resourceName = "Material";

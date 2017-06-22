@@ -1,6 +1,7 @@
 #include "../load_dds.hpp"
 #include "../load_kmg.hpp"
 #include "../load_ktx.hpp"
+#include "file.hpp"
 
 namespace gli
 {
@@ -29,7 +30,7 @@ namespace gli
 	/// Load a texture (DDS, KTX or KMG) from file
 	inline texture load(char const * Filename)
 	{
-		FILE* File = std::fopen(Filename, "rb");
+		FILE* File = detail::open_file(Filename, "rb");
 		if(!File)
 			return texture();
 

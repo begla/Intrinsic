@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref PipelineRef;
 typedef _INTR_ARRAY(PipelineRef) PipelineRefArray;
 
@@ -50,7 +51,7 @@ struct PipelineData : Dod::Resources::ResourceDataBase
     vkPipeline.resize(_INTR_MAX_RENDER_PASS_COUNT);
   }
 
-  // Desc.
+  // Description
   _INTR_ARRAY(VertexLayoutRef) descVertexLayout;
   _INTR_ARRAY(PipelineLayoutRef) descPipelineLayout;
   _INTR_ARRAY(RenderPassRef) descRenderPass;
@@ -69,7 +70,7 @@ struct PipelineData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(glm::uvec2) descAbsoluteScissorDimensions;
   _INTR_ARRAY(glm::uvec2) descAbsoluteViewportDimensions;
 
-  // GPU resources
+  // Resources
   _INTR_ARRAY(VkPipeline) vkPipeline;
 };
 
@@ -133,11 +134,13 @@ struct PipelineManager
   }
 
   _INTR_INLINE static void initFromDescriptor(PipelineRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         PipelineData,
-        _INTR_MAX_PIPELINE_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
+        _INTR_MAX_PIPELINE_COUNT>::_initFromDescriptor(p_Ref, p_GenerateDesc,
+                                                       p_Properties);
   }
 
   _INTR_INLINE static void saveToSingleFile(const char* p_FileName)
@@ -199,9 +202,7 @@ struct PipelineManager
     }
   }
 
-  // Getter/Setter
-  // ->
-
+  // Resources
   _INTR_INLINE static VertexLayoutRef& _descVertexLayout(PipelineRef p_Ref)
   {
     return _data.descVertexLayout[p_Ref._id];
@@ -266,7 +267,7 @@ struct PipelineManager
     return _data.descAbsoluteViewportDimensions[p_Ref._id];
   }
 
-  // GPU resources
+  // Resources
   _INTR_INLINE static VkPipeline& _vkPipeline(PipelineRef p_Ref)
   {
     return _data.vkPipeline[p_Ref._id];

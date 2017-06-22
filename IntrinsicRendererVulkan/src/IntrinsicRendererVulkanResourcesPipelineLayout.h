@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref PipelineLayoutRef;
 typedef Dod::RefArray PipelineLayoutRefArray;
 
@@ -37,8 +38,10 @@ struct PipelineLayoutData : Dod::Resources::ResourceDataBase
     vkDescriptorPool.resize(_INTR_MAX_PIPELINE_LAYOUT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(_INTR_ARRAY(BindingDescription)) bindingDescs;
 
+  // Resources
   _INTR_ARRAY(VkPipelineLayout) vkPipelineLayout;
   _INTR_ARRAY(VkDescriptorSetLayout) vkDescriptorSetLayout;
   _INTR_ARRAY(VkDescriptorPool) vkDescriptorPool;
@@ -91,11 +94,13 @@ struct PipelineLayoutManager
   }
 
   _INTR_INLINE static void initFromDescriptor(PipelineLayoutRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         PipelineLayoutData,
         _INTR_MAX_PIPELINE_LAYOUT_COUNT>::_initFromDescriptor(p_Ref,
+                                                              p_GenerateDesc,
                                                               p_Properties);
   }
 
@@ -142,15 +147,14 @@ struct PipelineLayoutManager
   allocateAndWriteDescriptorSet(PipelineLayoutRef p_Ref,
                                 const _INTR_ARRAY(BindingInfo) & p_BindInfos);
 
-  // Getter/Setter
-  // ->
-
+  // Description
   _INTR_INLINE static _INTR_ARRAY(BindingDescription) &
       _descBindingDescs(PipelineLayoutRef p_Ref)
   {
     return _data.bindingDescs[p_Ref._id];
   }
 
+  // Resources
   _INTR_INLINE static VkPipelineLayout&
   _vkPipelineLayout(PipelineLayoutRef p_Ref)
   {

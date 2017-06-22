@@ -1,0 +1,64 @@
+[
+    {
+        "name": "Decal3",
+        "offsetToParent": 0,
+        "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        -1122.5,
+                        582.25,
+                        -280.0
+                    ],
+                    "localOrient": [
+                        -0.7071067690849304,
+                        0.0,
+                        0.0,
+                        0.7071067690849304
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        -1122.5,
+                        582.25,
+                        -280.0
+                    ],
+                    "worldOrient": [
+                        -0.7071067690849304,
+                        0.0,
+                        0.0,
+                        0.7071067690849304
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            {
+                "type": "Decal",
+                "properties": {
+                    "albedoTextureName": "decal_road",
+                    "normalTextureName": "decal_road_NRM",
+                    "pbrTextureName": "decal_road_PBR",
+                    "uvTransform": [
+                        1.0,
+                        2.0,
+                        0.0,
+                        0.0
+                    ],
+                    "halfExtent": [
+                        10.0,
+                        20.0,
+                        2.0
+                    ]
+                }
+            }
+        ]
+    }
+]

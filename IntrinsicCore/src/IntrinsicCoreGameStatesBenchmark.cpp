@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,7 +45,12 @@ void Benchmark::activate()
 {
   Entity::EntityRef entityRef =
       Entity::EntityManager::getEntityByName(_N(BenchmarkCamera));
-  _INTR_ASSERT(entityRef.isValid());
+  if (!entityRef.isValid())
+  {
+    _INTR_LOG_ERROR("'BenchmarkCamera' not available...");
+    return;
+  }
+
   Components::CameraRef cameraRef =
       Components::CameraManager::getComponentForEntity(entityRef);
   _INTR_ASSERT(cameraRef.isValid());
@@ -76,13 +81,14 @@ void Benchmark::deativate() {}
 
 void Benchmark::parseBenchmark(rapidjson::Document& p_BenchmarkDesc)
 {
+  const _INTR_STRING& worldFilePath = World::_filePath;
+
+  _INTR_STRING worldFileName, worldFileExtension;
+  StringUtil::extractFileNameAndExtension(worldFilePath, worldFileName,
+                                          worldFileExtension);
+
   // Parse benchmark
-  _INTR_STRING filePath =
-      "worlds/" +
-      Entity::EntityManager::_name(
-          Components::NodeManager::_entity(World::getRootNode()))
-          .getString() +
-      ".benchmark.json";
+  _INTR_STRING filePath = "worlds/" + worldFileName + ".benchmark.json";
 
   {
     FILE* fp = fopen(filePath.c_str(), "rb");
@@ -118,6 +124,7 @@ void Benchmark::assembleBenchmarkPaths(
     Path path;
     path.name = pathDesc["name"].GetString();
     path.camSpeed = pathDesc["camSpeed"].GetFloat();
+    path.currentTime = pathDesc["currentTime"].GetFloat();
 
     for (uint32_t j = 0u; j < nodeDescs.Size(); ++j)
     {
@@ -146,7 +153,7 @@ void Benchmark::update(float p_DeltaT)
 
   const Components::NodeRef camNodeRef =
       Components::NodeManager::getComponentForEntity(
-          Components::CameraManager::_entity(World::getActiveCamera()));
+          Components::CameraManager::_entity(World::_activeCamera));
 
   const Path& currentPath = _paths[_pathIdx];
   Data& data = _benchmarkData[_pathIdx];
@@ -168,6 +175,8 @@ void Benchmark::update(float p_DeltaT)
   Components::NodeManager::_orientation(camNodeRef) =
       glm::quat_cast(glm::mat3(camRight, camUp, camForward));
   Components::NodeManager::updateTransforms(camNodeRef);
+
+  World::_currentTime = currentPath.currentTime;
 
   _pathPos += p_DeltaT * currentPath.camSpeed;
   data.meanFps = 1.0f / TaskManager::_lastActualFrameDuration;

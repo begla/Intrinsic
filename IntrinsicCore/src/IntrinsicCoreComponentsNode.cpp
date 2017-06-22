@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -101,7 +101,6 @@ void NodeManager::updateTransforms(const NodeRefArray& p_Nodes)
 
     _worldMatrix(nodeRef) = trans * rot * scale;
     _inverseWorldMatrix(nodeRef) = glm::inverse(_worldMatrix(nodeRef));
-    _normalMatrix(nodeRef) = rot;
 
     // Update AABB
     // TODO: Merge sub meshes
@@ -130,6 +129,12 @@ void NodeManager::updateTransforms(const NodeRefArray& p_Nodes)
               glm::length(Math::calcAABBHalfExtent(_worldAABB(nodeRef)))};
         }
       }
+    }
+    else
+    {
+      _worldAABB(nodeRef) =
+          Math::AABB(_worldPosition(nodeRef) - glm::vec3(0.5f),
+                     _worldPosition(nodeRef) + glm::vec3(0.5f));
     }
   }
 }

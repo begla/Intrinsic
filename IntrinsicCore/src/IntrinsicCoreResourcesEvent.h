@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref EventRef;
 typedef _INTR_ARRAY(EventRef) EventRefArray;
 
@@ -54,6 +55,7 @@ struct EventData : Dod::Resources::ResourceDataBase
     queuedEventData.resize(_INTR_MAX_EVENT_COUNT);
   }
 
+  // Resources
   _INTR_ARRAY(QueuedEventData) queuedEventData;
 };
 
@@ -163,9 +165,7 @@ struct EventManager
     EventListenerManager::destroyEventListener(p_EventListener);
   }
 
-  // Getter/Setter
-  // ->
-
+  // Resources
   _INTR_INLINE static QueuedEventData& _queuedEventData(EventRef p_EventRef)
   {
     return _data.queuedEventData[p_EventRef._id];

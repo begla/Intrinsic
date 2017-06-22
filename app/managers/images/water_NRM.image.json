@@ -4,14 +4,7 @@
         "name": "water_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "flags": 16,
-        "dimensions": [
-            2048.0,
-            2048.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 12,
-        "fileName": "water_NRM.dds"
+        "fileName": "water_NRM.dds",
+        "avgNormLength": 0.9965211749076843
     }
 }

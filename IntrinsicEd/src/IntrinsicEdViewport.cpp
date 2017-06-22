@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@
 #include "stdafx_editor.h"
 #include "stdafx.h"
 
+using namespace CComponents;
+
 IntrinsicEdViewport::IntrinsicEdViewport(QWidget* parent) : QWidget(parent)
 {
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
+  setAcceptDrops(true);
 
   Resources::EventManager::connect(_N(MouseMoved),
                                    std::bind(&IntrinsicEdViewport::onMouseMoved,
@@ -59,6 +62,9 @@ void IntrinsicEdViewport::onKeyPressed(Resources::EventRef p_EventRef)
   case Input::Key::kF3:
     IntrinsicEd::_mainWindow->onMainGameState();
     break;
+  case Input::Key::kF10:
+    IntrinsicEd::_mainWindow->onRecompileShaders();
+    break;
   case Input::Key::k1:
     IntrinsicEd::_mainWindow->onEditingModeDefault();
     break;
@@ -75,6 +81,130 @@ void IntrinsicEdViewport::onKeyPressed(Resources::EventRef p_EventRef)
     IntrinsicEd::_mainWindow->onEditingModeScale();
     break;
   }
+}
+
+void IntrinsicEdViewport::dragEnterEvent(QDragEnterEvent* event)
+{
+  const QMimeData* mimeData = event->mimeData();
+  if (mimeData->hasFormat("PrefabFilePath") && !_currentPrefab.isValid())
+  {
+    event->accept();
+
+    QByteArray encodedData = mimeData->data("PrefabFilePath");
+    QDataStream stream(&encodedData, QIODevice::ReadOnly);
+    QString prefabName;
+    stream >> prefabName;
+
+    spawnPrefab(prefabName.toStdString().c_str());
+  }
+}
+
+void IntrinsicEdViewport::dragLeaveEvent(QDragLeaveEvent* event)
+{
+  if (_currentPrefab.isValid())
+  {
+    World::destroyNodeFull(NodeManager::getComponentForEntity(_currentPrefab));
+
+    if (GameStates::Editing::_currentlySelectedEntity == _currentPrefab)
+    {
+      GameStates::Editing::_currentlySelectedEntity =
+          NodeManager::_entity(World::_rootNode);
+    }
+
+    _currentPrefab = Dod::Ref();
+  }
+}
+
+_INTR_INLINE void IntrinsicEdViewport::positionNodeOnGround(Dod::Ref p_NodeRef)
+{
+
+  CameraRef camRef = World::_activeCamera;
+  NodeRef camNodeRef =
+      NodeManager::getComponentForEntity(CameraManager::_entity(camRef));
+
+  QPoint mousePos = mapFromGlobal(QCursor::pos());
+  const glm::vec2 mousePosRel =
+      glm::vec2((float)mousePos.x() / geometry().width(),
+                (float)mousePos.y() / geometry().height());
+
+  const Math::Ray worldRay = Math::calcMouseRay(
+      NodeManager::_worldPosition(camNodeRef), mousePosRel,
+      Components::CameraManager::_inverseViewProjectionMatrix(camRef));
+
+  // Spawn the object close to the ground
+  physx::PxRaycastHit hit;
+  if (PhysxHelper::raycast(worldRay, hit, 50000.0f,
+                           physx::PxQueryFlag::eSTATIC))
+  {
+    NodeManager::_position(p_NodeRef) = worldRay.o + worldRay.d * hit.distance;
+  }
+  else
+  {
+    NodeManager::_position(p_NodeRef) = worldRay.o + worldRay.d * 10.0f;
+  }
+}
+
+void IntrinsicEdViewport::dragMoveEvent(QDragMoveEvent* event)
+{
+  if (_currentPrefab.isValid())
+  {
+    NodeRef nodeRef = NodeManager::getComponentForEntity(_currentPrefab);
+    positionNodeOnGround(nodeRef);
+    NodeManager::updateTransforms(nodeRef);
+
+    if (IntrinsicEd::_prefabsBrowser->_ui.alignWithGround->isChecked())
+    {
+      World::alignNodeWithGround(nodeRef);
+      NodeManager::updateTransforms(nodeRef);
+    }
+
+    setFocus();
+  }
+
+  IntrinsicEd::_mainWindow->tickMainLoop();
+}
+
+void IntrinsicEdViewport::dropEvent(QDropEvent* event)
+{
+  _currentPrefab = Dod::Ref();
+}
+
+void IntrinsicEdViewport::spawnPrefab(const _INTR_STRING& p_PrefabFilePath)
+{
+  NodeRef nodeRef = World::loadNodeHierarchy(p_PrefabFilePath);
+  Entity::EntityRef entityRef = NodeManager::_entity(nodeRef);
+  NodeManager::attachChild(World::_rootNode, nodeRef);
+
+  positionNodeOnGround(nodeRef);
+
+  const glm::vec3 randomRotEuler = glm::vec3(
+      Math::calcRandomFloatMinMax(
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMinX->value()),
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMaxX->value())),
+      Math::calcRandomFloatMinMax(
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMinY->value()),
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMaxY->value())),
+      Math::calcRandomFloatMinMax(
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMinZ->value()),
+          glm::radians(IntrinsicEd::_prefabsBrowser->_ui.rotMaxZ->value())));
+  const glm::vec2 randomScale =
+      glm::vec2(Math::calcRandomFloatMinMax(
+                    IntrinsicEd::_prefabsBrowser->_ui.scaleMinHor->value(),
+                    IntrinsicEd::_prefabsBrowser->_ui.scaleMaxHor->value()),
+                Math::calcRandomFloatMinMax(
+                    IntrinsicEd::_prefabsBrowser->_ui.scaleMinVert->value(),
+                    IntrinsicEd::_prefabsBrowser->_ui.scaleMaxVert->value()));
+
+  NodeManager::_orientation(nodeRef) =
+      NodeManager::_orientation(nodeRef) * glm::quat(randomRotEuler);
+  NodeManager::_size(nodeRef) *=
+      glm::vec3(randomScale.x, randomScale.y, randomScale.x);
+
+  Components::NodeManager::rebuildTreeAndUpdateTransforms();
+  World::loadNodeResources(nodeRef);
+
+  GameStates::Editing::_currentlySelectedEntity = entityRef;
+  _currentPrefab = entityRef;
 }
 
 void IntrinsicEdViewport::onKeyReleased(Resources::EventRef p_EventRef) {}

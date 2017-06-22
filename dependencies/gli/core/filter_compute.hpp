@@ -1,12 +1,19 @@
 #pragma once
 
-#include "../filter.hpp"
+#include "filter.hpp"
 #include "coord.hpp"
 #include <glm/gtc/integer.hpp>
 
 namespace gli{
 namespace detail
 {
+	enum dimension
+	{
+		DIMENSION_1D,
+		DIMENSION_2D,
+		DIMENSION_3D
+	};
+
 	template <typename T>
 	struct interpolate
 	{

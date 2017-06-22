@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,8 +33,7 @@ struct Default
   static Core::Dod::RefArray _activeFrustums;
   static _INTR_HASH_MAP(Components::CameraRef,
                         _INTR_ARRAY(Dod::Ref)) _shadowFrustums;
-  static _INTR_HASH_MAP(Core::Resources::FrustumRef,
-                        uint8_t) _cameraToIdMapping;
+  static _INTR_HASH_MAP(CResources::FrustumRef, uint8_t) _cameraToIdMapping;
 
   static _INTR_INLINE const
       LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>&

@@ -1,0 +1,10 @@
+{
+    "name": "vignette",
+    "properties": {
+        "name": "vignette",
+        "imageType": 1,
+        "imageFormat": 8,
+        "fileName": "vignette.dds",
+        "avgNormLength": 1.0
+    }
+}

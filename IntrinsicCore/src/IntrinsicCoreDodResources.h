@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -103,7 +103,6 @@ struct ResourceManagerBase : Dod::ManagerBase<IdCount, DataType>
   _INTR_INLINE static Ref _getResourceByName(const Name& p_Name)
   {
     auto resourceIt = _nameResourceMap.find(p_Name);
-
     if (resourceIt == _nameResourceMap.end())
     {
       return Dod::Ref();
@@ -127,14 +126,13 @@ struct ResourceManagerBase : Dod::ManagerBase<IdCount, DataType>
     return (_data.resourceFlags[p_Ref._id] & p_Flags) == p_Flags;
   }
 
-  // Getter/Setter
-  // ->
-
   _INTR_INLINE static Name& _name(Ref p_Ref) { return _data.name[p_Ref._id]; }
   _INTR_INLINE static uint8_t& _resourceFlags(Ref p_Ref)
   {
     return _data.resourceFlags[p_Ref._id];
   }
+
+  // <-
 
   static _INTR_HASH_MAP(Name, Ref) _nameResourceMap;
   static DataType _data;
@@ -170,16 +168,15 @@ protected:
                                               rapidjson::Value& p_Properties,
                                               rapidjson::Document& p_Document)
   {
-    p_Properties.AddMember("name",
-                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(Resource), _N(string),
-                                             _name(p_Ref), false, false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "name", _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Resource),
+                                  _N(string), _name(p_Ref), false, false),
+        p_Document.GetAllocator());
   }
 
   // <-
 
-  _INTR_INLINE static void _initFromDescriptor(Ref p_Ref,
+  _INTR_INLINE static void _initFromDescriptor(Ref p_Ref, bool p_GenerateDesc,
                                                rapidjson::Value& p_Properties)
   {
     _name(p_Ref) = JsonHelper::readPropertyName(p_Properties["name"]);
@@ -311,8 +308,8 @@ protected:
          i < Dod::ManagerBase<IdCount, DataType>::_activeRefs.size(); ++i)
     {
       Ref ref = Dod::ManagerBase<IdCount, DataType>::_activeRefs[i];
-      _saveToMultipleFilesSingleResource(ref, p_Path, p_Extension,
-                                         p_CompileFunction);
+      _saveToMultipleFilesSingleResource<WriterType>(ref, p_Path, p_Extension,
+                                                     p_CompileFunction);
     }
   }
 
@@ -397,7 +394,7 @@ protected:
 
       Ref ref = _createResource(resource["name"].GetString());
       p_ResetToDefaultFunction(ref);
-      p_InitFunction(ref, resource["properties"]);
+      p_InitFunction(ref, false, resource["properties"]);
     }
   }
 
@@ -459,7 +456,7 @@ protected:
 
       Ref ref = _createResource(resource["name"].GetString());
       p_ResetToDefaultFunction(ref);
-      p_InitFunction(ref, resource["properties"]);
+      p_InitFunction(ref, false, resource["properties"]);
 
       tinydir_next(&dir);
     }

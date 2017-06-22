@@ -3,9 +3,10 @@
     "properties": {
         "name": "sea",
         "materialPassMask": [
+            "GBufferWireframe",
             "GBufferWater"
         ],
-        "albedoTextureName": "water",
+        "albedoTextureName": "black",
         "emissiveTextureName": "white",
         "uvOffsetScale": [
             0.0,

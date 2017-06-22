@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,8 +26,10 @@ struct DebugStageFlags
 {
   enum Flags
   {
-    kWorldBoundingSpheres = 0x01,
-    kBenchmarkPaths = 0x02
+    kWorldBoundingSpheres = 0x01u,
+    kBenchmarkPaths = 0x02u,
+    kSelectedObject = 0x04u,
+    kWireframeRendering = 0x08u
   };
 };
 
@@ -43,6 +45,7 @@ struct Debug
                          uint32_t p_Color0, uint32_t p_Color1);
   static void renderSphere(const glm::vec3& p_Center, float p_Radius,
                            const glm::vec3& p_Color);
+  static void renderDecal(Dod::Ref p_Decal);
 
   static void render(float p_DeltaT, Components::CameraRef p_CameraRef);
 

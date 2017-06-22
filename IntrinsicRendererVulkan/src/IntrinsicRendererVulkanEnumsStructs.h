@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -64,13 +64,15 @@ enum Enum
 
   kFull,
   kHalf,
-  kQuarter
+  kQuarter,
+
+  kCubemap
 };
 }
 
 struct ResourceReleaseEntry
 {
-  Intrinsic::Core::Name typeName;
+  Name typeName;
 
   void* userData0;
   void* userData1;
@@ -85,6 +87,24 @@ enum Enum
   kExternal,
   kTextureFromFile,
   kTexture,
+};
+}
+
+namespace ImageTextureType
+{
+enum Enum
+{
+  kUnknown,
+
+  k1D,
+  k1DArray,
+  k2D,
+  k2DArray,
+  k3D,
+  k3DArray,
+
+  kCube,
+  kCubeArray
 };
 }
 
@@ -197,6 +217,7 @@ enum Enum
   kD32SFloat,
   kD16UNorm,
   kB10G11R11UFloat,
+  kR8UNorm,
 
   kCount
 };
@@ -213,6 +234,9 @@ enum Enum
   kPerMaterialFragment,
   kPerMaterialVertex,
 
+  kPerFrameFragment,
+  kPerFrameVertex,
+
   kInvalidUbo,
 
   kCount,
@@ -220,7 +244,9 @@ enum Enum
   kRangeStartPerInstance = kPerInstanceFragment,
   kRangeEndPerInstance = kPerInstanceCompute,
   kRangeStartPerMaterial = kPerMaterialFragment,
-  kRangeEndPerMaterial = kPerMaterialVertex
+  kRangeEndPerMaterial = kPerMaterialVertex,
+  kRangeStartPerFrame = kPerFrameFragment,
+  kRangeEndPerFrame = kPerFrameVertex
 };
 }
 
@@ -288,7 +314,9 @@ struct BindingFlags
 {
   enum Flags
   {
-    kAdressSubResource = 0x01
+    kAdressSubResource = 0x01,
+    kForceLinearSampling = 0x02,
+    kForceGammaSampling = 0x04
   };
 };
 

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ struct ImporterTexture
   static void destroy();
 
   static void importColorTextureFromFile(const _INTR_STRING& p_FilePath);
-  static void importAlebdoTextureFromFile(const _INTR_STRING& p_FilePath);
-  static void importAlebdoAlphaTextureFromFile(const _INTR_STRING& p_FilePath);
+  static void importAlbedoTextureFromFile(const _INTR_STRING& p_FilePath);
+  static void importAlbedoAlphaTextureFromFile(const _INTR_STRING& p_FilePath);
   static void importNormalMapTextureFromFile(const _INTR_STRING& p_FilePath);
   static void importHdrCubemapFromFile(const _INTR_STRING& p_FilePath);
 };

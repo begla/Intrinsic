@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,28 +27,29 @@ PER_INSTANCE_UBO;
 
 // Bindings
 BINDINGS_GBUFFER;
-layout (binding = 6) uniform sampler2D gbufferDepthTex;
+layout(binding = 6) uniform sampler2D gbufferDepthTex;
 
 // Input
-layout (location = 0) in vec3 inNormal;
-layout (location = 1) in vec3 inTangent;
-layout (location = 2) in vec3 inBinormal;
-layout (location = 3) in vec3 inColor;
-layout (location = 4) in vec2 inUV0;
-layout (location = 5) in vec4 inPosition;
+layout(location = 0) in vec3 inNormal;
+layout(location = 1) in vec3 inTangent;
+layout(location = 2) in vec3 inBinormal;
+layout(location = 3) in vec3 inColor;
+layout(location = 4) in vec2 inUV0;
+layout(location = 5) in vec4 inPosition;
 
 // Output
 OUTPUT
 
 void main()
-{ 
+{
   vec3 screenPos = inPosition.xyz / inPosition.w;
   screenPos.xy = screenPos.xy * 0.5 + 0.5;
-  screenPos.z = linearizeDepth(screenPos.z, uboPerInstance.camParams.x, uboPerInstance.camParams.y);
+  screenPos.z = linearizeDepth(screenPos.z, uboPerInstance.camParams.x,
+                               uboPerInstance.camParams.y);
 
-  const float opaqueDepth = linearizeDepth(textureLod(gbufferDepthTex, screenPos.xy, 0.0).r, 
-    uboPerInstance.camParams.x, 
-    uboPerInstance.camParams.y);
+  const float opaqueDepth =
+      linearizeDepth(textureLod(gbufferDepthTex, screenPos.xy, 0.0).r,
+                     uboPerInstance.camParams.x, uboPerInstance.camParams.y);
   if (opaqueDepth < screenPos.z)
   {
     discard;
@@ -56,7 +57,8 @@ void main()
 
   vec4 albedo;
   albedo.a = clamp(sin(inNormal.x + uboPerInstance.data0.w * 2.0), 0.0, 1.0);
-  albedo.rgb = vec3(1.0, 0.7, 0.7) * trunc(inNormal.xyz * 10.0 * 0.5 + 0.5) * 0.1;
+  albedo.rgb =
+      vec3(1.0, 0.7, 0.7) * trunc(inNormal.xyz * 10.0 * 0.5 + 0.5) * 0.1;
 
   GBuffer gbuffer;
   {

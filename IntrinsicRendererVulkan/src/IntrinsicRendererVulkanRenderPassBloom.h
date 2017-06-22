@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 // Needs to be synced with the shader
 #define BLUR_THREADS 128
-#define BLUR_HALF_BLUR_WIDTH 4
+#define BLUR_HALF_BLUR_WIDTH 7
 
 namespace Intrinsic
 {

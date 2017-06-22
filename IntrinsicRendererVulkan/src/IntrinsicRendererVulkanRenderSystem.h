@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ namespace Vulkan
 struct RenderSystem
 {
   static void init(void* p_PlatformHandle, void* p_PlatformWindow);
+  static void shutdown();
 
   // <-
 
@@ -214,9 +215,8 @@ struct RenderSystem
 
   // <-
 
-  _INTR_INLINE static void
-  releaseResource(const Intrinsic::Core::Name& p_TypeName, void* p_UserData0,
-                  void* p_UserData1)
+  _INTR_INLINE static void releaseResource(const Name& p_TypeName,
+                                           void* p_UserData0, void* p_UserData1)
   {
     ResourceReleaseEntry entry = {p_TypeName, p_UserData0, p_UserData1, 0u};
     _resourcesToFree.push_back(entry);
@@ -235,6 +235,8 @@ struct RenderSystem
       return _backbufferDimensions / 2u;
     case RenderSize::kQuarter:
       return _backbufferDimensions / 4u;
+    case RenderSize::kCubemap:
+      return glm::uvec2(256u, 256u);
     }
 
     return glm::uvec2(0u);

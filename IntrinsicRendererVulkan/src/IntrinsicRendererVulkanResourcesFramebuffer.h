@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref FramebufferRef;
 typedef _INTR_ARRAY(FramebufferRef) FramebufferRefArray;
 typedef _INTR_ARRAY(AttachmentInfo) AttachmentInfoArray;
@@ -38,11 +39,12 @@ struct FramebufferData : Dod::Resources::ResourceDataBase
     vkFramebuffer.resize(_INTR_MAX_FRAMEBUFFER_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(Resources::RenderPassRef) descRenderPass;
   _INTR_ARRAY(AttachmentInfoArray) descAttachedImages;
   _INTR_ARRAY(glm::uvec2) descDimensions;
 
-  // GPU resources
+  // Resources
   _INTR_ARRAY(VkFramebuffer) vkFramebuffer;
 };
 
@@ -91,11 +93,13 @@ struct FramebufferManager
   }
 
   _INTR_INLINE static void initFromDescriptor(FramebufferRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         FramebufferData,
-        _INTR_MAX_FRAMEBUFFER_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
+        _INTR_MAX_FRAMEBUFFER_COUNT>::_initFromDescriptor(p_Ref, p_GenerateDesc,
+                                                          p_Properties);
   }
 
   _INTR_INLINE static void saveToSingleFile(const char* p_FileName)
@@ -152,8 +156,7 @@ struct FramebufferManager
     }
   }
 
-  // Getter/Setter
-  // ->
+  // Description
   _INTR_INLINE static Resources::RenderPassRef&
   _descRenderPass(FramebufferRef p_Ref)
   {
@@ -169,7 +172,7 @@ struct FramebufferManager
     return _data.descDimensions[p_Ref._id];
   }
 
-  // GPU resources
+  // Resources
   _INTR_INLINE static VkFramebuffer& _vkFrameBuffer(FramebufferRef p_Ref)
   {
     return _data.vkFramebuffer[p_Ref._id];

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 // Precompiled header file
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
+
+using namespace CResources;
 
 namespace Intrinsic
 {
@@ -192,22 +194,17 @@ DrawCallRef DrawCallManager::createDrawCallForMesh(
     _descPipeline(drawCallMesh) = MaterialManager::_materialPassPipelines
         [MaterialManager::_materialPasses[p_MaterialPass].pipelineIdx];
 
-    _INTR_ASSERT(Renderer::Vulkan::Resources::PipelineManager::_vkPipeline(
-        _descPipeline(drawCallMesh)));
+    _INTR_ASSERT(PipelineManager::_vkPipeline(_descPipeline(drawCallMesh)));
 
     _descVertexBuffers(drawCallMesh) =
-        Core::Resources::MeshManager::_vertexBuffersPerSubMesh(
-            p_Mesh)[p_SubMeshIdx];
+        MeshManager::_vertexBuffersPerSubMesh(p_Mesh)[p_SubMeshIdx];
     _descIndexBuffer(drawCallMesh) =
-        Core::Resources::MeshManager::_indexBufferPerSubMesh(
-            p_Mesh)[p_SubMeshIdx];
+        MeshManager::_indexBufferPerSubMesh(p_Mesh)[p_SubMeshIdx];
     _descVertexCount(drawCallMesh) =
-        (uint32_t)Core::Resources::MeshManager::_descPositionsPerSubMesh(
-            p_Mesh)[p_SubMeshIdx]
+        (uint32_t)MeshManager::_descPositionsPerSubMesh(p_Mesh)[p_SubMeshIdx]
             .size();
     _descIndexCount(drawCallMesh) =
-        (uint32_t)Core::Resources::MeshManager::_descIndicesPerSubMesh(
-            p_Mesh)[p_SubMeshIdx]
+        (uint32_t)MeshManager::_descIndicesPerSubMesh(p_Mesh)[p_SubMeshIdx]
             .size();
     _descMaterial(drawCallMesh) = p_Material;
     _descMaterialPass(drawCallMesh) = p_MaterialPass;
@@ -263,19 +260,27 @@ DrawCallRef DrawCallManager::createDrawCallForMesh(
                   ? p_PerInstanceDataFragmentSize
                   : p_PerInstanceDataVertexSize);
         }
+        else if (entry.resourceName == _N(PerFrame))
+        {
+          DrawCallManager::bindBuffer(
+              drawCallMesh, entry.slotName, entry.shaderStage,
+              UniformManager::_perFrameUniformBuffer,
+              entry.shaderStage == GpuProgramType::kFragment
+                  ? UboType::kPerFrameFragment
+                  : UboType::kPerFrameVertex,
+              entry.shaderStage == GpuProgramType::kFragment
+                  ? sizeof(RenderProcess::PerFrameDataFrament)
+                  : sizeof(RenderProcess::PerFrameDataVertex));
+        }
         else
         {
-          _INTR_ASSERT(false && "Buffer type type not supported");
+          _INTR_ASSERT(false && "Resource type not found");
         }
       }
-      else
-      {
-        _INTR_ASSERT(false && "Resource type not found");
-      }
     }
-  }
 
-  return drawCallMesh;
+    return drawCallMesh;
+  }
 }
 }
 }

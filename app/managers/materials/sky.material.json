@@ -3,9 +3,10 @@
     "properties": {
         "name": "sky",
         "materialPassMask": [
+            "GBufferWireframe",
             "GBufferSky"
         ],
-        "albedoTextureName": "default_ibl_cube_radiance",
+        "albedoTextureName": "default_ibl_cube_specular",
         "emissiveTextureName": "white",
         "uvOffsetScale": [
             0.0,

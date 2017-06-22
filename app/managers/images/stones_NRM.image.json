@@ -1,0 +1,10 @@
+{
+    "name": "stones_NRM",
+    "properties": {
+        "name": "stones_NRM",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "stones_NRM.dds",
+        "avgNormLength": 0.5211499333381653
+    }
+}

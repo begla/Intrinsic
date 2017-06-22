@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,12 @@ namespace Core
 {
 namespace Math
 {
+template <class Type, uint32_t Count> struct Gradient
+{
+  Type _values[Count];
+  float _keyPoints[Count];
+};
+
 struct AABB
 {
   AABB() {}
@@ -34,6 +40,13 @@ struct AABB
 
 struct AABB2
 {
+  AABB2() {}
+
+  AABB2(const glm::vec3& p_Center, const glm::vec3& p_HalfExtent)
+      : center(p_Center), halfExtent(p_HalfExtent)
+  {
+  }
+
   glm::vec3 center;
   glm::vec3 halfExtent;
 };
@@ -544,7 +557,7 @@ _INTR_INLINE float noiseHash(float n, float p_Seed)
 
 // <-
 
-_INTR_INLINE float noise(const glm::vec3 p_X, float p_Seed = 753.5453123f)
+_INTR_INLINE float noise(const glm::vec3& p_X, float p_Seed = 753.5453123f)
 {
   glm::vec3 p = glm::floor(p_X);
   glm::vec3 f = glm::fract(p_X);
@@ -566,7 +579,7 @@ _INTR_INLINE float noise(const glm::vec3 p_X, float p_Seed = 753.5453123f)
 
 // <-
 
-_INTR_INLINE float noise(const glm::vec3 p_X, uint32_t p_Octaves,
+_INTR_INLINE float noise(const glm::vec3& p_X, uint32_t p_Octaves,
                          float p_Seed = 753.5453123f)
 {
   float n = 0.0f;
@@ -697,6 +710,51 @@ _INTR_INLINE glm::vec3 bezierQuadratic(const _INTR_ARRAY(glm::vec3) p_Points,
   }
 
   return interpPoints[0];
+}
+
+// <-
+
+template <class Type, uint32_t Count>
+_INTR_INLINE Type interpolateGradient(const Gradient<Type, Count>& p_Gradient,
+                                      float p_KeyValue)
+{
+  _INTR_ASSERT(Count >= 2u);
+  _INTR_ASSERT(p_KeyValue >= 0.0f && p_KeyValue <= 1.0f);
+
+  for (uint32_t i = 0u; i < Count - 1u; ++i)
+  {
+    const float currentPerc = p_Gradient._keyPoints[i];
+    const float nextPerc = p_Gradient._keyPoints[i + 1];
+    _INTR_ASSERT(currentPerc <= nextPerc);
+
+    if (p_KeyValue >= currentPerc && p_KeyValue < nextPerc)
+    {
+      Type currentValue = p_Gradient._values[i];
+      Type nextValue = p_Gradient._values[i + 1];
+
+      const float interp =
+          (p_KeyValue - currentPerc) / (nextPerc - currentPerc);
+      return glm::mix(currentValue, nextValue, interp);
+    }
+  }
+
+  _INTR_ASSERT(false && "Invalid values provided");
+  return glm::vec4(0.0f);
+}
+
+_INTR_INLINE float radicalInverse(uint32_t p_Bits)
+{
+  p_Bits = (p_Bits << 16u) | (p_Bits >> 16u);
+  p_Bits = ((p_Bits & 0x55555555u) << 1u) | ((p_Bits & 0xAAAAAAAAu) >> 1u);
+  p_Bits = ((p_Bits & 0x33333333u) << 2u) | ((p_Bits & 0xCCCCCCCCu) >> 2u);
+  p_Bits = ((p_Bits & 0x0F0F0F0Fu) << 4u) | ((p_Bits & 0xF0F0F0F0u) >> 4u);
+  p_Bits = ((p_Bits & 0x00FF00FFu) << 8u) | ((p_Bits & 0xFF00FF00u) >> 8u);
+  return float(p_Bits) * 2.3283064365386963e-10f; // / 0x100000000
+}
+
+_INTR_INLINE glm::vec2 hammersley(uint32_t p_I, uint32_t p_N)
+{
+  return glm::vec2(float(p_I) / float(p_N), radicalInverse(p_I));
 }
 }
 }

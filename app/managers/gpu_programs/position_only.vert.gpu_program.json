@@ -1,0 +1,10 @@
+{
+    "name": "position_only.vert",
+    "properties": {
+        "name": "position_only.vert",
+        "gpuProgramName": "position_only.vert.glsl",
+        "entryPoint": "main",
+        "preprocessorDefines": "",
+        "gpuProgramType": 0
+    }
+}

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -89,6 +89,11 @@ void ComputeCallManager::updateUniformMemory(
           uint8_t* gpuMem = &UniformManager::_perInstanceMemory[dynamicOffset];
           memcpy(gpuMem, p_PerInstanceDataCompute,
                  p_PerInstanceDataComputeSize);
+        }
+        else if (bindInfo.bufferData.uboType == UboType::kPerFrameFragment)
+        {
+          _dynamicOffsets(computeCallRef)[dynamicOffsetIndex] = RenderProcess::
+              UniformManager::getDynamicOffsetForPerFrameDataFragment();
         }
 
         ++dynamicOffsetIndex;

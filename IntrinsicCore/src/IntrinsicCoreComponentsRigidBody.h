@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref RigidBodyRef;
 typedef _INTR_ARRAY(RigidBodyRef) RigidBodyRefArray;
 
@@ -110,6 +111,7 @@ struct RigidBodyManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(RigidBodyRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("rigidBodyType"))
@@ -147,9 +149,6 @@ struct RigidBodyManager
 
   static void updateNodesFromActors(const RigidBodyRefArray& p_RigidBodies);
   static void updateActorsFromNodes(const RigidBodyRefArray& p_RigidBodies);
-
-  // Member refs
-  // ->
 
   // Description
   _INTR_INLINE static RigidBodyType::Enum&

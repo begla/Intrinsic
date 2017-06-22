@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,13 +56,13 @@ public slots:
   void onCreateRootNode();
   void onCloneNode();
   void onDeleteNode();
+  void onSaveNodeAsPrefab();
   void onCreateComponent();
   void onDestroyComponent();
   void onItemDoubleClicked(QTreeWidgetItem* item, int column);
   void onItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
   void onItemChanged(QTreeWidgetItem* item, int column);
-  void onLoadSHCoeffsFromFile();
-  void onCaptureIrradianceProbe();
+  void onCaptureProbe();
 
 signals:
   void nodeTreePopulated(uint32_t p_NodeCount);

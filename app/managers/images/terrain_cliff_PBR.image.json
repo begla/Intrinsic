@@ -1,0 +1,10 @@
+{
+    "name": "terrain_cliff_PBR",
+    "properties": {
+        "name": "terrain_cliff_PBR",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "terrain_cliff_PBR.dds",
+        "avgNormLength": 1.0
+    }
+}

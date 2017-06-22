@@ -4,14 +4,7 @@
         "name": "grassleaves_01_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "flags": 16,
-        "dimensions": [
-            4096.0,
-            4096.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 13,
-        "fileName": "grassleaves_01_NRM.dds"
+        "fileName": "grassleaves_01_NRM.dds",
+        "avgNormLength": 0.9919838905334473
     }
 }

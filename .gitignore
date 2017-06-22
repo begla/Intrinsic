@@ -1,6 +1,7 @@
 *.dir
 x64
 
+app/IntrinsicEd.ini
 app/Intrinsic
 app/*.exe
 app/*.lib
@@ -10,6 +11,7 @@ app/*.ilk
 !app/BsSndRpt64.exe
 app/platforms
 app/assets/world_machine/*.tmd.session
+app/media/pipeline_caches/*.pc
 
 distro/
 *.7z
@@ -34,8 +36,6 @@ app/assets/*
 app/media/shaders/*
 !app/media/shaders/KEEP_ME
 app/crash_dumps
-app/media/irradiance_probes/*
-!app/media/irradiance_probes/KEEP_ME
 
 app/Intrinsic.log
 <<<<<<< HEAD

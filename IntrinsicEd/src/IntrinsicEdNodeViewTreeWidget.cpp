@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 #include "stdafx_editor.h"
 #include "stdafx.h"
 
-// Lib. includes
-#include "gli.hpp"
+using namespace RVResources;
 
 // Helpers
 void expandAllParents(QTreeWidgetItem* p_Item)
@@ -98,8 +97,8 @@ void IntrinsicEdNodeViewTreeWidget::onPopulateNodeTree()
          Components::NodeFlags::Flags::kSpawned) > 0u)
       continue;
 
-    const Name& name =
-        Entity::EntityManager::_name(Components::NodeManager::_entity(nodeRef));
+    Entity::EntityRef entityRef = Components::NodeManager::_entity(nodeRef);
+    const Name& name = Entity::EntityManager::_name(entityRef);
 
     QTreeWidgetItem* item = nullptr;
     QString nodeTitle = name.getString().c_str();
@@ -109,7 +108,7 @@ void IntrinsicEdNodeViewTreeWidget::onPopulateNodeTree()
       item = new QTreeWidgetItem(this);
       _nodeToItemMap[nodeRef] = item;
 
-      item->setIcon(0, QIcon(":/Icons/globe"));
+      item->setIcon(0, IntrinsicEd::getIcon("RootNode"));
     }
     else
     {
@@ -119,7 +118,27 @@ void IntrinsicEdNodeViewTreeWidget::onPopulateNodeTree()
 
       item = new QTreeWidgetItem(parentItem);
       _nodeToItemMap[nodeRef] = item;
-      item->setIcon(0, QIcon(":/Icons/target"));
+
+      // Use the first component found as an icon
+      QIcon iconToUse = IntrinsicEd::getIcon("Node");
+      for (auto it = Application::_componentManagerMapping.begin();
+           it != Application::_componentManagerMapping.end(); ++it)
+      {
+        const Name& compName = it->first;
+
+        // Don't count nodes
+        if (compName == "Node")
+          continue;
+
+        Dod::Components::ComponentManagerEntry& entry = it->second;
+        if (entry.getComponentForEntityFunction(entityRef).isValid())
+        {
+          iconToUse = IntrinsicEd::getIcon(compName.getString());
+          break;
+        }
+      }
+
+      item->setIcon(0, iconToUse);
     }
 
     if (i == 0u)
@@ -153,18 +172,26 @@ void IntrinsicEdNodeViewTreeWidget::createAddComponentContextMenu(QMenu* p_Menu)
     Components::NodeRef currentNode = _itemToNodeMap[currIt];
     Entity::EntityRef entity = Components::NodeManager::_entity(currentNode);
 
+    QMap<QString, Dod::Components::ComponentManagerEntry*> sortedComponents;
+
     for (auto it = Application::_componentManagerMapping.begin();
          it != Application::_componentManagerMapping.end(); ++it)
     {
       const _INTR_STRING& compName = it->first.getString();
-      Dod::Components::ComponentManagerEntry& entry =
-          Application::_componentManagerMapping[compName];
+      Dod::Components::ComponentManagerEntry& entry = it->second;
+      sortedComponents[compName.c_str()] = &entry;
+    }
+
+    for (auto it = sortedComponents.begin(); it != sortedComponents.end(); ++it)
+    {
+      const QString& compName = it.key();
+      Dod::Components::ComponentManagerEntry& entry = *it.value();
 
       if (!entry.getComponentForEntityFunction(entity).isValid())
       {
-        QAction* createComp = new QAction(
-            QIcon(IntrinsicEd::_componentToIconMapping[compName].c_str()),
-            compName.c_str(), p_Menu);
+        QAction* createComp =
+            new QAction(IntrinsicEd::getIcon(compName.toStdString().c_str()),
+                        compName.toStdString().c_str(), p_Menu);
         p_Menu->addAction(createComp);
 
         QObject::connect(createComp, SIGNAL(triggered()), this,
@@ -184,18 +211,31 @@ void IntrinsicEdNodeViewTreeWidget::createRemoveComponentContextMenu(
     Components::NodeRef currentNode = _itemToNodeMap[currIt];
     Entity::EntityRef entity = Components::NodeManager::_entity(currentNode);
 
+    QMap<QString, Dod::Components::ComponentManagerEntry*> sortedComponents;
+
     for (auto it = Application::_componentManagerMapping.begin();
          it != Application::_componentManagerMapping.end(); ++it)
     {
       const _INTR_STRING& compName = it->first.getString();
-      Dod::Components::ComponentManagerEntry& entry =
-          Application::_componentManagerMapping[compName];
+      Dod::Components::ComponentManagerEntry& entry = it->second;
+      sortedComponents[compName.c_str()] = &entry;
+    }
+
+    for (auto it = sortedComponents.begin(); it != sortedComponents.end(); ++it)
+    {
+      const QString& compName = it.key();
+
+      // Nodes can't be deleted
+      if (compName == "Node")
+        continue;
+
+      Dod::Components::ComponentManagerEntry& entry = *it.value();
 
       if (entry.getComponentForEntityFunction(entity).isValid())
       {
-        QAction* removeComp = new QAction(
-            QIcon(IntrinsicEd::_componentToIconMapping[compName].c_str()),
-            compName.c_str(), p_Menu);
+        QAction* removeComp =
+            new QAction(IntrinsicEd::getIcon(compName.toStdString().c_str()),
+                        compName.toStdString().c_str(), p_Menu);
         p_Menu->addAction(removeComp);
 
         QObject::connect(removeComp, SIGNAL(triggered()), this,
@@ -274,11 +314,13 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
 {
   QMenu* contextMenu = new QMenu(this);
 
-  QAction* createNode =
-      new QAction(QIcon(":/Icons/plus"), "Create (Child) Node", this);
-  contextMenu->addAction(createNode);
-
-  QObject::connect(createNode, SIGNAL(triggered()), this, SLOT(onCreateNode()));
+  {
+    QAction* createNode = new QAction(QIcon(":/Icons/icons/essential/plus.png"),
+                                      "Create (Child) Node", this);
+    contextMenu->addAction(createNode);
+    QObject::connect(createNode, SIGNAL(triggered()), this,
+                     SLOT(onCreateNode()));
+  }
 
   QTreeWidgetItem* currIt = currentItem();
   if (currIt)
@@ -287,55 +329,59 @@ void IntrinsicEdNodeViewTreeWidget::onShowContextMenuForTreeView(QPoint p_Pos)
     Entity::EntityRef currentEntity =
         Components::NodeManager::_entity(currentNode);
 
-    Components::IrradianceProbeRef irradProbeRef =
-        Components::IrradianceProbeManager::getComponentForEntity(
-            currentEntity);
-    if (irradProbeRef.isValid())
-    {
-      contextMenu->addSeparator();
-
-      QAction* captureProbe = new QAction(QIcon(":/Icons/lightbulb"),
-                                          "Capture Irradiance Probe", this);
-      contextMenu->addAction(captureProbe);
-      QObject::connect(captureProbe, SIGNAL(triggered()), this,
-                       SLOT(onCaptureIrradianceProbe()));
-
-      QAction* loadSHCoeffs =
-          new QAction(QIcon(":/Icons/lightbulb"), "Load SH Coefficients", this);
-      contextMenu->addAction(loadSHCoeffs);
-      QObject::connect(loadSHCoeffs, SIGNAL(triggered()), this,
-                       SLOT(onLoadSHCoeffsFromFile()));
-
-      contextMenu->addSeparator();
-    }
-
     // Don't allow deleting the main node
-    if (World::getRootNode() != currentNode)
+    if (World::_rootNode != currentNode)
     {
       QAction* cloneNode =
-          new QAction(QIcon(":/Icons/plus"), "Clone Node", this);
+          new QAction(QIcon(":/Icons/icons/cad/layer.png"), "Clone Node", this);
       contextMenu->addAction(cloneNode);
       QObject::connect(cloneNode, SIGNAL(triggered()), this,
                        SLOT(onCloneNode()));
 
-      QAction* deleteNode =
-          new QAction(QIcon(":/Icons/minus"), "Delete Node", this);
+      QAction* deleteNode = new QAction(
+          QIcon(":/Icons/icons/essential/minus.png"), "Delete Node", this);
       contextMenu->addAction(deleteNode);
       QObject::connect(deleteNode, SIGNAL(triggered()), this,
                        SLOT(onDeleteNode()));
     }
 
     QMenu* addComponentMenu = new QMenu("Add Component", this);
-    addComponentMenu->setIcon(QIcon(":/Icons/plus"));
+    addComponentMenu->setIcon(QIcon(":/Icons/icons/essential/plus.png"));
     QMenu* removeComponentMenu = new QMenu("Remove Component", this);
-    removeComponentMenu->setIcon(QIcon(":/Icons/minus"));
+    removeComponentMenu->setIcon(QIcon(":/Icons/icons/essential/minus.png"));
 
     createAddComponentContextMenu(addComponentMenu);
     createRemoveComponentContextMenu(removeComponentMenu);
 
     contextMenu->addSeparator();
+
     contextMenu->addMenu(addComponentMenu);
     contextMenu->addMenu(removeComponentMenu);
+
+    Components::IrradianceProbeRef irradProbeRef =
+        Components::IrradianceProbeManager::getComponentForEntity(
+            currentEntity);
+    Components::SpecularProbeRef specProbeRef =
+        Components::SpecularProbeManager::getComponentForEntity(currentEntity);
+
+    if (irradProbeRef.isValid() || specProbeRef.isValid())
+    {
+      contextMenu->addSeparator();
+
+      QAction* captureProbe = new QAction(
+          QIcon(":/Icons/icons/various/idea.png"), "Capture Probe", this);
+      contextMenu->addAction(captureProbe);
+      QObject::connect(captureProbe, SIGNAL(triggered()), this,
+                       SLOT(onCaptureProbe()));
+    }
+
+    contextMenu->addSeparator();
+
+    QAction* savePrefab =
+        new QAction(IntrinsicEd::getIcon("Prefab"), "Save As Prefab", this);
+    contextMenu->addAction(savePrefab);
+    QObject::connect(savePrefab, SIGNAL(triggered()), this,
+                     SLOT(onSaveNodeAsPrefab()));
   }
 
   contextMenu->popup(viewport()->mapToGlobal(p_Pos));
@@ -367,10 +413,11 @@ void IntrinsicEdNodeViewTreeWidget::createNode(QTreeWidgetItem* p_Parent)
       _nodeToItemMap[nodeRef] = item;
       _itemToNodeMap[item] = nodeRef;
 
-      item->setText(0, Entity::EntityManager::_name(
-                           Components::NodeManager::_entity(nodeRef))
-                           .getString()
-                           .c_str());
+      item->setText(0,
+                    Entity::EntityManager::_name(
+                        Components::NodeManager::_entity(nodeRef))
+                        .getString()
+                        .c_str());
       item->setIcon(0, QIcon(":/Icons/target"));
     }
     else
@@ -379,10 +426,11 @@ void IntrinsicEdNodeViewTreeWidget::createNode(QTreeWidgetItem* p_Parent)
       _nodeToItemMap[nodeRef] = item;
       _itemToNodeMap[item] = nodeRef;
 
-      item->setText(0, Entity::EntityManager::_name(
-                           Components::NodeManager::_entity(nodeRef))
-                           .getString()
-                           .c_str());
+      item->setText(0,
+                    Entity::EntityManager::_name(
+                        Components::NodeManager::_entity(nodeRef))
+                        .getString()
+                        .c_str());
       item->setIcon(0, QIcon(":/Icons/globe"));
     }
 
@@ -437,6 +485,24 @@ void IntrinsicEdNodeViewTreeWidget::onDeleteNode()
   World::destroyNodeFull(currentNode);
 }
 
+void IntrinsicEdNodeViewTreeWidget::onSaveNodeAsPrefab()
+{
+  QTreeWidgetItem* currIt = currentItem();
+  Components::NodeRef currentNode = _itemToNodeMap[currIt];
+  Entity::EntityRef currentEntity =
+      Components::NodeManager::_entity(currentNode);
+
+  const _INTR_STRING fileName =
+      "media/prefabs/" +
+      Entity::EntityManager::_name(currentEntity).getString() + ".prefab.json";
+
+  const QString filePath =
+      QFileDialog::getSaveFileName(this, tr("Save Prefab"), fileName.c_str(),
+                                   tr("Prefab File (*.prefab.json)"));
+
+  World::saveNodeHierarchy(filePath.toStdString().c_str(), currentNode);
+}
+
 void IntrinsicEdNodeViewTreeWidget::dragEnterEvent(QDragEnterEvent* event)
 {
   event->acceptProposedAction();
@@ -444,8 +510,7 @@ void IntrinsicEdNodeViewTreeWidget::dragEnterEvent(QDragEnterEvent* event)
 
 QStringList IntrinsicEdNodeViewTreeWidget::mimeTypes() const
 {
-  QStringList forms = {"SingleNodeMimeData"};
-  return forms;
+  return {"SingleNodeMimeData"};
 }
 
 QMimeData* IntrinsicEdNodeViewTreeWidget::mimeData(
@@ -654,232 +719,30 @@ void IntrinsicEdNodeViewTreeWidget::onCurrentlySelectedEntityChanged(
   }
 }
 
-void IntrinsicEdNodeViewTreeWidget::onLoadSHCoeffsFromFile()
+void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
 {
-  QTreeWidgetItem* currIt = currentItem();
-  if (currIt)
-  {
-    Components::NodeRef currentNode = _itemToNodeMap[currIt];
-    Entity::EntityRef currentEntity =
-        Components::NodeManager::_entity(currentNode);
+  using namespace RV;
 
-    Components::IrradianceProbeRef irradProbeRef =
-        Components::IrradianceProbeManager::getComponentForEntity(
-            currentEntity);
-    if (irradProbeRef.isValid())
-    {
-      glm::vec3* coeffs =
-          (glm::vec3*)&Components::IrradianceProbeManager::_descSHCoeffs(
-              irradProbeRef);
-
-      const QString fileName = QFileDialog::getOpenFileName(
-          this, tr("Load SH Coefficients"), QString("media/irradiance_probes/"),
-          tr("LYS File (*.ash)"));
-
-      if (fileName.size() > 0u)
-      {
-        std::ifstream ifs(fileName.toStdString());
-        _INTR_STRING fileStr((std::istreambuf_iterator<char>(ifs)),
-                             std::istreambuf_iterator<char>());
-
-        _INTR_ARRAY(_INTR_STRING) lines;
-        StringUtil::split(fileStr, "\n", lines);
-
-        static const uint32_t shLineIndices[] = {3u,  5u,  6u,  7u, 9u,
-                                                 10u, 11u, 12u, 13u};
-
-        for (uint32_t i = 0u; i < 9; ++i)
-        {
-          const uint32_t lineIdx = shLineIndices[i];
-          _INTR_ARRAY(_INTR_STRING) rows;
-          StringUtil::split(lines[lineIdx], " ", rows);
-
-          coeffs[i] = glm::vec3(StringUtil::fromString<float>(rows[1]),
-                                StringUtil::fromString<float>(rows[2]),
-                                StringUtil::fromString<float>(rows[3]));
-        }
-      }
-    }
-  }
-}
-
-void IntrinsicEdNodeViewTreeWidget::onCaptureIrradianceProbe()
-{
   Components::IrradianceProbeRef irradProbeRef;
-  Components::NodeRef irradNodeRef;
+  Components::NodeRef probeNodeRef;
   Entity::EntityRef currentEntity;
 
-  static const glm::uvec2 cubeMapRes = glm::uvec2(320u, 320u);
+  static const uint32_t _probeTimeSamples = 8u;
 
   QTreeWidgetItem* currIt = currentItem();
   if (currIt)
   {
-    irradNodeRef = _itemToNodeMap[currIt];
-    currentEntity = Components::NodeManager::_entity(irradNodeRef);
+    probeNodeRef = _itemToNodeMap[currIt];
 
-    irradProbeRef = Components::IrradianceProbeManager::getComponentForEntity(
-        currentEntity);
-  }
-
-  if (irradProbeRef.isValid())
-  {
-    const uint32_t faceSizeInBytes =
-        cubeMapRes.x * cubeMapRes.y * 2u * sizeof(uint32_t);
-
-    // Setup camera
-    Entity::EntityRef entityRef =
-        Entity::EntityManager::createEntity(_N(ProbeCamera));
-    Components::NodeRef camNodeRef =
-        Components::NodeManager::createNode(entityRef);
-    Components::NodeManager::attachChild(World::getRootNode(), camNodeRef);
-    Components::CameraRef camRef =
-        Components::CameraManager::createCamera(entityRef);
-    Components::CameraManager::resetToDefault(camRef);
-    Components::CameraManager::_descFov(camRef) = glm::radians(90.0f);
-    Components::NodeManager::_position(camNodeRef) =
-        Components::NodeManager::_worldPosition(irradNodeRef);
-    Components::NodeManager::rebuildTreeAndUpdateTransforms();
-
-    Components::CameraRef prevCamera = World::getActiveCamera();
-    World::setActiveCamera(camRef);
-
-    // Setup buffer for readback
-    Intrinsic::Renderer::Vulkan::Resources::BufferRef readBackBufferRef =
-        Intrinsic::Renderer::Vulkan::Resources::BufferManager::createBuffer(
-            _N(IrradianceProbeReadBack));
-    {
-      Intrinsic::Renderer::Vulkan::Resources::BufferManager::resetToDefault(
-          readBackBufferRef);
-      Intrinsic::Renderer::Vulkan::Resources::BufferManager::addResourceFlags(
-          readBackBufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
-      Intrinsic::Renderer::Vulkan::Resources::BufferManager::
-          _descMemoryPoolType(readBackBufferRef) = Intrinsic::Renderer::Vulkan::
-              MemoryPoolType::kResolutionDependentStagingBuffers;
-
-      Intrinsic::Renderer::Vulkan::Resources::BufferManager::_descBufferType(
-          readBackBufferRef) =
-          Intrinsic::Renderer::Vulkan::BufferType::kStorage;
-      Intrinsic::Renderer::Vulkan::Resources::BufferManager::_descSizeInBytes(
-          readBackBufferRef) = faceSizeInBytes;
-
-      Intrinsic::Renderer::Vulkan::Resources::BufferManager::createResources(
-          {readBackBufferRef});
-    }
-
-    using namespace Intrinsic::Renderer::Vulkan;
-    RenderPass::Lighting::_globalAmbientFactor = 0.0f;
-
-    static glm::uvec2 atlasIndices[6]{glm::uvec2(0u, 1u), glm::uvec2(1u, 1u),
-                                      glm::uvec2(2u, 1u), glm::uvec2(3u, 1u),
-                                      glm::uvec2(1u, 0u), glm::uvec2(1u, 2u)};
-    static glm::quat rotationsPerFace[6] = {
-        glm::vec3(0.0f, glm::half_pi<float>(), 0.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, -glm::half_pi<float>(), 0.0f),
-        glm::vec3(0.0f, -glm::pi<float>(), 0.0f),
-        glm::vec3(-glm::half_pi<float>(), 0.0f, 0.0f),
-        glm::vec3(glm::half_pi<float>(), 0.0f, 0.0f)};
-
+    const glm::uvec2 cubeMapRes =
+        RV::RenderSystem::getAbsoluteRenderSize(RV::RenderSize::kCubemap);
     RenderSystem::_customBackbufferDimensions = cubeMapRes;
     RenderSystem::resizeSwapChain(true);
-    {
-      gli::texture2d tex = gli::texture2d(
-          gli::FORMAT_RGBA16_SFLOAT_PACK16,
-          gli::texture2d::extent_type(cubeMapRes.x * 4u, cubeMapRes.y * 3u),
-          1u);
 
-      for (uint32_t faceIdx = 0u; faceIdx < 6; ++faceIdx)
-      {
-        Components::NodeManager::_orientation(camNodeRef) =
-            rotationsPerFace[faceIdx];
-        Components::NodeManager::updateTransforms({camNodeRef});
+    for (uint32_t i = 0u; i < _probeTimeSamples; ++i)
+      IBL::captureProbes({probeNodeRef}, i == 0, i / (float)_probeTimeSamples);
 
-        for (uint32_t f = 0u; f < 60u; ++f)
-        {
-          RenderProcess::Default::renderFrame(0.0f);
-          qApp->processEvents();
-        }
-
-        // Wait for the rendering to finish
-        RenderSystem::waitForAllFrames();
-
-        // Copy image to host visible memory
-        VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
-
-        Intrinsic::Renderer::Vulkan::Resources::ImageRef sceneImageRef =
-            Intrinsic::Renderer::Vulkan::Resources::ImageManager::
-                getResourceByName(_N(Scene));
-
-        Intrinsic::Renderer::Vulkan::Resources::ImageManager::
-            insertImageMemoryBarrier(copyCmd, sceneImageRef,
-                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                                     VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-
-        VkBufferImageCopy bufferImageCopy = {};
-        {
-          bufferImageCopy.bufferOffset = 0u;
-          bufferImageCopy.imageOffset = {};
-          bufferImageCopy.bufferRowLength = cubeMapRes.x;
-          bufferImageCopy.bufferImageHeight = cubeMapRes.y;
-          bufferImageCopy.imageExtent.width = cubeMapRes.x;
-          bufferImageCopy.imageExtent.height = cubeMapRes.y;
-          bufferImageCopy.imageExtent.depth = 1u;
-          bufferImageCopy.imageSubresource.aspectMask =
-              VK_IMAGE_ASPECT_COLOR_BIT;
-          bufferImageCopy.imageSubresource.baseArrayLayer = 0u;
-          bufferImageCopy.imageSubresource.layerCount = 1u;
-          bufferImageCopy.imageSubresource.mipLevel = 0u;
-        }
-
-        vkCmdCopyImageToBuffer(
-            copyCmd,
-            Intrinsic::Renderer::Vulkan::Resources::ImageManager::_vkImage(
-                sceneImageRef),
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            Intrinsic::Renderer::Vulkan::Resources::BufferManager::_vkBuffer(
-                readBackBufferRef),
-            1u, &bufferImageCopy);
-
-        RenderSystem::flushTemporaryCommandBuffer();
-
-        const uint8_t* sceneMemory =
-            Intrinsic::Renderer::Vulkan::Resources::BufferManager::getGpuMemory(
-                readBackBufferRef);
-
-        const glm::uvec2 atlasIndex = atlasIndices[faceIdx];
-        for (uint32_t scanLineIdx = 0u; scanLineIdx < cubeMapRes.y;
-             ++scanLineIdx)
-        {
-          const uint32_t memOffsetInBytes =
-              ((atlasIndex.y * cubeMapRes.y * (cubeMapRes.x * 4u)) +
-               scanLineIdx * (cubeMapRes.x * 4u) +
-               atlasIndex.x * cubeMapRes.x) *
-              sizeof(uint32_t) * 2u;
-
-          const uint32_t scanLineSizeInBytes =
-              sizeof(uint32_t) * 2u * cubeMapRes.x;
-          memcpy((uint8_t*)tex.data() + memOffsetInBytes,
-                 sceneMemory + scanLineIdx * scanLineSizeInBytes,
-                 scanLineSizeInBytes);
-        }
-      }
-
-      const _INTR_STRING filePath =
-          "media/irradiance_probes/" +
-          Entity::EntityManager::_name(currentEntity).getString() + ".dds";
-      gli::save_dds(tex, filePath.c_str());
-
-      Intrinsic::Renderer::Vulkan::Resources::BufferManager::destroyResources(
-          {readBackBufferRef});
-      Intrinsic::Renderer::Vulkan::Resources::BufferManager::destroyBuffer(
-          readBackBufferRef);
-
-      RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
-      RenderSystem::resizeSwapChain(true);
-
-      RenderPass::Lighting::_globalAmbientFactor = 1.0f;
-      World::setActiveCamera(prevCamera);
-      World::destroyNodeFull(camNodeRef);
-    }
+    RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
+    RenderSystem::resizeSwapChain(true);
   }
 }

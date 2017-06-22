@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,19 +16,38 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
 {
 namespace Vulkan
 {
-using namespace Resources;
-
 namespace
 {
 bool _swapChainUpdatePending = false;
 const float _timeBetweenSwapChainUpdates = 1.0f;
 float _timePassedSinceLastSwapChainUpdate = _timeBetweenSwapChainUpdates;
+
+VkPhysicalDeviceProperties _vkPhysicalDeviceProps;
+VkPhysicalDeviceFeatures _vkPhysicalDeviceFeatures;
+
+_INTR_STRING getPipelineCacheUUID()
+{
+  _INTR_STRING uuid;
+  for (uint32_t i = 0u; i < VK_UUID_SIZE; ++i)
+  {
+    uuid += StringUtil::toString(
+        (uint32_t)_vkPhysicalDeviceProps.pipelineCacheUUID[i]);
+  }
+  return uuid;
+}
+
+_INTR_STRING getPipelineCacheFilePath()
+{
+  return "media/pipeline_caches/" + getPipelineCacheUUID() + ".pc";
+}
 }
 
 // Public static members
@@ -112,19 +131,23 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
     {
       _INTR_PROFILE_AUTO("Compile Shaders");
-      GpuProgramManager::compileAllShaders();
+
+      GpuProgramManager::compileAllShaders(false, false);
     }
 
     {
       _INTR_PROFILE_AUTO("Create GPU Program Resources");
-      GpuProgramManager::createAllResources();
+
+      GpuProgramManager::createResources(GpuProgramManager::_activeRefs);
     }
 
     RenderPassManager::createAllResources();
 
     {
       _INTR_PROFILE_AUTO("Create Image Resources");
+
       ImageManager::createAllResources();
+      ImageManager::updateGlobalDescriptorSet();
     }
 
     VertexLayoutManager::createAllResources();
@@ -156,7 +179,7 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
     RenderPass::Shadow::init();
 
-    RenderPass::Lighting::init();
+    RenderPass::Clustering::init();
     RenderPass::VolumetricLighting::init();
 
     RenderPass::Bloom::init();
@@ -170,6 +193,26 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
   MaterialManager::createAllResources();
 
   _INTR_LOG_POP();
+}
+
+// <-
+
+void RenderSystem::shutdown()
+{
+  _INTR_ARRAY(uint8_t) pipelineData;
+
+  size_t pipelineDataSize;
+  vkGetPipelineCacheData(_vkDevice, _vkPipelineCache, &pipelineDataSize,
+                         nullptr);
+
+  pipelineData.resize(pipelineDataSize);
+  vkGetPipelineCacheData(_vkDevice, _vkPipelineCache, &pipelineDataSize,
+                         pipelineData.data());
+
+  _INTR_STRING pipelineCachePath = getPipelineCacheFilePath();
+  _INTR_OFSTREAM of(pipelineCachePath.c_str(), std::ofstream::binary);
+  of.write((const char*)pipelineData.data(), pipelineData.size());
+  of.close();
 }
 
 // <-
@@ -303,13 +346,15 @@ void RenderSystem::dispatchDrawCall(Dod::Ref p_DrawCall,
   vkCmdBindPipeline(p_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     newPipeline);
 
+  VkDescriptorSet descSets[2] = {DrawCallManager::_vkDescriptorSet(p_DrawCall),
+                                 ImageManager::getGlobalDescriptorSet()};
+
   if (DrawCallManager::_vkDescriptorSet(p_DrawCall))
   {
     vkCmdBindDescriptorSets(
         p_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-        PipelineLayoutManager::_vkPipelineLayout(pipelineLayoutRef), 0u, 1u,
-        &DrawCallManager::_vkDescriptorSet(p_DrawCall),
-        (uint32_t)DrawCallManager::_dynamicOffsets(p_DrawCall).size(),
+        PipelineLayoutManager::_vkPipelineLayout(pipelineLayoutRef), 0u, 2u,
+        descSets, (uint32_t)DrawCallManager::_dynamicOffsets(p_DrawCall).size(),
         DrawCallManager::_dynamicOffsets(p_DrawCall).data());
   }
 
@@ -447,6 +492,8 @@ void RenderSystem::initVkInstance()
     extensionsToEnable.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #elif defined(VK_USE_PLATFORM_XLIB_KHR)
     extensionsToEnable.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
+    extensionsToEnable.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
 #endif // VK_USE_PLATFORM_WIN32_KHR
   }
 
@@ -558,8 +605,6 @@ void RenderSystem::initVkDevice()
   _INTR_LOG_PUSH();
 
   // Retrieve the physical device and its features
-  VkPhysicalDeviceProperties physDeviceProps;
-  VkPhysicalDeviceFeatures physDevFeatures;
   {
     uint32_t deviceCount;
     VkResult result =
@@ -579,18 +624,19 @@ void RenderSystem::initVkDevice()
     // Always use the first device found
     _vkPhysicalDevice = physDevs[0];
 
-    vkGetPhysicalDeviceProperties(_vkPhysicalDevice, &physDeviceProps);
-    vkGetPhysicalDeviceFeatures(_vkPhysicalDevice, &physDevFeatures);
+    vkGetPhysicalDeviceProperties(_vkPhysicalDevice, &_vkPhysicalDeviceProps);
+    vkGetPhysicalDeviceFeatures(_vkPhysicalDevice, &_vkPhysicalDeviceFeatures);
 
     // Queue memory properties
     vkGetPhysicalDeviceMemoryProperties(_vkPhysicalDevice,
                                         &_vkPhysicalDeviceMemoryProperties);
 
-    _INTR_LOG_INFO("Using physical device %s (Driver Ver. %u, API Ver. %u, "
-                   "Vendor ID %u, Device ID %u, Device Type %u)...",
-                   physDeviceProps.deviceName, physDeviceProps.driverVersion,
-                   physDeviceProps.apiVersion, physDeviceProps.vendorID,
-                   physDeviceProps.deviceID, physDeviceProps.deviceType);
+    _INTR_LOG_INFO(
+        "Using physical device %s (Driver Ver. %u, API Ver. %u, "
+        "Vendor ID %u, Device ID %u, Device Type %u)...",
+        _vkPhysicalDeviceProps.deviceName, _vkPhysicalDeviceProps.driverVersion,
+        _vkPhysicalDeviceProps.apiVersion, _vkPhysicalDeviceProps.vendorID,
+        _vkPhysicalDeviceProps.deviceID, _vkPhysicalDeviceProps.deviceType);
   }
 
   // Find graphics _AND_ compute queue
@@ -676,7 +722,7 @@ void RenderSystem::initVkDevice()
     deviceCreateInfo.pNext = nullptr;
     deviceCreateInfo.queueCreateInfoCount = 1u;
     deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-    deviceCreateInfo.pEnabledFeatures = &physDevFeatures;
+    deviceCreateInfo.pEnabledFeatures = &_vkPhysicalDeviceFeatures;
 
     if (enabledExtensions.size() > 0)
     {
@@ -713,19 +759,31 @@ void RenderSystem::initVkSurface(void* p_PlatformHandle, void* p_PlatformWindow)
 {
 #if defined(VK_USE_PLATFORM_XLIB_KHR)
   VkXlibSurfaceCreateInfoKHR surfaceCreateInfo = {};
-  surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
-  surfaceCreateInfo.dpy = (Display*)p_PlatformHandle;
-  surfaceCreateInfo.window = (Window)p_PlatformWindow;
-
+  {
+    surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.dpy = (Display*)p_PlatformHandle;
+    surfaceCreateInfo.window = (Window)p_PlatformWindow;
+  }
   VkResult result = vkCreateXlibSurfaceKHR(_vkInstance, &surfaceCreateInfo,
                                            nullptr, &_vkSurface);
   _INTR_VK_CHECK_RESULT(result);
+#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
+  VkWaylandSurfaceCreateInfoKHR surfaceCreateInfo = {};
+  {
+    surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.display = (wl_display*)p_PlatformHandle;
+    surfaceCreateInfo.surface = (wl_surface*)p_PlatformWindow;
+  }
+  VkResult result = vkCreateWaylandSurfaceKHR(_vkInstance, &surfaceCreateInfo,
+                                              nullptr, &_vkSurface);
+  _INTR_VK_CHECK_RESULT(result)
 #elif defined(VK_USE_PLATFORM_WIN32_KHR)
   VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
-  surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-  surfaceCreateInfo.hinstance = (HINSTANCE)p_PlatformHandle;
-  surfaceCreateInfo.hwnd = (HWND)p_PlatformWindow;
-
+  {
+    surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.hinstance = (HINSTANCE)p_PlatformHandle;
+    surfaceCreateInfo.hwnd = (HWND)p_PlatformWindow;
+  }
   VkResult result = vkCreateWin32SurfaceKHR(_vkInstance, &surfaceCreateInfo,
                                             nullptr, &_vkSurface);
   _INTR_VK_CHECK_RESULT(result);
@@ -752,7 +810,7 @@ void RenderSystem::initOrUpdateVkSwapChain()
       _vkPhysicalDevice, _vkSurface, &surfaceCapabilities);
   _INTR_VK_CHECK_RESULT(result);
 
-  static VkFormat surfaceFormatToUse = VK_FORMAT_B8G8R8A8_SRGB;
+  static VkFormat surfaceFormatToUse = VK_FORMAT_B8G8R8A8_UNORM;
   static VkColorSpaceKHR surfaceColorSpaceToUse =
       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
   VkPresentModeKHR presentModeToUse =
@@ -778,12 +836,11 @@ void RenderSystem::initOrUpdateVkSwapChain()
     bool found = false;
     for (uint32_t i = 0u; i < presentModeCount; ++i)
     {
-      _INTR_LOG_INFO("Present mode '%u' available...", presentModes[i]);
-
       if (presentModes[i] == presentModeToUse)
       {
         _INTR_LOG_INFO("Using present mode '%u'...", presentModes[i]);
         found = true;
+        break;
       }
     }
 
@@ -1000,12 +1057,33 @@ void RenderSystem::initVkPipelineCache()
 {
   _INTR_LOG_INFO("Creating Vulkan cache...");
 
+  _INTR_ARRAY(uint8_t) pipelineCacheData;
+
+  _INTR_STRING pipelineCacheFilePath = getPipelineCacheFilePath();
+  _INTR_IFSTREAM ifs(pipelineCacheFilePath.c_str(), std::ifstream::binary);
+
+  ifs.seekg(0, ifs.end);
+  std::streamoff size = ifs.tellg();
+  ifs.seekg(0);
+
+  if (size != -1)
+  {
+    pipelineCacheData.resize(size);
+    ifs.read((char*)pipelineCacheData.data(), size);
+  }
+  else
+  {
+    _INTR_LOG_WARNING("No pipeline cache available...");
+  }
+
+  ifs.close();
+
   VkPipelineCacheCreateInfo pipelineCache = {};
   {
     pipelineCache.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
     pipelineCache.pNext = nullptr;
-    pipelineCache.initialDataSize = 0;
-    pipelineCache.pInitialData = nullptr;
+    pipelineCache.initialDataSize = pipelineCacheData.size();
+    pipelineCache.pInitialData = pipelineCacheData.data();
     pipelineCache.flags = 0u;
   }
 
@@ -1291,8 +1369,8 @@ void RenderSystem::beginFrame()
     insertPostPresentBarrier();
   }
 
-  UniformManager::resetPerInstanceAllocators();
-  DrawCallDispatcher::reset();
+  UniformManager::onFrameEnded();
+  DrawCallDispatcher::onFrameEnded();
 }
 
 // <-

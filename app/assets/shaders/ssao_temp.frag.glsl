@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,20 +23,22 @@
 
 PER_INSTANCE_DATA_SSAO_TEMP_REPROJ;
 
-layout (binding = 1) uniform sampler2D ssaoTex;
-layout (binding = 2) uniform sampler2D ssaoPrevTex;
-layout (binding = 3) uniform sampler2D depthBufferTex;
+layout(binding = 1) uniform sampler2D ssaoTex;
+layout(binding = 2) uniform sampler2D ssaoPrevTex;
+layout(binding = 3) uniform sampler2D depthBufferTex;
 
-layout (location = 0) in vec2 inUV0;
-layout (location = 0) out vec4 outColor;
+layout(location = 0) in vec2 inUV0;
+layout(location = 0) out vec4 outColor;
 
 void main()
 {
-	const float depth = texture(depthBufferTex, inUV0, 0.0).r;
+  const float depth = texture(depthBufferTex, inUV0, 0.0).r;
   const float ao = texture(ssaoTex, inUV0, 0.0).r;
 
   const vec3 viewPos = unproject(inUV0, depth, uboPerInstance.invProjMatrix);
-  const vec4 prevViewPos = uboPerInstance.prevViewMatrix * vec4(unproject(inUV0, depth, uboPerInstance.invViewProjMatrix), 1.0);
+  const vec4 prevViewPos =
+      uboPerInstance.prevViewMatrix *
+      vec4(unproject(inUV0, depth, uboPerInstance.invViewProjMatrix), 1.0);
   vec4 prevUV = uboPerInstance.projMatrix * prevViewPos;
   prevUV /= prevUV.w;
   prevUV.xy = prevUV.xy * 0.5 + 0.5;

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -26,8 +28,6 @@ namespace RenderPass
 {
 void Base::init(const rapidjson::Value& p_RenderPassDesc)
 {
-  using namespace Resources;
-
   _name = p_RenderPassDesc["name"].GetString();
 
   if (!p_RenderPassDesc.HasMember("outputs"))
@@ -78,18 +78,19 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
     ImageRef imageRef =
         ImageManager::_getResourceByName(outputDesc[0].GetString());
 
-    if (outputs[i][0] != "Backbuffer")
+    if (outputDesc[0] != "Backbuffer")
     {
+      const uint8_t format = (uint8_t)ImageManager::_descImageFormat(imageRef);
+
       AttachmentDescription colorAttachment = {
-          (uint8_t)ImageManager::_descImageFormat(imageRef),
-          outputDesc.Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
+          format, outputDesc.Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
       RenderPassManager::_descAttachments(_renderPassRef)
           .push_back(colorAttachment);
     }
     else
     {
       AttachmentDescription sceneAttachment = {
-          Format::kB8G8R8A8Srgb,
+          Format::kB8G8R8A8UNorm,
           outputs[0].Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
       RenderPassManager::_descAttachments(_renderPassRef)
           .push_back(sceneAttachment);
@@ -157,8 +158,6 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
 
 void Base::destroy()
 {
-  using namespace Resources;
-
   FramebufferRefArray framebuffersToDestroy;
   RenderPassRefArray renderPassesToDestroy;
 

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref RenderPassRef;
 typedef Dod::RefArray RenderPassRefArray;
 
@@ -40,7 +41,7 @@ struct RenderPassData : Dod::Resources::ResourceDataBase
   // Description
   _INTR_ARRAY(_INTR_ARRAY(AttachmentDescription)) descAttachments;
 
-  // GPU resources
+  // Resources
   _INTR_ARRAY(VkRenderPass) vkRenderPass;
 };
 
@@ -87,11 +88,13 @@ struct RenderPassManager
   }
 
   _INTR_INLINE static void initFromDescriptor(RenderPassRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         RenderPassData,
-        _INTR_MAX_RENDER_PASS_COUNT>::_initFromDescriptor(p_Ref, p_Properties);
+        _INTR_MAX_RENDER_PASS_COUNT>::_initFromDescriptor(p_Ref, p_GenerateDesc,
+                                                          p_Properties);
   }
 
   _INTR_INLINE static void saveToSingleFile(const char* p_FileName)
@@ -150,9 +153,6 @@ struct RenderPassManager
     }
   }
 
-  // Getter/Setter
-  // ->
-
   // Description
   _INTR_INLINE static _INTR_ARRAY(AttachmentDescription) &
       _descAttachments(RenderPassRef p_Ref)
@@ -160,7 +160,7 @@ struct RenderPassManager
     return _data.descAttachments[p_Ref._id];
   }
 
-  // GPU resources
+  // Resources
   _INTR_INLINE static VkRenderPass& _vkRenderPass(RenderPassRef p_Ref)
   {
     return _data.vkRenderPass[p_Ref._id];

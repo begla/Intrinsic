@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,9 +25,6 @@
 PER_MATERIAL_UBO;
 PER_INSTANCE_UBO;
 
-layout (location = 0) out uint outPicking;
+layout(location = 0) out uint outPicking;
 
-void main()
-{ 
-  outPicking = uint(uboPerInstance.data0.z);
-}
+void main() { outPicking = uint(uboPerInstance.data0.z); }

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 #include "stdafx.h"
 
 #define MAX_LINE_COUNT 256000
+
+using namespace RVResources;
 
 namespace Intrinsic
 {
@@ -40,18 +42,18 @@ struct PerInstanceDataDebugLineVertex
   glm::mat4 normalMatrix;
 };
 
-Resources::ImageRef _albedoImageRef;
-Resources::ImageRef _normalImageRef;
-Resources::ImageRef _parameter0ImageRef;
-Resources::ImageRef _depthImageRef;
-Resources::FramebufferRef _framebufferRef;
+ImageRef _albedoImageRef;
+ImageRef _normalImageRef;
+ImageRef _parameter0ImageRef;
+ImageRef _depthImageRef;
+FramebufferRef _framebufferRef;
 
-Resources::PipelineLayoutRef _debugLinePipelineLayout;
-Resources::PipelineRef _debugLinePipelineRef;
-Resources::DrawCallRef _debugLineDrawCallRef;
-Resources::BufferRef _debugLineVertexBufferRef;
+PipelineLayoutRef _debugLinePipelineLayout;
+PipelineRef _debugLinePipelineRef;
+DrawCallRef _debugLineDrawCallRef;
+BufferRef _debugLineVertexBufferRef;
 
-Resources::RenderPassRef _renderPassRef;
+RenderPassRef _renderPassRef;
 
 DebugLineVertex* _mappedLineMemory = nullptr;
 uint32_t _currentLineVertexCount = 0u;
@@ -171,17 +173,36 @@ void displayDebugLineGeometryForSelectedObject()
           Components::IrradianceProbeManager::_descRadius(irradProbeRef),
           glm::vec3(1.0f, 0.0f, 0.0f));
     }
+
+    Components::SpecularProbeRef specProbeRef =
+        Components::SpecularProbeManager::getComponentForEntity(
+            GameStates::Editing::_currentlySelectedEntity);
+
+    if (specProbeRef.isValid())
+    {
+      Debug::renderSphere(
+          Components::NodeManager::_worldPosition(nodeRef),
+          Components::SpecularProbeManager::_descRadius(specProbeRef),
+          glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+
+    Components::DecalRef decalRef =
+        Components::DecalManager::getComponentForEntity(
+            GameStates::Editing::_currentlySelectedEntity);
+
+    if (decalRef.isValid())
+    {
+      Debug::renderDecal(decalRef);
+    }
   }
 }
 }
 
 // Static members
-uint32_t Debug::_activeDebugStageFlags = 0u;
+uint32_t Debug::_activeDebugStageFlags = DebugStageFlags::kSelectedObject;
 
 void Debug::init()
 {
-  using namespace Resources;
-
   RenderPassRefArray renderpassesToCreate;
   PipelineLayoutRefArray pipelineLayoutsToCreate;
   BufferRefArray buffersToCreate;
@@ -194,7 +215,7 @@ void Debug::init()
 
     GpuProgramManager::reflectPipelineLayout(
         8u,
-        {Resources::GpuProgramManager::getResourceByName("debug_line.vert"),
+        {GpuProgramManager::getResourceByName("debug_line.vert"),
          GpuProgramManager::getResourceByName("debug_line.frag")},
         _debugLinePipelineLayout);
 
@@ -246,16 +267,14 @@ void Debug::init()
   BufferManager::createResources(buffersToCreate);
 
   // Map line buffer memory
-  _mappedLineMemory = (DebugLineVertex*)Resources::BufferManager::getGpuMemory(
-      _debugLineVertexBufferRef);
+  _mappedLineMemory =
+      (DebugLineVertex*)BufferManager::getGpuMemory(_debugLineVertexBufferRef);
 }
 
 // <-
 
 void Debug::onReinitRendering()
 {
-  using namespace Resources;
-
   FramebufferRefArray framebuffersToDestroy;
   FramebufferRefArray framebuffersToCreate;
   PipelineRefArray pipelinesToDestroy;
@@ -440,14 +459,54 @@ void Debug::renderSphere(const glm::vec3& p_Center, float p_Radius,
 
 // <-
 
+void Debug::renderDecal(Dod::Ref p_Decal)
+{
+
+  const Components::NodeRef nodeRef =
+      Components::NodeManager::getComponentForEntity(
+          Components::DecalManager::_entity(p_Decal));
+  const glm::vec3 halfExtent =
+      Components::DecalManager::_descHalfExtent(p_Decal) *
+      Components::NodeManager::_worldSize(nodeRef);
+
+  const glm::quat orient = Components::NodeManager::_worldOrientation(nodeRef);
+  const glm::vec3 right = orient * glm::vec3(halfExtent.x, 0.0f, 0.0f);
+  const glm::vec3 forward =
+      orient * glm::vec3(0.0f, 0.0f, -halfExtent.z * 2.0f);
+  const glm::vec3 up = orient * glm::vec3(0.0f, halfExtent.y, 0.0f);
+
+  glm::vec3 verts[8] = {
+      forward + right + up,   forward + right - up, forward - (right + up),
+      forward - (right - up), right + up,           right - up,
+      -(right + up),          -(right - up)};
+
+  // Move to world space
+  for (uint32_t i = 0u; i < 8u; ++i)
+    verts[i] += Components::NodeManager::_worldPosition(nodeRef);
+
+  static const glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
+  for (uint32_t i = 0u; i < 4u; ++i)
+  {
+    // Front
+    renderLine(verts[i], verts[(i + 1u) % 4u], color, color);
+    // Back
+    renderLine(verts[4u + i], verts[4u + (i + 1u) % 4u], color, color);
+    // Front-Back connections
+    renderLine(verts[i], verts[i + 4u], color, color);
+  }
+}
+
+// <-
+
 void Debug::render(float p_DeltaT, Components::CameraRef p_CameraRef)
 {
-  using namespace Resources;
-
   _INTR_PROFILE_CPU("Render Pass", "Render Debug Geometry");
   _INTR_PROFILE_GPU("Render Debug Geometry");
 
-  DrawCallRefArray visibleDrawCalls;
+  static DrawCallRefArray visibleDrawCalls;
+  static DrawCallRefArray visibleMeshDrawCalls;
+  visibleMeshDrawCalls.clear();
+  visibleDrawCalls.clear();
 
   if (GameStates::Manager::getActiveGameState() !=
       GameStates::GameState::kEditing)
@@ -473,7 +532,8 @@ void Debug::render(float p_DeltaT, Components::CameraRef p_CameraRef)
       _parseBenchmark = true;
     }
 
-    displayDebugLineGeometryForSelectedObject();
+    if ((_activeDebugStageFlags & DebugStageFlags::kSelectedObject) > 0u)
+      displayDebugLineGeometryForSelectedObject();
   }
 
   // Line debug rendering
@@ -502,6 +562,38 @@ void Debug::render(float p_DeltaT, Components::CameraRef p_CameraRef)
     }
 
     visibleDrawCalls.push_back(_debugLineDrawCallRef);
+  }
+
+  if ((_activeDebugStageFlags & DebugStageFlags::kWireframeRendering) > 0u ||
+      GameStates::Editing::_currentlySelectedEntity.isValid())
+  {
+    RenderProcess::Default::getVisibleDrawCalls(
+        p_CameraRef, 0u,
+        MaterialManager::getMaterialPassId(_N(GBufferWireframe)))
+        .copy(visibleMeshDrawCalls);
+    // Update per mesh uniform data
+    CComponents::MeshManager::updateUniformData(visibleMeshDrawCalls);
+
+    if ((_activeDebugStageFlags & DebugStageFlags::kWireframeRendering) > 0u)
+    {
+      visibleDrawCalls.insert(visibleDrawCalls.end(),
+                              visibleMeshDrawCalls.begin(),
+                              visibleMeshDrawCalls.end());
+    }
+    else
+    {
+      for (uint32_t i = 0u; i < visibleMeshDrawCalls.size(); ++i)
+      {
+        DrawCallRef dcRef = visibleMeshDrawCalls[i];
+        Entity::EntityRef dcEntity = Components::MeshManager::_entity(
+            DrawCallManager::_descMeshComponent(dcRef));
+
+        if (dcEntity == GameStates::Editing::_currentlySelectedEntity)
+        {
+          visibleDrawCalls.push_back(dcRef);
+        }
+      }
+    }
   }
 
   RenderSystem::beginRenderPass(_renderPassRef, _framebufferRef,

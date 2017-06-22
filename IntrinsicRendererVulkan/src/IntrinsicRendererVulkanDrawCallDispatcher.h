@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ namespace Vulkan
 {
 struct DrawCallDispatcher
 {
-  static void reset();
+  static void onFrameEnded();
   static void queueDrawCalls(Core::Dod::RefArray& p_DrawCalls,
                              Core::Dod::Ref p_RenderPass,
                              Core::Dod::Ref p_Framebuffer);

@@ -14,6 +14,14 @@
       ]
     },
     {
+      "name": "GBufferSolid",
+      "resources" : [
+        ["Buffer", "PerInstance", "PerInstance", "Vertex"],
+        ["Buffer", "PerInstance", "PerInstance", "Fragment"],
+        ["Buffer", "PerMaterial", "PerMaterial", "Fragment"]
+      ]
+    },
+    {
       "name": "GBufferFoliage",
       "resources" : [
         ["Buffer", "PerInstance", "PerInstance", "Vertex"],
@@ -38,7 +46,7 @@
         ["Buffer", "PerInstance", "PerInstance", "Vertex"],
         ["Buffer", "PerInstance", "PerInstance", "Fragment"],
         ["Buffer", "PerMaterial", "PerMaterial", "Fragment"],
-        ["Image", "MaterialAlbedo", "albedoTex", "Fragment"]
+        ["Buffer", "PerFrame", "PerFrame", "Fragment"]
       ]
     },
     {
@@ -128,6 +136,15 @@
       "boundResources" : "GBuffer"
     },
     {
+      "name" : "GBufferWireframe",
+      "baseVertexGpuProgram" : "position_only.vert",
+      "baseFragmentGpuProgram" : "gbuffer_solid.frag",
+      "renderPass" : "GBuffer",
+      "blendStates" : ["Default", "Default", "Default"],
+      "boundResources" : "GBufferSolid",
+      "rasterizationState" : "Wireframe"
+    },
+    {
       "name" : "Shadow",
       "baseVertexGpuProgram" : "shadow.vert",
       "renderPass" : "Shadow",
@@ -149,6 +166,7 @@
       "baseVertexGpuProgram" : "gizmo.vert",
       "baseFragmentGpuProgram" : "gizmo.frag",
       "renderPass" : "Debug",
+      "rasterizationState" : "DoubleSided",
       "blendStates" : ["Default", "Default", "Default"],
       "boundResources" : "Debug"
     },
@@ -170,8 +188,26 @@
       "boundResources" : "GBufferFoliage"
     },
     {
+      "name" : "GBufferGrass",
+      "baseVertexGpuProgram" : "gbuffer_grass.vert",
+      "baseFragmentGpuProgram" : "gbuffer_foliage.frag",
+      "renderPass" : "GBuffer",
+      "blendStates" : ["Default", "Default", "Default"],
+      "rasterizationState" : "DoubleSided",
+      "boundResources" : "GBufferFoliage"
+    },
+    {
       "name" : "ShadowFoliage",
       "baseVertexGpuProgram" : "shadow_foliage.vert",
+      "baseFragmentGpuProgram" : "shadow_foliage.frag",
+      "renderPass" : "Shadow",
+      "viewportSize": "ShadowMap",
+      "rasterizationState" : "DoubleSided",
+      "boundResources" : "ShadowFoliage"
+    },
+    {
+      "name" : "ShadowGrass",
+      "baseVertexGpuProgram" : "shadow_grass.vert",
       "baseFragmentGpuProgram" : "shadow_foliage.frag",
       "renderPass" : "Shadow",
       "viewportSize": "ShadowMap",
@@ -202,6 +238,15 @@
       "viewportSize" : "PerPixelPicking",
       "blendStates" : ["Default"],
       "boundResources" : "PerPixelPicking"
+    },
+    {
+      "name" : "GBufferGrassPrePass",
+      "baseVertexGpuProgram" : "gbuffer_grass.vert",
+      "baseFragmentGpuProgram" : "gbuffer_foliage_prepass.frag",
+      "renderPass" : "GBufferPrePassFoliage",
+      "blendStates" : [],
+      "rasterizationState" : "DoubleSided",
+      "boundResources" : "GBufferFoliage"
     },
     {
       "name" : "GBufferFoliagePrePass",

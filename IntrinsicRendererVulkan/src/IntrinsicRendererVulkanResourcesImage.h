@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace Vulkan
 {
 namespace Resources
 {
+// Typedefs
 typedef Dod::Ref ImageRef;
 typedef _INTR_ARRAY(ImageRef) ImageRefArray;
 typedef _INTR_ARRAY(_INTR_ARRAY(VkImageView)) ImageViewArray;
@@ -38,9 +39,13 @@ struct ImageData : Dod::Resources::ResourceDataBase
     descMipLevelCount.resize(_INTR_MAX_IMAGE_COUNT);
     descFileName.resize(_INTR_MAX_IMAGE_COUNT);
     descMemoryPoolType.resize(_INTR_MAX_IMAGE_COUNT);
+    descAvgNormLength.resize(_INTR_MAX_IMAGE_COUNT);
+    imageTextureType.resize(_INTR_MAX_IMAGE_COUNT);
 
     vkImage.resize(_INTR_MAX_IMAGE_COUNT);
     vkImageView.resize(_INTR_MAX_IMAGE_COUNT);
+    vkImageViewLinear.resize(_INTR_MAX_IMAGE_COUNT);
+    vkImageViewGamma.resize(_INTR_MAX_IMAGE_COUNT);
     vkSubResourceImageViews.resize(_INTR_MAX_IMAGE_COUNT);
     memoryAllocationInfo.resize(_INTR_MAX_IMAGE_COUNT);
   }
@@ -54,12 +59,16 @@ struct ImageData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(uint32_t) descArrayLayerCount;
   _INTR_ARRAY(uint32_t) descMipLevelCount;
   _INTR_ARRAY(_INTR_STRING) descFileName;
+  _INTR_ARRAY(float) descAvgNormLength;
 
   // Resources
   _INTR_ARRAY(VkImage) vkImage;
   _INTR_ARRAY(VkImageView) vkImageView;
+  _INTR_ARRAY(VkImageView) vkImageViewLinear;
+  _INTR_ARRAY(VkImageView) vkImageViewGamma;
   _INTR_ARRAY(ImageViewArray) vkSubResourceImageViews;
   _INTR_ARRAY(GpuMemoryAllocationInfo) memoryAllocationInfo;
+  _INTR_ARRAY(ImageTextureType::Enum) imageTextureType;
 };
 
 struct ImageManager
@@ -85,6 +94,7 @@ struct ImageManager
     _descArrayLayerCount(p_Ref) = 1u;
     _descMipLevelCount(p_Ref) = 1u;
     _descFileName(p_Ref) = "";
+    _descAvgNormLength(p_Ref) = 1.0f;
   }
 
   _INTR_INLINE static void destroyImage(ImageRef p_Ref)
@@ -114,38 +124,25 @@ struct ImageManager
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
                           (uint32_t)_descImageFormat(p_Ref), false, true),
         p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "flags",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
-                          (uint32_t)_descImageFlags(p_Ref), false, true),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "dimensions",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
-                          glm::vec3(_descDimensions(p_Ref)), false, true),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "arrayLayerCount",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
-                          _descArrayLayerCount(p_Ref), false, true),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "mipLevelCount",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), "",
-                          _descMipLevelCount(p_Ref), false, true),
-        p_Document.GetAllocator());
     p_Properties.AddMember("fileName",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(Image), "string",
+                                             _N(Image), _N(string),
                                              _descFileName(p_Ref), true, false),
                            p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "avgNormLength",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Image), _N(float),
+                          _descAvgNormLength(p_Ref), true, false),
+        p_Document.GetAllocator());
   }
 
   _INTR_INLINE static void initFromDescriptor(ImageRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     Dod::Resources::ResourceManagerBase<
         ImageData, _INTR_MAX_IMAGE_COUNT>::_initFromDescriptor(p_Ref,
+                                                               p_GenerateDesc,
                                                                p_Properties);
 
     if (p_Properties.HasMember("imageType"))
@@ -154,21 +151,12 @@ struct ImageManager
     if (p_Properties.HasMember("imageFormat"))
       _descImageFormat(p_Ref) = (Format::Enum)JsonHelper::readPropertyUint(
           p_Properties["imageFormat"]);
-    if (p_Properties.HasMember("flags"))
-      _descImageFlags(p_Ref) =
-          JsonHelper::readPropertyUint(p_Properties["flags"]);
-    if (p_Properties.HasMember("dimensions"))
-      _descDimensions(p_Ref) =
-          JsonHelper::readPropertyVec3(p_Properties["dimensions"]);
-    if (p_Properties.HasMember("arrayLayerCount"))
-      _descArrayLayerCount(p_Ref) =
-          JsonHelper::readPropertyUint(p_Properties["arrayLayerCount"]);
-    if (p_Properties.HasMember("mipLevelCount"))
-      _descMipLevelCount(p_Ref) =
-          JsonHelper::readPropertyUint(p_Properties["mipLevelCount"]);
     if (p_Properties.HasMember("fileName"))
       _descFileName(p_Ref) =
           JsonHelper::readPropertyString(p_Properties["fileName"]);
+    if (p_Properties.HasMember("avgNormLength"))
+      _descAvgNormLength(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["avgNormLength"]);
   }
 
   // <-
@@ -212,6 +200,8 @@ struct ImageManager
       VkImage& vkImage = _vkImage(ref);
       ImageViewArray& vkImageViews = _vkSubResourceImageViews(ref);
       VkImageView& vkImageView = _vkImageView(ref);
+      VkImageView& vkImageViewLinear = _vkImageViewLinear(ref);
+      VkImageView& vkImageViewGamma = _vkImageViewGamma(ref);
 
       if (!hasImageFlags(ref, ImageFlags::kExternalImage))
       {
@@ -244,6 +234,20 @@ struct ImageManager
                                         nullptr);
           vkImageView = VK_NULL_HANDLE;
         }
+
+        if (vkImageViewLinear != VK_NULL_HANDLE)
+        {
+          RenderSystem::releaseResource(_N(VkImageView),
+                                        (void*)vkImageViewLinear, nullptr);
+          vkImageViewLinear = VK_NULL_HANDLE;
+        }
+
+        if (vkImageViewGamma != VK_NULL_HANDLE)
+        {
+          RenderSystem::releaseResource(_N(VkImageView),
+                                        (void*)vkImageViewGamma, nullptr);
+          vkImageViewGamma = VK_NULL_HANDLE;
+        }
       }
       vkImageViews.clear();
     }
@@ -259,8 +263,14 @@ struct ImageManager
     for (uint32_t i = 0u; i < p_Images.size(); ++i)
     {
       destroyImage(p_Images[i]);
+      _imageTextureType(p_Images[i]) = ImageTextureType::kUnknown;
     }
   }
+
+  // <-
+
+  static VkDescriptorSetLayout getGlobalDescriptorSetLayout();
+  static VkDescriptorSet getGlobalDescriptorSet();
 
   // <-
 
@@ -322,6 +332,21 @@ struct ImageManager
 
   // <-
 
+  static void updateGlobalDescriptorSet();
+
+  // <-
+
+  static _INTR_INLINE uint32_t getTextureId(ImageRef p_ImageRef)
+  {
+    auto mapping = _globalTextureIdMapping.find(p_ImageRef);
+    if (mapping == _globalTextureIdMapping.end())
+      return (uint32_t)-1;
+
+    return mapping->second;
+  }
+
+  // <-
+
   _INTR_INLINE static bool hasImageFlags(ImageRef p_Ref, uint8_t p_Flags)
   {
     return (_data.descImageFlags[p_Ref._id] & p_Flags) == p_Flags;
@@ -334,9 +359,6 @@ struct ImageManager
   {
     _data.descImageFlags[p_Ref._id] &= ~p_Flags;
   }
-
-  // Member refs.
-  // ->
 
   // Description
   _INTR_INLINE static MemoryPoolType::Enum& _descMemoryPoolType(ImageRef p_Ref)
@@ -371,8 +393,12 @@ struct ImageManager
   {
     return _data.descFileName[p_Ref._id];
   }
+  _INTR_INLINE static float& _descAvgNormLength(ImageRef p_Ref)
+  {
+    return _data.descAvgNormLength[p_Ref._id];
+  }
 
-  // GPU resources
+  // Resources
   _INTR_INLINE static VkImage& _vkImage(ImageRef p_Ref)
   {
     return _data.vkImage[p_Ref._id];
@@ -380,6 +406,14 @@ struct ImageManager
   _INTR_INLINE static VkImageView& _vkImageView(ImageRef p_Ref)
   {
     return _data.vkImageView[p_Ref._id];
+  }
+  _INTR_INLINE static VkImageView& _vkImageViewLinear(ImageRef p_Ref)
+  {
+    return _data.vkImageViewLinear[p_Ref._id];
+  }
+  _INTR_INLINE static VkImageView& _vkImageViewGamma(ImageRef p_Ref)
+  {
+    return _data.vkImageViewGamma[p_Ref._id];
   }
   _INTR_INLINE static VkImageView&
   _vkSubResourceImageView(ImageRef p_Ref, uint32_t p_ArrayLayerIndex,
@@ -397,6 +431,14 @@ struct ImageManager
   {
     return _data.memoryAllocationInfo[p_Ref._id];
   }
+  _INTR_INLINE static ImageTextureType::Enum& _imageTextureType(ImageRef p_Ref)
+  {
+    return _data.imageTextureType[p_Ref._id];
+  }
+
+  // ->
+
+  static _INTR_HASH_MAP(Dod::Ref, uint32_t) _globalTextureIdMapping;
 };
 }
 }

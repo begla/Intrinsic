@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ IntrinsicEdManagerWindowPostEffect::IntrinsicEdManagerWindowPostEffect(
   _propertyCompilerEntry =
       Application::_resourcePropertyCompilerMapping[_N(PostEffect)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(PostEffect)];
-  _resourceIcon = QIcon(":/Icons/calendar");
   _managerPath = "managers/post_effects/";
   _managerExtension = ".post_effect.json";
   _resourceName = "PostEffect";

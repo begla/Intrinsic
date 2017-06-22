@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@
 
 #define _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT 2u
 
-#define _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES 256u
+#define _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES 512u
 #define _INTR_VK_PER_INSTANCE_BLOCK_SMALL_COUNT _INTR_MAX_DRAW_CALL_COUNT
 #define _INTR_VK_PER_INSTANCE_BLOCK_LARGE_SIZE_IN_BYTES 2048u
 #define _INTR_VK_PER_INSTANCE_BLOCK_LARGE_COUNT 256u
 
+#define _INTR_VK_PER_FRAME_BLOCK_SIZE_IN_BYTES 512u
 #define _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES 256u
 #define _INTR_VK_PER_MATERIAL_BLOCK_COUNT _INTR_MAX_MATERIAL_COUNT
 

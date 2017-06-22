@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,10 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
+typedef Dod::Ref NodeRef;
+typedef _INTR_ARRAY(NodeRef) NodeRefArray;
+
 namespace NodeFlags
 {
 enum Flags
@@ -31,9 +35,6 @@ enum Flags
   kSpawned = 0x01u,
 };
 }
-
-typedef Dod::Ref NodeRef;
-typedef _INTR_ARRAY(NodeRef) NodeRefArray;
 
 ///
 /// Stores the Node Component Data in a data oriented fashion.
@@ -53,7 +54,6 @@ struct NodeData : Dod::Components::ComponentDataBase
     worldOrientation.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     worldSize.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     worldMatrix.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
-    normalMatrix.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
     inverseWorldMatrix.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
 
     localAABB.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
@@ -68,6 +68,7 @@ struct NodeData : Dod::Components::ComponentDataBase
     nextSibling.resize(_INTR_MAX_NODE_COMPONENT_COUNT);
   }
 
+  // Resources
   _INTR_ARRAY(uint32_t) flags;
 
   _INTR_ARRAY(glm::vec3) position;
@@ -78,7 +79,6 @@ struct NodeData : Dod::Components::ComponentDataBase
   _INTR_ARRAY(glm::quat) worldOrientation;
   _INTR_ARRAY(glm::vec3) worldSize;
   _INTR_ARRAY(glm::mat4x4) worldMatrix;
-  _INTR_ARRAY(glm::mat4x4) normalMatrix;
   _INTR_ARRAY(glm::mat4x4) inverseWorldMatrix;
 
   _INTR_ARRAY(Math::AABB) localAABB;
@@ -285,7 +285,6 @@ struct NodeManager
                  "This node is already part of a hierarchy");
 
     const NodeRef firstChild = _firstChild(p_Parent);
-
     {
       _parent(p_Child) = p_Parent;
 
@@ -296,12 +295,15 @@ struct NodeManager
       }
       else
       {
-        // The first child of a node has to be the first in the chain
         _INTR_ASSERT(!_prevSibling(firstChild).isValid());
 
-        _prevSibling(firstChild) = p_Child;
-        _nextSibling(p_Child) = firstChild;
-        _firstChild(p_Parent) = p_Child;
+        // Find the last sibling in the chain
+        NodeRef currentChild = _firstChild(p_Parent);
+        while (_nextSibling(currentChild).isValid())
+          currentChild = _nextSibling(currentChild);
+
+        _prevSibling(p_Child) = currentChild;
+        _nextSibling(currentChild) = p_Child;
       }
     }
 
@@ -420,6 +422,7 @@ struct NodeManager
 
   /// Init. the Node from the provided JSON descriptor.
   _INTR_INLINE static void initFromDescriptor(NodeRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("localPos"))
@@ -473,8 +476,7 @@ struct NodeManager
     }
   }
 
-  // Getter/Setter
-  // ->
+  // Scripting interface
 
   /// Gets the total amount of available sorted nodes.
   _INTR_INLINE static uint32_t getSortedNodeCount()
@@ -522,10 +524,7 @@ struct NodeManager
     _data.size[p_Ref._id] = p_Size;
   }
 
-  // <-
-
-  // Member refs
-  // ->
+  // Resources
 
   /// The parent Node of this Node. If any.
   _INTR_INLINE static NodeRef& _parent(NodeRef p_Ref)
@@ -595,11 +594,6 @@ struct NodeManager
   {
     return _data.worldMatrix[p_Ref._id];
   }
-  /// The normal matrix.
-  _INTR_INLINE static glm::mat4& _normalMatrix(NodeRef p_Ref)
-  {
-    return _data.normalMatrix[p_Ref._id];
-  }
 
   /// The inverse of the world matrix.
   _INTR_INLINE static glm::mat4& _inverseWorldMatrix(NodeRef p_Ref)
@@ -641,9 +635,6 @@ private:
   {
     _rootNodes.push_back(p_Ref);
   }
-
-  // <-
-
   /// Removes the given Node from the root node array.
   _INTR_INLINE static void internalRemoveFromRootNodeArray(NodeRef p_Ref)
   {
@@ -674,10 +665,10 @@ private:
 
 namespace std
 {
-template <> class hash<Intrinsic::Core::Components::NodeRef>
+template <> class hash<Components::NodeRef>
 {
 public:
-  size_t operator()(const Intrinsic::Core::Components::NodeRef& p_Ref) const
+  size_t operator()(const Components::NodeRef& p_Ref) const
   {
     return p_Ref._id;
   }

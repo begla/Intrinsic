@@ -5,6 +5,7 @@
         "materialPassMask": [
             "GBufferEffect",
             "GBufferDefault",
+            "GBufferDefaultWireframe",
             "Shadow",
             "PerPixelPicking"
         ],
@@ -23,7 +24,7 @@
         "translucencyThickness": 1.0,
         "emissiveIntensity": 0.0,
         "normalTextureName": "default_NRM",
-        "pbrTextureName": "default_NRM",
+        "pbrTextureName": "checkerboard_PBR",
         "metalMaskBias": 0.0,
         "roughnessBias": 0.0,
         "specularBias": 0.0

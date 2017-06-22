@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,53 +22,50 @@
 #include "lib_noise.glsl"
 #include "lib_lighting.glsl"
 #include "lib_buffers.glsl"
+#include "lib_clustering.glsl"
+#include "ubos.inc.glsl"
 
-layout (binding = 0) uniform PerInstance
+layout(binding = 0) uniform PerInstance
 {
-  mat4 viewMatrix;
-  mat4 invProjMatrix;
-  mat4 invViewMatrix;
-
   mat4 shadowViewProjMatrix[MAX_SHADOW_MAP_COUNT];
 
   vec4 nearFarWidthHeight;
   vec4 nearFar;
 
-  vec4 mainLightColorAndIntens;
-  vec4 mainLightDirAndTemp;
-
   vec4 data0;
-} uboPerInstance; 
+}
+uboPerInstance;
 
-layout (binding = 1) uniform sampler2D albedoTex;
-layout (binding = 2) uniform sampler2D normalTex;
-layout (binding = 3) uniform sampler2D parameter0Tex;
-layout (binding = 4) uniform sampler2D depthTex;
-layout (binding = 5) uniform sampler2D ssaoTex;
-layout (binding = 6) uniform samplerCube specularTex;
-layout (binding = 7) uniform sampler2DArrayShadow shadowBufferTex;
-layout (binding = 8) MATERIAL_BUFFER;
-layout (binding = 9) buffer LightBuffer
-{
-  Light lights[];
-};
-layout (binding = 10) buffer LightIndexBuffer
+PER_FRAME_DATA(1);
+
+layout(binding = 2) uniform sampler2D albedoTex;
+layout(binding = 3) uniform sampler2D normalTex;
+layout(binding = 4) uniform sampler2D parameter0Tex;
+layout(binding = 5) uniform sampler2D depthTex;
+layout(binding = 6) uniform sampler2D ssaoTex;
+layout(binding = 7) uniform samplerCube specularTex;
+layout(binding = 8) uniform sampler2DArrayShadow shadowBufferTex;
+layout(binding = 9) MATERIAL_BUFFER;
+layout(std430, binding = 10) buffer readonly LightBuffer { Light lights[]; };
+layout(std430, binding = 11) buffer readonly LightIndexBuffer
 {
   uint lightIndices[];
 };
-layout (binding = 11) buffer IrradProbeBuffer
+layout(std430, binding = 12) buffer readonly IrradProbeBuffer
 {
   IrradProbe irradProbes[];
 };
-layout (binding = 12) buffer IrradProbeIndexBuffer
+layout(std430, binding = 13) buffer readonly IrradProbeIndexBuffer
 {
   uint irradProbeIndices[];
 };
-layout (binding = 13) uniform sampler2D kelvinLutTex;
-layout (binding = 14) uniform sampler2D noiseTex;
+layout(binding = 14) uniform sampler2D kelvinLutTex;
+layout(binding = 15) uniform sampler2D noiseTex;
 
-layout (location = 0) in vec2 inUV0;
-layout (location = 0) out vec4 outColor;
+layout(location = 0) in vec2 inUV0;
+layout(location = 0) out vec4 outColor;
+
+#include "lighting.inc.glsl"
 
 void main()
 {
@@ -77,148 +74,144 @@ void main()
 
   // Pass through sky
   if (depth >= 1.0)
-  { 
+  {
     outColor.rgba = albedoSample;
     return;
   }
 
   outColor.rgba = vec4(0.0);
 
-  const vec3 posVS = unproject(inUV0, depth, uboPerInstance.invProjMatrix);
-
   const vec4 ssaoSample = textureLod(ssaoTex, inUV0, 0.0);
   const vec4 normalSample = textureLod(normalTex, inUV0, 0.0);
   const vec4 parameter0Sample = textureLod(parameter0Tex, inUV0, 0.0);
-  const MaterialParameters matParams = materialParameters[uint(parameter0Sample.y)];
+  const MaterialParameters matParams =
+      materialParameters[uint(parameter0Sample.y)];
+  const float occlusion = parameter0Sample.z;
+  const float emissive = parameter0Sample.w;
 
+  // Setup lighting data for sunlight
   LightingData d;
-  d.baseColor = albedoSample.rgb;  
-  d.metalMask = parameter0Sample.r;
-  d.specular = normalSample.b;
-  d.roughness = normalSample.a;
-  initLightingDataFromGBuffer(d);
+  {
+    d.baseColor = albedoSample.rgb;
+    d.metalMask = parameter0Sample.r;
+    d.specular = normalSample.b;
+    d.roughness = normalSample.a;
 
-  d.N = normalize(decodeNormal(normalSample.rg));  
-  d.L = uboPerInstance.mainLightDirAndTemp.xyz;
-  d.V = -normalize(posVS); 
-  d.energy = vec3(uboPerInstance.mainLightColorAndIntens.w);
-  calculateLightingData(d);
+    initLightingDataFromGBuffer(d);
+  }
 
-  const uvec3 gridPos = calcGridPosForViewPos(posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
-  const uint clusterIdx = calcClusterIndex(gridPos);
+  {
+    d.posVS = unproject(inUV0, depth, uboPerFrame.invProjMatrix);
+    d.N = normalize(decodeNormal(normalSample.rg));
+    d.energy = uboPerFrame.sunLightColorAndIntensity.w;
+    calculateLightingDataBase(d);
+
+    d.L = uboPerFrame.sunLightDirVS.xyz;
+    calculateDiscL(d, 0.025 * MATH_PI);
+    calculateLobeEnergySphere(d, 0.025 * MATH_PI);
+    calculateLightingData(d);
+  }
+
+  const uvec3 gridPos = calcGridPosForViewPos(
+      d.posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
 
   // Ambient lighting
-  const vec3 normalWS = (uboPerInstance.invViewMatrix * vec4(d.N, 0.0)).xyz;
-  const vec3 vWS = (uboPerInstance.invViewMatrix * vec4(d.V, 0.0)).xyz;
+  const vec3 normalWS = (uboPerFrame.invViewMatrix * vec4(d.N, 0.0)).xyz;
+  const vec3 vWS = (uboPerFrame.invViewMatrix * vec4(d.V, 0.0)).xyz;
 
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
-  const vec3 R = mix(normalWS, R0, (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
+  const vec3 R =
+      mix(normalWS, R0,
+          (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
-  vec3 irrad = vec3(0.0);
-
-  if (isGridPosValid(gridPos))
+  // Irradiance
+  vec3 irrad =
+      d.diffuseColor * sampleSH(uboPerFrame.skyLightSH, normalWS) / MATH_PI;
   {
+    const uint clusterIdx =
+        calcClusterIndex(gridPos, maxIrradProbeCountPerCluster) / 2;
     const uint irradProbeCount = irradProbeIndices[clusterIdx];
 
-    for (uint pi=0; pi<irradProbeCount; ++pi)
+    for (uint pi = 0; pi < irradProbeCount; pi += 2)
     {
-      IrradProbe probe = irradProbes[irradProbeIndices[clusterIdx + pi + 1]];
+      const uint packedProbeIndices =
+          irradProbeIndices[clusterIdx + pi / 2 + 1];
 
-      const float distToProbe = distance(posVS, probe.posAndRadius.xyz);
-      if (distToProbe < probe.posAndRadius.w)
-      {
-        const float fadeRange = probe.posAndRadius.w * probeFadeRange;
-        const float fadeStart = probe.posAndRadius.w - fadeRange;
-        const float fade = 1.0 - max(distToProbe - fadeStart, 0.0) / fadeRange;
-        
-        irrad = mix(irrad, (pi == 0 ? uboPerInstance.data0.y : 1.0) 
-          * d.diffuseColor * sampleSH(probe.data, R) / MATH_PI, fade);
-      }
+      IrradProbe probe = irradProbes[packedProbeIndices & 0xFFFF];
+      calcLocalIrradiance(probe, d, normalWS, irrad, 1.0);
+
+      probe = irradProbes[packedProbeIndices >> 16];
+      calcLocalIrradiance(probe, d, normalWS, irrad,
+                          float(pi + 1 < irradProbeCount));
     }
   }
 
-  outColor.rgb += min(ssaoSample.r, parameter0Sample.z) * irrad; 
+  outColor.rgb += uboPerInstance.data0.y * min(ssaoSample.r, occlusion) * irrad;
 
   // Specular
-  //const float specLod = burleyToMip(d.roughness, dot(normalWS, R0));
-  const float specLod = burleyToMipApprox(d.roughness);
-  const vec3 spec = d.specularColor * textureLod(specularTex, R, specLod).rgb;
-
-  outColor.rgb += uboPerInstance.data0.y * parameter0Sample.z * spec;
-
-  // Emissive
-  outColor.rgb += parameter0Sample.w * matParams.emissiveIntensity * d.baseColor;
-
-  const vec3 mainLightColor = uboPerInstance.mainLightColorAndIntens.rgb 
-    * kelvinToRGB(uboPerInstance.mainLightDirAndTemp.w, kelvinLutTex);
-
-  // Cloud shadows
-  const vec4 posWS = uboPerInstance.invViewMatrix * vec4(posVS, 1.0);
-  const float cloudShadows = clamp(texture(noiseTex, 
-    clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0 + uboPerInstance.data0.x * 0.01).r * 3.0 - 0.5, 0.0, 1.0);
-
-  // Direct lighting
-  float shadowAttenuation = cloudShadows * calcShadowAttenuation(posVS, uboPerInstance.shadowViewProjMatrix, shadowBufferTex);
-  outColor.rgb += shadowAttenuation * mainLightColor * calcLighting(d);
-
-  // Translucency
-  // TODO: Move this to a library
-
-  const float translThickness = matParams.translucencyThickness;
-  if (translThickness > EPSILON)
   {
-    const vec3 translLightVector = d.L + d.N * translDistortion;
-    const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
-    const vec3 transl = (translDot + translAmbient) * translThickness;
-    const vec3 translColor = uboPerInstance.mainLightColorAndIntens.w * d.diffuseColor * mainLightColor * transl;
-
-    outColor.rgb += translColor;    
+    const float specMipIdx = roughnessToMipIdx(d.roughness);
+    const vec3 spec =
+        d.specularColor * textureLod(specularTex, R, specMipIdx).rgb;
+    outColor.rgb += uboPerInstance.data0.y * uboPerInstance.data0.z * spec;
   }
 
-  if (isGridPosValid(gridPos))
+  // Emissive
+  outColor.rgb += emissive * matParams.emissiveIntensity * d.baseColor;
+
+  // Cloud shadows
+  const vec4 posWS = uboPerFrame.invViewMatrix * vec4(d.posVS, 1.0);
+  const float cloudShadows = mix(
+      1.0, clamp(texture(noiseTex,
+                         clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0 +
+                             uboPerInstance.data0.x * 0.025)
+                             .r *
+                         3.0 -
+                     0.5,
+                 0.1, 1.0),
+      uboPerFrame.postParams0.w);
+
+  // Sunlight
   {
-    // Point lights
+    const vec4 sunLightColorAndIntensity =
+        uboPerFrame.sunLightColorAndIntensity;
+    float shadowAttenuation =
+        cloudShadows *
+        calcShadowAttenuation(d.posVS, uboPerInstance.shadowViewProjMatrix,
+                              shadowBufferTex);
+    outColor.rgb +=
+        shadowAttenuation * sunLightColorAndIntensity.rgb * calcLighting(d);
+
+    calcTransl(d, matParams, clamp(uboPerFrame.sunLightDirWS.y - 0.3, 0.0,
+                                   1.0), // Dim for low sun
+               sunLightColorAndIntensity, outColor);
+  }
+
+  // Point lights
+  {
+    const uint clusterIdx =
+        calcClusterIndex(gridPos, maxLightCountPerCluster) / 2;
     const uint lightCount = lightIndices[clusterIdx];
 
-    // DEBUG: Visualize clusters
-    /*if (lightCount > 0)
+//#define DEBUG_VIS_CLUSTERS
+#if defined(DEBUG_VIS_CLUSTERS)
+    if (lightCount > 0)
     {
       outColor = vec4(gridPos / vec3(gridRes) * lightCount / 64.0, 0.0);
       return;
-    }*/
+    }
+#endif // DEBUG_VIS_CLUSTERS
 
-    for (uint li=0; li<lightCount; ++li)
+    for (uint li = 0; li < lightCount; li += 2)
     {
-      Light light = lights[lightIndices[clusterIdx + li + 1]];
+      const uint packedLightIndices = lightIndices[clusterIdx + li / 2u + 1u];
 
-      const vec3 lightDistVec = light.posAndRadius.xyz - posVS;
-      const float dist = length(lightDistVec);
-      const float att = calcInverseSqrFalloff(light.posAndRadius.w, dist);
-      if (att * light.colorAndIntensity.w < MIN_FALLOFF) continue;
+      Light light = lights[packedLightIndices & 0xFFFF];
+      calcPointLightLighting(light, d, matParams, outColor);
 
-      d.L = lightDistVec / dist;
-      d.energy = vec3(light.colorAndIntensity.a);
-      calculateLightingData(d);
-
-      const vec3 lightColor = light.colorAndIntensity.rgb 
-        * kelvinToRGB(light.temp.r, kelvinLutTex);
-
-      outColor.rgb += calcLighting(d) * att * lightColor;
-
-      const float localTranslThickness = matParams.translucencyThickness;
-
-      if (localTranslThickness > EPSILON)
-      {
-        // Translucency
-        // TODO: Move this to a library
-        const vec3 translLightVector = d.L + d.N * translDistortion;
-        const float translDot = exp2(clamp(dot(d.V, -translLightVector), 0.0, 1.0) * translPower - translPower) * translScale;
-        const vec3 transl = (translDot + translAmbient) * localTranslThickness;
-        const vec3 translColor = att * light.colorAndIntensity.w * lightColor * transl * d.diffuseColor;
-
-        outColor.rgb += translColor;
-      }
+      light = lights[packedLightIndices >> 16];
+      light.colorAndIntensity.w *= float(li + 1 < lightCount);
+      calcPointLightLighting(light, d, matParams, outColor);
     }
   }
 }
-  

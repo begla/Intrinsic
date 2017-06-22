@@ -1,0 +1,10 @@
+{
+    "name": "checkerboard_PBR",
+    "properties": {
+        "name": "checkerboard_PBR",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "checkerboard_PBR.dds",
+        "avgNormLength": 1.0
+    }
+}

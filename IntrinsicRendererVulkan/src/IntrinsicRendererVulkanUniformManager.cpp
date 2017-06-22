@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
+using namespace RVResources;
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -23,9 +25,12 @@ namespace Renderer
 namespace Vulkan
 {
 // Static members
-Resources::BufferRef _perInstanceUniformBuffer;
-Resources::BufferRef _perMaterialUniformBuffer;
+BufferRef _perInstanceUniformBuffer;
+BufferRef _perMaterialUniformBuffer;
+BufferRef _perFrameUniformBuffer;
+
 uint8_t* UniformManager::_perInstanceMemory = nullptr;
+uint8_t* UniformManager::_perFrameMemory = nullptr;
 Tlsf::Allocator _perMaterialAllocator;
 
 LockFreeFixedBlockAllocator<_INTR_VK_PER_INSTANCE_BLOCK_SMALL_COUNT,
@@ -40,16 +45,15 @@ LockFreeFixedBlockAllocator<_INTR_VK_PER_MATERIAL_BLOCK_COUNT,
                             _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES>
     UniformManager::_perMaterialAllocator;
 
-Resources::BufferRef UniformManager::_perInstanceUniformBuffer;
-Resources::BufferRef UniformManager::_perMaterialUniformBuffer;
-Resources::BufferRef UniformManager::_perMaterialStagingUniformBuffer;
+BufferRef UniformManager::_perInstanceUniformBuffer;
+BufferRef UniformManager::_perFrameUniformBuffer;
+BufferRef UniformManager::_perMaterialUniformBuffer;
+BufferRef UniformManager::_perMaterialStagingUniformBuffer;
 
 // <-
 
 void UniformManager::init()
 {
-  using namespace Resources;
-
   _INTR_LOG_INFO("Initializing Uniform Manager...");
   _INTR_LOG_PUSH();
 
@@ -105,10 +109,30 @@ void UniformManager::init()
     buffersToCreate.push_back(_perMaterialStagingUniformBuffer);
   }
 
+  // Per frame data
+  _perFrameUniformBuffer =
+      BufferManager::createBuffer(_N(PerFrameConstantBuffer));
+  {
+    BufferManager::resetToDefault(_perFrameUniformBuffer);
+    BufferManager::addResourceFlags(
+        _perFrameUniformBuffer,
+        Dod::Resources::ResourceFlags::kResourceVolatile);
+
+    BufferManager::_descMemoryPoolType(_perFrameUniformBuffer) =
+        MemoryPoolType::kStaticStagingBuffers;
+    BufferManager::_descBufferType(_perFrameUniformBuffer) =
+        BufferType::kUniform;
+    BufferManager::_descSizeInBytes(_perFrameUniformBuffer) =
+        _INTR_VK_PER_FRAME_BLOCK_SIZE_IN_BYTES *
+        (uint32_t)RenderSystem::_vkSwapchainImages.size() * 2u;
+    buffersToCreate.push_back(_perFrameUniformBuffer);
+  }
+
   BufferManager::createResources(buffersToCreate);
 
   // Get host memory
   _perInstanceMemory = BufferManager::getGpuMemory(_perInstanceUniformBuffer);
+  _perFrameMemory = BufferManager::getGpuMemory(_perFrameUniformBuffer);
 
   // Init. per instance data memory blocks
   {
@@ -143,7 +167,7 @@ void UniformManager::init()
 
 // <-
 
-void UniformManager::resetPerInstanceAllocators()
+void UniformManager::onFrameEnded()
 {
   const uint32_t bufferIdx =
       RenderSystem::_backbufferIndex % _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;

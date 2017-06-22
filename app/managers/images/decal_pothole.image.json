@@ -1,0 +1,10 @@
+{
+    "name": "decal_pothole",
+    "properties": {
+        "name": "decal_pothole",
+        "imageType": 1,
+        "imageFormat": 10,
+        "fileName": "decal_pothole.dds",
+        "avgNormLength": 1.0
+    }
+}

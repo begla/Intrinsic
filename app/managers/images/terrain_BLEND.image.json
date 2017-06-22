@@ -4,14 +4,7 @@
         "name": "terrain_BLEND",
         "imageType": 1,
         "imageFormat": 7,
-        "flags": 16,
-        "dimensions": [
-            4097.0,
-            4097.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 13,
-        "fileName": "terrain_BLEND.dds"
+        "fileName": "terrain_BLEND.dds",
+        "avgNormLength": 1.0
     }
 }

@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 // Precompiled header file
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
+
+using namespace CResources;
 
 namespace Intrinsic
 {
@@ -97,6 +99,16 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
     _perMaterialDataFragmentOffset(matRef) =
         UniformManager::allocatePerMaterialDataMemory();
 
+    // Update the average normal length
+    ImageRef normalRef =
+        ImageManager::_getResourceByName(_descNormalTextureName(matRef));
+
+    float avgNormalLength = 1.0f;
+    if (normalRef.isValid())
+    {
+      avgNormalLength = ImageManager::_descAvgNormLength(normalRef);
+    }
+
     // Update material pass flags
     {
       uint32_t& materialPassMask = _materialPassMask(matRef);
@@ -126,9 +138,8 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
       {
         entry.refractionFactor = _descRefractionFactor(matRef);
         entry.translucencyThicknessFactor = _descTranslucencyThickness(matRef);
-        entry.emissveIntensity = _descEmissiveIntensity(matRef);
+        entry.emissiveIntensity = _descEmissiveIntensity(matRef);
       }
-
       MaterialBuffer::updateMaterialBufferEntry(materialBufferEntryIdx, entry);
     }
 
@@ -148,7 +159,8 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
       fragmentData.pbrBias = glm::vec4(_descPbrBias(matRef), 0.0f);
       fragmentData.uvAnimation =
           glm::vec4(_descUvAnimation(matRef), 0.0f, 0.0f);
-      fragmentData.data0[0] = materialBufferEntryIdx;
+      fragmentData.data0.x = materialBufferEntryIdx;
+      fragmentData.data1.x = avgNormalLength;
 
       UniformManager::updatePerMaterialDataMemory(
           &fragmentData, sizeof(PerMaterialDataFragment),
@@ -156,16 +168,15 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
     }
 
     for (uint32_t i = 0u;
-         i < Core::Components::MeshManager::getActiveResourceCount(); ++i)
+         i < CComponents::MeshManager::getActiveResourceCount(); ++i)
     {
       Components::MeshRef meshCompRef =
           Components::MeshManager::getActiveResourceAtIndex(i);
-      Core::Resources::MeshRef meshRef =
-          Core::Resources::MeshManager::getResourceByName(
-              Components::MeshManager::_descMeshName(meshCompRef));
+      MeshRef meshRef = MeshManager::getResourceByName(
+          Components::MeshManager::_descMeshName(meshCompRef));
 
-      Core::Resources::MaterialNamesPerSubMeshArray& materialNamesPerSubMesh =
-          Core::Resources::MeshManager::_descMaterialNamesPerSubMesh(meshRef);
+      MaterialNamesPerSubMeshArray& materialNamesPerSubMesh =
+          MeshManager::_descMaterialNamesPerSubMesh(meshRef);
       const uint32_t subMeshCount = (uint32_t)materialNamesPerSubMesh.size();
 
       for (uint32_t i = 0u; i < subMeshCount; ++i)
@@ -178,8 +189,8 @@ void MaterialManager::createResources(const MaterialRefArray& p_Materiales)
     }
   }
 
-  Core::Components::MeshManager::destroyResources(componentsToRecreate);
-  Core::Components::MeshManager::createResources(componentsToRecreate);
+  CComponents::MeshManager::destroyResources(componentsToRecreate);
+  CComponents::MeshManager::createResources(componentsToRecreate);
 }
 
 // <-
@@ -436,6 +447,11 @@ void MaterialManager::loadMaterialPassConfig()
             {
               PipelineManager::_descRasterizationState(pipelineRef) =
                   RasterizationStates::kDoubleSided;
+            }
+            else if (materialPassDesc["rasterizationState"] == "Wireframe")
+            {
+              PipelineManager::_descRasterizationState(pipelineRef) =
+                  RasterizationStates::kWireframe;
             }
           }
 

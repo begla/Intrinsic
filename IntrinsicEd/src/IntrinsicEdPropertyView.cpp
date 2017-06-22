@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -121,11 +121,11 @@ QFrame* IntrinsicEdPropertyView::createCategoryHeaderWidget(const char* p_Title,
 
   if (p_Collapsed)
   {
-    button->setIcon(QIcon(":/Icons/roundRight"));
+    button->setIcon(QIcon(":/Icons/icons/arrows/shrink.png"));
   }
   else
   {
-    button->setIcon(QIcon(":/Icons/roundDown"));
+    button->setIcon(QIcon(":/Icons/icons/arrows/expand.png"));
   }
 
   button->setStyleSheet(
@@ -137,12 +137,9 @@ QFrame* IntrinsicEdPropertyView::createCategoryHeaderWidget(const char* p_Title,
                    SLOT(onCategoryHeaderClicked()));
 
   // Create icon (if mapping is available)
-  auto iconToUse = IntrinsicEd::_categoryToIconMapping.find(p_Title);
-  if (iconToUse != IntrinsicEd::_categoryToIconMapping.end())
   {
-    QPixmap* icon = new QPixmap(iconToUse->second.c_str());
     QLabel* iconLabel = new QLabel();
-    iconLabel->setPixmap(*icon);
+    iconLabel->setPixmap(IntrinsicEd::getPixmap(p_Title));
     frame->layout()->addWidget(iconLabel);
   }
 
@@ -408,7 +405,7 @@ void IntrinsicEdPropertyView::onValueChanged(rapidjson::Value& p_Properties)
       Dod::PropertyCompilerEntry& entry = _currentPropertyCompilerEntries[i];
       Dod::ManagerEntry& managerEntry = _currentManagerEntries[i];
 
-      entry.initFunction(entry.ref, p_Properties);
+      entry.initFunction(entry.ref, true, p_Properties);
 
       // Recreate resources if available
       if (managerEntry.destroyResourcesFunction &&

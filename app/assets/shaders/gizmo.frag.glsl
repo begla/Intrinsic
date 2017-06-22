@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,15 +21,13 @@
 #include "lib_math.glsl"
 #include "gbuffer.inc.glsl"
 
-layout (location = 0) in vec3 inNormal;
-layout (location = 1) in vec3 inColor;
+layout(location = 0) in vec3 inNormal;
+layout(location = 1) in vec3 inColor;
 
 OUTPUT
 
-layout (binding = 1) uniform PerInstance
-{
-  float _dummy;
-} uboPerInstance;
+layout(binding = 1) uniform PerInstance { float _dummy; }
+uboPerInstance;
 
 void main()
 {
@@ -42,7 +40,7 @@ void main()
     gbuffer.roughness = 0.5;
     gbuffer.materialBufferIdx = 0;
     gbuffer.occlusion = 1.0;
-    gbuffer.emissive = 0.0; 
+    gbuffer.emissive = 0.0;
   }
   writeGBuffer(gbuffer, outAlbedo, outNormal, outParameter0);
 }

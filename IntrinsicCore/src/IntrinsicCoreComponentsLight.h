@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref LightRef;
 typedef _INTR_ARRAY(LightRef) LightRefArray;
 
@@ -34,6 +35,7 @@ struct LightData : Dod::Components::ComponentDataBase
     descIntensity.resize(_INTR_MAX_LIGHT_COMPONENT_COUNT);
   }
 
+  // Description
   _INTR_ARRAY(float) descRadius;
   _INTR_ARRAY(glm::vec3) descColor;
   _INTR_ARRAY(float) descIntensity;
@@ -86,11 +88,10 @@ struct LightManager
                                              _N(Light), _N(float),
                                              _descRadius(p_Ref), false, false),
                            p_Document.GetAllocator());
-    p_Properties.AddMember("color",
-                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(Light), _N(color),
-                                             _descColor(p_Ref), false, false),
-                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "color", _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Light),
+                                   _N(color), _descColor(p_Ref), false, false),
+        p_Document.GetAllocator());
     p_Properties.AddMember(
         "intensity",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Light), _N(float),
@@ -106,6 +107,7 @@ struct LightManager
   // <-
 
   _INTR_INLINE static void initFromDescriptor(LightRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("radius"))
@@ -122,9 +124,6 @@ struct LightManager
   }
 
   // <-
-
-  // Getter/Setter
-  // ->
 
   // Description
   _INTR_INLINE static float& _descRadius(LightRef p_Ref)

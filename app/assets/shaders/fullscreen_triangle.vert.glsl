@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-out gl_PerVertex
-{
-  vec4 gl_Position;
-};
+out gl_PerVertex { vec4 gl_Position; };
 
-layout (location = 0) out vec2 outUV0;
+layout(location = 0) out vec2 outUV0;
 
 void main()
 {
-  outUV0 = vec2(float(gl_VertexIndex / 2) * 2.0, float(gl_VertexIndex % 2) * 2.0);
-  gl_Position = vec4(float(gl_VertexIndex / 2) * 4.0 - 1.0, float(gl_VertexIndex % 2) * 4.0 - 1.0, 0.0, 1.0);
+  outUV0 =
+      vec2(float(gl_VertexIndex / 2) * 2.0, float(gl_VertexIndex % 2) * 2.0);
+  gl_Position = vec4(float(gl_VertexIndex / 2) * 4.0 - 1.0,
+                     float(gl_VertexIndex % 2) * 4.0 - 1.0, 0.0, 1.0);
 }

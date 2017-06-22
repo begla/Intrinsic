@@ -4,6 +4,7 @@
         "name": "default_white",
         "materialPassMask": [
             "GBufferDefault",
+            "GBufferWireframe",
             "Shadow",
             "PerPixelPicking"
         ],
@@ -23,8 +24,8 @@
         "emissiveIntensity": 0.0,
         "normalTextureName": "default_NRM",
         "pbrTextureName": "default_PBR",
-        "metalMaskBias": 0.0,
-        "roughnessBias": 0.5,
-        "specularBias": 0.0
+        "metalMaskBias": -1.0,
+        "roughnessBias": 1.0,
+        "specularBias": -1.0
     }
 }

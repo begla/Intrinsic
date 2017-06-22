@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ struct Shadow
   static void destroy();
 
   static void prepareFrustums(Components::CameraRef p_CameraRef,
-                              _INTR_ARRAY(Core::Resources::FrustumRef) &
+                              _INTR_ARRAY(CResources::FrustumRef) &
                                   p_ShadowFrustums);
 
   static void render(float p_DeltaT, Components::CameraRef p_CameraRef);

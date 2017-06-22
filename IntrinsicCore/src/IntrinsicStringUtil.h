@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -92,10 +92,9 @@ _INTR_INLINE void replace(_INTR_STRING& p_String,
                           const _INTR_STRING& p_StringToReplace,
                           const _INTR_STRING& p_Replacement)
 {
-  size_t start_pos = p_String.find(p_StringToReplace);
-  if (start_pos == std::string::npos)
-    return;
-  p_String.replace(start_pos, p_StringToReplace.length(), p_Replacement);
+  size_t start_pos = std::string::npos;
+  while ((start_pos = p_String.find(p_StringToReplace)) != std::string::npos)
+    p_String.replace(start_pos, p_StringToReplace.length(), p_Replacement);
 }
 }
 }

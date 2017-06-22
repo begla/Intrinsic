@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,23 +20,9 @@ namespace Core
 {
 namespace Components
 {
+// Typedefs
 typedef Dod::Ref IrradianceProbeRef;
 typedef _INTR_ARRAY(IrradianceProbeRef) IrradianceProbeRefArray;
-
-struct SHCoeffs
-{
-  glm::vec3 L0;
-
-  glm::vec3 L10;
-  glm::vec3 L11;
-  glm::vec3 L12;
-
-  glm::vec3 L20;
-  glm::vec3 L21;
-  glm::vec3 L22;
-  glm::vec3 L23;
-  glm::vec3 L24;
-};
 
 struct IrradianceProbeData : Dod::Components::ComponentDataBase
 {
@@ -45,13 +31,19 @@ struct IrradianceProbeData : Dod::Components::ComponentDataBase
             _INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT)
   {
     descRadius.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
-    descSHCoeffs.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
     descPriority.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+    descFalloffRangePerc.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+    descFalloffExponent.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+
+    descSHs.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
   }
 
   _INTR_ARRAY(float) descRadius;
+  _INTR_ARRAY(float) descFalloffRangePerc;
+  _INTR_ARRAY(float) descFalloffExponent;
   _INTR_ARRAY(uint32_t) descPriority;
-  _INTR_ARRAY(SHCoeffs) descSHCoeffs;
+
+  _INTR_ARRAY(_INTR_ARRAY(IBL::SH9)) descSHs;
 };
 
 struct IrradianceProbeManager
@@ -76,7 +68,8 @@ struct IrradianceProbeManager
   _INTR_INLINE static void resetToDefault(MeshRef p_Ref)
   {
     _descRadius(p_Ref) = 20.0f;
-    memset(&_descSHCoeffs(p_Ref), 0x00, sizeof(SHCoeffs));
+    _descFalloffRangePerc(p_Ref) = 0.2f;
+    _descFalloffExp(p_Ref) = 1.0f;
   }
 
   // <-
@@ -101,98 +94,68 @@ struct IrradianceProbeManager
                                              _N(IrradianceProbe), _N(float),
                                              _descRadius(p_Ref), false, false),
                            p_Document.GetAllocator());
+    p_Properties.AddMember("falloffRangePerc",
+                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                             _N(IrradianceProbe), _N(float),
+                                             _descFalloffRangePerc(p_Ref),
+                                             false, false),
+                           p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "falloffExp",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
+                          _N(float), _descFalloffExp(p_Ref), false, false),
+        p_Document.GetAllocator());
     p_Properties.AddMember(
         "priority",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
                           _N(float), _descPriority(p_Ref), false, false),
         p_Document.GetAllocator());
 
-    p_Properties.AddMember(
-        "shL0",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L0, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL10",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L10, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL11",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L11, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL12",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L12, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL20",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L20, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL21",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L21, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL22",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L22, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL23",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L23, false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "shL24",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(vec3), _descSHCoeffs(p_Ref).L24, false, false),
-        p_Document.GetAllocator());
+    if (!p_GenerateDesc)
+    {
+      rapidjson::Value shs = rapidjson::Value(rapidjson::kArrayType);
+      for (uint32_t i = 0u; i < _descSHs(p_Ref).size(); ++i)
+      {
+        shs.PushBack(_INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                       _N(IrradianceProbe), _N(sh),
+                                       _descSHs(p_Ref)[i], false, false),
+                     p_Document.GetAllocator());
+      }
+      p_Properties.AddMember("shs", shs, p_Document.GetAllocator());
+    }
   }
 
   // <-
 
   _INTR_INLINE static void initFromDescriptor(IrradianceProbeRef p_Ref,
+                                              bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
   {
     if (p_Properties.HasMember("radius"))
       _descRadius(p_Ref) =
           JsonHelper::readPropertyFloat(p_Properties["radius"]);
+    if (p_Properties.HasMember("falloffRangePerc"))
+      _descFalloffRangePerc(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["falloffRangePerc"]);
+    if (p_Properties.HasMember("falloffExp"))
+      _descFalloffExp(p_Ref) =
+          JsonHelper::readPropertyFloat(p_Properties["falloffExp"]);
     if (p_Properties.HasMember("priority"))
       _descPriority(p_Ref) =
           (uint32_t)JsonHelper::readPropertyFloat(p_Properties["priority"]);
 
-    if (p_Properties.HasMember("shL0"))
-      _descSHCoeffs(p_Ref).L0 =
-          JsonHelper::readPropertyVec3(p_Properties["shL0"]);
-    if (p_Properties.HasMember("shL10"))
-      _descSHCoeffs(p_Ref).L10 =
-          JsonHelper::readPropertyVec3(p_Properties["shL10"]);
-    if (p_Properties.HasMember("shL11"))
-      _descSHCoeffs(p_Ref).L11 =
-          JsonHelper::readPropertyVec3(p_Properties["shL11"]);
-    if (p_Properties.HasMember("shL12"))
-      _descSHCoeffs(p_Ref).L12 =
-          JsonHelper::readPropertyVec3(p_Properties["shL12"]);
-    if (p_Properties.HasMember("shL20"))
-      _descSHCoeffs(p_Ref).L20 =
-          JsonHelper::readPropertyVec3(p_Properties["shL20"]);
-    if (p_Properties.HasMember("shL21"))
-      _descSHCoeffs(p_Ref).L21 =
-          JsonHelper::readPropertyVec3(p_Properties["shL21"]);
-    if (p_Properties.HasMember("shL22"))
-      _descSHCoeffs(p_Ref).L22 =
-          JsonHelper::readPropertyVec3(p_Properties["shL22"]);
-    if (p_Properties.HasMember("shL23"))
-      _descSHCoeffs(p_Ref).L23 =
-          JsonHelper::readPropertyVec3(p_Properties["shL23"]);
-    if (p_Properties.HasMember("shL24"))
-      _descSHCoeffs(p_Ref).L24 =
-          JsonHelper::readPropertyVec3(p_Properties["shL24"]);
+    if (!p_GenerateDesc)
+    {
+      if (p_Properties.HasMember("shs"))
+      {
+        _descSHs(p_Ref).clear();
+        const rapidjson::Value& shs = p_Properties["shs"];
+        for (uint32_t i = 0u; i < shs.Size(); ++i)
+        {
+          _descSHs(p_Ref).push_back(JsonHelper::readPropertySH(shs[i]));
+        }
+      }
+    }
   }
 
   // <-
@@ -214,9 +177,6 @@ struct IrradianceProbeManager
 
   // <-
 
-  // Getter/Setter
-  // ->
-
   // Description
   _INTR_INLINE static float& _descRadius(IrradianceProbeRef p_Ref)
   {
@@ -226,10 +186,18 @@ struct IrradianceProbeManager
   {
     return _data.descPriority[p_Ref._id];
   }
-
-  _INTR_INLINE static SHCoeffs& _descSHCoeffs(IrradianceProbeRef p_Ref)
+  _INTR_INLINE static float& _descFalloffRangePerc(IrradianceProbeRef p_Ref)
   {
-    return _data.descSHCoeffs[p_Ref._id];
+    return _data.descFalloffRangePerc[p_Ref._id];
+  }
+  _INTR_INLINE static float& _descFalloffExp(IrradianceProbeRef p_Ref)
+  {
+    return _data.descFalloffExponent[p_Ref._id];
+  }
+
+  _INTR_INLINE static _INTR_ARRAY(IBL::SH9) & _descSHs(IrradianceProbeRef p_Ref)
+  {
+    return _data.descSHs[p_Ref._id];
   }
 };
 }

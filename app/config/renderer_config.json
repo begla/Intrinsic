@@ -4,6 +4,7 @@
 		{
 			"name" : "PerInstanceDataPreCombine",
 			"entries" : [
+				"InverseViewMatrix",
 				"InverseProjectionMatrix",
 				"InverseViewProjectionMatrix",
 				"CameraWorldPosition",
@@ -24,7 +25,8 @@
 			"name" : "PerInstanceDataPostCombine",
 			"entries" : [
 				"HaltonSamples",
-				"CameraParameters"
+				"CameraParameters",
+				"PostParams0"
 			]
 		},
 		{
@@ -76,9 +78,9 @@
 			]
 		},
 		{
-			"name" : "Dummy",
+			"name" : "PerInstanceDataSMAA",
 			"entries" : [
-				"CameraWorldPosition"
+				"BackbufferSize"
 			]
 		}
 	],
@@ -167,9 +169,23 @@
 			"name" : "SSAOPrevFrame",
 			"renderSize" : "Half",
 			"imageFormat" : "B8G8R8A8UNorm"
+		},
+		{
+			"name" : "Output",
+			"renderSize" : "Full",
+			"imageFormat" : "B8G8R8A8Srgb"
+		},
+		{
+			"name" : "SMAAEdge",
+			"renderSize" : "Full",
+			"imageFormat" : "B8G8R8A8UNorm"
+		},
+		{
+			"name" : "SMAABlend",
+			"renderSize" : "Full",
+			"imageFormat" : "B8G8R8A8UNorm"
 		}
 	],
-
 	"renderSteps" : [
 		// Offscreen test
 		{
@@ -206,7 +222,7 @@
 			"materialPasses" : ["GBufferDefault", "GBufferTerrain"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
-				["GBufferAlbedo", [0.1, 0.5, 1.0, 1.0]],
+				["GBufferAlbedo", [0.0, 0.0, 0.0, 1.0]],
 				["GBufferNormal", [0.0, 0.0, 0.0, 0.0]],
 				["GBufferParameter0", [0.0, 0.0, 0.0, 0.0]],
 				["GBufferDepth", [1.0, 0.0, 0.0, 0.0]]
@@ -215,7 +231,7 @@
 		{
 			"type" : "RenderPassGenericMesh",
 			"name" : "GBufferFoliage",
-			"materialPasses" : ["GBufferFoliage"],
+			"materialPasses" : ["GBufferFoliage", "GBufferGrass"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
 				["GBufferAlbedo"],
@@ -241,7 +257,6 @@
 			"name" : "CopyOffscreenResult",
 			"fragmentGpuProgram" : "blit.frag",
 			"viewportRenderSize" : "Full",
-			"perInstanceDataBufferName" : "Dummy",
 			"inputs" : [
 				["Image", "GBufferAlbedo", "inputTex", "Fragment", "NearestClamp"]
 			],
@@ -271,7 +286,7 @@
 		{
 			"type" : "RenderPassGenericMesh",
 			"name" : "GBufferPrePassFoliage",
-			"materialPasses" : ["GBufferFoliagePrePass"],
+			"materialPasses" : ["GBufferFoliagePrePass", "GBufferGrassPrePass"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
 				["GBufferDepth", [1.0]]
@@ -280,7 +295,7 @@
 		{
 			"type" : "RenderPassGenericMesh",
 			"name" : "GBuffer",
-			"materialPasses" : ["GBufferDefault", "GBufferTerrain", "GBufferFoliage"],
+			"materialPasses" : ["GBufferDefault", "GBufferTerrain", "GBufferFoliage", "GBufferGrass"],
 			"renderOrder" : "FrontToBack",
 			"outputs" : [
 				["GBufferAlbedo", [0.1, 0.5, 1.0, 1.0]],
@@ -519,7 +534,6 @@
 			"name" : "CopySSAO",
 			"fragmentGpuProgram" : "blit.frag",
 			"viewportRenderSize" : "Half",
-			"perInstanceDataBufferName" : "Dummy",
 			"inputs" : [
 				["Image", "SSAO", "inputTex", "Fragment", "NearestClamp"]
 			],
@@ -529,7 +543,7 @@
 		},
 		// <-
 		{
-			"type" : "RenderPassLighting"
+			"type" : "RenderPassClustering"
 		},
 		{
 			"type" : "RenderPassVolumetricLighting"
@@ -549,6 +563,7 @@
 			"fragmentGpuProgram" : "pre_combine.frag",
 			"viewportRenderSize" : "Full",
 			"perInstanceDataBufferName" : "PerInstanceDataPreCombine",
+			"needsPerFrameBufferFragment" : true,
 			"inputs" : [
 				["Image", "GBufferAlbedo", "albedoTex", "Fragment", "NearestClamp"],
 				["Image", "GBufferNormal", "normalTex", "Fragment", "NearestClamp"],
@@ -561,8 +576,7 @@
 				["Image", "GBufferDepth", "depthBufferTex", "Fragment", "NearestClamp"],
 				["Image", "GBufferTransparentsDepth", "depthBufferTranspTex", "Fragment", "NearestClamp"],
 				["Buffer", "MaterialBuffer", "MaterialBuffer", "Fragment"],
-				["Image", "VolumetricLightingScatteringBuffer", "volLightScatteringBufferTex", "Fragment", "LinearClamp"],
-				["Image", "default_ibl_cube_irradiance", "irradianceTex", "Fragment", "LinearClamp"]
+				["Image", "VolumetricLightingScatteringBuffer", "volLightScatteringBufferTex", "Fragment", "LinearClamp"]
 			],
 			"outputs" : [
 				["Scene"]
@@ -586,7 +600,6 @@
 			"name" : "DownSampleScene",
 			"fragmentGpuProgram" : "blit.frag",
 			"viewportRenderSize" : "Half",
-			"perInstanceDataBufferName" : "Dummy",
 			"inputs" : [
 				["Image", "Scene", "inputTex", "Fragment", "LinearClamp"]
 			],
@@ -616,7 +629,6 @@
 			"name" : "LensFlare",
 			"fragmentGpuProgram" : "lens_flare.frag",
 			"viewportRenderSize" : "Quarter",
-			"perInstanceDataBufferName" : "Dummy",
 			"inputs" : [
 				["Image", "BloomBright", "brightnessTex", "Fragment", "LinearClamp"],
 				["Image", "lens_flare", "lensFlareTex", "Fragment", "LinearClamp"]
@@ -695,7 +707,7 @@
 			"name" : "BlurScene_X",
 			"fragmentGpuProgram" : "blur.frag",
 			"viewportRenderSize" : "Half",
-			"perInstanceDataBufferName" : "BlurLowX",
+			"perInstanceDataBufferName" : "BlurX",
 			"inputs" : [
 				["Image", "SceneDownSampled", "inputTex", "Fragment", "NearestClamp"]
 			],
@@ -720,7 +732,7 @@
 			"name" : "BlurScene_Y",
 			"fragmentGpuProgram" : "blur.frag",
 			"viewportRenderSize" : "Half",
-			"perInstanceDataBufferName" : "BlurLowY",
+			"perInstanceDataBufferName" : "BlurY",
 			"inputs" : [
 				["Image", "SceneBlurredPingPong", "inputTex", "Fragment", "NearestClamp"]
 			],
@@ -734,21 +746,12 @@
 			"sourceImageLayout" : "ColorAttachment",
 			"targetImageLayout" : "ShaderReadOnly"
 		},
-		// <-
-		/*{
-			"type" : "RenderPassGenericFullscreen",
-			"name" : "CopyOffscreenResult",
-			"fragmentGpuProgram" : "blit.frag",
-			"viewportRenderSize" : "Full",
-			"perInstanceDataBufferName" : "Dummy",
-			"inputs" : [
-				["Image", "LightBuffer", "inputTex", "Fragment", "NearestClamp"]
-			],
-			"outputs" : [
-				["Backbuffer"]
-			]
-		},*/
-		// <-
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "Output",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
 		{
 			"type" : "RenderPassGenericFullscreen",
 			"name" : "PostCombine",
@@ -766,9 +769,101 @@
 				["Buffer", "BloomLumBuffer", "AvgLum", "Fragment"]
 			],
 			"outputs" : [
+				["Output"]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "Output",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SMAAEdge",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		// SMAA
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "SMAA_Edge",
+			"fragmentGpuProgram" : "smaa_edge.frag",
+			"vertexGpuProgram" : "smaa_edge.vert",
+			"viewportRenderSize" : "Full",
+			"perInstanceDataBufferName" : "PerInstanceDataSMAA",
+			"perInstanceDataVertexBufferName" : "PerInstanceDataSMAA",
+			"inputs" : [
+				["Image", "Output", "inputTex", "Fragment", "LinearClamp", 2]
+			],
+			"outputs" : [
+				["SMAAEdge", [0.0, 0.0, 0.0, 0.0]]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SMAAEdge",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SMAABlend",
+			"sourceImageLayout" : "Undefined",
+			"targetImageLayout" : "ColorAttachment"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "SMAA_Weight",
+			"fragmentGpuProgram" : "smaa_weight.frag",
+			"vertexGpuProgram" : "smaa_weight.vert",
+			"viewportRenderSize" : "Full",
+			"perInstanceDataBufferName" : "PerInstanceDataSMAA",
+			"perInstanceDataVertexBufferName" : "PerInstanceDataSMAA",
+			"inputs" : [
+				["Image", "SMAAEdge", "inputTex", "Fragment", "LinearClamp"],
+				["Image", "smaa_search", "searchTex", "Fragment", "NearestClamp"],
+				["Image", "smaa_area", "areaTex", "Fragment", "LinearClamp"]
+			],
+			"outputs" : [
+				["SMAABlend", [0.0, 0.0, 0.0, 0.0]]
+			]
+		},
+		{
+			"type" : "ImageMemoryBarrier",
+			"image" : "SMAABlend",
+			"sourceImageLayout" : "ColorAttachment",
+			"targetImageLayout" : "ShaderReadOnly"
+		},
+		{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "SMAA_Blend",
+			"fragmentGpuProgram" : "smaa_blend.frag",
+			"vertexGpuProgram" : "smaa_blend.vert",
+			"perInstanceDataBufferName" : "PerInstanceDataSMAA",
+			"perInstanceDataVertexBufferName" : "PerInstanceDataSMAA",
+			"viewportRenderSize" : "Full",
+			"inputs" : [
+				["Image", "Output", "inputTex", "Fragment", "LinearClamp", 2],
+				["Image", "SMAABlend", "blendTex", "Fragment", "LinearClamp"]
+			],
+			"outputs" : [
 				["Backbuffer"]
 			]
 		}
+		// <-
+		/*,{
+			"type" : "RenderPassGenericFullscreen",
+			"name" : "BlitTest",
+			"fragmentGpuProgram" : "blit.frag",
+			"viewportRenderSize" : "Full",
+			"inputs" : [
+				["Image", "Output", "inputTex", "Fragment", "NearestClamp", 2]
+			],
+			"outputs" : [
+				["Backbuffer"]
+			]
+		}*/
 		// <-
 	]
 }

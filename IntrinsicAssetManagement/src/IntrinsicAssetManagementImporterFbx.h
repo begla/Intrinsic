@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ struct ImporterFbx
   static void destroy();
 
   static bool importMeshesFromFile(const _INTR_STRING& p_FilePath,
-                                   _INTR_ARRAY(Core::Resources::MeshRef) &
+                                   _INTR_ARRAY(CResources::MeshRef) &
                                        p_ImportedMeshes);
 };
 }

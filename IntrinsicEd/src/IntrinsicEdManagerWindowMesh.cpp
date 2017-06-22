@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ IntrinsicEdManagerWindowMesh::IntrinsicEdManagerWindowMesh(QWidget* parent)
   _propertyCompilerEntry =
       Application::_resourcePropertyCompilerMapping[_N(Mesh)];
   _resourceManagerEntry = Application::_resourceManagerMapping[_N(Mesh)];
-  _resourceIcon = QIcon(":/Icons/truck");
   _managerPath = "managers/meshes/";
   _managerExtension = ".mesh.json";
 

@@ -4,6 +4,7 @@
         "name": "default_emissive",
         "materialPassMask": [
             "GBufferDefault",
+            "GBufferWireframe",
             "Shadow",
             "PerPixelPicking"
         ],

@@ -42,6 +42,7 @@
 namespace glslang {
 
 class TAttributeMap; // forward declare
+class TFunctionDeclarator;
 
 class HlslParseContext : public TParseContextBase {
 public:
@@ -93,7 +94,9 @@ public:
     void decomposeSampleMethods(const TSourceLoc&, TIntermTyped*& node, TIntermNode* arguments);
     void decomposeStructBufferMethods(const TSourceLoc&, TIntermTyped*& node, TIntermNode* arguments);
     void decomposeGeometryMethods(const TSourceLoc&, TIntermTyped*& node, TIntermNode* arguments);
+    void pushFrontArguments(TIntermTyped* front, TIntermTyped*& arguments);
     void addInputArgumentConversions(const TFunction&, TIntermTyped*&);
+    void expandArguments(const TSourceLoc&, const TFunction&, TIntermTyped*&);
     TIntermTyped* addOutputArgumentConversions(const TFunction&, TIntermOperator&);
     void builtInOpCheck(const TSourceLoc&, const TFunction&, TIntermOperator&);
     TFunction* makeConstructorCall(const TSourceLoc&, const TType&);
@@ -135,7 +138,7 @@ public:
     void mergeObjectLayoutQualifiers(TQualifier& dest, const TQualifier& src, bool inheritOnly);
     void checkNoShaderLayouts(const TSourceLoc&, const TShaderQualifiers&);
 
-    const TFunction* findFunction(const TSourceLoc& loc, TFunction& call, bool& builtIn, TIntermTyped*& args);
+    const TFunction* findFunction(const TSourceLoc& loc, TFunction& call, bool& builtIn, int& thisDepth, TIntermTyped*& args);
     void declareTypedef(const TSourceLoc&, const TString& identifier, const TType&);
     void declareStruct(const TSourceLoc&, TString& structName, TType&);
     TSymbol* lookupUserType(const TString&, TType&);
@@ -166,7 +169,7 @@ public:
     void pushScope()         { symbolTable.push(); }
     void popScope()          { symbolTable.pop(0); }
 
-    void pushThisScope(const TType&);
+    void pushThisScope(const TType&, const TVector<TFunctionDeclarator>&);
     void popThisScope()      { symbolTable.pop(0); }
 
     void pushImplicitThis(TVariable* thisParameter) { implicitThisStack.push_back(thisParameter); }
@@ -184,7 +187,8 @@ public:
     virtual void growGlobalUniformBlock(const TSourceLoc&, TType&, const TString& memberName, TTypeList* typeList = nullptr) override;
 
     // Apply L-value conversions.  E.g, turning a write to a RWTexture into an ImageStore.
-    TIntermTyped* handleLvalue(const TSourceLoc&, const char* op, TIntermTyped* node);
+    TIntermTyped* handleLvalue(const TSourceLoc&, const char* op, TIntermTyped*& node);
+    TIntermTyped* handleSamplerLvalue(const TSourceLoc&, const char* op, TIntermTyped*& node);
     bool lValueErrorCheck(const TSourceLoc&, const char* op, TIntermTyped*) override;
 
     TLayoutFormat getLayoutFromTxType(const TSourceLoc&, const TType&);
@@ -234,13 +238,14 @@ protected:
 
     // Array and struct flattening
     TIntermTyped* flattenAccess(TIntermTyped* base, int member);
-    bool shouldFlattenUniform(const TType&) const;
+    TIntermTyped* flattenAccess(int uniqueId, int member, const TType&);
+    bool shouldFlatten(const TType&) const;
     bool wasFlattened(const TIntermTyped* node) const;
     bool wasFlattened(int id) const { return flattenMap.find(id) != flattenMap.end(); }
     int  addFlattenedMember(const TSourceLoc& loc, const TVariable&, const TType&, TFlattenData&, const TString& name, bool track);
     bool isFinalFlattening(const TType& type) const { return !(type.isStruct() || type.isArray()); }
 
-    // Structure splitting (splits interstage builtin types into its own struct)
+    // Structure splitting (splits interstage built-in types into its own struct)
     TIntermTyped* splitAccessStruct(const TSourceLoc& loc, TIntermTyped*& base, int& member);
     void splitAccessArray(const TSourceLoc& loc, TIntermTyped* base, TIntermTyped* index);
     TType& split(TType& type, TString name, const TType* outerStructType = nullptr);
@@ -275,6 +280,7 @@ protected:
 
     // Test method names
     bool isStructBufferMethod(const TString& name) const;
+    void counterBufferType(const TSourceLoc& loc, TType& type);
 
     // Return standard sample position array
     TIntermConstantUnion* getSamplePosArray(int count);
@@ -283,6 +289,9 @@ protected:
     bool isStructBufferType(const TType& type) const { return getStructBufferContentType(type) != nullptr; }
     TIntermTyped* indexStructBufferContent(const TSourceLoc& loc, TIntermTyped* buffer) const;
     TIntermTyped* getStructBufferCounter(const TSourceLoc& loc, TIntermTyped* buffer);
+    TString getStructBuffCounterName(const TString&) const;
+    void addStructBuffArguments(const TSourceLoc& loc, TIntermAggregate*&);
+    void addStructBufferHiddenCounterParam(const TSourceLoc& loc, TParameter&, TIntermAggregate*&);
 
     // Return true if this type is a reference.  This is not currently a type method in case that's
     // a language specific answer.
@@ -305,17 +314,7 @@ protected:
     TIntermSymbol* findLinkageSymbol(TBuiltInVariable biType) const;
 
     // Current state of parsing
-    struct TPragma contextPragma;
-    int loopNestingLevel;        // 0 if outside all loops
     int annotationNestingLevel;  // 0 if outside all annotations
-    int structNestingLevel;      // 0 if outside blocks and structures
-    int controlFlowNestingLevel; // 0 if outside all flow control
-    TList<TIntermSequence*> switchSequenceStack;  // case, node, case, case, node, ...; ensure only one node between cases;   stack of them for nesting
-    bool postEntryPointReturn;         // if inside a function, true if the function is the entry point and this is after a return statement
-    const TType* currentFunctionType;  // the return type of the function that's currently being parsed
-    bool functionReturnsValue;   // true if a non-void function has a return
-    TBuiltInResource resources;
-    TLimits& limits;
 
     HlslParseContext(HlslParseContext&);
     HlslParseContext& operator=(HlslParseContext&);

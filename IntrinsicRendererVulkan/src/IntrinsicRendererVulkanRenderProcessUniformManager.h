@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,28 @@ namespace Vulkan
 {
 namespace RenderProcess
 {
+struct PerFrameDataVertex
+{
+  glm::vec4 _dummy;
+};
+
+struct PerFrameDataFrament
+{
+  glm::mat4 viewMatrix;
+  glm::mat4 invProjectionMatrix;
+  glm::mat4 invViewMatrix;
+
+  glm::vec4 skyModelConfigs[7];
+  glm::vec4 skyModelRadiances;
+
+  glm::vec4 sunLightDirVS;
+  glm::vec4 sunLightDirWS;
+  glm::vec4 skyLightSH[7];
+  glm::vec4 sunLightColorAndIntensity;
+
+  glm::vec4 postParams0;
+};
+
 struct UniformBufferDataEntry
 {
   UniformBufferDataEntry(void* p_UniformData, uint32_t p_Size)
@@ -41,13 +63,26 @@ struct UniformManager
   static void resetAllocator();
   static UniformBufferDataEntry requestUniformBufferData(const Name& p_Name);
 
+  _INTR_INLINE static uint32_t getDynamicOffsetForPerFrameDataFragment()
+  {
+    return RenderSystem::_backbufferIndex * 2u *
+               _INTR_VK_PER_FRAME_BLOCK_SIZE_IN_BYTES +
+           _INTR_VK_PER_FRAME_BLOCK_SIZE_IN_BYTES;
+  }
+
+  _INTR_INLINE static uint32_t getDynamicOffsetForPerFrameDataVertex()
+  {
+    return RenderSystem::_backbufferIndex * 2u *
+           _INTR_VK_PER_FRAME_BLOCK_SIZE_IN_BYTES;
+  }
+
   static struct UniformDataSource
   {
+    glm::mat4 inverseViewMatrix;
     glm::mat4 projectionMatrix;
     glm::mat4 inverseProjectionMatrix;
     glm::mat4 inverseViewProjectionMatrix;
     glm::vec4 cameraWorldPosition;
-    glm::mat4 normalMatrix;
     glm::mat4 viewMatrix;
     glm::mat4 prevViewMatrix;
     glm::vec4 haltonSamples;
@@ -60,7 +95,7 @@ struct UniformManager
     glm::vec4 blurParamsYLow;
     glm::vec4 cameraParameters;
     glm::vec4 postParams0;
-
+    glm::vec4 backbufferSize;
   } _uniformDataSource;
 };
 }

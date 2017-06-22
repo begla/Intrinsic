@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -64,7 +64,6 @@ struct ComponentManagerBase : Dod::ManagerBase<IdCount, DataType>
     return componentIt->second;
   }
 
-  // Setter/getter
   _INTR_INLINE static Entity::EntityRef& _entity(Ref p_Ref)
   {
     return _data.entity[p_Ref._id];

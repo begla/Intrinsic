@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,6 +98,7 @@ int _main(int argc, char* argv[])
   {
     TaskManager::executeTasks();
   }
+  RV::RenderSystem::shutdown();
 
   return 0;
 }

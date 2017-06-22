@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -119,8 +119,9 @@ void System::processKeyReleaseEvent(const KeyEvent& p_Event)
 
 void System::processMouseMoveEvent(const MouseMoveEvent& p_Event)
 {
-  if (_lastMousePos != p_Event.pos || _lastMousePosRel != p_Event.posRel ||
-      _lastMousePosViewport != p_Event.posViewport)
+  if (_lastMousePos != p_Event.pos ||
+      _lastMousePosViewport != p_Event.posViewport ||
+      _lastMousePosRel != p_Event.posRel)
   {
     Resources::QueuedEventData eventData;
     eventData.mouseEvent.pos[0] = p_Event.pos.x;
@@ -131,8 +132,8 @@ void System::processMouseMoveEvent(const MouseMoveEvent& p_Event)
     eventData.mouseEvent.posRel[1] = p_Event.posRel.y;
     Resources::EventManager::queueEvent(_N(MouseMoved), eventData);
 
+    _lastMousePosRel += p_Event.posRel;
     _lastMousePos = p_Event.pos;
-    _lastMousePosRel = p_Event.posRel;
     _lastMousePosViewport = p_Event.posViewport;
   }
 }

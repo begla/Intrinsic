@@ -4,14 +4,7 @@
         "name": "default_NRM",
         "imageType": 1,
         "imageFormat": 7,
-        "flags": 16,
-        "dimensions": [
-            1.0,
-            1.0,
-            1.0
-        ],
-        "arrayLayerCount": 1,
-        "mipLevelCount": 1,
-        "fileName": "default_NRM.dds"
+        "fileName": "default_NRM.dds",
+        "avgNormLength": 0.9999999403953552
     }
 }

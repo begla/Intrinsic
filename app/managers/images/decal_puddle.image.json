@@ -1,0 +1,10 @@
+{
+    "name": "decal_puddle",
+    "properties": {
+        "name": "decal_puddle",
+        "imageType": 1,
+        "imageFormat": 10,
+        "fileName": "decal_puddle.dds",
+        "avgNormLength": 1.0
+    }
+}

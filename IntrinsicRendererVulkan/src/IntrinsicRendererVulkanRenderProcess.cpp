@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
 // Precompiled header file
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
+
+using namespace RVResources;
+using namespace CResources;
 
 namespace Intrinsic
 {
@@ -43,7 +46,7 @@ enum Enum
   kRenderPassDebug,
   kRenderPassPerPixelPicking,
   kRenderPassShadow,
-  kRenderPassLighting,
+  kRenderPassClustering,
   kRenderPassVolumetricLighting,
   kRenderPassBloom
 };
@@ -54,7 +57,7 @@ _renderStepTypeMapping = {
     {"RenderPassDebug", RenderStepType::kRenderPassDebug},
     {"RenderPassPerPixelPicking", RenderStepType::kRenderPassPerPixelPicking},
     {"RenderPassShadow", RenderStepType::kRenderPassShadow},
-    {"RenderPassLighting", RenderStepType::kRenderPassLighting},
+    {"RenderPassClustering", RenderStepType::kRenderPassClustering},
     {"RenderPassVolumetricLighting",
      RenderStepType::kRenderPassVolumetricLighting},
     {"RenderPassBloom", RenderStepType::kRenderPassBloom}};
@@ -74,8 +77,9 @@ _renderStepFunctionMapping = {
       RenderPass::PerPixelPicking::onReinitRendering}},
     {RenderStepType::kRenderPassShadow,
      {RenderPass::Shadow::render, RenderPass::Shadow::onReinitRendering}},
-    {RenderStepType::kRenderPassLighting,
-     {RenderPass::Lighting::render, RenderPass::Lighting::onReinitRendering}},
+    {RenderStepType::kRenderPassClustering,
+     {RenderPass::Clustering::render,
+      RenderPass::Clustering::onReinitRendering}},
     {RenderStepType::kRenderPassVolumetricLighting,
      {RenderPass::VolumetricLighting::render,
       RenderPass::VolumetricLighting::onReinitRendering}},
@@ -111,16 +115,14 @@ _INTR_ARRAY(RenderPass::GenericFullscreen) _renderPassesGenericFullScreen;
 _INTR_ARRAY(RenderPass::GenericBlur) _renderPassesGenericBlur;
 _INTR_ARRAY(RenderPass::GenericMesh) _renderPassesGenericMesh;
 _INTR_ARRAY(RenderStep) _renderSteps;
-_INTR_ARRAY(Resources::ImageRef) _images;
+_INTR_ARRAY(ImageRef) _images;
 
 _INTR_ARRAY(Name) _cameraNames;
 _INTR_ARRAY(Components::CameraRef) _cameras;
 
 _INTR_INLINE void executeRenderSteps(float p_DeltaT)
 {
-  using namespace Resources;
-
-  Components::CameraRef activeCamera = World::getActiveCamera();
+  Components::CameraRef activeCamera = World::_activeCamera;
   Components::CameraRef currentActiveCamera = Components::CameraRef();
 
   for (uint32_t i = 0u; i < _renderSteps.size(); ++i)
@@ -196,8 +198,6 @@ LockFreeStack<Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT> RenderProcess::Default::
 
 void Default::loadRendererConfig()
 {
-  using namespace Resources;
-
   // Destroy render passes and images
   {
     for (uint32_t i = 0u; i < _renderPassesGenericFullScreen.size(); ++i)
@@ -277,7 +277,8 @@ void Default::loadRendererConfig()
         {
           ImageManager::_descImageFormat(imageRef) =
               Helper::mapFormat(imageFormat.GetString());
-          ImageManager::_descImageFlags(imageRef) |= ImageFlags::kUsageStorage;
+          // ImageManager::_descImageFlags(imageRef) |=
+          // ImageFlags::kUsageStorage;
         }
 
         ImageManager::_descImageType(imageRef) = ImageType::kTexture;
@@ -379,7 +380,7 @@ void Default::renderFrame(float p_DeltaT)
           {
             const Name& cameraName = _cameraNames[i];
 
-            Components::CameraRef cam = World::getActiveCamera();
+            Components::CameraRef cam = World::_activeCamera;
             if (cameraName != _N(ActiveCamera))
               cam = Components::CameraManager::getComponentForEntity(
                   Entity::EntityManager::getEntityByName(cameraName));
@@ -389,7 +390,7 @@ void Default::renderFrame(float p_DeltaT)
         }
         else
         {
-          _cameras.push_back(World::getActiveCamera());
+          _cameras.push_back(World::_activeCamera);
         }
       }
 
@@ -399,16 +400,14 @@ void Default::renderFrame(float p_DeltaT)
       {
         Components::CameraRef camRef = _cameras[i];
 
-        Core::Resources::FrustumRef frustumRef =
-            Components::CameraManager::_frustum(camRef);
+        FrustumRef frustumRef = Components::CameraManager::_frustum(camRef);
         _cameraToIdMapping[camRef] = (uint8_t)_activeFrustums.size();
         _activeFrustums.push_back(frustumRef);
 
         // Only allow shadows for the main view
         if (_cameraNames[i] == _N(ActiveCamera))
         {
-          _INTR_ARRAY(Core::Resources::FrustumRef)& shadowFrustums =
-              _shadowFrustums[camRef];
+          _INTR_ARRAY(FrustumRef)& shadowFrustums = _shadowFrustums[camRef];
           RenderPass::Shadow::prepareFrustums(camRef, shadowFrustums);
           _activeFrustums.insert(RenderProcess::Default::_activeFrustums.end(),
                                  shadowFrustums.begin(), shadowFrustums.end());
@@ -417,11 +416,9 @@ void Default::renderFrame(float p_DeltaT)
 
       Components::CameraManager::updateFrustums(
           Components::CameraManager::_activeRefs);
-      Core::Resources::FrustumManager::prepareForRendering(
-          Core::Resources::FrustumManager::_activeRefs);
+      FrustumManager::prepareForRendering(FrustumManager::_activeRefs);
 
-      Core::Resources::FrustumManager::cullNodes(
-          RenderProcess::Default::_activeFrustums);
+      FrustumManager::cullNodes(RenderProcess::Default::_activeFrustums);
 
       // Collect visible draw calls and mesh components
       Components::MeshManager::collectDrawCallsAndMeshComponents();

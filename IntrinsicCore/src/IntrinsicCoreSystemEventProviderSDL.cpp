@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -86,6 +86,9 @@ void SDL::pumpEvents()
       case SDLK_F3:
         keyEvent.key = Input::Key::kF3;
         break;
+      case SDLK_F10:
+        keyEvent.key = Input::Key::kF10;
+        break;
       case SDLK_0:
         keyEvent.key = Input::Key::k0;
         break;
@@ -130,6 +133,12 @@ void SDL::pumpEvents()
         break;
       case SDLK_ESCAPE:
         keyEvent.key = Input::Key::kEscape;
+        break;
+      case SDLK_DELETE:
+        keyEvent.key = Input::Key::kDel;
+        break;
+      case SDLK_BACKSPACE:
+        keyEvent.key = Input::Key::kBackspace;
         break;
       }
 
@@ -178,7 +187,7 @@ void SDL::pumpEvents()
       Input::MouseMoveEvent mouseEvent = {
           glm::vec2(sdlEvent.motion.x, sdlEvent.motion.y),
           glm::vec2(sdlEvent.motion.x, sdlEvent.motion.y) /
-              glm::vec2(Renderer::Vulkan::RenderSystem::_backbufferDimensions),
+              glm::vec2(RV::RenderSystem::_backbufferDimensions),
           glm::vec2(sdlEvent.motion.xrel, sdlEvent.motion.yrel)};
 
       Input::System::processMouseMoveEvent(mouseEvent);
@@ -189,11 +198,10 @@ void SDL::pumpEvents()
       {
       case SDL_WINDOWEVENT_RESIZED:
         if (sdlEvent.window.data1 !=
-                Renderer::Vulkan::RenderSystem::_backbufferDimensions.x ||
-            sdlEvent.window.data2 !=
-                Renderer::Vulkan::RenderSystem::_backbufferDimensions.y)
+                RV::RenderSystem::_backbufferDimensions.x ||
+            sdlEvent.window.data2 != RV::RenderSystem::_backbufferDimensions.y)
         {
-          Renderer::Vulkan::RenderSystem::onViewportChanged();
+          RV::RenderSystem::onViewportChanged();
         }
         break;
       case SDL_WINDOWEVENT_CLOSE:

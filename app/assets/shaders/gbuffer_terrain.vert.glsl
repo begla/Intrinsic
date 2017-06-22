@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,29 +18,29 @@
 #extension GL_ARB_shading_language_420pack : enable
 #extension GL_GOOGLE_include_directive : enable
 
-#include "surface_vertex.inc.glsl"
+#include "gbuffer_vertex.inc.glsl"
 
-out gl_PerVertex
-{
-  vec4 gl_Position;
-};
+out gl_PerVertex { vec4 gl_Position; };
 
 PER_INSTANCE_UBO;
 INPUT();
 
-layout (location = 0) out vec3 outNormal;
-layout (location = 1) out vec3 outTangent;
-layout (location = 2) out vec3 outBinormal;
-layout (location = 3) out vec3 outColor;
-layout (location = 4) out vec2 outUV0;
+layout(location = 0) out vec3 outNormal;
+layout(location = 1) out vec3 outTangent;
+layout(location = 2) out vec3 outBinormal;
+layout(location = 3) out vec3 outColor;
+layout(location = 4) out vec2 outUV0;
 
 void main()
 {
   gl_Position = uboPerInstance.worldViewProjMatrix * vec4(inPosition.xyz, 1.0);
 
   outColor = inColor.xyz;
-  outNormal = normalize(uboPerInstance.normalMatrix * vec4(inNormal, 0.0)).xyz;
-  outTangent = normalize(uboPerInstance.normalMatrix * vec4(inTangent, 0.0)).xyz;
-  outBinormal = normalize(uboPerInstance.normalMatrix * vec4(inBinormal, 0.0)).xyz;
+  outNormal =
+      normalize(uboPerInstance.worldViewMatrix * vec4(inNormal, 0.0)).xyz;
+  outTangent =
+      normalize(uboPerInstance.worldViewMatrix * vec4(inTangent, 0.0)).xyz;
+  outBinormal =
+      normalize(uboPerInstance.worldViewMatrix * vec4(inBinormal, 0.0)).xyz;
   outUV0 = inUV0;
 }

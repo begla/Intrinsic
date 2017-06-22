@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
 
 // Precompiled header file
 #include "stdafx_assets.h"
-#include "stdafx.h"
 #include "stdafx_vulkan.h"
+
+using namespace RVResources;
+using namespace CResources;
 
 namespace Intrinsic
 {
@@ -69,7 +71,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     {
       ImporterFbx::init();
 
-      _INTR_ARRAY(Core::Resources::MeshRef) importedMeshes;
+      _INTR_ARRAY(MeshRef) importedMeshes;
       ImporterFbx::importMeshesFromFile(Settings::Manager::_assetMeshPath +
                                             "/" + _descAssetFileName(assetRef),
                                         importedMeshes);
@@ -77,12 +79,12 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
 
       for (uint32_t i = 0u; i < importedMeshes.size(); ++i)
       {
-        Core::Resources::MeshManager::saveToMultipleFilesSingleResource(
+        MeshManager::saveToMultipleFilesSingleResource(
             importedMeshes[i], "managers/meshes/", ".mesh.json");
       }
 
-      Renderer::Vulkan::Resources::MaterialManager::saveToMultipleFiles(
-          "managers/materials/", ".material.json");
+      MaterialManager::saveToMultipleFiles("managers/materials/",
+                                           ".material.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kLinearColorTexture)
     {
@@ -92,30 +94,27 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      Renderer::Vulkan::Resources::ImageManager::saveToMultipleFiles(
-          "managers/images/", ".image.json");
+      ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kAlbedoTexture)
     {
       ImporterTexture::init();
-      ImporterTexture::importAlebdoAlphaTextureFromFile(
+      ImporterTexture::importAlbedoTextureFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      Renderer::Vulkan::Resources::ImageManager::saveToMultipleFiles(
-          "managers/images/", ".image.json");
+      ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kAlbedoAlphaTexture)
     {
       ImporterTexture::init();
-      ImporterTexture::importAlebdoAlphaTextureFromFile(
+      ImporterTexture::importAlbedoAlphaTextureFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      Renderer::Vulkan::Resources::ImageManager::saveToMultipleFiles(
-          "managers/images/", ".image.json");
+      ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kNormalTexture)
     {
@@ -125,8 +124,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      Renderer::Vulkan::Resources::ImageManager::saveToMultipleFiles(
-          "managers/images/", ".image.json");
+      ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kHdrTexture)
     {
@@ -136,8 +134,7 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
           _descAssetFileName(assetRef));
       ImporterTexture::destroy();
 
-      Renderer::Vulkan::Resources::ImageManager::saveToMultipleFiles(
-          "managers/images/", ".image.json");
+      ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
   }
 }

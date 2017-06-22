@@ -1,4 +1,4 @@
-// Copyright 2016 Benjamin Glatzel
+// Copyright 2017 Benjamin Glatzel
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ _INTR_INLINE void initResource(TBuiltInResource& p_Resource)
   p_Resource.maxVertexUniformComponents = 4096;
   p_Resource.maxVaryingFloats = 64;
   p_Resource.maxVertexTextureImageUnits = 32;
-  p_Resource.maxCombinedTextureImageUnits = 80;
+  p_Resource.maxCombinedTextureImageUnits = 4096;
   p_Resource.maxTextureImageUnits = 32;
   p_Resource.maxFragmentUniformComponents = 4096;
   p_Resource.maxDrawBuffers = 32;
@@ -267,6 +267,9 @@ _INTR_INLINE VkFormat mapFormatToVkFormat(Format::Enum p_Format)
     return VK_FORMAT_BC5_SNORM_BLOCK;
   case Format::kBC6UFloat:
     return VK_FORMAT_BC6H_UFLOAT_BLOCK;
+
+  case Format::kR8UNorm:
+    return VK_FORMAT_R8_UNORM;
   }
 
   _INTR_ASSERT(false && "Failed to map format");
@@ -643,7 +646,8 @@ mapRenderSize(const _INTR_STRING& p_RenderSize)
   static _INTR_HASH_MAP(Name, RenderSize::Enum)
       renderSizes = {{"Full", RenderSize::kFull},
                      {"Half", RenderSize::kHalf},
-                     {"Quarter", RenderSize::kQuarter}};
+                     {"Quarter", RenderSize::kQuarter},
+                     {"Cubemap", RenderSize::kCubemap}};
 
   auto renderSize = renderSizes.find(p_RenderSize);
   if (renderSize != renderSizes.end())

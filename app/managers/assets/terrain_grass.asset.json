@@ -1,0 +1,8 @@
+{
+    "name": "terrain_grass",
+    "properties": {
+        "name": "terrain_grass",
+        "assetFileName": "terrain_grass.tga",
+        "assetType": 2
+    }
+}
