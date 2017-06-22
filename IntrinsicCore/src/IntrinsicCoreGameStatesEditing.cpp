@@ -218,8 +218,9 @@ _INTR_INLINE void selectGizmoPlane(const glm::vec3& p_EntityWorldPos,
   bool iXZ = Math::calcIntersectRayPlane(
       p_WorldRay, glm::vec3(0.0f, 1.0f, 0.0f), p_EntityWorldPos, pXZ);
   glm::vec3 localXZ = pXZ - p_EntityWorldPos;
-  iXZ = iXZ && glm::all(glm::lessThanEqual(glm::vec2(localXZ.x, localXZ.z),
-                                           glm::vec2(planeWidthHeight))) &&
+  iXZ = iXZ &&
+        glm::all(glm::lessThanEqual(glm::vec2(localXZ.x, localXZ.z),
+                                    glm::vec2(planeWidthHeight))) &&
         glm::all(
             greaterThanEqual(glm::vec2(localXZ.x, localXZ.z), glm::vec2(0.0f)));
 
@@ -227,8 +228,9 @@ _INTR_INLINE void selectGizmoPlane(const glm::vec3& p_EntityWorldPos,
   bool iXY = Math::calcIntersectRayPlane(
       p_WorldRay, glm::vec3(0.0f, 0.0f, 1.0f), p_EntityWorldPos, pXY);
   glm::vec3 localXY = pXY - p_EntityWorldPos;
-  iXY = iXY && glm::all(glm::lessThanEqual(glm::vec2(localXY.x, localXY.y),
-                                           glm::vec2(planeWidthHeight))) &&
+  iXY = iXY &&
+        glm::all(glm::lessThanEqual(glm::vec2(localXY.x, localXY.y),
+                                    glm::vec2(planeWidthHeight))) &&
         glm::all(
             greaterThanEqual(glm::vec2(localXY.x, localXY.y), glm::vec2(0.0f)));
 
@@ -236,8 +238,9 @@ _INTR_INLINE void selectGizmoPlane(const glm::vec3& p_EntityWorldPos,
   bool iYZ = Math::calcIntersectRayPlane(
       p_WorldRay, glm::vec3(1.0f, 0.0f, 0.0f), p_EntityWorldPos, pYZ);
   glm::vec3 localYZ = pYZ - p_EntityWorldPos;
-  iYZ = iYZ && glm::all(glm::lessThanEqual(glm::vec2(localYZ.y, localYZ.z),
-                                           glm::vec2(planeWidthHeight))) &&
+  iYZ = iYZ &&
+        glm::all(glm::lessThanEqual(glm::vec2(localYZ.y, localYZ.z),
+                                    glm::vec2(planeWidthHeight))) &&
         glm::all(
             greaterThanEqual(glm::vec2(localYZ.y, localYZ.z), glm::vec2(0.0f)));
 
@@ -453,10 +456,10 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
   else if (Input::System::getKeyStates()[Input::Key::kCtrl] ==
            Input::KeyState::kPressed)
   {
-    _orbitRadius = glm::max(_orbitRadius -
-                                Editing::_cameraSpeed *
+    _orbitRadius =
+        glm::max(_orbitRadius - Editing::_cameraSpeed *
                                     (_camAngVel.x - _camAngVel.y) * p_DeltaT,
-                            0.1f);
+                 0.1f);
   }
 
   camRot = glm::quat(_eulerAngles);
@@ -953,6 +956,11 @@ void Editing::updatePerInstanceData()
             Components::NodeManager::_worldPosition(nodeRef), worldRay, x, y,
             z);
       }
+
+      // Also highlight axes which are currently "picked/used"
+      x = x || _XAxisSelected;
+      y = y || _YAxisSelected;
+      z = z || _ZAxisSelected;
 
       perInstanceDataVertex.colorTintX = x ? glm::vec4(1.0f) : glm::vec4(0.5f);
       perInstanceDataVertex.colorTintY = y ? glm::vec4(1.0f) : glm::vec4(0.5f);
