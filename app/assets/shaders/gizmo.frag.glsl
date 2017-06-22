@@ -33,7 +33,7 @@ void main()
 {
   GBuffer gbuffer;
   {
-    gbuffer.albedo = vec4(inColor, 1.0);
+    gbuffer.albedo = vec4(pow(inColor, vec3(1.5)), 1.0);
     gbuffer.normal = normalize(inNormal);
     gbuffer.metalMask = 0.0;
     gbuffer.specular = 0.5;
