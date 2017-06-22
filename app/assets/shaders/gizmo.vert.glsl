@@ -46,18 +46,15 @@ void main()
   vec3 localPos = inPosition.xyz;
 
   outColor = inColor.xyz;
-
-  if (abs(localPos.x) > 0.1 && abs(localPos.y) < 0.25 && abs(localPos.y) < 0.25)
+  if (inColor.x >= inColor.y && inColor.x >= inColor.z)
   {
     outColor *= uboPerInstance.colorTintX.xyz;
   }
-  else if (abs(localPos.y) > 0.1 && abs(localPos.x) < 0.25 &&
-           abs(localPos.z) < 0.25)
+  else if (inColor.y >= inColor.x && inColor.y >= inColor.z)
   {
     outColor *= uboPerInstance.colorTintY.xyz;
   }
-  else if (abs(localPos.z) > 0.1 && abs(localPos.x) < 0.25 &&
-           abs(localPos.y) < 0.25)
+  else if (inColor.z >= inColor.x && inColor.z >= inColor.y)
   {
     outColor *= uboPerInstance.colorTintZ.xyz;
   }
