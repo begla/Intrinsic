@@ -285,7 +285,6 @@ struct NodeManager
                  "This node is already part of a hierarchy");
 
     const NodeRef firstChild = _firstChild(p_Parent);
-
     {
       _parent(p_Child) = p_Parent;
 
@@ -296,12 +295,15 @@ struct NodeManager
       }
       else
       {
-        // The first child of a node has to be the first in the chain
         _INTR_ASSERT(!_prevSibling(firstChild).isValid());
 
-        _prevSibling(firstChild) = p_Child;
-        _nextSibling(p_Child) = firstChild;
-        _firstChild(p_Parent) = p_Child;
+        // Find the last sibling in the chain
+        NodeRef currentChild = _firstChild(p_Parent);
+        while (_nextSibling(currentChild).isValid())
+          currentChild = _nextSibling(currentChild);
+
+        _prevSibling(p_Child) = currentChild;
+        _nextSibling(currentChild) = p_Child;
       }
     }
 
