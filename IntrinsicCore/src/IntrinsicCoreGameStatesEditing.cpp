@@ -40,6 +40,10 @@ bool _translScaleXAxisSelected = false;
 bool _translScaleYAxisSelected = false;
 bool _translScaleZAxisSelected = false;
 bool _anyTranslScaleAxisSelected = false;
+bool _translXZPlaneSelected = false;
+bool _translXYPlaneSelected = false;
+bool _translYZPlaneSelected = false;
+bool _anyTranslPlaneSelected = false;
 glm::vec3 _initialPosOffset = glm::vec3(0.0f);
 glm::vec3 _initialScale = glm::vec3(1.0f);
 glm::quat _initialOrientation = glm::quat();
@@ -121,7 +125,9 @@ struct PerInstanceDataGridFragment
 
 // <-
 
-DrawCallRef _drawCallRefGizmo;
+DrawCallRef _drawCallRefGizmoTransl;
+DrawCallRef _drawCallRefGizmoRotate;
+DrawCallRef _drawCallRefGizmoScale;
 DrawCallRef _drawCallRefGrid;
 
 // <-
@@ -142,7 +148,7 @@ _INTR_INLINE void selectGizmoAxis(const glm::vec3& p_EntityWorldPos,
   p_Y = false;
   p_Z = false;
 
-  const float widthDepth = 0.05f * _lastGizmoScale;
+  const float widthDepth = 0.025f * _lastGizmoScale;
   Math::AABB worldBoxX = {
       p_EntityWorldPos - glm::vec3(-0.5f, widthDepth, widthDepth),
       p_EntityWorldPos + glm::vec3(_lastGizmoScale, widthDepth, widthDepth)};
@@ -192,6 +198,77 @@ _INTR_INLINE void selectGizmoAxis(const glm::vec3& p_EntityWorldPos,
   else if (distZ < distX && distZ < distY)
   {
     p_Z = true;
+  }
+}
+_INTR_INLINE void selectGizmoPlane(const glm::vec3& p_EntityWorldPos,
+                                   const Math::Ray& p_WorldRay, bool& p_XZ,
+                                   bool& p_XY, bool& p_YZ)
+{
+  p_XZ = false;
+  p_XY = false;
+  p_YZ = false;
+
+  const float planeWidthHeight = _lastGizmoScale * 0.25f;
+
+  glm::vec3 pXZ;
+  bool iXZ = Math::calcIntersectRayPlane(
+      p_WorldRay, glm::vec3(0.0f, 1.0f, 0.0f), p_EntityWorldPos, pXZ);
+  glm::vec3 localXZ = pXZ - p_EntityWorldPos;
+  iXZ = iXZ &&
+        glm::all(glm::lessThanEqual(glm::vec2(localXZ.x, localXZ.z),
+                                    glm::vec2(planeWidthHeight))) &&
+        glm::all(
+            greaterThanEqual(glm::vec2(localXZ.x, localXZ.z), glm::vec2(0.0f)));
+
+  glm::vec3 pXY;
+  bool iXY = Math::calcIntersectRayPlane(
+      p_WorldRay, glm::vec3(0.0f, 0.0f, 1.0f), p_EntityWorldPos, pXY);
+  glm::vec3 localXY = pXY - p_EntityWorldPos;
+  iXY = iXY &&
+        glm::all(glm::lessThanEqual(glm::vec2(localXY.x, localXY.y),
+                                    glm::vec2(planeWidthHeight))) &&
+        glm::all(
+            greaterThanEqual(glm::vec2(localXY.x, localXY.y), glm::vec2(0.0f)));
+
+  glm::vec3 pYZ;
+  bool iYZ = Math::calcIntersectRayPlane(
+      p_WorldRay, glm::vec3(1.0f, 0.0f, 0.0f), p_EntityWorldPos, pYZ);
+  glm::vec3 localYZ = pYZ - p_EntityWorldPos;
+  iYZ = iYZ &&
+        glm::all(glm::lessThanEqual(glm::vec2(localYZ.y, localYZ.z),
+                                    glm::vec2(planeWidthHeight))) &&
+        glm::all(
+            greaterThanEqual(glm::vec2(localYZ.y, localYZ.z), glm::vec2(0.0f)));
+
+  float distXZ = FLT_MAX;
+  if (iXZ)
+  {
+    distXZ = glm::distance2(pXZ, p_WorldRay.o);
+  }
+
+  float distXY = FLT_MAX;
+  if (iXY)
+  {
+    distXY = glm::distance2(pXY, p_WorldRay.o);
+  }
+
+  float distYZ = FLT_MAX;
+  if (iYZ)
+  {
+    distYZ = glm::distance2(pYZ, p_WorldRay.o);
+  }
+
+  if (distXZ < distXY && distXZ < distYZ)
+  {
+    p_XZ = true;
+  }
+  else if (distXY < distXZ && distXY < distYZ)
+  {
+    p_XY = true;
+  }
+  else if (distYZ < distXZ && distYZ < distXY)
+  {
+    p_YZ = true;
   }
 }
 
@@ -312,10 +389,10 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
   else if (Input::System::getKeyStates()[Input::Key::kCtrl] ==
            Input::KeyState::kPressed)
   {
-    _orbitRadius = glm::max(_orbitRadius -
-                                Editing::_cameraSpeed *
+    _orbitRadius =
+        glm::max(_orbitRadius - Editing::_cameraSpeed *
                                     (_camAngVel.x - _camAngVel.y) * p_DeltaT,
-                            0.1f);
+                 0.1f);
   }
 
   camRot = glm::quat(_eulerAngles);
@@ -441,114 +518,139 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
         camPosition, Input::System::getLastMousePosViewport(),
         Components::CameraManager::_inverseViewProjectionMatrix(camRef));
 
-    // Initial click handling - select gizmo axis and calc. initial offsets
-    if (!_leftMouseButtonPressed)
+    if (Editing::_editingMode == EditingMode::kTranslation ||
+        Editing::_editingMode == EditingMode::kScale)
     {
-      selectGizmoAxis(entityWorldPos, worldRay, _translScaleXAxisSelected,
-                      _translScaleYAxisSelected, _translScaleZAxisSelected);
-      _anyTranslScaleAxisSelected = _translScaleXAxisSelected ||
-                                    _translScaleYAxisSelected ||
-                                    _translScaleZAxisSelected;
-
-      if (!_anyTranslScaleAxisSelected)
+      // Initial click handling - select gizmo axis and calc. initial offsets
+      if (!_leftMouseButtonPressed)
       {
+        selectGizmoAxis(entityWorldPos, worldRay, _translScaleXAxisSelected,
+                        _translScaleYAxisSelected, _translScaleZAxisSelected);
+        _anyTranslScaleAxisSelected = _translScaleXAxisSelected ||
+                                      _translScaleYAxisSelected ||
+                                      _translScaleZAxisSelected;
+
+        if (!_anyTranslScaleAxisSelected)
+        {
+          if (Editing::_editingMode == EditingMode::kTranslation)
+          {
+            selectGizmoPlane(entityWorldPos, worldRay, _translXZPlaneSelected,
+                             _translXYPlaneSelected, _translYZPlaneSelected);
+            _anyTranslPlaneSelected = _translXZPlaneSelected ||
+                                      _translXYPlaneSelected ||
+                                      _translYZPlaneSelected;
+          }
+
+          if (!_anyTranslPlaneSelected)
+            return;
+        }
+
+        if (_anyTranslScaleAxisSelected)
+        {
+          const glm::vec3 axisVector = getAxisVector(_translScaleXAxisSelected,
+                                                     _translScaleYAxisSelected,
+                                                     _translScaleZAxisSelected);
+          const glm::vec3 dirToCam =
+              glm::normalize(camPosition - entityWorldPos);
+          _translScalePlaneNormal =
+              findBestTranslationPlaneNormal(axisVector, dirToCam);
+        }
+        else if (_anyTranslPlaneSelected)
+        {
+          if (_translXYPlaneSelected)
+          {
+            _translScalePlaneNormal = glm::vec3(0.0f, 0.0f, 1.0f);
+          }
+          else if (_translXZPlaneSelected)
+          {
+            _translScalePlaneNormal = glm::vec3(0.0f, 1.0f, 0.0f);
+          }
+          else if (_translYZPlaneSelected)
+          {
+            _translScalePlaneNormal = glm::vec3(1.0f, 0.0f, 0.0f);
+          }
+        }
+
+        glm::vec3 planeIntersectionPoint;
+        bool intersects =
+            Math::calcIntersectRayPlane(worldRay, _translScalePlaneNormal,
+                                        entityWorldPos, planeIntersectionPoint);
+        _INTR_ASSERT(intersects);
+
+        _initialPosOffset = planeIntersectionPoint - entityWorldPos;
+
+        _initialScale = Components::NodeManager::_size(currentEntityNodeRef);
+        _leftMouseButtonPressed = true;
+      }
+
+      // Calc. intersection between ray and selected axis plane
+      glm::vec3 planeIntersectionPoint;
+      if (Math::calcIntersectRayPlane(worldRay, _translScalePlaneNormal,
+                                      entityWorldPos, planeIntersectionPoint))
+      {
+        Components::NodeRef parentNode =
+            Components::NodeManager::_parent(currentEntityNodeRef);
+        glm::vec3 newWorldPos =
+            Components::NodeManager::_worldPosition(currentEntityNodeRef);
+        glm::vec3 newSize = _initialScale;
+
+        if (_translScaleXAxisSelected)
+        {
+          newSize.x +=
+              planeIntersectionPoint.x - _initialPosOffset.x - newWorldPos.x;
+          newWorldPos.x = planeIntersectionPoint.x - _initialPosOffset.x;
+        }
+        else if (_translScaleYAxisSelected)
+        {
+          newSize.y +=
+              planeIntersectionPoint.y - _initialPosOffset.y - newWorldPos.y;
+          newWorldPos.y = planeIntersectionPoint.y - _initialPosOffset.y;
+        }
+        else if (_translScaleZAxisSelected)
+        {
+          newSize.z +=
+              planeIntersectionPoint.z - _initialPosOffset.z - newWorldPos.z;
+          newWorldPos.z = planeIntersectionPoint.z - _initialPosOffset.z;
+        }
+        else if (_anyTranslPlaneSelected)
+        {
+          newWorldPos = planeIntersectionPoint - _initialPosOffset;
+        }
+
+        if (Editing::_editingMode == EditingMode::kTranslation)
+        {
+          newWorldPos = snapToGrid(newWorldPos, Editing::_gridSize);
+          Components::NodeManager::updateFromWorldPosition(currentEntityNodeRef,
+                                                           newWorldPos);
+        }
+        else if (Editing::_editingMode == EditingMode::kScale)
+        {
+          newSize = snapToGrid(newSize, Editing::_gridSize);
+          Components::NodeManager::_size(currentEntityNodeRef) = newSize;
+        }
+
+        Components::NodeManager::updateTransforms(currentEntityNodeRef);
+        _gridPosition =
+            Components::NodeManager::_worldPosition(currentEntityNodeRef);
+
         return;
       }
-
-      const glm::vec3 axisVector =
-          getAxisVector(_translScaleXAxisSelected, _translScaleYAxisSelected,
-                        _translScaleZAxisSelected);
-      const glm::vec3 dirToCam = glm::normalize(camPosition - entityWorldPos);
-      _translScalePlaneNormal =
-          findBestTranslationPlaneNormal(axisVector, dirToCam);
-
-      glm::vec3 planeIntersectionPoint;
-      bool intersects =
-          Math::calcIntersectRayPlane(worldRay, _translScalePlaneNormal,
-                                      entityWorldPos, planeIntersectionPoint);
-      _INTR_ASSERT(intersects);
-
-      _initialPosOffset = planeIntersectionPoint - entityWorldPos;
-      _initialScale = Components::NodeManager::_size(currentEntityNodeRef);
-      _initialOrientation =
-          Components::NodeManager::_orientation(currentEntityNodeRef);
-
-      _leftMouseButtonPressed = true;
-    }
-
-    // Calc. intersection between ray and selected axis plane
-    glm::vec3 planeIntersectionPoint;
-    if (Math::calcIntersectRayPlane(worldRay, _translScalePlaneNormal,
-                                    entityWorldPos, planeIntersectionPoint))
-    {
-      Components::NodeRef parentNode =
-          Components::NodeManager::_parent(currentEntityNodeRef);
-      glm::vec3 newWorldPos =
-          Components::NodeManager::_worldPosition(currentEntityNodeRef);
-      glm::vec3 newSize = _initialScale;
-      glm::vec3 newRotation = glm::vec3(0.0f);
-
-      const float sss =
-          1.0f / Math::calcScreenSpaceScale(
-                     newWorldPos,
-                     Components::CameraManager::_viewProjectionMatrix(camRef),
-                     0.1f);
-
-      if (_translScaleXAxisSelected)
-      {
-        newSize.x +=
-            planeIntersectionPoint.x - _initialPosOffset.x - newWorldPos.x;
-        newRotation.x += sss * (planeIntersectionPoint.x - _initialPosOffset.x -
-                                newWorldPos.x);
-        newWorldPos.x = planeIntersectionPoint.x - _initialPosOffset.x;
-      }
-      else if (_translScaleYAxisSelected)
-      {
-        newSize.y +=
-            planeIntersectionPoint.y - _initialPosOffset.y - newWorldPos.y;
-        newRotation.y += sss * (planeIntersectionPoint.y - _initialPosOffset.y -
-                                newWorldPos.y);
-        newWorldPos.y = planeIntersectionPoint.y - _initialPosOffset.y;
-      }
-      else if (_translScaleZAxisSelected)
-      {
-        newSize.z +=
-            planeIntersectionPoint.z - _initialPosOffset.z - newWorldPos.z;
-        newRotation.z += sss * (planeIntersectionPoint.z - _initialPosOffset.z -
-                                newWorldPos.z);
-        newWorldPos.z = planeIntersectionPoint.z - _initialPosOffset.z;
-      }
-
-      // Execute Gizmo transformation
-      if (Editing::_editingMode == EditingMode::kTranslation)
-      {
-        newWorldPos = snapToGrid(newWorldPos, Editing::_gridSize);
-        Components::NodeManager::updateFromWorldPosition(currentEntityNodeRef,
-                                                         newWorldPos);
-      }
-      else if (Editing::_editingMode == EditingMode::kScale)
-      {
-        newSize = snapToGrid(newSize, Editing::_gridSize);
-        Components::NodeManager::_size(currentEntityNodeRef) = newSize;
-      }
-      else if (Editing::_editingMode == EditingMode::kRotation)
-      {
-        // TODO: Quantize rotation
-        Components::NodeManager::_orientation(currentEntityNodeRef) =
-            glm::quat(newRotation) * _initialOrientation;
-      }
-
-      Components::NodeManager::updateTransforms(currentEntityNodeRef);
-      _gridPosition =
-          Components::NodeManager::_worldPosition(currentEntityNodeRef);
     }
   }
   else
   {
     _translScaleXAxisSelected = false;
+    _translXZPlaneSelected = false;
+
     _translScaleYAxisSelected = false;
+    _translXYPlaneSelected = false;
+
     _translScaleZAxisSelected = false;
+    _translYZPlaneSelected = false;
+
     _anyTranslScaleAxisSelected = false;
+    _anyTranslPlaneSelected = false;
+
     _leftMouseButtonPressed = false;
   }
 }
@@ -557,7 +659,7 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
 // Static members
 Entity::EntityRef Editing::_currentlySelectedEntity;
 EditingMode::Enum Editing::_editingMode = EditingMode::kDefault;
-float Editing::_gridSize = 0.25f;
+float Editing::_gridSize = 1.0f;
 float Editing::_gizmoSize = 0.15f;
 float Editing::_cameraSpeed = 150.0f;
 
@@ -567,14 +669,22 @@ void Editing::init() { onReinitRendering(); }
 
 void Editing::onReinitRendering()
 {
-  Resources::MeshRef meshRefGizmo =
+  Resources::MeshRef meshRefGizmoTransl =
       Resources::MeshManager::getResourceByName(_N(gizmo_translate));
+  Resources::MeshRef meshRefGizmoRotate =
+      Resources::MeshManager::getResourceByName(_N(gizmo_rotate));
+  Resources::MeshRef meshRefGizmoScale =
+      Resources::MeshManager::getResourceByName(_N(gizmo_scale));
   Resources::MeshRef meshRefGrid =
       Resources::MeshManager::getResourceByName(_N(plane));
 
   DrawCallRefArray drawCallsToDestroy;
-  if (_drawCallRefGizmo.isValid())
-    drawCallsToDestroy.push_back(_drawCallRefGizmo);
+  if (_drawCallRefGizmoTransl.isValid())
+    drawCallsToDestroy.push_back(_drawCallRefGizmoTransl);
+  if (_drawCallRefGizmoRotate.isValid())
+    drawCallsToDestroy.push_back(_drawCallRefGizmoRotate);
+  if (_drawCallRefGizmoScale.isValid())
+    drawCallsToDestroy.push_back(_drawCallRefGizmoScale);
   if (_drawCallRefGrid.isValid())
     drawCallsToDestroy.push_back(_drawCallRefGrid);
 
@@ -583,13 +693,29 @@ void Editing::onReinitRendering()
   // Draw calls
   DrawCallRefArray drawCallsToCreate;
   {
-    _drawCallRefGizmo = DrawCallManager::createDrawCallForMesh(
-        _N(gizmo_translate), meshRefGizmo,
+    _drawCallRefGizmoTransl = DrawCallManager::createDrawCallForMesh(
+        _N(gizmo_translate), meshRefGizmoTransl,
         MaterialManager::getResourceByName(_N(gizmo)),
         MaterialManager::getMaterialPassId(_N(DebugGizmo)),
         sizeof(PerInstanceDataGizmoVertex),
         sizeof(PerInstanceDataGizmoFragment));
-    drawCallsToCreate.push_back(_drawCallRefGizmo);
+    drawCallsToCreate.push_back(_drawCallRefGizmoTransl);
+
+    _drawCallRefGizmoRotate = DrawCallManager::createDrawCallForMesh(
+        _N(gizmo_rotate), meshRefGizmoRotate,
+        MaterialManager::getResourceByName(_N(gizmo)),
+        MaterialManager::getMaterialPassId(_N(DebugGizmo)),
+        sizeof(PerInstanceDataGizmoVertex),
+        sizeof(PerInstanceDataGizmoFragment));
+    drawCallsToCreate.push_back(_drawCallRefGizmoRotate);
+
+    _drawCallRefGizmoScale = DrawCallManager::createDrawCallForMesh(
+        _N(gizmo_scale), meshRefGizmoScale,
+        MaterialManager::getResourceByName(_N(gizmo)),
+        MaterialManager::getMaterialPassId(_N(DebugGizmo)),
+        sizeof(PerInstanceDataGizmoVertex),
+        sizeof(PerInstanceDataGizmoFragment));
+    drawCallsToCreate.push_back(_drawCallRefGizmoScale);
 
     _drawCallRefGrid = DrawCallManager::createDrawCallForMesh(
         _N(Grid), meshRefGrid, MaterialManager::getResourceByName(_N(grid)),
@@ -706,7 +832,9 @@ void Editing::updatePerInstanceData()
     }
 
     // Write to GPU memory
-    DrawCallRefArray dcsToUpdate = {_drawCallRefGizmo};
+    DrawCallRefArray dcsToUpdate = {_drawCallRefGizmoTransl,
+                                    _drawCallRefGizmoRotate,
+                                    _drawCallRefGizmoScale};
     DrawCallManager::allocateAndUpdateUniformMemory(
         dcsToUpdate, &perInstanceDataVertex, sizeof(PerInstanceDataGizmoVertex),
         &perInstanceDataFragment, sizeof(PerInstanceDataGizmoFragment));
@@ -758,11 +886,17 @@ void Editing::findVisibleEditingDrawCalls(Dod::RefArray& p_DrawCalls)
 {
   if (isCurrentlySelectedEntityValid())
   {
-    if (_editingMode == EditingMode::kTranslation ||
-        _editingMode == EditingMode::kScale ||
-        _editingMode == EditingMode::kRotation)
+    if (_editingMode == EditingMode::kTranslation)
     {
-      p_DrawCalls.push_back(_drawCallRefGizmo);
+      p_DrawCalls.push_back(_drawCallRefGizmoTransl);
+    }
+    else if (_editingMode == EditingMode::kRotation)
+    {
+      p_DrawCalls.push_back(_drawCallRefGizmoRotate);
+    }
+    else if (_editingMode == EditingMode::kScale)
+    {
+      p_DrawCalls.push_back(_drawCallRefGizmoScale);
     }
   }
 
@@ -783,7 +917,7 @@ void Editing::update(float p_DeltaT)
 
   // Fade grid in/out
   static const float fadeDurationInSeconds = 1.0f;
-  if (_anyTranslScaleAxisSelected)
+  if (_anyTranslScaleAxisSelected || _anyTranslPlaneSelected)
   {
     if (_gridFade < 1.0f)
     {
