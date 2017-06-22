@@ -492,6 +492,8 @@ void RenderSystem::initVkInstance()
     extensionsToEnable.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #elif defined(VK_USE_PLATFORM_XLIB_KHR)
     extensionsToEnable.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
+    extensionsToEnable.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
 #endif // VK_USE_PLATFORM_WIN32_KHR
   }
 
@@ -757,19 +759,31 @@ void RenderSystem::initVkSurface(void* p_PlatformHandle, void* p_PlatformWindow)
 {
 #if defined(VK_USE_PLATFORM_XLIB_KHR)
   VkXlibSurfaceCreateInfoKHR surfaceCreateInfo = {};
-  surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
-  surfaceCreateInfo.dpy = (Display*)p_PlatformHandle;
-  surfaceCreateInfo.window = (Window)p_PlatformWindow;
-
+  {
+    surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.dpy = (Display*)p_PlatformHandle;
+    surfaceCreateInfo.window = (Window)p_PlatformWindow;
+  }
   VkResult result = vkCreateXlibSurfaceKHR(_vkInstance, &surfaceCreateInfo,
                                            nullptr, &_vkSurface);
   _INTR_VK_CHECK_RESULT(result);
+#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
+  VkWaylandSurfaceCreateInfoKHR surfaceCreateInfo = {};
+  {
+    surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.display = (wl_display*)p_PlatformHandle;
+    surfaceCreateInfo.surface = (wl_surface*)p_PlatformWindow;
+  }
+  VkResult result = vkCreateWaylandSurfaceKHR(_vkInstance, &surfaceCreateInfo,
+                                              nullptr, &_vkSurface);
+  _INTR_VK_CHECK_RESULT(result)
 #elif defined(VK_USE_PLATFORM_WIN32_KHR)
   VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
-  surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-  surfaceCreateInfo.hinstance = (HINSTANCE)p_PlatformHandle;
-  surfaceCreateInfo.hwnd = (HWND)p_PlatformWindow;
-
+  {
+    surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.hinstance = (HINSTANCE)p_PlatformHandle;
+    surfaceCreateInfo.hwnd = (HWND)p_PlatformWindow;
+  }
   VkResult result = vkCreateWin32SurfaceKHR(_vkInstance, &surfaceCreateInfo,
                                             nullptr, &_vkSurface);
   _INTR_VK_CHECK_RESULT(result);
