@@ -166,6 +166,7 @@
       "baseVertexGpuProgram" : "gizmo.vert",
       "baseFragmentGpuProgram" : "gizmo.frag",
       "renderPass" : "Debug",
+      "rasterizationState" : "DoubleSided",
       "blendStates" : ["Default", "Default", "Default"],
       "boundResources" : "Debug"
     },
