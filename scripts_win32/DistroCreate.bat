@@ -21,4 +21,3 @@ robocopy app/worlds distro/worlds /E
 robocopy app/assets distro/assets /E
 
 cd scripts_win32
-

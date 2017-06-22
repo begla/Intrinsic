@@ -34,7 +34,7 @@ install:
   - git clone https://%INTR_GIT_TOKEN%@github.com/begla/Intrinsic_Dependencies.git
   - cd Intrinsic
   - cd scripts_win32
-  - call ConfigAndBuildDependencies.bat
+  - call ConfigAndBuildDependenciesVS15.bat
   - cd ..
   
 # Download and install Vulkan SDK
@@ -44,7 +44,7 @@ install:
 build_script:
   - dir
   - cd scripts_win32
-  - call Config.bat
+  - call ConfigVS15.bat
   - cd ../build
   - cmake --build . --config %CONFIGURATION%
   - cd ..
