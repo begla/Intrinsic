@@ -99,7 +99,7 @@ void NodeManager::updateTransforms(const NodeRefArray& p_Nodes)
     glm::mat4 scale =
         glm::scale(glm::mat4(1.0f), NodeManager::_worldSize(nodeRef));
 
-    _worldMatrix(nodeRef) = trans * rot * scale;
+    _worldMatrix(nodeRef) = trans * scale * rot;
     _inverseWorldMatrix(nodeRef) = glm::inverse(_worldMatrix(nodeRef));
 
     // Update AABB
