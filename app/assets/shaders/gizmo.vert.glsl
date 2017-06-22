@@ -62,7 +62,7 @@ void main()
   vec3 worldPos = (uboPerInstance.worldMatrix * vec4(inPosition.xyz, 1.0)).xyz;
 
   gl_Position = uboPerInstance.worldViewProjMatrix * vec4(localPos, 1.0);
-  gl_Position.z *= 0.001;
+  gl_Position.z *= 0.01;
 
   outNormal = (uboPerInstance.viewMatrix * vec4(inNormal, 0.0)).xyz;
 }
