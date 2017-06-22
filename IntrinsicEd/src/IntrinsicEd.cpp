@@ -258,7 +258,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   QObject::connect(_ui.actionShow_Debug_Geometry_Context_Menu,
                    SIGNAL(triggered()), this,
                    SLOT(onShowDebugGeometryContextMenu()));
-  QObject::connect(_ui.actionCaptureAllProbes, SIGNAL(triggered()), this, SLOT(onCaptureAllProbes()));
+  QObject::connect(_ui.actionCaptureAllProbes, SIGNAL(triggered()), this,
+                   SLOT(onCaptureAllProbes()));
 
   QObject::connect(_ui.actionCompile_Shaders, SIGNAL(triggered()), this,
                    SLOT(onCompileShaders()));
@@ -930,15 +931,14 @@ void IntrinsicEd::onCaptureAllProbes()
        i < (uint32_t)Components::NodeManager::_activeRefs.size(); ++i)
   {
     Components::NodeRef nodeRef = Components::NodeManager::_activeRefs[i];
-    Entity::EntityRef entityRef = Components::NodeManager::_entity(nodeRef); 
+    Entity::EntityRef entityRef = Components::NodeManager::_entity(nodeRef);
 
     Components::IrradianceProbeRef irradProbeRef =
         Components::IrradianceProbeManager::getComponentForEntity(entityRef);
     Components::SpecularProbeRef specProbeRef =
-      Components::SpecularProbeManager::getComponentForEntity(entityRef);
+        Components::SpecularProbeManager::getComponentForEntity(entityRef);
 
-    if (irradProbeRef.isValid()
-        || specProbeRef.isValid())
+    if (irradProbeRef.isValid() || specProbeRef.isValid())
       probeNodes.push_back(nodeRef);
   }
 

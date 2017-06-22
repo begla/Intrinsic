@@ -719,7 +719,6 @@ void IntrinsicEdNodeViewTreeWidget::onCurrentlySelectedEntityChanged(
   }
 }
 
-
 void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
 {
   using namespace RV;
@@ -747,4 +746,3 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
     RenderSystem::resizeSwapChain(true);
   }
 }
-
