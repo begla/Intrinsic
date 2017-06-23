@@ -96,7 +96,7 @@ void main()
     gbuffer.metalMask = pbr.r;
     gbuffer.specular = pbr.g;
     gbuffer.roughness = pbr.b;
-    gbuffer.materialBufferIdx = 0u;
+    gbuffer.materialBufferIdx = 1u;
     gbuffer.emissive = 0.0;
     gbuffer.occlusion = 1.0;
   }
