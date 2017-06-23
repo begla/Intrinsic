@@ -59,6 +59,12 @@ void main()
     outColor *= uboPerInstance.colorTintZ.xyz;
   }
 
+  if (inColor.z == inColor.x 
+    && inColor.z == inColor.y)
+  {
+    outColor = vec3(0.1, 0.5, 1.0);
+  }
+
   vec3 worldPos = (uboPerInstance.worldMatrix * vec4(inPosition.xyz, 1.0)).xyz;
 
   gl_Position = uboPerInstance.worldViewProjMatrix * vec4(localPos, 1.0);
