@@ -27,6 +27,28 @@ namespace
 {
 float _stepAccum = 0.0f;
 const float _stepSize = 0.016f;
+
+struct PhysicsUpdateTaskSet : enki::ITaskSet
+{
+  virtual ~PhysicsUpdateTaskSet() {}
+
+  void ExecuteRange(enki::TaskSetPartition p_Range,
+                    uint32_t p_ThreadNum) override
+  {
+    const float modDeltaT =
+        TaskManager::_lastDeltaT * TaskManager::_timeModulator;
+    _stepAccum += modDeltaT;
+
+    while (_stepAccum > _stepSize)
+    {
+      Physics::System::dispatchSimulation(modDeltaT);
+      Physics::System::syncSimulation();
+
+      _stepAccum -= modDeltaT;
+    }
+  };
+
+} _physicsUpdateTaskSet;
 }
 
 // Static members
@@ -89,17 +111,7 @@ void TaskManager::executeTasks()
 
     // Physics
     {
-      _INTR_PROFILE_CPU("TaskManager", "Simulate And Update");
-
-      _stepAccum += modDeltaT;
-
-      while (_stepAccum > _stepSize)
-      {
-        Physics::System::dispatchSimulation(modDeltaT);
-        Physics::System::syncSimulation();
-
-        _stepAccum -= modDeltaT;
-      }
+      _INTR_PROFILE_CPU("TaskManager", "Update From Physics Results");
 
       Components::RigidBodyManager::updateNodesFromActors(
           Components::RigidBodyManager::_activeRefs);
@@ -136,8 +148,13 @@ void TaskManager::executeTasks()
   {
     _INTR_PROFILE_CPU("TaskManager", "Rendering Tasks");
 
+    // Process physics during rendering
+    Application::_scheduler.AddTaskSetToPipe(&_physicsUpdateTaskSet);
+
     // Rendering
     RV::RenderProcess::Default::renderFrame(modDeltaT);
+
+    Application::_scheduler.WaitforTaskSet(&_physicsUpdateTaskSet);
   }
 
   {
