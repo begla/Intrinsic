@@ -56,26 +56,26 @@ void main()
 {
   const vec2 samplePoint = (2.0 * vec2(gl_GlobalInvocationID.xy) + 0.5) /
                            vec2(uboPerInstance.dim.x, uboPerInstance.dim.y);
-  vec4 bright = vec4(10000.0);
+  vec4 bright = vec4(0.0);
   const ivec2 outPos = 2 * ivec2(gl_GlobalInvocationID.xy);
 
-  // Gather the minimum of the surrounding pixels to fight
-  // specular aliasing
-  bright =
-      min(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 0)), bright);
-  bright =
-      min(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 2)), bright);
-  bright =
-      min(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 0)), bright);
-  bright =
-      min(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 2)), bright);
-  bright = brightClampAndLuminance(bright);
+  vec4 b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 0)));
+  imageStore(output0Tex, outPos, b);
+  bright += b;
 
-  imageStore(output0Tex, outPos, bright);
-  imageStore(output0Tex, outPos + ivec2(1.0, 0.0), bright);
-  imageStore(output0Tex, outPos + ivec2(0.0, 1.0), bright);
-  imageStore(output0Tex, outPos + ivec2(1.0, 1.0), bright);
+  b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 2)));
+  imageStore(output0Tex, outPos + ivec2(0, 1), b);
+  bright += b;
+  
+  b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 0)));
+  imageStore(output0Tex, outPos + ivec2(1, 0), b);
+  bright += b;
+  
+  b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 2)));
+  imageStore(output0Tex, outPos + ivec2(1, 1), b);
+  bright += b;
 
+  bright = bright / 4;
   temp0[gl_LocalInvocationID.x][gl_LocalInvocationID.y] = bright;
 
   imageStore(output1Tex, ivec2(gl_LocalInvocationID.xy +
