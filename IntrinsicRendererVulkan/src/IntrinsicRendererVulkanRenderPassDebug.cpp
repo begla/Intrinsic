@@ -405,6 +405,26 @@ void Debug::renderLine(const glm::vec3& p_Pos0, const glm::vec3& p_Pos1,
   lineVertex1.color = Math::convertColorToBGRA(glm::vec4(p_Color1, 1.0f));
 }
 
+void Debug::renderLineDotted(const glm::vec3& p_Pos0, const glm::vec3& p_Pos1,
+                             const glm::vec3& p_Color)
+{
+  glm::vec3 lineDir = p_Pos1 - p_Pos0;
+  const float lineLength = glm::length(lineDir);
+  lineDir /= lineLength;
+
+  static const uint32_t lineSegments = 17u;
+  const float lineSegmentLength = lineLength / lineSegments;
+
+  for (uint32_t i = 0u; i < lineSegments; ++i)
+  {
+    // "Dotted" line
+    if ((i % 2u) == 0u)
+      RV::RenderPass::Debug::renderLine(
+          p_Pos0 + i * lineSegmentLength * lineDir,
+          p_Pos0 + (i + 1) * lineSegmentLength * lineDir, p_Color, p_Color);
+  }
+}
+
 // <-
 
 void Debug::renderLine(const glm::vec3& p_Pos0, const glm::vec3& p_Pos1,
