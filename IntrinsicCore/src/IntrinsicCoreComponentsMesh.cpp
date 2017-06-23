@@ -146,30 +146,30 @@ struct DrawCallCollectionParallelTaskSet : enki::ITaskSet
     const uint32_t activeFrustumCount =
         (uint32_t)RV::RenderProcess::Default::_activeFrustums.size();
 
-    for (uint32_t drawCallIdx = p_Range.start; drawCallIdx < p_Range.end;
-         ++drawCallIdx)
+    for (uint32_t frustIdx = 0u; frustIdx < activeFrustumCount; ++frustIdx)
     {
-      DrawCallRef drawCallRef = drawCallsPerMaterialPass[drawCallIdx];
-      Components::MeshRef meshComponentRef =
-          DrawCallManager::_descMeshComponent(drawCallRef);
+      auto& visibleDrawCallsPerMaterialPass = RV::RenderProcess::Default::
+          _visibleDrawCallsPerMaterialPass[frustIdx][_materialPassIdx];
 
-      if (meshComponentRef.isValid())
+      for (uint32_t drawCallIdx = p_Range.start; drawCallIdx < p_Range.end;
+           ++drawCallIdx)
       {
-        Components::NodeRef nodeComponentRef =
-            Components::MeshManager::_node(meshComponentRef);
+        DrawCallRef drawCallRef = drawCallsPerMaterialPass[drawCallIdx];
+        Components::MeshRef meshComponentRef =
+            DrawCallManager::_descMeshComponent(drawCallRef);
 
-        for (uint32_t frustIdx = 0u; frustIdx < activeFrustumCount; ++frustIdx)
+        if (meshComponentRef.isValid())
         {
-          auto& visibleDrawCallsPerMaterialPass = RV::RenderProcess::Default::
-              _visibleDrawCallsPerMaterialPass[frustIdx][_materialPassIdx];
+          Components::NodeRef nodeComponentRef =
+              Components::MeshManager::_node(meshComponentRef);
+
           if ((Components::NodeManager::_visibilityMask(nodeComponentRef) &
                (1u << frustIdx)) > 0u)
           {
             DrawCallManager::updateSortingHash(
-                drawCallRef,
-                Components::MeshManager::_perInstanceDataVertex(
-                    meshComponentRef)
-                    .data0.y);
+                drawCallRef, Components::MeshManager::_perInstanceDataVertex(
+                                 meshComponentRef)
+                                 .data0.y);
 
             visibleDrawCallsPerMaterialPass.push_back(drawCallRef);
           }
@@ -191,6 +191,7 @@ struct MeshCollectionParallelTaskSet : enki::ITaskSet
                     uint32_t p_ThreadNum) override
   {
     _INTR_PROFILE_CPU("General", "Collect Visible Mesh Components Job");
+
     uint32_t activeFrustumsCount =
         (uint32_t)RV::RenderProcess::Default::_activeFrustums.size();
 
