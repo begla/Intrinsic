@@ -685,12 +685,16 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
       {
         float planeRotation = 0.0f;
 
+        const glm::vec3 rayDir = glm::normalize(entityWorldPos - camPosition);
+        const glm::vec3 pointOnHelperPlane = camPosition + rayDir * 2.0f;
+
         glm::vec3 planeIntersectionPoint;
         if (Math::calcIntersectRayPlane(
                 worldRay, -Components::CameraManager::_forward(camRef),
-                entityWorldPos, planeIntersectionPoint))
+                pointOnHelperPlane, planeIntersectionPoint))
         {
-          glm::vec3 dir = planeIntersectionPoint - entityWorldPos;
+          glm::vec3 dir = planeIntersectionPoint - pointOnHelperPlane;
+
           if (glm::length2(dir) > _INTR_EPSILON &&
               glm::length2(_initialRotationDir) > _INTR_EPSILON)
           {
@@ -703,6 +707,13 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
             const float sign =
                 glm::dot(v0, -Components::CameraManager::_forward(camRef));
             planeRotation *= sign >= 0.0f ? 1.0f : -1.0f;
+
+            // Visualize helper line
+            {
+              RV::RenderPass::Debug::renderLineDotted(
+                  pointOnHelperPlane, planeIntersectionPoint,
+                  glm::vec3(0.5f, 0.5f, 0.5f));
+            }
           }
         }
 
@@ -942,25 +953,23 @@ void Editing::updatePerInstanceData()
           Components::CameraManager::_inverseViewProjectionMatrix(camRef));
 
       // Highlight gizmo axis
-      bool x = true, y = true, z = true;
+      bool x = _XAxisSelected, y = _YAxisSelected, z = _ZAxisSelected;
 
-      if (_editingMode == EditingMode::kTranslation ||
-          _editingMode == EditingMode::kScale)
+      if (!_anyAxisSelected)
       {
-        selectGizmoAxis(Components::NodeManager::_worldPosition(nodeRef),
-                        worldRay, x, y, z);
+        if (_editingMode == EditingMode::kTranslation ||
+            _editingMode == EditingMode::kScale)
+        {
+          selectGizmoAxis(Components::NodeManager::_worldPosition(nodeRef),
+                          worldRay, x, y, z);
+        }
+        else if (_editingMode == EditingMode::kRotation)
+        {
+          selectGizmoRotationAxis(
+              Components::NodeManager::_worldPosition(nodeRef), worldRay, x, y,
+              z);
+        }
       }
-      else if (_editingMode == EditingMode::kRotation)
-      {
-        selectGizmoRotationAxis(
-            Components::NodeManager::_worldPosition(nodeRef), worldRay, x, y,
-            z);
-      }
-
-      // Also highlight axes which are currently "picked/used"
-      x = x || _XAxisSelected;
-      y = y || _YAxisSelected;
-      z = z || _ZAxisSelected;
 
       perInstanceDataVertex.colorTintX = x ? glm::vec4(1.0f) : glm::vec4(0.5f);
       perInstanceDataVertex.colorTintY = y ? glm::vec4(1.0f) : glm::vec4(0.5f);
