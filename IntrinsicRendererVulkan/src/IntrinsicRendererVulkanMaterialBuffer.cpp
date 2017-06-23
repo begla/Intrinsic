@@ -64,16 +64,21 @@ void MaterialBuffer::init()
   BufferManager::createResources(buffersToCreate);
 
   _materialBufferEntries.clear();
-  for (uint32_t i = 0u; i < _INTR_MAX_MATERIAL_COUNT - 1u; ++i)
+  for (uint32_t i = 0u; i < _INTR_MAX_MATERIAL_COUNT; ++i)
   {
-    _materialBufferEntries.push_back(_INTR_MAX_MATERIAL_COUNT - 1u - i);
+    _materialBufferEntries.push_back(_INTR_MAX_MATERIAL_COUNT - 1u - i +
+                                     2u /* Offset for the default buffers */);
   }
 
-  MaterialBufferEntry defaultMaterialBuffer = {};
+  // Default unlit and lit
+  MaterialBufferEntry defaultMaterialBufferUnlit = {};
+  MaterialBufferEntry defaultMaterialBufferLit = {};
   {
-    // Set to default values here
+    // NOTE: Set to default values here
+    defaultMaterialBufferUnlit.materialFlags = MaterialFlags::kUnlit;
   }
-  updateMaterialBufferEntry(0u, defaultMaterialBuffer);
+  updateMaterialBufferEntry(0u, defaultMaterialBufferUnlit);
+  updateMaterialBufferEntry(1u, defaultMaterialBufferLit);
 }
 }
 }

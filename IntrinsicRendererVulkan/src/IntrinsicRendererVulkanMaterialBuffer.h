@@ -22,11 +22,20 @@ namespace Renderer
 {
 namespace Vulkan
 {
+namespace MaterialFlags
+{
+enum Flags
+{
+  kUnlit = 1u << 0u
+};
+}
+
 struct MaterialBufferEntry
 {
   float refractionFactor;
   float translucencyThicknessFactor;
   float emissiveIntensity;
+  uint32_t materialFlags;
 };
 
 struct MaterialBuffer
