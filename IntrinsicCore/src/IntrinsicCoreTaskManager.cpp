@@ -83,6 +83,9 @@ void TaskManager::executeTasks()
     }
   }
 
+  // Avoid very high deltaTs due to stalls
+  _lastDeltaT = std::min(_lastDeltaT, 0.1f);
+
   const float modDeltaT = _lastDeltaT * _timeModulator;
   _totalTimePassed += modDeltaT;
   _lastUpdate = TimingHelper::getMicroseconds();
