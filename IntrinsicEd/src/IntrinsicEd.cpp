@@ -316,6 +316,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     editingViewContainer->setLayout(editingViewLayout);
     _editingView->setWindowTitle("Editing View");
 
+    uint32_t row = 0u;
     {
       QLabel* label = new QLabel("Grid Size:");
       label->setMargin(3);
@@ -327,11 +328,29 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
       gridSizeSpinBox->setValue(GameStates::Editing::_gridSize);
 
-      editingViewLayout->addWidget(label, 0, 0);
-      editingViewLayout->addWidget(gridSizeSpinBox, 0, 1);
+      editingViewLayout->addWidget(label, row, 0);
+      editingViewLayout->addWidget(gridSizeSpinBox, row++, 1);
 
       QObject::connect(gridSizeSpinBox, SIGNAL(valueChanged(double)), this,
                        SLOT(onGridSizeChanged(double)));
+    }
+
+    {
+      QLabel* label = new QLabel("Rotation Step Size:");
+      label->setMargin(3);
+
+      QDoubleSpinBox* rotationStepSizeSpinBox = new QDoubleSpinBox();
+      rotationStepSizeSpinBox->setMinimum(0.01f);
+      rotationStepSizeSpinBox->setSingleStep(0.5f);
+      rotationStepSizeSpinBox->setToolTip("Rotation Step Size");
+
+      rotationStepSizeSpinBox->setValue(GameStates::Editing::_rotationStepSize);
+
+      editingViewLayout->addWidget(label, row, 0);
+      editingViewLayout->addWidget(rotationStepSizeSpinBox, row++, 1);
+
+      QObject::connect(rotationStepSizeSpinBox, SIGNAL(valueChanged(double)),
+                       this, SLOT(onRotationStepSizeChanged(double)));
     }
 
     {
@@ -345,8 +364,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
       gizmoSizeSpinBox->setValue(GameStates::Editing::_gizmoSize);
 
-      editingViewLayout->addWidget(label, 1, 0);
-      editingViewLayout->addWidget(gizmoSizeSpinBox, 1, 1);
+      editingViewLayout->addWidget(label, row, 0);
+      editingViewLayout->addWidget(gizmoSizeSpinBox, row++, 1);
 
       QObject::connect(gizmoSizeSpinBox, SIGNAL(valueChanged(double)), this,
                        SLOT(onGizmoSizeChanged(double)));
@@ -364,8 +383,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
       cameraSpeedSpinBox->setValue(GameStates::Editing::_cameraSpeed);
 
-      editingViewLayout->addWidget(label, 2, 0);
-      editingViewLayout->addWidget(cameraSpeedSpinBox, 2, 1);
+      editingViewLayout->addWidget(label, row, 0);
+      editingViewLayout->addWidget(cameraSpeedSpinBox, row++, 1);
 
       QObject::connect(cameraSpeedSpinBox, SIGNAL(valueChanged(double)), this,
                        SLOT(onCameraSpeedChanged(double)));
@@ -382,8 +401,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
       _dayNightSlider->setToolTip("Day/Night");
       _dayNightSlider->setValue(int(World::_currentTime * 10000.0f));
 
-      editingViewLayout->addWidget(label, 3, 0);
-      editingViewLayout->addWidget(_dayNightSlider, 3, 1);
+      editingViewLayout->addWidget(label, row, 0);
+      editingViewLayout->addWidget(_dayNightSlider, row++, 1);
 
       QObject::connect(_dayNightSlider, SIGNAL(valueChanged(int)), this,
                        SLOT(onDayNightSliderChanged(int)));
@@ -401,14 +420,14 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
       timeModSpinBox->setValue(TaskManager::_timeModulator);
 
-      editingViewLayout->addWidget(label, 4, 0);
-      editingViewLayout->addWidget(timeModSpinBox, 4, 1);
+      editingViewLayout->addWidget(label, row, 0);
+      editingViewLayout->addWidget(timeModSpinBox, row++, 1);
 
       QObject::connect(timeModSpinBox, SIGNAL(valueChanged(double)), this,
                        SLOT(onTimeModChanged(double)));
     }
 
-    editingViewLayout->setRowStretch(5, 1);
+    editingViewLayout->setRowStretch(row, 1);
   }
 
   // Context menus
@@ -733,6 +752,11 @@ void IntrinsicEd::onCreateDecal()
 void IntrinsicEd::onGridSizeChanged(double p_Value)
 {
   GameStates::Editing::_gridSize = (float)p_Value;
+}
+
+void IntrinsicEd::onRotationStepSizeChanged(double p_Value)
+{
+  GameStates::Editing::_rotationStepSize = (float)p_Value;
 }
 
 void IntrinsicEd::onDayNightSliderChanged(int p_Value)

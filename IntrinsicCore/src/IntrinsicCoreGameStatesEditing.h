@@ -61,6 +61,7 @@ struct Editing
   static Entity::EntityRef _currentlySelectedEntity;
   static EditingMode::Enum _editingMode;
   static float _gridSize;
+  static float _rotationStepSize;
   static float _gizmoSize;
   static float _cameraSpeed;
 };

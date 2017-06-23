@@ -85,6 +85,7 @@ public slots:
   void onMainGameState();
   void onBenchmarkGameState();
   void onGridSizeChanged(double p_Value);
+  void onRotationStepSizeChanged(double p_Value);
   void onGizmoSizeChanged(double p_Value);
   void onCameraSpeedChanged(double p_Value);
   void onTimeModChanged(double p_Value);

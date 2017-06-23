@@ -144,6 +144,8 @@ _INTR_INLINE bool isCurrentlySelectedEntityValid()
              .isValid();
 }
 
+// <-
+
 _INTR_INLINE void selectGizmoAxis(const glm::vec3& p_EntityWorldPos,
                                   const Math::Ray& p_WorldRay, bool& p_X,
                                   bool& p_Y, bool& p_Z)
@@ -204,6 +206,9 @@ _INTR_INLINE void selectGizmoAxis(const glm::vec3& p_EntityWorldPos,
     p_Z = true;
   }
 }
+
+// <-
+
 _INTR_INLINE void selectGizmoPlane(const glm::vec3& p_EntityWorldPos,
                                    const Math::Ray& p_WorldRay, bool& p_XZ,
                                    bool& p_XY, bool& p_YZ)
@@ -275,6 +280,8 @@ _INTR_INLINE void selectGizmoPlane(const glm::vec3& p_EntityWorldPos,
     p_YZ = true;
   }
 }
+
+// <-
 
 _INTR_INLINE void selectGizmoRotationAxis(const glm::vec3& p_EntityWorldPos,
                                           const Math::Ray& p_WorldRay,
@@ -709,14 +716,18 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
             planeRotation *= sign >= 0.0f ? 1.0f : -1.0f;
 
             // Visualize helper line
-            {
-              RV::RenderPass::Debug::renderLineDotted(
-                  pointOnHelperPlane, planeIntersectionPoint,
-                  glm::vec3(0.5f, 0.5f, 0.5f));
-            }
+            RV::RenderPass::Debug::renderLineDotted(
+                pointOnHelperPlane, planeIntersectionPoint,
+                glm::vec3(0.5f, 0.5f, 0.5f));
           }
         }
 
+        // Quant. rotation
+        const float rotationQuantStep =
+            1.0f / glm::radians(Editing::_rotationStepSize);
+
+        planeRotation =
+            glm::trunc(planeRotation * rotationQuantStep) / rotationQuantStep;
         const glm::vec3 newRotation = planeRotation * _selectedPlaneNormal;
         Components::NodeManager::_orientation(currentEntityNodeRef) =
             glm::quat(newRotation) * _initialOrientation;
@@ -803,6 +814,7 @@ EditingMode::Enum Editing::_editingMode = EditingMode::kDefault;
 float Editing::_gridSize = 1.0f;
 float Editing::_gizmoSize = 0.15f;
 float Editing::_cameraSpeed = 150.0f;
+float Editing::_rotationStepSize = 5.0f;
 
 // <-
 
