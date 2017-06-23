@@ -35,11 +35,7 @@ _INTR_INLINE void createPxTriangleMesh(MeshRef p_MeshRef)
 {
   physx::PxCookingParams params(
       Physics::System::_pxPhysics->getTolerancesScale());
-  params.meshPreprocessParams |=
-      physx::PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
-  params.meshPreprocessParams |=
-      physx::PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
-  params.meshCookingHint = physx::PxMeshCookingHint::eCOOKING_PERFORMANCE;
+  params.meshCookingHint = physx::PxMeshCookingHint::eSIM_PERFORMANCE;
 
   Physics::System::_pxCooking->setParams(params);
 
@@ -61,11 +57,9 @@ _INTR_INLINE void createPxTriangleMesh(MeshRef p_MeshRef)
   meshDesc.triangles.data =
       MeshManager::_descIndicesPerSubMesh(p_MeshRef)[0].data();
 
-  //#ifdef _DEBUG
-  //        const bool res =
-  //        Physics::System::_pxCooking->validateTriangleMesh(meshDesc);
-  //        _INTR_ASSERT(res);
-  //#endif // _DEBUG
+#if defined(_DEBUG)
+  Physics::System::_pxCooking->validateTriangleMesh(meshDesc);
+#endif // _DEBUG
 
   MeshManager::_pxTriangleMesh(p_MeshRef) =
       Physics::System::_pxCooking->createTriangleMesh(
