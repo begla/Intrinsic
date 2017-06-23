@@ -66,7 +66,8 @@ void System::init()
                                physx::PxCookingParams(toleranceScale));
   _INTR_ASSERT(_pxCooking);
 
-  _pxCpuDispatcher = physx::PxDefaultCpuDispatcherCreate(2u);
+  _pxCpuDispatcher = physx::PxDefaultCpuDispatcherCreate(
+      Application::_scheduler.GetNumTaskThreads());
   _INTR_ASSERT(_pxCpuDispatcher);
 
   physx::PxSceneDesc sceneDesc = physx::PxSceneDesc(toleranceScale);
