@@ -14,6 +14,9 @@
 
 #pragma once
 
+// Settings
+#define _INTR_MAX_PLAYER_COUNT 4u
+
 // Components
 #define _INTR_MAX_ENTITY_COUNT 10240u
 #define _INTR_MAX_NODE_COMPONENT_COUNT 10240u

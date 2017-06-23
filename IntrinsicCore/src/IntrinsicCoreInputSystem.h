@@ -125,12 +125,14 @@ enum Enum
 struct KeyEvent
 {
   Key::Enum key;
+  uint8_t playerId;
 };
 
 struct AxisEvent
 {
   Axis::Enum axis;
   float value;
+  uint8_t playerId;
 };
 
 struct MouseMoveEvent
@@ -168,11 +170,15 @@ struct System
     return _axisStates[p_Key];
   }
   _INTR_INLINE static float* getAxisStates() { return _axisStates; }
-  _INTR_INLINE static float& getVirtualKeyState(VirtualKey::Enum p_Key)
+  _INTR_INLINE static float& getVirtualKeyState(VirtualKey::Enum p_Key,
+                                                uint32_t p_PlayerId = 0u)
   {
-    return _virtualKeyStates[p_Key];
+    return _virtualKeyStates[p_PlayerId][p_Key];
   }
-  _INTR_INLINE static float* getVirtualKeyStates() { return _virtualKeyStates; }
+  _INTR_INLINE static float* getVirtualKeyStates(uint32_t p_PlayerId = 0u)
+  {
+    return _virtualKeyStates[p_PlayerId];
+  }
   _INTR_INLINE static glm::vec2& getLastMousePos() { return _lastMousePos; }
   _INTR_INLINE static glm::vec2& getLastMousePosViewport()
   {
@@ -183,16 +189,18 @@ struct System
     return _lastMousePosRel;
   }
 
-  _INTR_INLINE static glm::vec4 getMovementFiltered()
+  _INTR_INLINE static glm::vec4 getMovementFiltered(uint32_t p_PlayerId = 0u)
   {
     glm::vec2 camMovement =
         glm::vec2(Input::System::getVirtualKeyState(
-                      Input::VirtualKey::kMoveCameraVertical),
+                      Input::VirtualKey::kMoveCameraVertical, p_PlayerId),
                   Input::System::getVirtualKeyState(
-                      Input::VirtualKey::kMoveCameraHorizontal));
-    glm::vec2 movement = glm::vec2(
-        Input::System::getVirtualKeyState(Input::VirtualKey::kMoveVertical),
-        Input::System::getVirtualKeyState(Input::VirtualKey::kMoveHorizontal));
+                      Input::VirtualKey::kMoveCameraHorizontal, p_PlayerId));
+    glm::vec2 movement =
+        glm::vec2(Input::System::getVirtualKeyState(
+                      Input::VirtualKey::kMoveVertical, p_PlayerId),
+                  Input::System::getVirtualKeyState(
+                      Input::VirtualKey::kMoveHorizontal, p_PlayerId));
 
     // Dead zone
     if (glm::length(camMovement) < Settings::Manager::_controllerDeadZone)
@@ -219,7 +227,7 @@ private:
   static _INTR_HASH_MAP(uint32_t, uint32_t) _keyToVirtualKeyMapping;
   static _INTR_HASH_MAP(uint32_t, uint32_t) _axisToVirtualKeyMapping;
 
-  static float _virtualKeyStates[VirtualKey::kCount];
+  static float _virtualKeyStates[_INTR_MAX_PLAYER_COUNT][VirtualKey::kCount];
 };
 }
 }

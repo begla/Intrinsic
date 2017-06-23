@@ -28,6 +28,10 @@ namespace Core
 {
 namespace GameStates
 {
+namespace
+{
+uint32_t _currentlyActivePlayerId = 0u;
+}
 
 void Main::init() {}
 
@@ -65,98 +69,98 @@ void Main::update(float p_DeltaT)
         Components::NodeManager::getComponentForEntity(
             Components::PlayerManager::_entity(playerRef));
 
-    if (Components::PlayerManager::_descPlayerId(playerRef) == 0u)
+    Components::CameraRef camRef = World::_activeCamera;
+    Components::NodeRef camNodeRef =
+        Components::NodeManager::getComponentForEntity(
+            Components::CameraManager::_entity(camRef));
+
+    const glm::quat& camOrient =
+        Components::NodeManager::_worldOrientation(camNodeRef);
+
+    Components::CharacterControllerRef charCtrlRef =
+        Components::CharacterControllerManager::getComponentForEntity(
+            Components::PlayerManager::_entity(playerRef));
+    Components::CameraControllerRef camCtrlRef =
+        Components::CameraControllerManager::getComponentForEntity(
+            Components::CameraManager::_entity(camRef));
+
+    const uint32_t playerId =
+        Components::PlayerManager::_descPlayerId(playerRef);
+    const glm::vec4 movement = Input::System::getMovementFiltered(playerId);
+
+    if (camCtrlRef.isValid() && playerId == _currentlyActivePlayerId)
     {
-      Components::CameraRef camRef = World::_activeCamera;
-      Components::NodeRef camNodeRef =
-          Components::NodeManager::getComponentForEntity(
-              Components::CameraManager::_entity(camRef));
+      static const float camSpeed = 3.0f;
+      static const float camSpeedMouse = 0.075f;
 
-      const glm::quat& camOrient =
-          Components::NodeManager::_worldOrientation(camNodeRef);
+      glm::vec3& targetEulerAngles =
+          Components::CameraControllerManager::_descTargetEulerAngles(
+              camCtrlRef);
 
-      Components::CharacterControllerRef charCtrlRef =
-          Components::CharacterControllerManager::getComponentForEntity(
-              Components::PlayerManager::_entity(playerRef));
-      Components::CameraControllerRef camCtrlRef =
-          Components::CameraControllerManager::getComponentForEntity(
-              Components::CameraManager::_entity(camRef));
+      targetEulerAngles.y += -camSpeed * movement.w * deltaT;
+      targetEulerAngles.x += camSpeed * movement.z * deltaT;
 
-      const glm::vec4 movement = Input::System::getMovementFiltered();
-
-      if (camCtrlRef.isValid())
-      {
-        static const float camSpeed = 3.0f;
-        static const float camSpeedMouse = 0.075f;
-
-        glm::vec3& targetEulerAngles =
-            Components::CameraControllerManager::_descTargetEulerAngles(
-                camCtrlRef);
-
-        targetEulerAngles.y += -camSpeed * movement.w * deltaT;
-        targetEulerAngles.x += camSpeed * movement.z * deltaT;
-
-        targetEulerAngles.y +=
-            -camSpeedMouse * Input::System::getLastMousePosRel().x * deltaT;
-        targetEulerAngles.x +=
-            camSpeedMouse * Input::System::getLastMousePosRel().y * deltaT;
-      }
-
-      static const float moveSpeed = 500.0f;
-      static const float runMultiplier = 0.5f;
-      static const float jumpSpeed = 20.0f;
-
-      const float actualMovedSpeed =
-          moveSpeed * (1.0f +
-                       runMultiplier * Input::System::getVirtualKeyState(
-                                           Input::VirtualKey::kRun));
-
-      glm::vec3 moveVector = glm::vec3(0.0f);
-      {
-        moveVector +=
-            Input::System::getVirtualKeyState(Input::VirtualKey::kMoveUp) *
-            glm::vec3(0.0f, 0.0f, 1.0f);
-        moveVector +=
-            Input::System::getVirtualKeyState(Input::VirtualKey::kMoveDown) *
-            glm::vec3(0.0f, 0.0f, -1.0f);
-        moveVector +=
-            Input::System::getVirtualKeyState(Input::VirtualKey::kMoveRight) *
-            glm::vec3(-1.0f, 0.0f, 0.0f);
-        moveVector +=
-            Input::System::getVirtualKeyState(Input::VirtualKey::kMoveLeft) *
-            glm::vec3(1.0f, 0.0f, 0.0f);
-
-        moveVector += glm::vec3(-movement.y, 0.0f, 0.0f);
-        moveVector += glm::vec3(0.0f, 0.0f, -movement.x);
-      }
-
-      const float moveVecLen = glm::length(moveVector);
-      if (moveVecLen < Settings::Manager::_controllerDeadZone)
-        moveVector = glm::vec3(0.0f);
-      else if (moveVecLen > 1.0f)
-        moveVector /= moveVecLen;
-
-      moveVector = camOrient * moveVector;
-      moveVector.y = 0.0f;
-      moveVector *= actualMovedSpeed;
-
-      if (charCtrlRef.isValid())
-      {
-        if (Components::CharacterControllerManager::isGrounded(charCtrlRef) &&
-            Input::System::getVirtualKeyState(Input::VirtualKey::kJump) > 0.0f)
-        {
-          moveVector.y += jumpSpeed;
-        }
-
-        Components::CharacterControllerManager::move(charCtrlRef, moveVector);
-      }
+      targetEulerAngles.y +=
+          -camSpeedMouse * Input::System::getLastMousePosRel().x * deltaT;
+      targetEulerAngles.x +=
+          camSpeedMouse * Input::System::getLastMousePosRel().y * deltaT;
     }
 
-    Components::CameraControllerManager::updateControllers(
-        Components::CameraControllerManager::_activeRefs, deltaT);
-    Components::CharacterControllerManager::updateControllers(
-        Components::CharacterControllerManager::_activeRefs, p_DeltaT);
+    static const float moveSpeed = 500.0f;
+    static const float runMultiplier = 0.5f;
+    static const float jumpSpeed = 20.0f;
+
+    const float actualMovedSpeed =
+        moveSpeed *
+        (1.0f + runMultiplier * Input::System::getVirtualKeyState(
+                                    Input::VirtualKey::kRun, playerId));
+
+    glm::vec3 moveVector = glm::vec3(0.0f);
+    {
+      moveVector += Input::System::getVirtualKeyState(
+                        Input::VirtualKey::kMoveUp, playerId) *
+                    glm::vec3(0.0f, 0.0f, 1.0f);
+      moveVector += Input::System::getVirtualKeyState(
+                        Input::VirtualKey::kMoveDown, playerId) *
+                    glm::vec3(0.0f, 0.0f, -1.0f);
+      moveVector += Input::System::getVirtualKeyState(
+                        Input::VirtualKey::kMoveRight, playerId) *
+                    glm::vec3(-1.0f, 0.0f, 0.0f);
+      moveVector += Input::System::getVirtualKeyState(
+                        Input::VirtualKey::kMoveLeft, playerId) *
+                    glm::vec3(1.0f, 0.0f, 0.0f);
+
+      moveVector += glm::vec3(-movement.y, 0.0f, 0.0f);
+      moveVector += glm::vec3(0.0f, 0.0f, -movement.x);
+    }
+
+    const float moveVecLen = glm::length(moveVector);
+    if (moveVecLen < Settings::Manager::_controllerDeadZone)
+      moveVector = glm::vec3(0.0f);
+    else if (moveVecLen > 1.0f)
+      moveVector /= moveVecLen;
+
+    moveVector = camOrient * moveVector;
+    moveVector.y = 0.0f;
+    moveVector *= actualMovedSpeed;
+
+    if (charCtrlRef.isValid())
+    {
+      if (Components::CharacterControllerManager::isGrounded(charCtrlRef) &&
+          Input::System::getVirtualKeyState(Input::VirtualKey::kJump,
+                                            playerId) > 0.0f)
+      {
+        moveVector.y += jumpSpeed;
+      }
+
+      Components::CharacterControllerManager::move(charCtrlRef, moveVector);
+    }
   }
+
+  Components::CameraControllerManager::updateControllers(
+      Components::CameraControllerManager::_activeRefs, deltaT);
+  Components::CharacterControllerManager::updateControllers(
+      Components::CharacterControllerManager::_activeRefs, p_DeltaT);
 }
 }
 }

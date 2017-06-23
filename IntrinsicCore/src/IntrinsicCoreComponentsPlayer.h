@@ -77,7 +77,7 @@ struct PlayerManager
   {
     p_Properties.AddMember(
         "playerId",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Player), _N(Enum),
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Player), _N(uint),
                           _descPlayerId(p_Ref), false, false),
         p_Document.GetAllocator());
   }

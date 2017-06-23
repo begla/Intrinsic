@@ -23,7 +23,8 @@ namespace Input
 {
 uint8_t System::_keyStates[] = {};
 float System::_axisStates[Axis::kCount] = {};
-float System::_virtualKeyStates[VirtualKey::kCount] = {};
+float System::_virtualKeyStates[_INTR_MAX_PLAYER_COUNT][VirtualKey::kCount] =
+    {};
 
 glm::vec2 System::_lastMousePos = glm::vec2(0.0f);
 glm::vec2 System::_lastMousePosViewport = glm::vec2(0.0f);
@@ -70,7 +71,7 @@ void System::processAxisEvent(const AxisEvent& p_Event)
     auto virtualKey = _axisToVirtualKeyMapping.find(p_Event.axis);
     if (virtualKey != _axisToVirtualKeyMapping.end())
     {
-      _virtualKeyStates[virtualKey->second] = axisValue;
+      _virtualKeyStates[p_Event.playerId][virtualKey->second] = axisValue;
     }
   }
 }
@@ -90,7 +91,7 @@ void System::processKeyPressEvent(const KeyEvent& p_Event)
     auto virtualKey = _keyToVirtualKeyMapping.find(p_Event.key);
     if (virtualKey != _keyToVirtualKeyMapping.end())
     {
-      _virtualKeyStates[virtualKey->second] = 1.0f;
+      _virtualKeyStates[p_Event.playerId][virtualKey->second] = 1.0f;
     }
   }
 }
@@ -110,7 +111,7 @@ void System::processKeyReleaseEvent(const KeyEvent& p_Event)
     auto virtualKey = _keyToVirtualKeyMapping.find(p_Event.key);
     if (virtualKey != _keyToVirtualKeyMapping.end())
     {
-      _virtualKeyStates[virtualKey->second] = 0.0f;
+      _virtualKeyStates[p_Event.playerId][virtualKey->second] = 0.0f;
     }
   }
 }

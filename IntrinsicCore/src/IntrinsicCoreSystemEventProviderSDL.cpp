@@ -23,8 +23,7 @@ namespace SystemEventProvider
 {
 namespace
 {
-const uint32_t _maxNumGameControllers = 4;
-SDL_GameController* _gameControllers[_maxNumGameControllers] = {};
+SDL_GameController* _gameControllers[_INTR_MAX_PLAYER_COUNT] = {};
 uint32_t _connectedControllerCount = 0u;
 }
 
@@ -43,6 +42,7 @@ void SDL::pumpEvents()
     {
       Input::KeyEvent keyEvent;
       keyEvent.key = (Input::Key::Enum)((uint32_t)-1);
+      keyEvent.playerId = 0u;
 
       // Keys
       switch (sdlEvent.key.keysym.sym)
@@ -159,6 +159,7 @@ void SDL::pumpEvents()
     {
       Input::KeyEvent keyEvent;
       keyEvent.key = (Input::Key::Enum)((uint32_t)-1);
+      keyEvent.playerId = 0u;
 
       switch (sdlEvent.button.button)
       {
@@ -211,7 +212,7 @@ void SDL::pumpEvents()
     }
     else if (sdlEvent.type == SDL_CONTROLLERDEVICEADDED)
     {
-      if (sdlEvent.cdevice.which < _maxNumGameControllers)
+      if (sdlEvent.cdevice.which < _INTR_MAX_PLAYER_COUNT)
       {
         _gameControllers[sdlEvent.cdevice.which] =
             SDL_GameControllerOpen(sdlEvent.cdevice.which);
@@ -220,7 +221,7 @@ void SDL::pumpEvents()
     }
     else if (sdlEvent.type == SDL_CONTROLLERDEVICEREMOVED)
     {
-      if (sdlEvent.cdevice.which < _maxNumGameControllers)
+      if (sdlEvent.cdevice.which < _INTR_MAX_PLAYER_COUNT)
       {
         SDL_GameControllerClose(_gameControllers[sdlEvent.cdevice.which]);
         _gameControllers[sdlEvent.cdevice.which] = nullptr;
@@ -231,6 +232,7 @@ void SDL::pumpEvents()
     {
       Input::KeyEvent keyEvent;
       keyEvent.key = (Input::Key::Enum)(uint32_t)-1;
+      keyEvent.playerId = sdlEvent.cdevice.which;
 
       switch (sdlEvent.cbutton.button)
       {
@@ -265,6 +267,7 @@ void SDL::pumpEvents()
       Input::AxisEvent axisEvent;
       axisEvent.axis = (Input::Axis::Enum)(uint32_t)-1;
       axisEvent.value = (float)sdlEvent.caxis.value / INT16_MAX;
+      axisEvent.playerId = sdlEvent.cdevice.which;
 
       switch (sdlEvent.caxis.axis)
       {
