@@ -29,6 +29,9 @@ namespace Components
 namespace
 {
 physx::PxControllerManager* _pxControllerManager = nullptr;
+// TODO: Expose as properties
+const float _controllerRadius = 1.5f;
+const float _controllerHeight = 2.0f;
 }
 
 // <-
@@ -92,8 +95,7 @@ void CharacterControllerManager::updateControllers(
 
     NodeRef nodeRef = NodeManager::getComponentForEntity(_entity(charCtrlRef));
     const glm::vec3 currentControllerPosition =
-        PhysxHelper::convertExt(pxController->getPosition()) -
-        glm::vec3(0.0f, 1.5f, 0.0f);
+        PhysxHelper::convertExt(pxController->getFootPosition());
     const glm::vec3& currentWorldPos = NodeManager::_worldPosition(nodeRef);
 
     if (currentControllerPosition != currentWorldPos)
@@ -168,8 +170,7 @@ void CharacterControllerManager::updateControllers(
     }
 
     const glm::vec3 nodeWorldPosAfterSim =
-        PhysxHelper::convertExt(pxController->getPosition()) -
-        glm::vec3(0.0f, 1.5f, 0.0f);
+        PhysxHelper::convertExt(pxController->getFootPosition());
 
     // Update node position (and remove parent transform beforehand)
     NodeRef parentNodeRef = NodeManager::_parent(nodeRef);
@@ -216,8 +217,8 @@ void CharacterControllerManager::createResources(
     {
       physx::PxCapsuleControllerDesc controllerDesc;
       {
-        controllerDesc.height = 2.0f;
-        controllerDesc.radius = 0.5f;
+        controllerDesc.height = _controllerHeight;
+        controllerDesc.radius = _controllerRadius;
         controllerDesc.nonWalkableMode = physx::PxControllerNonWalkableMode::
             ePREVENT_CLIMBING_AND_FORCE_SLIDING;
         controllerDesc.material = RigidBodyManager::_defaultMaterial;
