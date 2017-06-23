@@ -38,6 +38,16 @@ namespace Physics
 namespace
 {
 uint32_t _debugRenderingFlags = 0u;
+
+struct PhysXErrorCallback : public physx::PxErrorCallback
+{
+  void reportError(physx::PxErrorCode::Enum code, const char* message,
+                   const char* file, int line) override
+  {
+    _INTR_LOG_WARNING("PhysX Error Message: \"%s\" in file \"%s\" line %i",
+                      message, file, line);
+  }
+} _physXErrorCallback;
 }
 
 // Static members
@@ -49,13 +59,12 @@ physx::PxScene* System::_pxScene;
 
 void System::init()
 {
-  static physx::PxDefaultErrorCallback defaultErrorCallback;
   static physx::PxDefaultAllocator defaultAllocator;
 
   physx::PxTolerancesScale toleranceScale;
 
   _pxFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, defaultAllocator,
-                                     defaultErrorCallback);
+                                     _physXErrorCallback);
   _INTR_ASSERT(_pxFoundation);
 
   _pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *_pxFoundation,
