@@ -79,13 +79,25 @@ void main()
     return;
   }
 
+  const vec4 parameter0Sample = textureLod(parameter0Tex, inUV0, 0.0);
+  const MaterialParameters matParams =
+    materialParameters[uint(parameter0Sample.y)];
+  const vec4 normalSample = textureLod(normalTex, inUV0, 0.0);
+
+  // Unlit materials
+  if ((matParams.materialFlags & 1) > 0)
+  {
+    const vec3 N = normalize(decodeNormal(normalSample.rg));
+    const float fakeShading = clamp(
+      dot((uboPerFrame.viewMatrix * vec4(normalize(vec3(0.5, 0.5, 0.5)), 0.0)).xyz, N), 
+        0.0, 1.0);
+    outColor.rgba = albedoSample * clamp(fakeShading + 0.5, 0.0, 1.0);
+    return;
+  }
+
   outColor.rgba = vec4(0.0);
 
   const vec4 ssaoSample = textureLod(ssaoTex, inUV0, 0.0);
-  const vec4 normalSample = textureLod(normalTex, inUV0, 0.0);
-  const vec4 parameter0Sample = textureLod(parameter0Tex, inUV0, 0.0);
-  const MaterialParameters matParams =
-      materialParameters[uint(parameter0Sample.y)];
   const float occlusion = parameter0Sample.z;
   const float emissive = parameter0Sample.w;
 
