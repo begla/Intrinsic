@@ -64,10 +64,16 @@ void MaterialBuffer::init()
   BufferManager::createResources(buffersToCreate);
 
   _materialBufferEntries.clear();
-  for (uint32_t i = 0u; i < _INTR_MAX_MATERIAL_COUNT; ++i)
+  for (uint32_t i = 0u; i < _INTR_MAX_MATERIAL_COUNT - 1u; ++i)
   {
     _materialBufferEntries.push_back(_INTR_MAX_MATERIAL_COUNT - 1u - i);
   }
+
+  MaterialBufferEntry defaultMaterialBuffer = {};
+  {
+    // Set to default values here
+  }
+  updateMaterialBufferEntry(0u, defaultMaterialBuffer);
 }
 }
 }
