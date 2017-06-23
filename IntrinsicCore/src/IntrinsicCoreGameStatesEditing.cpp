@@ -812,7 +812,7 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
 Entity::EntityRef Editing::_currentlySelectedEntity;
 EditingMode::Enum Editing::_editingMode = EditingMode::kDefault;
 float Editing::_gridSize = 1.0f;
-float Editing::_gizmoSize = 0.15f;
+float Editing::_gizmoSize = 0.1f;
 float Editing::_cameraSpeed = 150.0f;
 float Editing::_rotationStepSize = 5.0f;
 
