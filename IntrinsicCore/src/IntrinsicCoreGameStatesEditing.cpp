@@ -1175,16 +1175,27 @@ void Editing::update(float p_DeltaT)
                                  physx::PxQueryFlag::eDYNAMIC))
         {
           _pickingInitialDistance = hit.distance;
+
+          _pickingDummyActor->setGlobalPose(
+              physx::PxTransform(PhysxHelper::convert(
+                  worldRay.o + worldRay.d * _pickingInitialDistance)));
+
           _pickingJoint = physx::PxDistanceJointCreate(
               *Physics::System::_pxPhysics, hit.actor,
-              physx::PxTransform(physx::PxIdentity), _pickingDummyActor,
-              physx::PxTransform(physx::PxIdentity));
+              physx::PxTransform(
+                  hit.actor->getGlobalPose().transformInv(hit.position)),
+              _pickingDummyActor,
+              physx::PxTransform(
+                  _pickingDummyActor->getGlobalPose().transformInv(
+                      hit.position)));
         }
       }
-
-      _pickingDummyActor->setKinematicTarget(
-          physx::PxTransform(PhysxHelper::convert(
-              worldRay.o + worldRay.d * _pickingInitialDistance)));
+      else
+      {
+        _pickingDummyActor->setKinematicTarget(
+            physx::PxTransform(PhysxHelper::convert(
+                worldRay.o + worldRay.d * _pickingInitialDistance)));
+      }
     }
     else
     {
