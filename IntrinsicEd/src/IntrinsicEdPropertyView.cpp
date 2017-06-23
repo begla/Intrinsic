@@ -301,6 +301,12 @@ void IntrinsicEdPropertyView::clearAndUpdatePropertyView()
               &_propertyDocument, &currentProperties, &it->value,
               it->name.GetString());
         }
+        else if (strcmp(editor, "uint") == 0u)
+        {
+          propertyEditor = new IntrinsicEdPropertyEditorUInt(
+              &_propertyDocument, &currentProperties, &it->value,
+              it->name.GetString());
+        }
         else if (strcmp(editor, "rotation") == 0u)
         {
           propertyEditor = new IntrinsicEdPropertyEditorRotation(
