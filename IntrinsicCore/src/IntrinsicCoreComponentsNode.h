@@ -449,8 +449,8 @@ struct NodeManager
     {
       // Undo parent transform first
       _orientation(p_Ref) =
-          p_WorldOrientation *
-          glm::normalize(glm::inverse(_worldOrientation(parentNode)));
+          glm::normalize(glm::inverse(_worldOrientation(parentNode))) *
+          p_WorldOrientation;
     }
     else
     {

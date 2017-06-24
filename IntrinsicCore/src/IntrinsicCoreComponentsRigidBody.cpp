@@ -446,18 +446,8 @@ void RigidBodyManager::updateNodesFromActors(
       glm::quat worldOrientation;
       PhysxHelper::convert(globalPose, worldPosition, worldOrientation);
 
-      NodeRef parentNodeRef = NodeManager::_parent(nodeCompRef);
-      if (parentNodeRef.isValid())
-      {
-        glm::quat inverseParentOrient =
-            glm::inverse(NodeManager::_worldOrientation(parentNodeRef));
-
-        NodeManager::_position(nodeCompRef) =
-            inverseParentOrient *
-            (worldPosition - NodeManager::_worldPosition(parentNodeRef));
-        NodeManager::_orientation(nodeCompRef) =
-            worldOrientation * inverseParentOrient;
-      }
+      NodeManager::updateFromWorldPosition(nodeCompRef, worldPosition);
+      NodeManager::updateFromWorldOrientation(nodeCompRef, worldOrientation);
 
       NodeManager::updateTransforms(nodeCompRef);
     }
