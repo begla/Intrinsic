@@ -18,6 +18,7 @@
 namespace physx
 {
 class PxTriangleMesh;
+class PxConvexMesh;
 }
 
 namespace Intrinsic
@@ -59,6 +60,7 @@ struct MeshData : Dod::Resources::ResourceDataBase
     aabbPerSubMesh.resize(_INTR_MAX_MESH_COUNT);
 
     pxTriangleMesh.resize(_INTR_MAX_MESH_COUNT);
+    pxConvexMesh.resize(_INTR_MAX_MESH_COUNT);
   }
 
   // <-
@@ -79,6 +81,7 @@ struct MeshData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(AABBPerSubMeshArray) aabbPerSubMesh;
 
   _INTR_ARRAY(physx::PxTriangleMesh*) pxTriangleMesh;
+  _INTR_ARRAY(physx::PxConvexMesh*) pxConvexMesh;
 };
 
 struct MeshManager
@@ -469,6 +472,10 @@ struct MeshManager
   _INTR_INLINE static physx::PxTriangleMesh*& _pxTriangleMesh(MeshRef p_Ref)
   {
     return _data.pxTriangleMesh[p_Ref._id];
+  }
+  _INTR_INLINE static physx::PxConvexMesh*& _pxConvexMesh(MeshRef p_Ref)
+  {
+    return _data.pxConvexMesh[p_Ref._id];
   }
 };
 }

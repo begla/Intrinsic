@@ -280,8 +280,7 @@ void SwarmManager::destroyResources(const SwarmRefArray& p_Swarms)
     Dod::RefArray& lights = Components::SwarmManager::_lights(swarmRef);
     Dod::RefArray& meshes = Components::SwarmManager::_meshes(swarmRef);
 
-    if (World::_rootNode
-            .isValid()) // Check if the world is currently being destroyed
+    if ((World::_flags & WorldFlags::kLoadingUnloading) == 0u)
     {
       for (uint32_t i = 0u; i < nodes.size(); ++i)
       {

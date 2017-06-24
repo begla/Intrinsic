@@ -94,7 +94,9 @@ void IntrinsicEdManagerWindowAsset::onPopulateResourceTree()
     _resourceToItemMapping[assetEntry] = item;
 
     if (AssetManager::_descAssetType(assetEntry) ==
-        AssetManagement::Resources::AssetType::kMesh)
+            AssetManagement::Resources::AssetType::kMesh ||
+        AssetManager::_descAssetType(assetEntry) ==
+            AssetManagement::Resources::AssetType::kMeshAndPhysicsMesh)
     {
       meshes->addChild(item);
     }

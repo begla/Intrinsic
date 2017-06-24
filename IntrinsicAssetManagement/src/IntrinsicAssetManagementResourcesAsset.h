@@ -29,12 +29,16 @@ namespace AssetType
 enum Enum
 {
   kNone,
+
   kMesh,
+
   kAlbedoTexture,
   kAlbedoAlphaTexture,
   kLinearColorTexture,
   kNormalTexture,
   kHdrTexture,
+
+  kMeshAndPhysicsMesh,
 
   kCount,
   kTexturesBegin = kAlbedoTexture,
@@ -105,11 +109,12 @@ struct AssetManager
         p_Document.GetAllocator());
     p_Properties.AddMember(
         "assetType",
-        _INTR_CREATE_PROP_ENUM(p_Document, p_GenerateDesc, _N(Asset), _N(enum),
-                               _descAssetType(p_Ref),
-                               "None,Mesh,AlbedoTexture,AlbedoAlphaTexture,"
-                               "LinearColorTexture,NormalTexture,HDRTexture",
-                               false, false),
+        _INTR_CREATE_PROP_ENUM(
+            p_Document, p_GenerateDesc, _N(Asset), _N(enum),
+            _descAssetType(p_Ref),
+            "None,Mesh,AlbedoTexture,AlbedoAlphaTexture,"
+            "LinearColorTexture,NormalTexture,HDRTexture,MeshAndPhysicsMesh",
+            false, false),
         p_Document.GetAllocator());
   }
 

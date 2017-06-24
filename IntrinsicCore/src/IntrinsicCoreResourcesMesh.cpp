@@ -20,6 +20,9 @@
 #include "PxScene.h"
 #include "cooking/PxCooking.h"
 #include "common/PxTolerancesScale.h"
+#include "extensions/PxDefaultStreams.h"
+#include "geometry/PxTriangleMesh.h"
+#include "geometry/PxConvexMesh.h"
 
 using namespace RVResources;
 
@@ -31,40 +34,31 @@ namespace Resources
 {
 namespace
 {
-_INTR_INLINE void createPxTriangleMesh(MeshRef p_MeshRef)
+_INTR_INLINE void createOrLoadPhysicsMeshes(MeshRef p_MeshRef)
 {
-  physx::PxCookingParams params(
-      Physics::System::_pxPhysics->getTolerancesScale());
-  params.meshCookingHint = physx::PxMeshCookingHint::eSIM_PERFORMANCE;
+  const _INTR_STRING meshFilePath =
+      "media/physics_meshes/" +
+      CResources::MeshManager::_name(p_MeshRef).getString() + ".pm";
 
-  Physics::System::_pxCooking->setParams(params);
+  if (Util::fileExists(meshFilePath.c_str()))
+  {
+    physx::PxDefaultFileInputData fileInput =
+        physx::PxDefaultFileInputData(meshFilePath.c_str());
+    MeshManager::_pxTriangleMesh(p_MeshRef) =
+        Physics::System::_pxPhysics->createTriangleMesh(fileInput);
+  }
 
-  // Don't even try to create empty triangle meshes
-  if (MeshManager::_descPositionsPerSubMesh(p_MeshRef).empty() ||
-      MeshManager::_descIndicesPerSubMesh(p_MeshRef).empty())
-    return;
+  const _INTR_STRING convexMeshFilePath =
+      "media/physics_meshes/" +
+      CResources::MeshManager::_name(p_MeshRef).getString() + ".pcm";
 
-  physx::PxTriangleMeshDesc meshDesc;
-  meshDesc.points.count =
-      (uint32_t)MeshManager::_descPositionsPerSubMesh(p_MeshRef)[0].size();
-  meshDesc.points.stride = sizeof(glm::vec3);
-  meshDesc.points.data =
-      MeshManager::_descPositionsPerSubMesh(p_MeshRef)[0].data();
-
-  meshDesc.triangles.count =
-      (uint32_t)MeshManager::_descIndicesPerSubMesh(p_MeshRef)[0].size() / 3u;
-  meshDesc.triangles.stride = 3u * sizeof(uint32_t);
-  meshDesc.triangles.data =
-      MeshManager::_descIndicesPerSubMesh(p_MeshRef)[0].data();
-
-#if defined(_DEBUG)
-  Physics::System::_pxCooking->validateTriangleMesh(meshDesc);
-#endif // _DEBUG
-
-  MeshManager::_pxTriangleMesh(p_MeshRef) =
-      Physics::System::_pxCooking->createTriangleMesh(
-          meshDesc, Physics::System::_pxPhysics->getPhysicsInsertionCallback());
-  _INTR_ASSERT(MeshManager::_pxTriangleMesh(p_MeshRef));
+  if (Util::fileExists(convexMeshFilePath.c_str()))
+  {
+    physx::PxDefaultFileInputData fileInput =
+        physx::PxDefaultFileInputData(convexMeshFilePath.c_str());
+    MeshManager::_pxConvexMesh(p_MeshRef) =
+        Physics::System::_pxPhysics->createConvexMesh(fileInput);
+  }
 }
 }
 
@@ -412,7 +406,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
       }
     }
 
-    createPxTriangleMesh(meshRef);
+    createOrLoadPhysicsMeshes(meshRef);
   }
 
   BufferManager::createResources(buffersToCreate);
@@ -460,6 +454,18 @@ void MeshManager::destroyResources(const MeshRefArray& p_Meshes)
 
     _vertexBuffersPerSubMesh(meshRef).clear();
     _indexBufferPerSubMesh(meshRef).clear();
+
+    if (_pxTriangleMesh(meshRef) != nullptr)
+    {
+      _pxTriangleMesh(meshRef)->release();
+      _pxTriangleMesh(meshRef) = nullptr;
+    }
+
+    if (_pxConvexMesh(meshRef) != nullptr)
+    {
+      _pxConvexMesh(meshRef)->release();
+      _pxConvexMesh(meshRef) = nullptr;
+    }
   }
 
   BufferManager::destroyResources(buffersToDestroy);

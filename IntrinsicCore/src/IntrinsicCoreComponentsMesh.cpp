@@ -289,6 +289,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
   for (uint32_t meshIdx = 0u; meshIdx < p_Meshes.size(); ++meshIdx)
   {
     MeshRef meshCompRef = p_Meshes[meshIdx];
+    NodeRef nodeRef = NodeManager::getComponentForEntity(_entity(meshCompRef));
     Name& meshName = _descMeshName(meshCompRef);
     DrawCallArray& drawCalls = _drawCalls(meshCompRef);
 
@@ -331,10 +332,25 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
       }
     }
 
+    // Update transform since the AABB most probably changed
+    NodeManager::updateTransforms(nodeRef);
+
     // Create references
     {
-      _node(meshCompRef) =
-          NodeManager::getComponentForEntity(_entity(meshCompRef));
+      _node(meshCompRef) = nodeRef;
+    }
+
+    // Update dependent resources/components
+    if ((World::_flags & WorldFlags::kLoadingUnloading) == 0u)
+    {
+      RigidBodyRef rigidBodyComp =
+          RigidBodyManager::getComponentForEntity(_entity(meshCompRef));
+
+      if (rigidBodyComp.isValid())
+      {
+        RigidBodyManager::destroyResources(rigidBodyComp);
+        RigidBodyManager::createResources(rigidBodyComp);
+      }
     }
   }
 

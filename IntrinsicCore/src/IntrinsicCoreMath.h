@@ -302,9 +302,8 @@ _INTR_INLINE bool calcIntersectSphereAABB(const Sphere& p_Sphere,
 
 _INTR_INLINE void scaleAABB(AABB& p_AABB, const glm::vec3& p_Scale)
 {
-  const glm::vec3 aabbCenter = calcAABBCenter(p_AABB);
-  const glm::vec3 halfExtent = p_Scale * calcAABBHalfExtent(p_AABB);
-  p_AABB = AABB(aabbCenter - halfExtent, aabbCenter + halfExtent);
+  p_AABB.min *= p_Scale;
+  p_AABB.max *= p_Scale;
 }
 
 // <-

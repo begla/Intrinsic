@@ -423,35 +423,7 @@ void importMesh(FbxMesh* p_Mesh, _INTR_ARRAY(MeshRef) & p_ImportedMeshes)
   }
 
   stripDuplicateVertices(meshRef);
-
-  // Create mesh resource
-  MeshRefArray meshesToCreate;
-  meshesToCreate.push_back(meshRef);
-  MeshManager::createResources(meshesToCreate);
-  p_ImportedMeshes.insert(p_ImportedMeshes.begin(), meshesToCreate.begin(),
-                          meshesToCreate.end());
-
-  // Reload mesh components if necessary
-  if (!newMesh)
-  {
-    Components::MeshRefArray componentsToRecreate;
-
-    for (uint32_t i = 0u;
-         i < CComponents::MeshManager::getActiveResourceCount(); ++i)
-    {
-      Components::MeshRef meshCompRef =
-          CComponents::MeshManager::getActiveResourceAtIndex(i);
-
-      if (CComponents::MeshManager::_descMeshName(meshCompRef) ==
-          MeshManager::_name(meshRef))
-      {
-        componentsToRecreate.push_back(meshCompRef);
-      }
-    }
-
-    CComponents::MeshManager::destroyResources(componentsToRecreate);
-    CComponents::MeshManager::createResources(componentsToRecreate);
-  }
+  p_ImportedMeshes.push_back(meshRef);
 }
 
 // <-
@@ -461,8 +433,9 @@ _INTR_INLINE void importMeshesFromNode(FbxNode* p_Node,
 {
   _INTR_ASSERT(p_Node);
 
-  // Try to find a triangle mesh first
   bool triangleMeshFound = false;
+  bool meshFound = false;
+
   for (uint32_t i = 0u; i < (uint32_t)p_Node->GetNodeAttributeCount(); ++i)
   {
     FbxNodeAttribute* nodeAttribute = p_Node->GetNodeAttributeByIndex(i);
@@ -470,10 +443,40 @@ _INTR_INLINE void importMeshesFromNode(FbxNode* p_Node,
     if (nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh)
     {
       const char* meshName = p_Node->GetName();
-      _INTR_LOG_INFO("Found mesh in node '%s'", meshName);
+      FbxMesh* mesh = (FbxMesh*)nodeAttribute;
 
-      importMesh((FbxMesh*)nodeAttribute, p_ImportedMeshes);
-      triangleMeshFound = true;
+      if (mesh->IsTriangleMesh())
+      {
+        _INTR_LOG_INFO("Triangle mesh found in node '%s'! Importing...",
+                       meshName);
+
+        importMesh((FbxMesh*)nodeAttribute, p_ImportedMeshes);
+        triangleMeshFound = true;
+      }
+
+      meshFound = true;
+    }
+  }
+
+  if (!triangleMeshFound && meshFound)
+  {
+    _INTR_LOG_WARNING("No triangle mesh found in node attributes, trying to "
+                      "import anyhow...");
+
+    for (uint32_t i = 0u; i < (uint32_t)p_Node->GetNodeAttributeCount(); ++i)
+    {
+      FbxNodeAttribute* nodeAttribute = p_Node->GetNodeAttributeByIndex(i);
+
+      if (nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh)
+      {
+        const char* meshName = p_Node->GetName();
+        _INTR_LOG_INFO("Found mesh in node '%s'", meshName);
+
+        FbxMesh* mesh = (FbxMesh*)nodeAttribute;
+
+        importMesh((FbxMesh*)nodeAttribute, p_ImportedMeshes);
+        break;
+      }
     }
   }
 

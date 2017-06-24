@@ -67,7 +67,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
   {
     AssetRef assetRef = p_Refs[assetIdx];
 
-    if (_descAssetType(assetRef) == AssetType::kMesh)
+    if (_descAssetType(assetRef) == AssetType::kMesh ||
+        _descAssetType(assetRef) == AssetType::kMeshAndPhysicsMesh)
     {
       ImporterFbx::init();
 
@@ -77,6 +78,9 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
                                         importedMeshes);
       ImporterFbx::destroy();
 
+      // Create mesh resources
+      CResources::MeshManager::createResources(importedMeshes);
+
       for (uint32_t i = 0u; i < importedMeshes.size(); ++i)
       {
         MeshManager::saveToMultipleFilesSingleResource(
@@ -85,6 +89,51 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
 
       MaterialManager::saveToMultipleFiles("managers/materials/",
                                            ".material.json");
+
+      if (_descAssetType(assetRef) == AssetType::kMeshAndPhysicsMesh)
+      {
+        ProcessorPhysics::createPhysicsTriangleMeshes(importedMeshes);
+        ProcessorPhysics::createPhysicsConvexMeshes(importedMeshes);
+
+        // Recreate mesh resources again to init. physics resources
+        CResources::MeshManager::destroyResources(importedMeshes);
+        CResources::MeshManager::createResources(importedMeshes);
+      }
+
+      Components::MeshRefArray meshComponentsToRecreate;
+      Components::RigidBodyRefArray rigidBodyComponentsToRecreate;
+
+      for (MeshRef importedMeshRef : importedMeshes)
+      {
+        for (uint32_t i = 0u;
+             i < CComponents::MeshManager::getActiveResourceCount(); ++i)
+        {
+          Components::MeshRef meshCompRef =
+              CComponents::MeshManager::getActiveResourceAtIndex(i);
+
+          if (CComponents::MeshManager::_descMeshName(meshCompRef) ==
+              MeshManager::_name(importedMeshRef))
+          {
+            meshComponentsToRecreate.push_back(meshCompRef);
+
+            CComponents::RigidBodyRef rigidBodyRef =
+                CComponents::RigidBodyManager::getComponentForEntity(
+                    CComponents::MeshManager::_entity(meshCompRef));
+
+            if (rigidBodyRef.isValid())
+            {
+              rigidBodyComponentsToRecreate.push_back(rigidBodyRef);
+            }
+          }
+        }
+      }
+
+      CComponents::MeshManager::destroyResources(meshComponentsToRecreate);
+      CComponents::MeshManager::createResources(meshComponentsToRecreate);
+      CComponents::RigidBodyManager::destroyResources(
+          rigidBodyComponentsToRecreate);
+      CComponents::RigidBodyManager::createResources(
+          rigidBodyComponentsToRecreate);
     }
     else if (_descAssetType(assetRef) == AssetType::kLinearColorTexture)
     {

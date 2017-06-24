@@ -75,6 +75,10 @@ void System::init()
                                physx::PxCookingParams(toleranceScale));
   _INTR_ASSERT(_pxCooking);
 
+  physx::PxCookingParams params(_pxPhysics->getTolerancesScale());
+  params.meshCookingHint = physx::PxMeshCookingHint::eSIM_PERFORMANCE;
+  _pxCooking->setParams(params);
+
   _pxCpuDispatcher = physx::PxDefaultCpuDispatcherCreate(
       Application::_scheduler.GetNumTaskThreads());
   _INTR_ASSERT(_pxCpuDispatcher);

@@ -22,6 +22,7 @@ namespace Core
 Components::NodeRef World::_rootNode;
 Components::CameraRef World::_activeCamera;
 _INTR_STRING World::_filePath;
+uint32_t World::_flags = 0u;
 
 float World::_currentTime = 0.1f;
 float World::_currentDayNightFactor = 0.0f;
@@ -239,9 +240,10 @@ void World::destroyNodeFull(Components::NodeRef p_NodeRef)
 
 void World::destroy()
 {
-  Components::NodeRef currentRootNode = _rootNode;
+  _flags |= WorldFlags::kLoadingUnloading;
+  destroyNodeFull(_rootNode);
   _rootNode = Components::NodeRef();
-  destroyNodeFull(currentRootNode);
+  _flags &= ~WorldFlags::kLoadingUnloading;
 }
 
 // <-
@@ -513,6 +515,8 @@ void World::load(const _INTR_STRING& p_FilePath)
   // Destroy the current world
   destroy();
 
+  _flags |= WorldFlags::kLoadingUnloading;
+
   // Load world and set root node
   _rootNode = loadNodeHierarchy(p_FilePath);
   Components::NodeManager::rebuildTreeAndUpdateTransforms();
@@ -528,6 +532,8 @@ void World::load(const _INTR_STRING& p_FilePath)
       Components::NodeManager::_entity(_rootNode);
   Resources::EventManager::queueEventIfNotExisting(
       _N(CurrentlySelectedEntityChanged));
+
+  _flags &= ~WorldFlags::kLoadingUnloading;
 }
 
 // <-

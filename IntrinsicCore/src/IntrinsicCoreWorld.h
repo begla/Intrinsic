@@ -18,6 +18,14 @@ namespace Intrinsic
 {
 namespace Core
 {
+namespace WorldFlags
+{
+enum Flags
+{
+  kLoadingUnloading = 0x01
+};
+}
+
 struct World
 {
   static void init();
@@ -50,6 +58,7 @@ struct World
   static _INTR_STRING _filePath;
   static Components::NodeRef _rootNode;
   static Components::CameraRef _activeCamera;
+  static uint32_t _flags;
 
   // <-
 

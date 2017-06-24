@@ -24,3 +24,4 @@
 #include "IntrinsicAssetManagementResourcesAsset.h"
 #include "IntrinsicAssetManagementImporterFbx.h"
 #include "IntrinsicAssetManagementImporterTexture.h"
+#include "IntrinsicAssetManagementProcessorPhysics.h"

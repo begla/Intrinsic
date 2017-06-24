@@ -126,7 +126,7 @@ physx::PxRigidActor* createSphereDynamicKinematic(RigidBodyRef p_Ref,
                                    p_Kinematic);
 
   physx::PxSphereGeometry sphereGeometry;
-  sphereGeometry.radius = halfExtent.x;
+  sphereGeometry.radius = glm::compMin(halfExtent);
 
   physx::PxShape* shape = sphereActor->createShape(
       sphereGeometry, *RigidBodyManager::_defaultMaterial);
@@ -204,6 +204,14 @@ physx::PxRigidActor* createTriangleMeshStaticKinematic(RigidBodyRef p_Ref,
       MeshManager::_descMeshName(meshCompRef));
   _INTR_ASSERT(meshRef.isValid());
 
+  if (Resources::MeshManager::_pxTriangleMesh(meshRef) == nullptr)
+  {
+    _INTR_LOG_WARNING(
+        "No physics triangle mesh available for mesh \"%s\"!",
+        Resources::MeshManager::_name(meshRef).getString().c_str());
+    return nullptr;
+  }
+
   const physx::PxTransform transform =
       PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
                            NodeManager::_worldOrientation(nodeCompRef));
@@ -251,6 +259,61 @@ physx::PxRigidActor* createTriangleMeshStaticKinematic(RigidBodyRef p_Ref,
   return actor;
 }
 
+physx::PxRigidActor* createConvexMeshDynamicKinematic(RigidBodyRef p_Ref,
+                                                      bool p_Kinematic)
+{
+  NodeRef nodeCompRef =
+      NodeManager::getComponentForEntity(RigidBodyManager::_entity(p_Ref));
+  _INTR_ASSERT(nodeCompRef.isValid());
+  MeshRef meshCompRef =
+      MeshManager::getComponentForEntity(RigidBodyManager::_entity(p_Ref));
+  _INTR_ASSERT(meshCompRef.isValid());
+  Resources::MeshRef meshRef = Resources::MeshManager::getResourceByName(
+      MeshManager::_descMeshName(meshCompRef));
+  _INTR_ASSERT(meshRef.isValid());
+
+  if (Resources::MeshManager::_pxConvexMesh(meshRef) == nullptr)
+  {
+    _INTR_LOG_WARNING(
+        "No physics convex mesh available for mesh \"%s\"!",
+        Resources::MeshManager::_name(meshRef).getString().c_str());
+    return nullptr;
+  }
+
+  const physx::PxTransform transform =
+      PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
+                           NodeManager::_worldOrientation(nodeCompRef));
+
+  physx::PxConvexMeshGeometry convexMeshGeometry;
+  convexMeshGeometry.scale = physx::PxMeshScale(
+      PhysxHelper::convert(NodeManager::_worldSize(nodeCompRef)),
+      physx::PxQuat::createIdentity());
+  convexMeshGeometry.convexMesh =
+      Resources::MeshManager::_pxConvexMesh(meshRef);
+
+  physx::PxRigidActor* actor = nullptr;
+
+  physx::PxRigidDynamic* convexMeshActor =
+      Physics::System::_pxPhysics->createRigidDynamic(transform);
+  _INTR_ASSERT(convexMeshActor);
+  actor = convexMeshActor;
+
+  if (p_Kinematic)
+    convexMeshActor->setRigidDynamicFlag(physx::PxRigidDynamicFlag::eKINEMATIC,
+                                         true);
+
+  physx::PxShape* shape = convexMeshActor->createShape(
+      convexMeshGeometry, *RigidBodyManager::_defaultMaterial);
+  _INTR_ASSERT(shape);
+
+  physx::PxRigidBodyExt::updateMassAndInertia(
+      *convexMeshActor, RigidBodyManager::_descDensity(p_Ref));
+
+  Physics::System::_pxScene->addActor(*actor);
+
+  return actor;
+}
+
 // <-
 
 void RigidBodyManager::createResources(const RigidBodyRefArray& p_RigidBodies)
@@ -261,32 +324,31 @@ void RigidBodyManager::createResources(const RigidBodyRefArray& p_RigidBodies)
        ++rigidBodyIdx)
   {
     RigidBodyRef rigidBodyRef = p_RigidBodies[rigidBodyIdx];
+    const RigidBodyType::Enum rigidBodyType = _descRigidBodyType(rigidBodyRef);
 
-    if (_descRigidBodyType(rigidBodyRef) == RigidBodyType::kBoxDynamic ||
-        _descRigidBodyType(rigidBodyRef) == RigidBodyType::kBoxKinematic)
+    if (rigidBodyType == RigidBodyType::kBoxDynamic ||
+        rigidBodyType == RigidBodyType::kBoxKinematic)
     {
       _pxRigidActor(rigidBodyRef) = createBoxDynamicKinematic(
-          rigidBodyRef,
-          _descRigidBodyType(rigidBodyRef) == RigidBodyType::kBoxKinematic);
+          rigidBodyRef, rigidBodyType == RigidBodyType::kBoxKinematic);
     }
-    else if (_descRigidBodyType(rigidBodyRef) ==
-                 RigidBodyType::kSphereDynamic ||
-             _descRigidBodyType(rigidBodyRef) ==
-                 RigidBodyType::kSphereKinematic)
+    else if (rigidBodyType == RigidBodyType::kSphereDynamic ||
+             rigidBodyType == RigidBodyType::kSphereKinematic)
     {
       _pxRigidActor(rigidBodyRef) = createSphereDynamicKinematic(
-          rigidBodyRef,
-          _descRigidBodyType(rigidBodyRef) == RigidBodyType::kSphereKinematic);
+          rigidBodyRef, rigidBodyType == RigidBodyType::kSphereKinematic);
     }
-    else if (_descRigidBodyType(rigidBodyRef) ==
-                 RigidBodyType::kTriangleMeshStatic ||
-             _descRigidBodyType(rigidBodyRef) ==
-                 RigidBodyType::kTriangleMeshKinematic)
+    else if (rigidBodyType == RigidBodyType::kTriangleMeshStatic ||
+             rigidBodyType == RigidBodyType::kTriangleMeshKinematic)
     {
       _pxRigidActor(rigidBodyRef) = createTriangleMeshStaticKinematic(
-          rigidBodyRef,
-          _descRigidBodyType(rigidBodyRef) ==
-              RigidBodyType::kTriangleMeshKinematic);
+          rigidBodyRef, rigidBodyType == RigidBodyType::kTriangleMeshKinematic);
+    }
+    else if (rigidBodyType == RigidBodyType::kConvexMeshDynamic ||
+             rigidBodyType == RigidBodyType::kConvexMeshKinematic)
+    {
+      _pxRigidActor(rigidBodyRef) = createConvexMeshDynamicKinematic(
+          rigidBodyRef, rigidBodyType == RigidBodyType::kConvexMeshKinematic);
     }
   }
 }
@@ -323,7 +385,7 @@ void RigidBodyManager::updateNodesFromActors(
         RigidBodyManager::_entity(rigidBodyRef));
     physx::PxRigidActor* actor = RigidBodyManager::_pxRigidActor(rigidBodyRef);
 
-    if (actor->isRigidDynamic() &&
+    if (actor && actor->isRigidDynamic() &&
         !actor->isRigidDynamic()->getRigidBodyFlags().isSet(
             physx::PxRigidBodyFlag::eKINEMATIC))
     {
@@ -366,25 +428,27 @@ void RigidBodyManager::updateActorsFromNodes(
         RigidBodyManager::_entity(rigidBodyRef));
     physx::PxRigidActor* actor = RigidBodyManager::_pxRigidActor(rigidBodyRef);
 
-    physx::PxRigidDynamic* rigidDynamic = actor->isRigidDynamic();
-    physx::PxRigidStatic* rigidStatic = actor->isRigidStatic();
+    if (actor)
+    {
+      physx::PxRigidDynamic* rigidDynamic = actor->isRigidDynamic();
+      physx::PxRigidStatic* rigidStatic = actor->isRigidStatic();
 
-    if (rigidDynamic &&
-        rigidDynamic->getRigidBodyFlags().isSet(
-            physx::PxRigidBodyFlag::eKINEMATIC))
-    {
-      // Update kinematic target
-      const physx::PxTransform transform =
-          PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
-                               NodeManager::_worldOrientation(nodeCompRef));
-      rigidDynamic->setKinematicTarget(transform);
-    }
-    else if (rigidStatic)
-    {
-      const physx::PxTransform transform =
-          PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
-                               NodeManager::_worldOrientation(nodeCompRef));
-      rigidStatic->setGlobalPose(transform);
+      if (rigidDynamic && rigidDynamic->getRigidBodyFlags().isSet(
+                              physx::PxRigidBodyFlag::eKINEMATIC))
+      {
+        // Update kinematic target
+        const physx::PxTransform transform =
+            PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
+                                 NodeManager::_worldOrientation(nodeCompRef));
+        rigidDynamic->setKinematicTarget(transform);
+      }
+      else if (rigidStatic)
+      {
+        const physx::PxTransform transform =
+            PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
+                                 NodeManager::_worldOrientation(nodeCompRef));
+        rigidStatic->setGlobalPose(transform);
+      }
     }
   }
 }

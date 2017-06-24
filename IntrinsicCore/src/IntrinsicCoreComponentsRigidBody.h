@@ -40,6 +40,8 @@ enum Enum
   kTriangleMeshKinematic,
   kSphereKinematic,
   kSphereDynamic,
+  kConvexMeshKinematic,
+  kConvexMeshDynamic
 };
 }
 
@@ -98,7 +100,8 @@ struct RigidBodyManager
             p_Document, p_GenerateDesc, _N(RigidBody), _N(enum),
             _descRigidBodyType(p_Ref),
             "BoxKinematic,BoxDynamic,TriangleMeshStatic,TriangleMeshKinematic,"
-            "SphereKinematic,SphereDynamic,",
+            "SphereKinematic,SphereDynamic,ConvexMeshKinematic,"
+            "ConvexMeshDynamic",
             false, false),
         p_Document.GetAllocator());
     p_Properties.AddMember("density",
