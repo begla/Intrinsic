@@ -1,6 +1,10 @@
+// Visual Studio dirs/files
 *.dir
 x64
+*.TMP
+*.lastcodeanalysissucceeded
 
+// Binary data and settings
 app/IntrinsicEd.ini
 app/Intrinsic
 app/*.exe
@@ -10,31 +14,33 @@ app/*.dll
 app/*.ilk
 !app/BsSndRpt64.exe
 app/platforms
-app/assets/world_machine/*.tmd.session
-app/media/pipeline_caches/*.pc
 
+// Distro directory
 distro/
 *.7z
 
+// Build and dependencies
 build
 dependencies/glslang/build
 
+// Doxygen
 doc/
 
-*.TMP
-*.lastcodeanalysissucceeded
-
+// Qt creator
 Intrinsic.config
 Intrinsic.creator
 Intrinsic.creator.user
 Intrinsic.files
 Intrinsic.includes
 
+// Assets and media
 app/assets/*
-
 !app/assets/shaders
+
+app/media/pipeline_caches/*.pc
 app/media/shaders/*
 !app/media/shaders/KEEP_ME
-app/crash_dumps
 
+// Crash dumps and log
+app/crash_dumps
 app/Intrinsic.log
