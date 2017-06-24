@@ -18,6 +18,8 @@ namespace Intrinsic
 {
 namespace Core
 {
+namespace Rendering
+{
 namespace IBL
 {
 void initCubemapProcessing();
@@ -67,10 +69,11 @@ struct SH9
 
 // <-
 
-_INTR_INLINE IBL::SH9 blend(const IBL::SH9& p_Left, const IBL::SH9& p_Right,
-                            float p_Blend)
+_INTR_INLINE Rendering::IBL::SH9 blend(const Rendering::IBL::SH9& p_Left,
+                                       const Rendering::IBL::SH9& p_Right,
+                                       float p_Blend)
 {
-  IBL::SH9 result;
+  Rendering::IBL::SH9 result;
   {
     glm::vec3* rawResult = (glm::vec3*)&result;
 
@@ -243,9 +246,9 @@ _INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
       gli::fsamplerCube(p_Output, gli::WRAP_CLAMP_TO_EDGE);
 
   glm::uvec2 extent = p_Output.extent(p_MipIdx);
-  const float roughness =
-      p_MinRoughness +
-      float(p_MipIdx) / p_Output.max_level() * (1.0f - p_MinRoughness);
+  const float roughness = p_MinRoughness + float(p_MipIdx) /
+                                               p_Output.max_level() *
+                                               (1.0f - p_MinRoughness);
   const uint32_t sampleCount = p_SampleCounts[p_MipIdx];
 
   for (uint32_t y = p_RangeY.x; y < p_RangeY.y; ++y)
@@ -254,7 +257,7 @@ _INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
     {
       const glm::uvec3 pixelPos = glm::uvec3(x, y, p_FaceIdx);
       const glm::vec2 uv = (glm::vec2(pixelPos) + 0.5f) / glm::vec2(extent);
-      const glm::vec3 R = IBL::mapXYSToDirection(pixelPos, extent);
+      const glm::vec3 R = Rendering::IBL::mapXYSToDirection(pixelPos, extent);
 
       glm::vec3 prefilteredColor = glm::vec3(0.0f);
 
@@ -352,6 +355,7 @@ _INTR_INLINE SH9 project(const gli::texture_cube& p_CubeMap)
 // <-
 
 void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear, float p_Time);
+}
 }
 }
 }

@@ -740,7 +740,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
     RenderSystem::resizeSwapChain(true);
 
     for (uint32_t i = 0u; i < _probeTimeSamples; ++i)
-      IBL::captureProbes({probeNodeRef}, i == 0, i / (float)_probeTimeSamples);
+      Rendering::IBL::captureProbes({probeNodeRef}, i == 0, i / (float)_probeTimeSamples);
 
     RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
     RenderSystem::resizeSwapChain(true);

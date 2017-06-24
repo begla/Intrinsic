@@ -82,7 +82,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
 
   // Initializes Intrinsic
   Application::init(GetModuleHandle(NULL), (void*)_ui.viewPort->winId());
-  IBL::initCubemapProcessing();
+  Rendering::IBL::initCubemapProcessing();
 
   // Activate editing game state
   GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
@@ -967,7 +967,8 @@ void IntrinsicEd::onCaptureAllProbes()
   }
 
   for (uint32_t i = 0u; i < _probeTimeSamples; ++i)
-    IBL::captureProbes(probeNodes, i == 0, i / (float)_probeTimeSamples);
+    Rendering::IBL::captureProbes(probeNodes, i == 0,
+                                  i / (float)_probeTimeSamples);
 
   RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
   RenderSystem::resizeSwapChain(true);

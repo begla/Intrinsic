@@ -21,6 +21,8 @@ namespace Intrinsic
 {
 namespace Core
 {
+namespace Rendering
+{
 namespace IBL
 {
 namespace
@@ -309,7 +311,8 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
             16u, 512u, 1024u, 1024u, 1024u, 1024u, 1024u, 1024u, 1024u};
         _INTR_ASSERT(sampleCounts.size() == filteredTexCube.levels());
 
-        IBL::preFilterGGX(texCube, filteredTexCube, sampleCounts.data());
+        Rendering::IBL::preFilterGGX(texCube, filteredTexCube,
+                                     sampleCounts.data());
 
         _INTR_STRING timeString = StringUtil::toString(p_Time);
         StringUtil::replace(timeString, ".", "-");
@@ -340,7 +343,7 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
       {
         // Generate and store SH irrad.
         Components::IrradianceProbeManager::_descSHs(irradProbeRef)
-            .push_back(IBL::project(texCube));
+            .push_back(Rendering::IBL::project(texCube));
       }
     }
   }
@@ -357,6 +360,7 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
   RenderPass::Debug::_activeDebugStageFlags = prevDebugStageFlags;
   World::setActiveCamera(prevCamera);
   World::destroyNodeFull(camNodeRef);
+}
 }
 }
 }

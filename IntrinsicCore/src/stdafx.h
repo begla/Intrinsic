@@ -165,7 +165,7 @@ namespace CComponents = Intrinsic::Core::Components;
 #include "IntrinsicCoreName.h"
 #include "IntrinsicCoreTimingHelper.h"
 #include "IntrinsicCoreDod.h"
-#include "IntrinsicCoreIBL.h"
+#include "IntrinsicCoreRenderingIBL.h"
 #include "IntrinsicCoreJsonHelper.h"
 #include "IntrinsicCoreEntity.h"
 #include "IntrinsicCoreDodResources.h"
@@ -192,6 +192,7 @@ namespace CComponents = Intrinsic::Core::Components;
 #include "IntrinsicCoreWorld.h"
 #include "IntrinsicCoreResourcesPostEffect.h"
 #include "IntrinsicCoreComponentsPostEffectVolume.h"
+#include "IntrinsicCoreRenderingSkyModel.h"
 
 #include "IntrinsicCoreTaskManager.h"
 #include "IntrinsicCorePhysicsSystem.h"

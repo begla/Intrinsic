@@ -43,7 +43,7 @@ struct IrradianceProbeData : Dod::Components::ComponentDataBase
   _INTR_ARRAY(float) descFalloffExponent;
   _INTR_ARRAY(uint32_t) descPriority;
 
-  _INTR_ARRAY(_INTR_ARRAY(IBL::SH9)) descSHs;
+  _INTR_ARRAY(_INTR_ARRAY(Rendering::IBL::SH9)) descSHs;
 };
 
 struct IrradianceProbeManager
@@ -195,7 +195,7 @@ struct IrradianceProbeManager
     return _data.descFalloffExponent[p_Ref._id];
   }
 
-  _INTR_INLINE static _INTR_ARRAY(IBL::SH9) & _descSHs(IrradianceProbeRef p_Ref)
+  _INTR_INLINE static _INTR_ARRAY(Rendering::IBL::SH9) & _descSHs(IrradianceProbeRef p_Ref)
   {
     return _data.descSHs[p_Ref._id];
   }

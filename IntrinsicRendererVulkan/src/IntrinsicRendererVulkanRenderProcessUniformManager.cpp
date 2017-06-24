@@ -16,9 +16,6 @@
 #include "stdafx_vulkan.h"
 #include "stdafx.h"
 
-// Sky model
-#include "IntrinsicCoreSkyModel.h"
-
 #define HALTON_SAMPLE_COUNT 1024
 
 using namespace CResources;
@@ -312,8 +309,8 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
                              0.00001f));
 
       // TODO: Move params to post effect
-      SkyModel::ArHosekSkyModelState skyModel =
-          SkyModel::createSkyModelStateRGB(
+      Rendering::SkyModel::ArHosekSkyModelState skyModel =
+          Rendering::SkyModel::createSkyModelStateRGB(
               PostEffectManager::_descSkyTurbidity(
                   PostEffectManager::_blendTargetRef),
               PostEffectManager::_descSkyAlbedo(
@@ -328,8 +325,10 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
 
       // Project sky light SH
       {
-        IBL::SH9 skyLightSH = SkyModel::project(skyModel, sunDir, 64u);
-        memcpy(fragmentData.skyLightSH, &skyLightSH, sizeof(IBL::SH9));
+        Rendering::IBL::SH9 skyLightSH =
+            Rendering::SkyModel::project(skyModel, sunDir, 64u);
+        memcpy(fragmentData.skyLightSH, &skyLightSH,
+               sizeof(Rendering::IBL::SH9));
       }
 
       // Pack sky model configs/radiance for sky sampling

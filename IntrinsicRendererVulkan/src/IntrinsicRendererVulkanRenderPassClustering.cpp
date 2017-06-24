@@ -473,11 +473,11 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
           Components::IrradianceProbeManager::_descFalloffExp(irradProbeRef),
           0.0f, 0.0f);
 
-      const _INTR_ARRAY(IBL::SH9)& shs =
+      const _INTR_ARRAY(Rendering::IBL::SH9)& shs =
           Components::IrradianceProbeManager::_descSHs(irradProbeRef);
 
       // Blend SHs according to the time of day
-      IBL::SH9 blendedSH;
+      Rendering::IBL::SH9 blendedSH;
       if (!shs.empty())
       {
         if (shs.size() >= 2u)
@@ -492,10 +492,10 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
           const float interp =
               (World::_currentTime - leftPerc) / (rightPerc - leftPerc);
 
-          const IBL::SH9& left = shs[leftIdx];
-          const IBL::SH9& right = shs[leftIdx + 1u];
+          const Rendering::IBL::SH9& left = shs[leftIdx];
+          const Rendering::IBL::SH9& right = shs[leftIdx + 1u];
 
-          blendedSH = IBL::blend(left, right, interp);
+          blendedSH = Rendering::IBL::blend(left, right, interp);
         }
         else
         {
@@ -504,7 +504,7 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
       }
 
       memcpy(_irradProbeBufferMemory[_currentIrradProbeCount].shData,
-             &blendedSH, sizeof(IBL::SH9));
+             &blendedSH, sizeof(Rendering::IBL::SH9));
       ++_currentIrradProbeCount;
     }
   }
