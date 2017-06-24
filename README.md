@@ -10,7 +10,7 @@ Intrinsic is a Vulkan based cross-platform game and rendering engine. The projec
 
 You can find some simple build and setup instructions in `GETTING_STARTED.md`.
 
-Further details are available on the project homepage (see http://www.intrinsic-engine.com). The Intrinsic repository is hosted on GitHub (see http://www.github.com/begla/Intrinsic).
+Further details and the (heavily WIP) API documentation are available on the project homepage (see http://www.intrinsic-engine.com and http://www.intrinsic-engine.com/api-doc). The Intrinsic repository is hosted on GitHub (see http://www.github.com/begla/Intrinsic).
 
 # Screenshots
 
