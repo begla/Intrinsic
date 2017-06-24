@@ -16,14 +16,15 @@
 
 #define _INTR_TLSF_SIZE_IN_MB 256u
 #define _INTR_TLSF_INIT_ON_DEMAND()                                            \
-  {                                                                            \
-    if (_allocator == nullptr)                                                 \
-      _allocator = new Allocator(_INTR_TLSF_SIZE_IN_MB * 1024u * 1024u);       \
-  }
+  std::call_once(_onceFlag, []() {                                             \
+    _allocator = new Allocator(_INTR_TLSF_SIZE_IN_MB * 1024u * 1024u);         \
+  });
 
 namespace Intrinsic
 {
 namespace Core
+{
+namespace Memory
 {
 namespace Tlsf
 {
@@ -93,7 +94,9 @@ struct MainAllocator
 
 private:
   static Allocator* _allocator;
+  static std::once_flag _onceFlag;
 };
+}
 }
 }
 }

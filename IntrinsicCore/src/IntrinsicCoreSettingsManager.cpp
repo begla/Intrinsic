@@ -84,13 +84,13 @@ void Manager::loadSettings()
 
   rapidjson::Document doc;
 
-  char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+  char* readBuffer = (char*)Memory::Tlsf::MainAllocator::allocate(65536u);
   {
     rapidjson::FileReadStream is(fp, readBuffer, 65536u);
     doc.ParseStream<rapidjson::kParseCommentsFlag>(is);
     fclose(fp);
   }
-  Tlsf::MainAllocator::free(readBuffer);
+  Memory::Tlsf::MainAllocator::free(readBuffer);
 
   {
     bool rendererValidationEnabled =

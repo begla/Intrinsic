@@ -182,7 +182,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             (uint32_t)positions[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
-        uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
+        uint16_t* tempBuffer = (uint16_t*)Memory::Tlsf::MainAllocator::allocate(
             BufferManager::_descSizeInBytes(posVertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
@@ -215,7 +215,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             (uint32_t)uv0s[subMeshIdx].size() * sizeof(uint16_t) * 2u;
 
         // Convert to half
-        uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
+        uint16_t* tempBuffer = (uint16_t*)Memory::Tlsf::MainAllocator::allocate(
             BufferManager::_descSizeInBytes(uv0VertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
@@ -246,7 +246,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             (uint32_t)normals[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
-        uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
+        uint16_t* tempBuffer = (uint16_t*)Memory::Tlsf::MainAllocator::allocate(
             BufferManager::_descSizeInBytes(normalVertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
@@ -281,7 +281,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             (uint32_t)tangents[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
-        uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
+        uint16_t* tempBuffer = (uint16_t*)Memory::Tlsf::MainAllocator::allocate(
             BufferManager::_descSizeInBytes(tangentVertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
@@ -316,7 +316,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             (uint32_t)binormals[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
         // Convert to half
-        uint16_t* tempBuffer = (uint16_t*)Tlsf::MainAllocator::allocate(
+        uint16_t* tempBuffer = (uint16_t*)Memory::Tlsf::MainAllocator::allocate(
             BufferManager::_descSizeInBytes(binormalVertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
@@ -352,7 +352,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             (uint32_t)vtxColors[subMeshIdx].size() * sizeof(uint32_t);
 
         // Convert color
-        uint32_t* tempBuffer = (uint32_t*)Tlsf::MainAllocator::allocate(
+        uint32_t* tempBuffer = (uint32_t*)Memory::Tlsf::MainAllocator::allocate(
             BufferManager::_descSizeInBytes(vtxColorVertexBuffer));
         tempBuffersToRelease.push_back(tempBuffer);
 
@@ -378,7 +378,8 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
           uint32_t indexBufferSizeInBytes =
               (uint16_t)indices[subMeshIdx].size() * sizeof(uint16_t);
           uint16_t* tempIndexBuffer =
-              (uint16_t*)Tlsf::MainAllocator::allocate(indexBufferSizeInBytes);
+              (uint16_t*)Memory::Tlsf::MainAllocator::allocate(
+                  indexBufferSizeInBytes);
           tempBuffersToRelease.push_back(tempIndexBuffer);
 
           for (uint32_t i = 0u; i < indices[subMeshIdx].size(); ++i)
@@ -413,7 +414,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
 
   for (uint32_t i = 0u; i < tempBuffersToRelease.size(); ++i)
   {
-    Tlsf::MainAllocator::free(tempBuffersToRelease[i]);
+    Memory::Tlsf::MainAllocator::free(tempBuffersToRelease[i]);
   }
   tempBuffersToRelease.clear();
 }

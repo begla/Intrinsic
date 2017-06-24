@@ -42,7 +42,8 @@ _INTR_INLINE void split(const _INTR_STRING& p_String, const char* p_Delim,
   const uint32_t bytesToCopy =
       sizeof(char) * ((uint32_t)p_String.length() + 1u);
 
-  char* tempStringBuffer = (char*)Tlsf::MainAllocator::allocate(bytesToCopy);
+  char* tempStringBuffer =
+      (char*)Memory::Tlsf::MainAllocator::allocate(bytesToCopy);
   memcpy(tempStringBuffer, p_String.c_str(), bytesToCopy);
 
   char* splitString = tempStringBuffer;
@@ -56,7 +57,7 @@ _INTR_INLINE void split(const _INTR_STRING& p_String, const char* p_Delim,
     token = _INTR_STRING_TOK(nullptr, p_Delim, &nextToken);
   }
 
-  Tlsf::MainAllocator::free(tempStringBuffer);
+  Memory::Tlsf::MainAllocator::free(tempStringBuffer);
 }
 
 _INTR_INLINE void extractFileNameAndExtension(const _INTR_STRING& p_String,

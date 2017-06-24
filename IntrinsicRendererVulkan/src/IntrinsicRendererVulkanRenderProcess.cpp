@@ -188,11 +188,12 @@ Default::_shadowFrustums;
 _INTR_HASH_MAP(Components::CameraRef, uint8_t)
 Default::_cameraToIdMapping;
 
-LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>
+Containers::LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>
     RenderProcess::Default::_visibleDrawCallsPerMaterialPass
         [_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT][_INTR_MAX_MATERIAL_PASS_COUNT];
-LockFreeStack<Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT> RenderProcess::Default::
-    _visibleMeshComponents[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT];
+Containers::LockFreeStack<Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT>
+    RenderProcess::Default::_visibleMeshComponents
+        [_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT];
 
 // <-
 
@@ -231,13 +232,13 @@ void Default::loadRendererConfig()
       return;
     }
 
-    char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+    char* readBuffer = (char*)Memory::Tlsf::MainAllocator::allocate(65536u);
     {
       rapidjson::FileReadStream is(fp, readBuffer, 65536u);
       rendererConfig.ParseStream<rapidjson::kParseCommentsFlag>(is);
       fclose(fp);
     }
-    Tlsf::MainAllocator::free(readBuffer);
+    Memory::Tlsf::MainAllocator::free(readBuffer);
   }
 
   _INTR_LOG_INFO("Loading renderer config '%s'...",

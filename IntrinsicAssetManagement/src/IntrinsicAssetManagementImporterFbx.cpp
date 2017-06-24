@@ -31,6 +31,8 @@ namespace Intrinsic
 {
 namespace AssetManagement
 {
+namespace Importers
+{
 namespace
 {
 FbxManager* _fbxManager = nullptr;
@@ -487,7 +489,7 @@ _INTR_INLINE void importMeshesFromNode(FbxNode* p_Node,
 }
 }
 
-void ImporterFbx::init()
+void Fbx::init()
 {
   _INTR_ASSERT(_fbxManager == nullptr);
   _fbxManager = FbxManager::Create();
@@ -497,7 +499,7 @@ void ImporterFbx::init()
 
 // <-
 
-void ImporterFbx::destroy()
+void Fbx::destroy()
 {
   _INTR_ASSERT(_fbxManager);
 
@@ -507,8 +509,8 @@ void ImporterFbx::destroy()
 
 // <-
 
-bool ImporterFbx::importMeshesFromFile(const _INTR_STRING& p_FilePath,
-                                       _INTR_ARRAY(MeshRef) & p_ImportedMeshes)
+bool Fbx::importMeshesFromFile(const _INTR_STRING& p_FilePath,
+                               _INTR_ARRAY(MeshRef) & p_ImportedMeshes)
 {
   FbxImporter* importer = FbxImporter::Create(_fbxManager, "");
 
@@ -538,6 +540,7 @@ bool ImporterFbx::importMeshesFromFile(const _INTR_STRING& p_FilePath,
   _INTR_LOG_POP();
 
   return true;
+}
 }
 }
 }

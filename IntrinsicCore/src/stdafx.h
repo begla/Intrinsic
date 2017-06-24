@@ -72,6 +72,7 @@
 #include <cfloat>
 #include <cmath>
 #include <thread>
+#include <mutex>
 
 // Core related includes
 #include "IntrinsicCoreVersion.h"
@@ -158,8 +159,8 @@ namespace CComponents = Intrinsic::Core::Components;
 #include "IntrinsicCoreLockFreeStack.h"
 #include "IntrinsicCoreLinearOffsetAllocator.h"
 #include "IntrinsicCoreLockFreeFixedBlockAllocator.h"
-#include "IntrinsicStringUtil.h"
-#include "IntrinsicUtil.h"
+#include "IntrinsicCoreStringUtil.h"
+#include "IntrinsicCoreUtil.h"
 #include "IntrinsicCoreSimd.h"
 #include "IntrinsicCoreMath.h"
 #include "IntrinsicCoreName.h"

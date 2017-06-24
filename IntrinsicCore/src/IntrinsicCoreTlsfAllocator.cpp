@@ -19,9 +19,13 @@ namespace Intrinsic
 {
 namespace Core
 {
+namespace Memory
+{
 namespace Tlsf
 {
 Allocator* MainAllocator::_allocator = nullptr;
+std::once_flag MainAllocator::_onceFlag;
+}
 }
 }
 }

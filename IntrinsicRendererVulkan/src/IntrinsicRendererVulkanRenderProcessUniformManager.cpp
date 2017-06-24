@@ -150,7 +150,7 @@ _uniformOffsetMapping = {
 
 _INTR_HASH_MAP(Name, UniformBuffer) _uniformBuffers;
 uint8_t* _uniformBufferMemory = nullptr;
-LinearOffsetAllocator _uniformBufferMemoryAllocator;
+Memory::LinearOffsetAllocator _uniformBufferMemoryAllocator;
 const uint32_t _uniformBufferMemorySizeInBytes = 2u * 1024u * 1024u;
 }
 

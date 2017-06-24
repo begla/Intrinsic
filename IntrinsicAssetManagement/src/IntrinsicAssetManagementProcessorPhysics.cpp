@@ -32,7 +32,9 @@ namespace Intrinsic
 {
 namespace AssetManagement
 {
-void ProcessorPhysics::createPhysicsTriangleMeshes(
+namespace Processors
+{
+void Physics::createPhysicsTriangleMeshes(
     const CResources::MeshRefArray& p_MeshRefs)
 {
   for (MeshRef meshRef : p_MeshRefs)
@@ -63,8 +65,8 @@ void ProcessorPhysics::createPhysicsTriangleMeshes(
     {
       physx::PxDefaultFileOutputStream outStream =
           physx::PxDefaultFileOutputStream(meshFilePath.c_str());
-      result =
-          Physics::System::_pxCooking->cookTriangleMesh(meshDesc, outStream);
+      result = Core::Physics::System::_pxCooking->cookTriangleMesh(meshDesc,
+                                                                   outStream);
     }
 
     if (!result)
@@ -76,7 +78,7 @@ void ProcessorPhysics::createPhysicsTriangleMeshes(
     }
   }
 }
-void ProcessorPhysics::createPhysicsConvexMeshes(
+void Physics::createPhysicsConvexMeshes(
     const CResources::MeshRefArray& p_MeshRefs)
 {
   for (MeshRef meshRef : p_MeshRefs)
@@ -104,8 +106,8 @@ void ProcessorPhysics::createPhysicsConvexMeshes(
     {
       physx::PxDefaultFileOutputStream outStream =
           physx::PxDefaultFileOutputStream(convexMeshFilePath.c_str());
-      result = Physics::System::_pxCooking->cookConvexMesh(convexMeshDesc,
-                                                           outStream);
+      result = Core::Physics::System::_pxCooking->cookConvexMesh(convexMeshDesc,
+                                                                 outStream);
     }
 
     if (!result)
@@ -135,8 +137,8 @@ void ProcessorPhysics::createPhysicsConvexMeshes(
       {
         physx::PxDefaultFileOutputStream outStream =
             physx::PxDefaultFileOutputStream(convexMeshFilePath.c_str());
-        result = Physics::System::_pxCooking->cookConvexMesh(convexMeshDesc,
-                                                             outStream);
+        result = Core::Physics::System::_pxCooking->cookConvexMesh(
+            convexMeshDesc, outStream);
       }
 
       if (!result)
@@ -148,6 +150,7 @@ void ProcessorPhysics::createPhysicsConvexMeshes(
       }
     }
   }
+}
 }
 }
 }

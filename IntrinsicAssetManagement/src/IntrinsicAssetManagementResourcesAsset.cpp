@@ -70,13 +70,14 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     if (_descAssetType(assetRef) == AssetType::kMesh ||
         _descAssetType(assetRef) == AssetType::kMeshAndPhysicsMesh)
     {
-      ImporterFbx::init();
+      Importers::Fbx::init();
 
       _INTR_ARRAY(MeshRef) importedMeshes;
-      ImporterFbx::importMeshesFromFile(Settings::Manager::_assetMeshPath +
-                                            "/" + _descAssetFileName(assetRef),
-                                        importedMeshes);
-      ImporterFbx::destroy();
+      Importers::Fbx::importMeshesFromFile(Settings::Manager::_assetMeshPath +
+                                               "/" +
+                                               _descAssetFileName(assetRef),
+                                           importedMeshes);
+      Importers::Fbx::destroy();
 
       // Create mesh resources
       CResources::MeshManager::createResources(importedMeshes);
@@ -92,8 +93,8 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
 
       if (_descAssetType(assetRef) == AssetType::kMeshAndPhysicsMesh)
       {
-        ProcessorPhysics::createPhysicsTriangleMeshes(importedMeshes);
-        ProcessorPhysics::createPhysicsConvexMeshes(importedMeshes);
+        Processors::Physics::createPhysicsTriangleMeshes(importedMeshes);
+        Processors::Physics::createPhysicsConvexMeshes(importedMeshes);
 
         // Recreate mesh resources again to init. physics resources
         CResources::MeshManager::destroyResources(importedMeshes);
@@ -137,51 +138,51 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     }
     else if (_descAssetType(assetRef) == AssetType::kLinearColorTexture)
     {
-      ImporterTexture::init();
-      ImporterTexture::importColorTextureFromFile(
+      Importers::Texture::init();
+      Importers::Texture::importColorTextureFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
-      ImporterTexture::destroy();
+      Importers::Texture::destroy();
 
       ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kAlbedoTexture)
     {
-      ImporterTexture::init();
-      ImporterTexture::importAlbedoTextureFromFile(
+      Importers::Texture::init();
+      Importers::Texture::importAlbedoTextureFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
-      ImporterTexture::destroy();
+      Importers::Texture::destroy();
 
       ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kAlbedoAlphaTexture)
     {
-      ImporterTexture::init();
-      ImporterTexture::importAlbedoAlphaTextureFromFile(
+      Importers::Texture::init();
+      Importers::Texture::importAlbedoAlphaTextureFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
-      ImporterTexture::destroy();
+      Importers::Texture::destroy();
 
       ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kNormalTexture)
     {
-      ImporterTexture::init();
-      ImporterTexture::importNormalMapTextureFromFile(
+      Importers::Texture::init();
+      Importers::Texture::importNormalMapTextureFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
-      ImporterTexture::destroy();
+      Importers::Texture::destroy();
 
       ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }
     else if (_descAssetType(assetRef) == AssetType::kHdrTexture)
     {
-      ImporterTexture::init();
-      ImporterTexture::importHdrCubemapFromFile(
+      Importers::Texture::init();
+      Importers::Texture::importHdrCubemapFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
-      ImporterTexture::destroy();
+      Importers::Texture::destroy();
 
       ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
     }

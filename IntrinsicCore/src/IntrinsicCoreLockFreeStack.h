@@ -18,11 +18,13 @@ namespace Intrinsic
 {
 namespace Core
 {
+namespace Containers
+{
 template <class T, uint64_t Capacity> struct LockFreeStack
 {
   LockFreeStack()
   {
-    _data = (T*)Tlsf::MainAllocator::allocate(Capacity * sizeof(T));
+    _data = (T*)Memory::Tlsf::MainAllocator::allocate(Capacity * sizeof(T));
     _capacity = Capacity;
     _size = 0u;
   }
@@ -31,7 +33,7 @@ template <class T, uint64_t Capacity> struct LockFreeStack
 
   ~LockFreeStack()
   {
-    Tlsf::MainAllocator::free(_data);
+    Memory::Tlsf::MainAllocator::free(_data);
     _data = nullptr;
   }
 
@@ -124,5 +126,6 @@ private:
   uint64_t _capacity;
   Threading::Atomic _size;
 };
+}
 }
 }

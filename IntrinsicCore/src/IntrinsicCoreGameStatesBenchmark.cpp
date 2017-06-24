@@ -100,13 +100,13 @@ void Benchmark::parseBenchmark(rapidjson::Document& p_BenchmarkDesc)
       return;
     }
 
-    char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+    char* readBuffer = (char*)Memory::Tlsf::MainAllocator::allocate(65536u);
     {
       rapidjson::FileReadStream is(fp, readBuffer, 65536u);
       p_BenchmarkDesc.ParseStream(is);
       fclose(fp);
     }
-    Tlsf::MainAllocator::free(readBuffer);
+    Memory::Tlsf::MainAllocator::free(readBuffer);
   }
 }
 

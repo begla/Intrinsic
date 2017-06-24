@@ -244,14 +244,14 @@ protected:
       return;
     }
 
-    char* writeBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+    char* writeBuffer = (char*)Memory::Tlsf::MainAllocator::allocate(65536u);
     {
       rapidjson::FileWriteStream os(fp, writeBuffer, 65536u);
       WriterType writer(os);
       resources.Accept(writer);
       fclose(fp);
     }
-    Tlsf::MainAllocator::free(writeBuffer);
+    Memory::Tlsf::MainAllocator::free(writeBuffer);
   }
 
   // <-
@@ -352,12 +352,12 @@ protected:
     }
 
     {
-      char* writeBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+      char* writeBuffer = (char*)Memory::Tlsf::MainAllocator::allocate(65536u);
       rapidjson::FileWriteStream os(fp, writeBuffer, 65536u);
       WriterType writer(os);
       resource.Accept(writer);
       fclose(fp);
-      Tlsf::MainAllocator::free(writeBuffer);
+      Memory::Tlsf::MainAllocator::free(writeBuffer);
     }
   }
 
@@ -379,13 +379,13 @@ protected:
         return;
       }
 
-      char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+      char* readBuffer = (char*)Memory::Tlsf::MainAllocator::allocate(65536u);
       {
         rapidjson::FileReadStream is(fp, readBuffer, 65536u);
         resources.ParseStream(is);
         fclose(fp);
       }
-      Tlsf::MainAllocator::free(readBuffer);
+      Memory::Tlsf::MainAllocator::free(readBuffer);
     }
 
     for (uint32_t i = 0u; i < resources.Size(); ++i)
@@ -405,7 +405,7 @@ protected:
                          ManagerInitFromDescriptorFunction p_InitFunction,
                          ManagerResetToDefaultFunction p_ResetToDefaultFunction)
   {
-    char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+    char* readBuffer = (char*)Memory::Tlsf::MainAllocator::allocate(65536u);
 
     tinydir_dir dir;
     if (tinydir_open(&dir, p_Path) == -1)
@@ -463,7 +463,7 @@ protected:
 
     tinydir_close(&dir);
 
-    Tlsf::MainAllocator::free(readBuffer);
+    Memory::Tlsf::MainAllocator::free(readBuffer);
   }
 };
 

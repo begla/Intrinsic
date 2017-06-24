@@ -82,39 +82,41 @@
 #define _N(x) Name(#x)
 
 // Memory management
-#define _INTR_NEW(x, y) y = new (Tlsf::MainAllocator::allocate(sizeof(x))) x
+#define _INTR_NEW(x, y)                                                        \
+  y = new (Memory::Tlsf::MainAllocator::allocate(sizeof(x))) x
 #define _INTR_DELETE(x, y)                                                     \
   if (y != nullptr)                                                            \
   {                                                                            \
     y->~x();                                                                   \
-    Tlsf::MainAllocator::free(y);                                              \
+    Memory::Tlsf::MainAllocator::free(y);                                      \
   }
 #define _INTR_DELETE_SAFE(x, y)                                                \
   if (y != nullptr)                                                            \
   {                                                                            \
     y->~x();                                                                   \
-    Tlsf::MainAllocator::free(y);                                              \
+    Memory::Tlsf::MainAllocator::free(y);                                      \
     y = nullptr;                                                               \
   }
 
 // Data structures
 #define _INTR_STRING                                                           \
   std::basic_string<char, std::char_traits<char>,                              \
-                    Intrinsic::Core::StlAllocator<char>>
+                    Intrinsic::Core::Memory::StlAllocator<char>>
 #define _INTR_STRING_STREAM                                                    \
   std::basic_stringstream<char, std::char_traits<char>,                        \
-                          Intrinsic::Core::StlAllocator<char>>
-#define _INTR_ARRAY(a) std::vector<a, Intrinsic::Core::StlAllocator<a>>
+                          Intrinsic::Core::Memory::StlAllocator<char>>
+#define _INTR_ARRAY(a) std::vector<a, Intrinsic::Core::Memory::StlAllocator<a>>
 #define _INTR_STACK_ARRAY(a, b) std::array<a, b>
 #define _INTR_HASH_MAP(a, b)                                                   \
-  spp::sparse_hash_map<a, b, spp::spp_hash<a>, std::equal_to<a>,               \
-                       Intrinsic::Core::StlAllocator<std::pair<const a, b>>>
+  spp::sparse_hash_map<                                                        \
+      a, b, spp::spp_hash<a>, std::equal_to<a>,                                \
+      Intrinsic::Core::Memory::StlAllocator<std::pair<const a, b>>>
 #define _INTR_FSTREAM std::fstream
 #define _INTR_IFSTREAM std::ifstream
 #define _INTR_OFSTREAM std::ofstream
 #define _INTR_OSTRINGSTREAM                                                    \
   std::basic_ostringstream<char, std::char_traits<char>,                       \
-                           Intrinsic::Core::StlAllocator<char>>
+                           Intrinsic::Core::Memory::StlAllocator<char>>
 
 // Timing macros
 #if defined(_INTR_PROFILING_ENABLED)

@@ -33,7 +33,7 @@ struct UniformManager
     const uint32_t bufferIdx = RV::RenderSystem::_backbufferIndex %
                                _INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT;
 
-    MemoryBlock block;
+    Memory::Block block;
     if (p_Size < _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES)
     {
       block = _perInstanceAllocatorSmall[bufferIdx].allocate();
@@ -104,16 +104,17 @@ struct UniformManager
   static BufferRef _perFrameUniformBuffer;
 
 private:
-  static LockFreeFixedBlockAllocator<
+  static Memory::LockFreeFixedBlockAllocator<
       _INTR_VK_PER_INSTANCE_BLOCK_SMALL_COUNT,
       _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES>
       _perInstanceAllocatorSmall[_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
-  static LockFreeFixedBlockAllocator<
+  static Memory::LockFreeFixedBlockAllocator<
       _INTR_VK_PER_INSTANCE_BLOCK_LARGE_COUNT,
       _INTR_VK_PER_INSTANCE_BLOCK_LARGE_SIZE_IN_BYTES>
       _perInstanceAllocatorLarge[_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
-  static LockFreeFixedBlockAllocator<_INTR_VK_PER_MATERIAL_BLOCK_COUNT,
-                                     _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES>
+  static Memory::LockFreeFixedBlockAllocator<
+      _INTR_VK_PER_MATERIAL_BLOCK_COUNT,
+      _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES>
       _perMaterialAllocator;
 
   static BufferRef _perMaterialStagingUniformBuffer;

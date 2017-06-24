@@ -51,7 +51,8 @@ public:
     const _INTR_STRING sourceStr = contents.str();
 
     const char* sourceBuffer =
-        (const char*)Tlsf::MainAllocator::allocate((uint32_t)sourceStr.size());
+        (const char*)Memory::Tlsf::MainAllocator::allocate(
+            (uint32_t)sourceStr.size());
     memcpy((void*)sourceBuffer, sourceStr.c_str(), sourceStr.size());
 
     IncludeResult result = {p_RequestedSource, sourceBuffer, sourceStr.size(),
@@ -61,7 +62,7 @@ public:
 
   virtual void releaseInclude(IncludeResult* result) override
   {
-    Tlsf::MainAllocator::free((void*)result->headerData);
+    Memory::Tlsf::MainAllocator::free((void*)result->headerData);
     delete result;
   }
 } _includer;
@@ -90,13 +91,13 @@ void loadShaderCache()
     return;
   }
 
-  char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+  char* readBuffer = (char*)Memory::Tlsf::MainAllocator::allocate(65536u);
   {
     rapidjson::FileReadStream is(fp, readBuffer, 65536u);
     _shaderCache.ParseStream(is);
     fclose(fp);
   }
-  Tlsf::MainAllocator::free(readBuffer);
+  Memory::Tlsf::MainAllocator::free(readBuffer);
 }
 
 void saveShaderCache()
@@ -109,14 +110,14 @@ void saveShaderCache()
     return;
   }
 
-  char* writeBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+  char* writeBuffer = (char*)Memory::Tlsf::MainAllocator::allocate(65536u);
   {
     rapidjson::FileWriteStream os(fp, writeBuffer, 65536u);
     rapidjson::PrettyWriter<rapidjson::FileWriteStream> writer(os);
     _shaderCache.Accept(writer);
     fclose(fp);
   }
-  Tlsf::MainAllocator::free(writeBuffer);
+  Memory::Tlsf::MainAllocator::free(writeBuffer);
 }
 
 void addShaderToCache(uint32_t p_ShaderHash, const char* p_GpuProgramName,

@@ -18,7 +18,9 @@ namespace Intrinsic
 {
 namespace Core
 {
-struct MemoryBlock
+namespace Memory
+{
+struct Block
 {
   uint8_t* memory;
   uint32_t memoryOffset;
@@ -48,7 +50,7 @@ struct LockFreeFixedBlockAllocator
 
   // <-
 
-  _INTR_INLINE MemoryBlock allocate()
+  _INTR_INLINE Block allocate()
   {
     _INTR_ASSERT(!_memoryBlocks.empty());
     return _memoryBlocks.pop_back();
@@ -56,7 +58,7 @@ struct LockFreeFixedBlockAllocator
 
   // <-
 
-  _INTR_INLINE void free(const MemoryBlock& p_Block)
+  _INTR_INLINE void free(const Block& p_Block)
   {
     _memoryBlocks.push_back(p_Block);
   }
@@ -85,7 +87,8 @@ struct LockFreeFixedBlockAllocator
   }
 
 private:
-  LockFreeStack<MemoryBlock, BlockCount> _memoryBlocks;
+  Containers::LockFreeStack<Block, BlockCount> _memoryBlocks;
 };
+}
 }
 }

@@ -18,7 +18,9 @@ namespace Intrinsic
 {
 namespace AssetManagement
 {
-struct ImporterFbx
+namespace Importers
+{
+struct Fbx
 {
   static void init();
   static void destroy();
@@ -27,5 +29,6 @@ struct ImporterFbx
                                    _INTR_ARRAY(CResources::MeshRef) &
                                        p_ImportedMeshes);
 };
+}
 }
 }

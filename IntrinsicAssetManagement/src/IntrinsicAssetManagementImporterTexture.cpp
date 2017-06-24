@@ -23,13 +23,15 @@ namespace Intrinsic
 {
 namespace AssetManagement
 {
+namespace Importers
+{
 _INTR_STRING mediaPath = "media/textures";
 
-void ImporterTexture::init() {}
+void Texture::init() {}
 
 // <-
 
-void ImporterTexture::destroy() {}
+void Texture::destroy() {}
 
 // <-
 
@@ -87,7 +89,7 @@ ImageRef createTexture(const _INTR_STRING& p_TextureName,
 
 // <-
 
-void ImporterTexture::importColorTextureFromFile(const _INTR_STRING& p_FilePath)
+void Texture::importColorTextureFromFile(const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
@@ -98,8 +100,7 @@ void ImporterTexture::importColorTextureFromFile(const _INTR_STRING& p_FilePath)
 
 // <-
 
-void ImporterTexture::importAlbedoTextureFromFile(
-    const _INTR_STRING& p_FilePath)
+void Texture::importAlbedoTextureFromFile(const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
@@ -111,8 +112,7 @@ void ImporterTexture::importAlbedoTextureFromFile(
 
 // <-
 
-void ImporterTexture::importAlbedoAlphaTextureFromFile(
-    const _INTR_STRING& p_FilePath)
+void Texture::importAlbedoAlphaTextureFromFile(const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
@@ -124,8 +124,7 @@ void ImporterTexture::importAlbedoAlphaTextureFromFile(
 
 // <-
 
-void ImporterTexture::importNormalMapTextureFromFile(
-    const _INTR_STRING& p_FilePath)
+void Texture::importNormalMapTextureFromFile(const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
@@ -164,13 +163,14 @@ void ImporterTexture::importNormalMapTextureFromFile(
 
 // <-
 
-void ImporterTexture::importHdrCubemapFromFile(const _INTR_STRING& p_FilePath)
+void Texture::importHdrCubemapFromFile(const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
   copyFile(p_FilePath, mediaPath + "/" + fileName + ".dds");
   ImageRef imgRef = createTexture(fileName, RV::Format::kBC6UFloat);
+}
 }
 }
 }

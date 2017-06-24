@@ -370,14 +370,14 @@ void World::saveNodeHierarchy(const _INTR_STRING& p_FilePath,
     return;
   }
 
-  char* writeBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+  char* writeBuffer = (char*)Memory::Tlsf::MainAllocator::allocate(65536u);
   {
     rapidjson::FileWriteStream os(fp, writeBuffer, 65536u);
     rapidjson::PrettyWriter<rapidjson::FileWriteStream> writer(os);
     saveDesc.Accept(writer);
     fclose(fp);
   }
-  Tlsf::MainAllocator::free(writeBuffer);
+  Memory::Tlsf::MainAllocator::free(writeBuffer);
 }
 
 // <-
@@ -395,13 +395,13 @@ Components::NodeRef World::loadNodeHierarchy(const _INTR_STRING& p_FilePath)
       return Components::NodeRef();
     }
 
-    char* readBuffer = (char*)Tlsf::MainAllocator::allocate(65536u);
+    char* readBuffer = (char*)Memory::Tlsf::MainAllocator::allocate(65536u);
     {
       rapidjson::FileReadStream is(fp, readBuffer, 65536u);
       saveDesc.ParseStream(is);
       fclose(fp);
     }
-    Tlsf::MainAllocator::free(readBuffer);
+    Memory::Tlsf::MainAllocator::free(readBuffer);
   }
 
   _INTR_ARRAY(Components::NodeRef) loadedNodes;

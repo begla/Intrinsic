@@ -18,12 +18,15 @@ namespace Intrinsic
 {
 namespace AssetManagement
 {
-struct ProcessorPhysics
+namespace Processors
+{
+struct Physics
 {
   static void
   createPhysicsTriangleMeshes(const CResources::MeshRefArray& p_MeshRef);
   static void
   createPhysicsConvexMeshes(const CResources::MeshRefArray& p_MeshRef);
 };
+}
 }
 }

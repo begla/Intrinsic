@@ -36,7 +36,7 @@ struct Default
   static _INTR_HASH_MAP(CResources::FrustumRef, uint8_t) _cameraToIdMapping;
 
   static _INTR_INLINE const
-      LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>&
+      Containers::LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>&
       getVisibleDrawCalls(Components::CameraRef p_CameraRef,
                           uint32_t p_FrustumIdx, uint32_t p_MaterialPassIdx)
   {
@@ -45,7 +45,7 @@ struct Default
   }
 
   static _INTR_INLINE const
-      LockFreeStack<Core::Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT>&
+      Containers::LockFreeStack<Core::Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT>&
       getVisibleMeshComponents(Components::CameraRef p_CameraRef,
                                uint32_t p_FrustumIdx)
   {
@@ -53,10 +53,11 @@ struct Default
                                   p_FrustumIdx];
   }
 
-  static LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>
+  static Containers::LockFreeStack<Core::Dod::Ref, _INTR_MAX_DRAW_CALL_COUNT>
       _visibleDrawCallsPerMaterialPass[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT]
                                       [_INTR_MAX_MATERIAL_PASS_COUNT];
-  static LockFreeStack<Core::Dod::Ref, _INTR_MAX_MESH_COMPONENT_COUNT>
+  static Containers::LockFreeStack<Core::Dod::Ref,
+                                   _INTR_MAX_MESH_COMPONENT_COUNT>
       _visibleMeshComponents[_INTR_MAX_FRUSTUMS_PER_FRAME_COUNT];
 
   // <-

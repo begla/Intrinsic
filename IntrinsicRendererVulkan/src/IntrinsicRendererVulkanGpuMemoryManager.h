@@ -24,7 +24,7 @@ namespace Vulkan
 {
 struct GpuMemoryPage
 {
-  Core::LinearOffsetAllocator _allocator;
+  Core::Memory::LinearOffsetAllocator _allocator;
   VkDeviceMemory _vkDeviceMemory;
   uint8_t* _mappedMemory;
   uint32_t _memoryTypeIdx;

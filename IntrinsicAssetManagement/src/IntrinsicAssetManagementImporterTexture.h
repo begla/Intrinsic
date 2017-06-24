@@ -18,7 +18,9 @@ namespace Intrinsic
 {
 namespace AssetManagement
 {
-struct ImporterTexture
+namespace Importers
+{
+struct Texture
 {
   static void init();
   static void destroy();
@@ -29,5 +31,6 @@ struct ImporterTexture
   static void importNormalMapTextureFromFile(const _INTR_STRING& p_FilePath);
   static void importHdrCubemapFromFile(const _INTR_STRING& p_FilePath);
 };
+}
 }
 }

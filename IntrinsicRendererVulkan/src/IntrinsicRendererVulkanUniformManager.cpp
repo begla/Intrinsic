@@ -31,18 +31,20 @@ BufferRef _perFrameUniformBuffer;
 
 uint8_t* UniformManager::_perInstanceMemory = nullptr;
 uint8_t* UniformManager::_perFrameMemory = nullptr;
-Tlsf::Allocator _perMaterialAllocator;
+Memory::Tlsf::Allocator _perMaterialAllocator;
 
-LockFreeFixedBlockAllocator<_INTR_VK_PER_INSTANCE_BLOCK_SMALL_COUNT,
-                            _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES>
+Memory::LockFreeFixedBlockAllocator<
+    _INTR_VK_PER_INSTANCE_BLOCK_SMALL_COUNT,
+    _INTR_VK_PER_INSTANCE_BLOCK_SMALL_SIZE_IN_BYTES>
     UniformManager::_perInstanceAllocatorSmall
         [_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
-LockFreeFixedBlockAllocator<_INTR_VK_PER_INSTANCE_BLOCK_LARGE_COUNT,
-                            _INTR_VK_PER_INSTANCE_BLOCK_LARGE_SIZE_IN_BYTES>
+Memory::LockFreeFixedBlockAllocator<
+    _INTR_VK_PER_INSTANCE_BLOCK_LARGE_COUNT,
+    _INTR_VK_PER_INSTANCE_BLOCK_LARGE_SIZE_IN_BYTES>
     UniformManager::_perInstanceAllocatorLarge
         [_INTR_VK_PER_INSTANCE_DATA_BUFFER_COUNT];
-LockFreeFixedBlockAllocator<_INTR_VK_PER_MATERIAL_BLOCK_COUNT,
-                            _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES>
+Memory::LockFreeFixedBlockAllocator<_INTR_VK_PER_MATERIAL_BLOCK_COUNT,
+                                    _INTR_VK_PER_MATERIAL_BLOCK_SIZE_IN_BYTES>
     UniformManager::_perMaterialAllocator;
 
 BufferRef UniformManager::_perInstanceUniformBuffer;

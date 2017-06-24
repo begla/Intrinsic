@@ -18,6 +18,8 @@ namespace Intrinsic
 {
 namespace Core
 {
+namespace Memory
+{
 template <class T> class StlAllocator
 {
 public:
@@ -49,7 +51,7 @@ public:
 
   pointer allocate(size_type num, const void* = 0)
   {
-    return (T*)Tlsf::MainAllocator::allocate((uint32_t)num * sizeof(T));
+    return (T*)Memory::Tlsf::MainAllocator::allocate((uint32_t)num * sizeof(T));
   }
 
   void construct(pointer p, const T& value) { new ((void*)p) T(value); }
@@ -58,7 +60,7 @@ public:
 
   void deallocate(pointer p, size_type num)
   {
-    return Tlsf::MainAllocator::free(p);
+    return Memory::Tlsf::MainAllocator::free(p);
   }
 };
 
@@ -71,6 +73,7 @@ template <class T1, class T2>
 bool operator!=(const StlAllocator<T1>&, const StlAllocator<T2>&) throw()
 {
   return false;
+}
 }
 }
 }

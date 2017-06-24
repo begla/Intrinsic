@@ -18,6 +18,8 @@ namespace Intrinsic
 {
 namespace Core
 {
+namespace Memory
+{
 struct LinearOffsetAllocator
 {
   LinearOffsetAllocator()
@@ -80,5 +82,6 @@ private:
   uint32_t _sizeInBytes;
   uint32_t _currentOffsetInBytes;
 };
+}
 }
 }
