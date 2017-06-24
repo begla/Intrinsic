@@ -221,6 +221,8 @@ void CharacterControllerManager::createResources(
         controllerDesc.radius = _controllerRadius;
         controllerDesc.nonWalkableMode = physx::PxControllerNonWalkableMode::
             ePREVENT_CLIMBING_AND_FORCE_SLIDING;
+        controllerDesc.invisibleWallHeight = 2.0f;
+        controllerDesc.slopeLimit = cos(glm::radians(45.0f));
         controllerDesc.material = RigidBodyManager::_defaultMaterial;
       }
       _INTR_ASSERT(controllerDesc.isValid());

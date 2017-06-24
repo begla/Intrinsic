@@ -314,6 +314,53 @@ physx::PxRigidActor* createConvexMeshDynamicKinematic(RigidBodyRef p_Ref,
   return actor;
 }
 
+physx::PxRigidActor* createConvexMeshStatic(RigidBodyRef p_Ref)
+{
+  NodeRef nodeCompRef =
+      NodeManager::getComponentForEntity(RigidBodyManager::_entity(p_Ref));
+  _INTR_ASSERT(nodeCompRef.isValid());
+  MeshRef meshCompRef =
+      MeshManager::getComponentForEntity(RigidBodyManager::_entity(p_Ref));
+  _INTR_ASSERT(meshCompRef.isValid());
+  Resources::MeshRef meshRef = Resources::MeshManager::getResourceByName(
+      MeshManager::_descMeshName(meshCompRef));
+  _INTR_ASSERT(meshRef.isValid());
+
+  if (Resources::MeshManager::_pxConvexMesh(meshRef) == nullptr)
+  {
+    _INTR_LOG_WARNING(
+        "No physics convex mesh available for mesh \"%s\"!",
+        Resources::MeshManager::_name(meshRef).getString().c_str());
+    return nullptr;
+  }
+
+  const physx::PxTransform transform =
+      PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
+                           NodeManager::_worldOrientation(nodeCompRef));
+
+  physx::PxConvexMeshGeometry convexMeshGeometry;
+  convexMeshGeometry.scale = physx::PxMeshScale(
+      PhysxHelper::convert(NodeManager::_worldSize(nodeCompRef)),
+      physx::PxQuat::createIdentity());
+  convexMeshGeometry.convexMesh =
+      Resources::MeshManager::_pxConvexMesh(meshRef);
+
+  physx::PxRigidActor* actor = nullptr;
+
+  physx::PxRigidStatic* convexMeshActor =
+      Physics::System::_pxPhysics->createRigidStatic(transform);
+  _INTR_ASSERT(convexMeshActor);
+  actor = convexMeshActor;
+
+  physx::PxShape* shape = convexMeshActor->createShape(
+      convexMeshGeometry, *RigidBodyManager::_defaultMaterial);
+  _INTR_ASSERT(shape);
+
+  Physics::System::_pxScene->addActor(*actor);
+
+  return actor;
+}
+
 // <-
 
 void RigidBodyManager::createResources(const RigidBodyRefArray& p_RigidBodies)
@@ -349,6 +396,10 @@ void RigidBodyManager::createResources(const RigidBodyRefArray& p_RigidBodies)
     {
       _pxRigidActor(rigidBodyRef) = createConvexMeshDynamicKinematic(
           rigidBodyRef, rigidBodyType == RigidBodyType::kConvexMeshKinematic);
+    }
+    else if (rigidBodyType == RigidBodyType::kConvexMeshStatic)
+    {
+      _pxRigidActor(rigidBodyRef) = createConvexMeshStatic(rigidBodyRef);
     }
   }
 }
