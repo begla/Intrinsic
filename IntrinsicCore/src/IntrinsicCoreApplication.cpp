@@ -40,16 +40,16 @@ bool Application::_running = true;
 
 void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
 {
-  // Init. physics
+  // Initializes physics
   Physics::System::init();
 
   // Threading
   _scheduler.Initialize(std::min(enki::GetNumHardwareThreads(), 6u));
 
-  // Init. managers
+  // Initializes managers
   initManagers();
 
-  // Init. renderer
+  // Initializes renderer
   RV::RenderSystem::init(p_PlatformHandle, p_PlatformWindow);
 
 // MicroProfile init.
@@ -85,13 +85,13 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
         "managers/post_effects/", ".post_effect.json");
   }
 
-  // Init. world
+  // Initializes world
   {
     World::init();
     World::load("worlds/" + Settings::Manager::_initialWorld);
   }
 
-  // Init. game states
+  // Initializes game states
   {
     GameStates::Editing::init();
   }
@@ -103,7 +103,7 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
 void Application::initManagers()
 {
-  // Init. component managers
+  // Initializes component managers
   {
     Entity::EntityManager::init();
     Components::NodeManager::init();

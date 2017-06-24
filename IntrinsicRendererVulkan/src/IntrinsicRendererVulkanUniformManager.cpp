@@ -134,7 +134,7 @@ void UniformManager::init()
   _perInstanceMemory = BufferManager::getGpuMemory(_perInstanceUniformBuffer);
   _perFrameMemory = BufferManager::getGpuMemory(_perFrameUniformBuffer);
 
-  // Init. per instance data memory blocks
+  // Initializes per instance data memory blocks
   {
     uint32_t currentOffset = 0u;
     for (uint32_t bufferIdx = 0u;

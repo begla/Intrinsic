@@ -33,7 +33,7 @@ int _main(int argc, char* argv[])
   // Loading settings file
   Settings::Manager::loadSettings();
 
-  // Init. SDL and window
+  // Initializes SDL and window
   int sdlResult =
       SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER);
   _INTR_ASSERT(sdlResult == 0u);
@@ -74,10 +74,10 @@ int _main(int argc, char* argv[])
   SDL_VERSION(&wmInfo.version);
   SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
 
-  // Init. event system
+  // Initializes event system
   Application::initEventSystem();
 
-// Init. Intrinsic
+// Initializes Intrinsic
 #if (_WIN32)
   Application::init(GetModuleHandle(NULL), (void*)wmInfo.info.win.window);
 #else

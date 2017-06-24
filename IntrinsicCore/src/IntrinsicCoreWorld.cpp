@@ -406,7 +406,7 @@ Components::NodeRef World::loadNodeHierarchy(const _INTR_STRING& p_FilePath)
 
   _INTR_ARRAY(Components::NodeRef) loadedNodes;
 
-  // Init. nodes
+  // Initializes nodes
   {
     for (uint32_t i = 0u; i < saveDesc.Size(); ++i)
     {

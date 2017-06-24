@@ -94,7 +94,7 @@ void RigidBodyManager::init()
         propCompilerRigidBody;
   }
 
-  // Init. default material
+  // Initializes default material
   _defaultMaterial =
       Physics::System::_pxPhysics->createMaterial(0.5f, 0.5f, 0.1f);
 }

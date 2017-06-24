@@ -413,7 +413,7 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
   glm::quat camRot = glm::quat(_eulerAngles);
   glm::vec3 forward = camRot * glm::vec3(0.0f, 0.0f, 1.0f);
 
-  // Init. orbit camera mode
+  // Initializes orbit camera mode
   if (_cameraMode != CameraMode::kOrbit)
   {
     _camAngVel = glm::vec3(0.0f);
@@ -482,7 +482,7 @@ _INTR_INLINE void updateCameraOrbit(float p_DeltaT)
 
 _INTR_INLINE void updateCameraFreeFlight(float p_DeltaT)
 {
-  // Init. free flight mode
+  // Initializes free flight mode
   if (_cameraMode != CameraMode::kFreeFlight)
   {
     _camAngVel = glm::vec3(0.0f);

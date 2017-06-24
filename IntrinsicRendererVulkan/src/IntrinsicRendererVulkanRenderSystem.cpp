@@ -97,7 +97,7 @@ _INTR_ARRAY(ResourceReleaseEntry) RenderSystem::_resourcesToFree;
 
 void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
 {
-  _INTR_PROFILE_AUTO("Init. Vulkan Render System");
+  _INTR_PROFILE_AUTO("Initializes Vulkan Render System");
 
   _INTR_LOG_INFO("Inititializing Vulkan Render System...");
   _INTR_LOG_PUSH();
@@ -107,10 +107,10 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     RenderStates::init();
   }
 
-  // Init. Vulkan
+  // Initializes Vulkan
   {
     _INTR_LOG_INFO("Using Vulkan SDK version 1.0.%u.x...", VK_HEADER_VERSION);
-    _INTR_PROFILE_AUTO("Init. Vulkan");
+    _INTR_PROFILE_AUTO("Initializes Vulkan");
 
     initVkInstance();
     initVkDevice();
@@ -155,7 +155,7 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     PipelineManager::createAllResources();
   }
 
-  // Init. swap chain and cmd buffers
+  // Initializes swap chain and cmd buffers
   {
     initOrUpdateVkSwapChain();
     initVkSynchronization();
@@ -167,15 +167,15 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
     setupPlatformDependentFormats();
   }
 
-  // Init. separate manager
+  // Initializes separate manager
   {
     UniformManager::init();
     MaterialBuffer::init();
   }
 
-  // Init. render passes
+  // Initializes render passes
   {
-    _INTR_PROFILE_AUTO("Init. Render Passes");
+    _INTR_PROFILE_AUTO("Initializes Render Passes");
 
     RenderPass::Shadow::init();
 

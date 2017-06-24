@@ -74,20 +74,20 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   // Loading settings file
   Settings::Manager::loadSettings();
 
-  // Init. event system
+  // Initializes event system
   Application::initEventSystem();
 
   _ui.setupUi(this);
   setWindowTitle(QString("IntrinsicEd - ") + _INTR_VERSION_STRING);
 
-  // Init. Intrinsic
+  // Initializes Intrinsic
   Application::init(GetModuleHandle(NULL), (void*)_ui.viewPort->winId());
   IBL::initCubemapProcessing();
 
   // Activate editing game state
   GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
 
-  // Init. resources
+  // Initializes resources
   {
     AssetManagement::Resources::AssetManager::init();
     AssetManagement::Resources::AssetManager::loadFromMultipleFiles(
@@ -101,7 +101,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   SetWindowLongPtr((HWND)winId(), GWLP_WNDPROC, (LONG_PTR)DummyWindowProc);
 #endif // _WIN32
 
-  // Init. SDL
+  // Initializes SDL
   int sdlResult =
       SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER);
   _INTR_ASSERT(sdlResult == 0u);

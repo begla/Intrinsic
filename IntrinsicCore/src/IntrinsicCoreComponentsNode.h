@@ -14,10 +14,6 @@
 
 #pragma once
 
-/** \file
- * Contains the Node Component Manager.
- */
-
 namespace Intrinsic
 {
 namespace Core
@@ -36,9 +32,9 @@ enum Flags
 };
 }
 
-///
-/// Stores the Node Component Data in a data oriented fashion.
-///
+/**
+ * Stores the Node Component Data in a data oriented fashion.
+ */
 struct NodeData : Dod::Components::ComponentDataBase
 {
   NodeData()
@@ -93,19 +89,23 @@ struct NodeData : Dod::Components::ComponentDataBase
   _INTR_ARRAY(NodeRef) nextSibling;
 };
 
-///
-/// The manager for all Node Components.
-///
+/**
+ * The manager for all Node Components.
+ */
 struct NodeManager
     : Dod::Components::ComponentManagerBase<NodeData,
                                             _INTR_MAX_NODE_COMPONENT_COUNT>
 {
-  /// Init. the Node Component Manager.
+  /**
+   * Initializes the Node Component Manager.
+   */
   static void init();
 
   // <-
 
-  /// Init. the provided Node with default values.
+  /**
+   * Initializes the provided Node with default values.
+   */
   _INTR_INLINE static void initNode(NodeRef p_Ref)
   {
     _parent(p_Ref) = NodeRef();
@@ -124,7 +124,9 @@ struct NodeManager
 
   // <-
 
-  /// Requests a new reference for a Node Component.
+  /**
+   * Requests a new reference for a Node Component.
+   */
   _INTR_INLINE static NodeRef createNode(Entity::EntityRef p_ParentEntity)
   {
     _INTR_ASSERT(p_ParentEntity.isValid());
@@ -143,8 +145,10 @@ struct NodeManager
 
   // <-
 
-  /// Collects all Nodes recursively starting at the given Node and puts
-  /// them in the provided array.
+  /**
+   * Collects all Nodes recursively starting at the given Node and puts
+   * them in the provided array.
+   */
   _INTR_INLINE static void collectNodes(NodeRef p_Node, NodeRefArray& p_Nodes)
   {
     static _INTR_ARRAY(NodeRef) nodeStack;
@@ -174,8 +178,10 @@ struct NodeManager
 
   // <-
 
-  /// Collects all Entities recursively starting at the given Node and puts
-  /// them in the provided Array.
+  /**
+   * Collects all Entities recursively starting at the given Node and puts
+   * them in the provided array.
+   */
   _INTR_INLINE static void collectEntities(NodeRef p_Node,
                                            Entity::EntityRefArray& p_Entities)
   {
@@ -191,8 +197,10 @@ struct NodeManager
 
   // <-
 
-  /// Destroys the given Node Component by putting the reference back into the
-  /// pool.
+  /**
+   * Destroys the given Node Component by putting the reference back into the
+   * pool.
+   */
   _INTR_INLINE static void destroyNode(NodeRef p_Node)
   {
     NodeRefArray nodes;
@@ -223,7 +231,9 @@ struct NodeManager
 
   // <-
 
-  /// Rebuilds the internal sorted node array.
+  /**
+   * Rebuilds the internal sorted node array.
+   */
   _INTR_INLINE static void rebuildTree()
   {
     _sortedNodes.clear();
@@ -239,12 +249,16 @@ struct NodeManager
 
   // <-
 
-  /// Updates the transformations for the provided Nodes.
+  /**
+   * Updates the transformations for the provided Nodes.
+   */
   static void updateTransforms(const NodeRefArray& p_Nodes);
 
   // <-
 
-  /// Updates all transformation for all trees in the manager.
+  /**
+   * Updates all transformation for all trees in the manager.
+   */
   _INTR_INLINE static void updateTransforms()
   {
     updateTransforms(_sortedNodes);
@@ -252,7 +266,9 @@ struct NodeManager
 
   // <-
 
-  /// Updates the transformations recursively starting at the given Node.
+  /**
+   * Updates the transformations recursively starting at the given Node.
+   */
   _INTR_INLINE static void updateTransforms(NodeRef p_RootNode)
   {
     NodeRefArray nodes;
@@ -262,7 +278,9 @@ struct NodeManager
 
   // <-
 
-  /// Rebuilds the internal sorted node array and updates all node transforms.
+  /**
+   * Rebuilds the internal sorted node array and updates all node transforms.
+   */
   _INTR_INLINE static void rebuildTreeAndUpdateTransforms()
   {
     rebuildTree();
@@ -271,10 +289,12 @@ struct NodeManager
 
   // <-
 
-  /// Attaches the given child Node to the provided (soon to be) parent Node.
-  /// The current local
-  /// transformation of the node is kept and thus potentially changes the world
-  /// transformation.
+  /**
+   * Attaches the given child Node to the provided (soon to be) parent Node.
+   * The current local
+   * transformation of the node is kept and thus potentially changes the world
+   * transformation.
+   */
   _INTR_INLINE static void attachChildIgnoreParent(NodeRef p_Parent,
                                                    NodeRef p_Child)
   {
@@ -312,9 +332,11 @@ struct NodeManager
 
   // <-
 
-  /// Attaches the child Node to the provided (soon to be) parent Node. Adjusts
-  /// the local
-  /// transformation to keep the world transformation.
+  /**
+   * Attaches the child Node to the provided (soon to be) parent Node. Adjusts
+   * the local
+   * transformation to keep the world transformation.
+   */
   _INTR_INLINE static void attachChild(NodeRef p_Parent, NodeRef p_Child)
   {
     attachChildIgnoreParent(p_Parent, p_Child);
@@ -333,7 +355,9 @@ struct NodeManager
 
   // <-
 
-  /// Detaches the Node from the current parent node.
+  /**
+   * Detaches the Node from the current parent Node.
+   */
   _INTR_INLINE static void detachChild(NodeRef p_Child)
   {
     NodeRef parent = _parent(p_Child);
@@ -381,7 +405,9 @@ struct NodeManager
 
   // <-
 
-  /// Compiles all exposed properties to a JSON descriptor.
+  /**
+   * Compiles all exposed properties to a JSON descriptor.
+   */
   _INTR_INLINE static void compileDescriptor(NodeRef p_Ref, bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
                                              rapidjson::Document& p_Document)
@@ -420,7 +446,9 @@ struct NodeManager
                            p_Document.GetAllocator());
   }
 
-  /// Init. the Node from the provided JSON descriptor.
+  /**
+   * Initializes the Node from the provided JSON descriptor.
+   */
   _INTR_INLINE static void initFromDescriptor(NodeRef p_Ref,
                                               bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
@@ -440,14 +468,16 @@ struct NodeManager
     }
   }
 
-  ///
+  /**
+   * Updates the local node orientation from the given world orientation (undos
+   * the parent world orientation beforehand).
+   */
   _INTR_INLINE static void
   updateFromWorldOrientation(NodeRef p_Ref, const glm::quat& p_WorldOrientation)
   {
     Components::NodeRef parentNode = _parent(p_Ref);
     if (parentNode.isValid())
     {
-      // Undo parent transform first
       _orientation(p_Ref) =
           glm::normalize(glm::inverse(_worldOrientation(parentNode))) *
           p_WorldOrientation;
@@ -458,14 +488,16 @@ struct NodeManager
     }
   }
 
-  ///
+  /**
+   * Updates the local node position from the given world position (undos the
+   * parent world translation beforehand).
+   */
   _INTR_INLINE static void
   updateFromWorldPosition(NodeRef p_Ref, const glm::vec3& p_WorldPosition)
   {
     Components::NodeRef parentNode = _parent(p_Ref);
     if (parentNode.isValid())
     {
-      // Undo parent transform first
       _position(p_Ref) =
           glm::normalize(glm::inverse(_worldOrientation(parentNode))) *
           (p_WorldPosition - _worldPosition(parentNode));
@@ -478,47 +510,67 @@ struct NodeManager
 
   // Scripting interface
 
-  /// Gets the total amount of available sorted nodes.
+  /**
+   * Gets the total amount of available sorted nodes.
+   */
   _INTR_INLINE static uint32_t getSortedNodeCount()
   {
     return (uint32_t)_sortedNodes.size();
   }
-  /// Gets the sorted node at the given index.
+
+  /**
+   * Gets the sorted node at the given index.
+   */
   _INTR_INLINE static NodeRef getSortedNodeAtIndex(uint32_t p_Idx)
   {
     return _sortedNodes[p_Idx];
   }
 
-  /// Returns the (local) position.
+  /**
+   * Returns the (local) position.
+   */
   _INTR_INLINE static const glm::vec3& getPosition(NodeRef p_Ref)
   {
     return _data.position[p_Ref._id];
   }
-  /// Sets the (local) position.
+
+  /**
+   * Sets the (local) position.
+   */
   _INTR_INLINE static void setPosition(NodeRef p_Ref,
                                        const glm::vec3& p_Position)
   {
     _data.position[p_Ref._id] = p_Position;
   }
 
-  /// Returns the (local) orientation.
+  /**
+   * Returns the (local) orientation.
+   */
   _INTR_INLINE static const glm::quat& getOrientation(NodeRef p_Ref)
   {
     return _data.orientation[p_Ref._id];
   }
-  /// Sets the (local) orientation.
+
+  /**
+   * Sets the (local) orientation.
+   */
   _INTR_INLINE static void setOrientation(NodeRef p_Ref,
                                           const glm::quat& p_Orientation)
   {
     _data.orientation[p_Ref._id] = p_Orientation;
   }
 
-  /// Returns the (local) size.
+  /**
+   * Returns the (local) size.
+   */
   _INTR_INLINE static const glm::vec3& getSize(NodeRef p_Ref)
   {
     return _data.size[p_Ref._id];
   }
-  /// Sets the (local) size.
+
+  /**
+   * Sets the (local) size.
+   */
   _INTR_INLINE static void setSize(NodeRef p_Ref, const glm::vec3& p_Size)
   {
     _data.size[p_Ref._id] = p_Size;
@@ -526,22 +578,33 @@ struct NodeManager
 
   // Resources
 
-  /// The parent Node of this Node. If any.
+  /**
+   * The parent Node of this Node. If any.
+   */
   _INTR_INLINE static NodeRef& _parent(NodeRef p_Ref)
   {
     return _data.parent[p_Ref._id];
   }
-  /// The first child Node of this Node. If any.
+
+  /**
+   * The first child Node of this Node. If any.
+   */
   _INTR_INLINE static NodeRef& _firstChild(NodeRef p_Ref)
   {
     return _data.firstChild[p_Ref._id];
   }
-  /// The previous sibling Node of this Node. If any.
+
+  /**
+   * The previous sibling Node of this Node. If any.
+   */
   _INTR_INLINE static NodeRef& _prevSibling(NodeRef p_Ref)
   {
     return _data.prevSibling[p_Ref._id];
   }
-  /// The next sibling Node of this Node. If any.
+
+  /**
+   * The next sibling Node of this Node. If any.
+   */
   _INTR_INLINE static NodeRef& _nextSibling(NodeRef p_Ref)
   {
     return _data.nextSibling[p_Ref._id];
@@ -549,23 +612,33 @@ struct NodeManager
 
   // <-
 
-  /// The node flags
+  /**
+   * The node flags.
+   */
   _INTR_INLINE static uint32_t& _flags(NodeRef p_Ref)
   {
     return _data.flags[p_Ref._id];
   }
 
-  /// The (local) position.
+  /**
+   * The (local) position.
+   */
   _INTR_INLINE static glm::vec3& _position(NodeRef p_Ref)
   {
     return _data.position[p_Ref._id];
   }
-  /// The (local) orientation.
+
+  /**
+   * The (local) orientation.
+   */
   _INTR_INLINE static glm::quat& _orientation(NodeRef p_Ref)
   {
     return _data.orientation[p_Ref._id];
   }
-  /// The (local) size.
+
+  /**
+   * The (local) size.
+   */
   _INTR_INLINE static glm::vec3& _size(NodeRef p_Ref)
   {
     return _data.size[p_Ref._id];
@@ -573,55 +646,75 @@ struct NodeManager
 
   // <-
 
-  /// The (world) position.
+  /**
+   * The (world) position.
+   */
   _INTR_INLINE static glm::vec3& _worldPosition(NodeRef p_Ref)
   {
     return _data.worldPosition[p_Ref._id];
   }
-  /// The (world) orientation.
+
+  /**
+   * The (world) orientation.
+   */
   _INTR_INLINE static glm::quat& _worldOrientation(NodeRef p_Ref)
   {
     return _data.worldOrientation[p_Ref._id];
   }
-  /// The (world) size.
+
+  /**
+   * The (world) size.
+   */
   _INTR_INLINE static glm::vec3& _worldSize(NodeRef p_Ref)
   {
     return _data.worldSize[p_Ref._id];
   }
 
-  /// The world transform/matrix.
+  /**
+   * The world transform/matrix.
+   */
   _INTR_INLINE static glm::mat4& _worldMatrix(NodeRef p_Ref)
   {
     return _data.worldMatrix[p_Ref._id];
   }
 
-  /// The inverse of the world matrix.
+  /**
+   * The inverse of the world matrix.
+   */
   _INTR_INLINE static glm::mat4& _inverseWorldMatrix(NodeRef p_Ref)
   {
     return _data.inverseWorldMatrix[p_Ref._id];
   }
 
-  /// The (world) axis aligned bounding box.
+  /**
+   * The (world) axis aligned bounding box (AABB).
+   */
   _INTR_INLINE static Math::AABB& _worldAABB(NodeRef p_Ref)
   {
     return _data.worldAABB[p_Ref._id];
   }
-  /// The (local) axis aligned bounding box.
+
+  /**
+   * The (local) axis aligned bounding box (AABB).
+   */
   _INTR_INLINE static Math::AABB& _localAABB(NodeRef p_Ref)
   {
     return _data.localAABB[p_Ref._id];
   }
 
-  /// The (world) bounding sphere.
+  /**
+   * The (world) bounding sphere.
+   */
   _INTR_INLINE static Math::Sphere& _worldBoundingSphere(NodeRef p_Ref)
   {
     return _data.worldBoundingSphere[p_Ref._id];
   }
 
-  /// The visibility mask for each node.
-  /// Stores the current visibility/culling information where each bit
-  /// represents the visibility for an active
-  /// Frustum in the scene. This is updated during culling.
+  /** The visibility mask for each node.
+   * Stores the current visibility/culling information where each bit represents
+   * the visibility for an active Frustum in the scene. This is updated during
+   * culling.
+   */
   _INTR_INLINE static uint32_t& _visibilityMask(NodeRef p_Ref)
   {
     return _data.visibilityMask[p_Ref._id];
@@ -630,12 +723,17 @@ struct NodeManager
   // <-
 
 private:
-  /// Adds the given Node to the root node array.
+  /**
+   * Adds the given Node to the root node array.
+   */
   _INTR_INLINE static void internalAddToRootNodeArray(NodeRef p_Ref)
   {
     _rootNodes.push_back(p_Ref);
   }
-  /// Removes the given Node from the root node array.
+
+  /**
+   * Removes the given Node from the root node array.
+   */
   _INTR_INLINE static void internalRemoveFromRootNodeArray(NodeRef p_Ref)
   {
     for (uint32_t i = 0u; i < _rootNodes.size(); ++i)
@@ -654,9 +752,13 @@ private:
 
   // <-
 
-  /// The root nodes of the trees.
+  /**
+   * The root nodes of the trees.
+   */
   static NodeRefArray _rootNodes;
-  /// The sorted nodes of all trees.
+  /**
+   * The sorted nodes of all trees.
+   */
   static NodeRefArray _sortedNodes;
 };
 }

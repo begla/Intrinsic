@@ -104,7 +104,7 @@ void ImageManager::init()
 
   _defaultResourceName = _N(checkerboard);
 
-  // Init. global descriptor sets
+  // Initializes global descriptor sets
   {
     VkDescriptorSetLayoutBinding globalImageBinding = {};
     {
