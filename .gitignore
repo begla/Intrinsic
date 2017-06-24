@@ -24,7 +24,7 @@ build
 dependencies/glslang/build
 
 // Doxygen
-doc/
+documentation/html
 
 // Qt creator
 Intrinsic.config

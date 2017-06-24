@@ -24,15 +24,22 @@ namespace Components
 typedef Dod::Ref SwarmRef;
 typedef _INTR_ARRAY(SwarmRef) SwarmRefArray;
 
-struct Boid
-{
-  glm::vec3 pos;
-  glm::vec3 vel;
-  glm::vec3 color;
-};
-
+/**
+ * Stores all the relevant data for the Swarm Component in a data
+ * oriented fashion.
+ */
 struct SwarmData : Dod::Components::ComponentDataBase
 {
+  /**
+   * Struct containing all data for a single Boid.
+   */
+  struct Boid
+  {
+    glm::vec3 pos;
+    glm::vec3 vel;
+    glm::vec3 color;
+  };
+
   SwarmData()
       : Dod::Components::ComponentDataBase(_INTR_MAX_SWARM_COMPONENT_COUNT)
   {
@@ -60,14 +67,23 @@ struct SwarmData : Dod::Components::ComponentDataBase
   _INTR_ARRAY(glm::vec3) currentCenterOfMass;
 };
 
+/**
+ * The manager for all Swarm Components.
+ */
 struct SwarmManager
     : Dod::Components::ComponentManagerBase<SwarmData,
                                             _INTR_MAX_SWARM_COMPONENT_COUNT>
 {
+  /**
+   * Initializes the Swarm Manager.
+   */
   static void init();
 
   // <-
 
+  /**
+   * Requests a new reference for a Swarm Component.
+   */
   _INTR_INLINE static SwarmRef createSwarm(Entity::EntityRef p_ParentEntity)
   {
     SwarmRef ref = Dod::Components::ComponentManagerBase<
@@ -78,13 +94,20 @@ struct SwarmManager
 
   // <-
 
+  /**
+   * Resets the given Swarm Component to the default values.
+   */
   _INTR_INLINE static void resetToDefault(SwarmRef p_Ref)
   {
-    _descBoidMeshName(p_Ref) = _N(monkey);
+    _descBoidMeshName(p_Ref) = _N(sphere);
   }
 
   // <-
 
+  /**
+   * Destroys the given Swarm Component by putting the reference
+   * back in to the pool.
+   */
   _INTR_INLINE static void destroySwarm(SwarmRef p_Swarm)
   {
     Dod::Components::ComponentManagerBase<
@@ -93,6 +116,9 @@ struct SwarmManager
 
   // <-
 
+  /**
+   * Compiles all exposed properties to a JSON descriptor.
+   */
   _INTR_INLINE static void compileDescriptor(SwarmRef p_Ref,
                                              bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
@@ -108,6 +134,9 @@ struct SwarmManager
 
   // <-
 
+  /**
+   * Initializes all properties from a JSON descriptor.
+   */
   _INTR_INLINE static void initFromDescriptor(SwarmRef p_Ref,
                                               bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
@@ -121,6 +150,9 @@ struct SwarmManager
 
   // <-
 
+  /**
+   * Creates all resources for the given Swarm Component.
+   */
   _INTR_INLINE static void createResources(SwarmRef p_Swarm)
   {
     SwarmRefArray swarms = {p_Swarm};
@@ -129,6 +161,9 @@ struct SwarmManager
 
   // <-
 
+  /**
+   * Destroys all resources for the given Swarm Component.
+   */
   _INTR_INLINE static void destroyResources(SwarmRef p_Swarm)
   {
     SwarmRefArray swarms = {p_Swarm};
@@ -137,48 +172,81 @@ struct SwarmManager
 
   // <-
 
+  /**
+   * Creates all resources for the given set of Swarm Components.
+   */
   static void createResources(const SwarmRefArray& p_Swarms);
+
+  /**
+   * Destroys all resources for the given set of Swarm Components.
+   */
   static void destroyResources(const SwarmRefArray& p_Swarms);
 
   // <-
 
-  static void updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT);
+  /**
+   * Simulates all given Swarm Components for a single time step.
+   */
+  static void simulateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT);
 
   // <-
 
-  // Members refs
-  // ->
-
   // Description
+
+  /**
+   * The name of the Mesh used for rendering the Boids of a swarm.
+   */
   _INTR_INLINE static Name& _descBoidMeshName(MeshRef p_Ref)
   {
     return _data.descBoidMeshName[p_Ref._id];
   }
 
   // Resources
-  _INTR_INLINE static _INTR_ARRAY(Boid) & _boids(SwarmRef p_Ref)
+
+  /**
+   * Array of Boids owned by each of the Swarm Components.
+   */
+  _INTR_INLINE static _INTR_ARRAY(SwarmData::Boid) & _boids(SwarmRef p_Ref)
   {
     return _data.boids[p_Ref._id];
   }
 
+  /**
+   * Array of Node Components where each one is used for positioning a single
+   * Boid in the world.
+   */
   _INTR_INLINE static _INTR_ARRAY(NodeRef) & _nodes(SwarmRef p_Ref)
   {
     return _data.nodes[p_Ref._id];
   }
+
+  /**
+   * Array of Light Components attached to the Boids of swarm.
+   */
   _INTR_INLINE static _INTR_ARRAY(NodeRef) & _lights(SwarmRef p_Ref)
   {
     return _data.lights[p_Ref._id];
   }
+
+  /**
+   * Array of Mesh Components used for rendering the Boids of a swarm.
+   */
   _INTR_INLINE static _INTR_ARRAY(NodeRef) & _meshes(SwarmRef p_Ref)
   {
     return _data.meshes[p_Ref._id];
   }
 
+  /**
+   * The center of mass of the swarm the Boids are attracted to.
+   */
   _INTR_INLINE static glm::vec3& _currentCenterOfMass(SwarmRef p_Ref)
   {
     return _data.currentCenterOfMass[p_Ref._id];
   }
 
+  /**
+   * The current average velocity of a single swarm.
+   */
   _INTR_INLINE static glm::vec3& _currentAverageVelocity(SwarmRef p_Ref)
   {
     return _data.currentAverageVelocity[p_Ref._id];

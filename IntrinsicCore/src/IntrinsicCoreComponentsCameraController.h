@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** \file
- * Contains the Camera Controller Component Manager.
- */
-
 #pragma once
 
 namespace Intrinsic
@@ -31,9 +27,9 @@ typedef _INTR_ARRAY(CameraControllerRef) CameraControllerRefArray;
 namespace CameraControllerType
 {
 
-///
-/// Enum defining the different camera controller types.
-///
+/**
+ * Enum defining the different camera controller types.
+ */
 enum Enum
 {
   /** A third person camera controller. */
@@ -43,10 +39,10 @@ enum Enum
 };
 }
 
-///
-/// Stores all the relevant data for the Camera Controller Component in a data
-/// oriented fashion.
-///
+/**
+ * Stores all the relevant data for the Camera Controller Component in a data
+ * oriented fashion.
+ */
 struct CameraControllerData : Dod::Components::ComponentDataBase
 {
   CameraControllerData()
@@ -73,23 +69,23 @@ struct CameraControllerData : Dod::Components::ComponentDataBase
   _INTR_ARRAY(float) timeSinceLastOrientationChange;
 };
 
-///
-/// The manager for all Camera Controller Components.
-///
+/**
+ * The manager for all Camera Controller Components.
+ */
 struct CameraControllerManager
     : Dod::Components::ComponentManagerBase<
           CameraControllerData, _INTR_MAX_CAMERA_CONTROLLER_COMPONENT_COUNT>
 {
-  ///
-  /// Init. the Camera Controller Manager.
-  ///
+  /**
+   * Initializes the Camera Controller Manager.
+   */
   static void init();
 
   // <-
 
-  ///
-  /// Requests a new reference for a Camera Controller Component.
-  ///
+  /**
+   * Requests a new reference for a Camera Controller Component.
+   */
   _INTR_INLINE static CameraControllerRef
   createCameraController(Entity::EntityRef p_ParentEntity)
   {
@@ -101,9 +97,9 @@ struct CameraControllerManager
 
   // <-
 
-  ///
-  /// Resets the given Camera Controller Component to the default value.
-  ///
+  /**
+   * Resets the given Camera Controller Component to the default values.
+   */
   _INTR_INLINE static void resetToDefault(MeshRef p_Ref)
   {
     _descCameraControllerType(p_Ref) = CameraControllerType::kThirdPerson;
@@ -113,10 +109,10 @@ struct CameraControllerManager
 
   // <-
 
-  ///
-  /// Destroys the given Camera Controller Component by putting the reference
-  /// back in to to the pool.
-  ///
+  /**
+   * Destroys the given Camera Controller Component by putting the reference
+   * back in to the pool.
+   */
   _INTR_INLINE static void
   destroyCameraController(CameraControllerRef p_CameraController)
   {
@@ -127,9 +123,9 @@ struct CameraControllerManager
 
   // <-
 
-  ///
-  /// Compiles all exposed properties to a JSON descriptor.
-  ///
+  /**
+   * Compiles all exposed properties to a JSON descriptor.
+   */
   _INTR_INLINE static void compileDescriptor(CameraControllerRef p_Ref,
                                              bool p_GenerateDesc,
                                              rapidjson::Value& p_Properties,
@@ -157,9 +153,9 @@ struct CameraControllerManager
 
   // <-
 
-  ///
-  /// Initializes all properties from a JSON descriptor.
-  ///
+  /**
+   * Initializes all properties from a JSON descriptor.
+   */
   _INTR_INLINE static void initFromDescriptor(CameraControllerRef p_Ref,
                                               bool p_GenerateDesc,
                                               rapidjson::Value& p_Properties)
@@ -178,9 +174,9 @@ struct CameraControllerManager
 
   // <-
 
-  ///
-  /// Updates the given controllers.
-  ///
+  /**
+   * Updates the given controllers.
+   */
   static void
   updateControllers(const CameraControllerRefArray& p_CamControllers,
                     float p_DeltaT);
@@ -189,19 +185,25 @@ struct CameraControllerManager
 
   // Description
 
-  /// The target orientation of the Camera Controller Component described in
-  /// Euler Angles. Can be controlled/overwritten internally.
+  /**
+   * The target orientation of the Camera Controller Component described in
+   * Euler Angles. Can be controlled/overwritten internally.
+   */
   _INTR_INLINE static glm::vec3&
   _descTargetEulerAngles(CameraControllerRef p_Ref)
   {
     return _data.descTargetEulerAngles[p_Ref._id];
   }
-  /// The target the Camera Controller Component should follow.
+
+  /**
+   * The target the Camera Controller Component should follow.
+   */
   _INTR_INLINE static Name& _descTargetObjectName(CameraControllerRef p_Ref)
   {
     return _data.descTargetObjectName[p_Ref._id];
   }
-  /// The type of Camera Controller used.
+
+  /** The type of Camera Controller used. */
   _INTR_INLINE static CameraControllerType::Enum&
   _descCameraControllerType(CameraControllerRef p_Ref)
   {
@@ -210,13 +212,18 @@ struct CameraControllerManager
 
   // Resources
 
-  /// The euler angles seen during the last update call.
+  /**
+   * The euler angles seen during the last update call.
+   */
   _INTR_INLINE static glm::vec3&
   _lastTargetEulerAngles(CameraControllerRef p_Ref)
   {
     return _data.lastTargetEulerAngles[p_Ref._id];
   }
-  /// The time passed since the last change in orientation.
+
+  /**
+   * The time passed since the last change in orientation.
+   */
   _INTR_INLINE static float&
   _timeSinceLastOrientationChange(CameraControllerRef p_Ref)
   {

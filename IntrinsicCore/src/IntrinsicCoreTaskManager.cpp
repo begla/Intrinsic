@@ -127,7 +127,7 @@ void TaskManager::executeTasks()
     {
       _INTR_PROFILE_CPU("TaskManager", "Swarms");
 
-      Components::SwarmManager::updateSwarms(
+      Components::SwarmManager::simulateSwarms(
           Components::SwarmManager::_activeRefs, modDeltaT);
     }
 

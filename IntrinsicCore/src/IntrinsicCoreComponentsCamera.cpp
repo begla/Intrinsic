@@ -55,7 +55,7 @@ void CameraManager::init()
 
 // <-
 
-void CameraManager::updateFrustums(const CameraRefArray& p_Cameras)
+void CameraManager::updateFrustumsAndMatrices(const CameraRefArray& p_Cameras)
 {
   _INTR_PROFILE_CPU("General", "Cam. Matrix Updt.");
 

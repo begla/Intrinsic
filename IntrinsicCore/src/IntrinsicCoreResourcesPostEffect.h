@@ -275,9 +275,6 @@ struct PostEffectManager
 
   // <-
 
-  // Members refs.
-  // ->
-
   // Description
   _INTR_INLINE static glm::vec2&
   _descVolumetricLightingScatteringDayNight(PostEffectRef p_Ref)

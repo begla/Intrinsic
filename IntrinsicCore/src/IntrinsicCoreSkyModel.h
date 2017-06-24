@@ -14,12 +14,16 @@
 
 #pragma once
 
-/// Based on 'An Analytic Model for Full Spectral Sky-Dome Radiance'
-/// ACM Transactions on Graphics (Proceedings of ACM SIGGRAPH 2012)
 namespace Intrinsic
 {
 namespace Core
 {
+/**
+ * Physically based sky radiance model.
+ *
+ * Based on: "An Analytic Model for Full Spectral Sky-Dome Radiance' ACM
+ * Transactions on Graphics (Proceedings of ACM SIGGRAPH 2012)"
+ */
 namespace SkyModel
 {
 #include "ArHosekSkyModelData_RGB.h"
@@ -29,6 +33,9 @@ typedef double* ArHosekSkyModelDataset;
 typedef double* ArHosekSkyModelRadianceDataset;
 typedef double ArHosekSkyModelConfiguration[9];
 
+/**
+ * Struct storing the data/current state of the sky model.
+ */
 typedef struct ArHosekSkyModelState
 {
   ArHosekSkyModelConfiguration configs[3];
@@ -43,6 +50,9 @@ typedef struct ArHosekSkyModelState
 
 // <-
 
+/**
+ * Cooks the sky model configuration for the given parameters.
+ */
 _INTR_INLINE void cookConfiguration(ArHosekSkyModelDataset p_Dataset,
                                     ArHosekSkyModelConfiguration p_Config,
                                     double p_Turbidity, double p_Albedo,
@@ -136,6 +146,9 @@ _INTR_INLINE void cookConfiguration(ArHosekSkyModelDataset p_Dataset,
 
 // <-
 
+/**
+ * Cooks the sky model radiance configuration for the given set of parameters.
+ */
 _INTR_INLINE double
 cookRadianceConfiguration(ArHosekSkyModelRadianceDataset p_DataSet,
                           double p_Turbidity, double p_Albedo,
@@ -216,9 +229,10 @@ cookRadianceConfiguration(ArHosekSkyModelRadianceDataset p_DataSet,
 }
 
 // <-
-// <-
 
-/// Creates the sky model state for the given parameters
+/**
+ * Creates the sky model state for the given parameters.
+ */
 _INTR_INLINE ArHosekSkyModelState createSkyModelStateRGB(double p_Turbidity,
                                                          double p_Albedo,
                                                          double p_Elevation)
@@ -244,7 +258,9 @@ _INTR_INLINE ArHosekSkyModelState createSkyModelStateRGB(double p_Turbidity,
 
 // <-
 
-/// Calculates the radiance of the sky model setup at the given coordinates
+/**
+ * Calculates the radiance of the sky model at the given coordinates.
+ */
 _INTR_INLINE glm::vec3
 calculateSkyModelRadianceRGB(const ArHosekSkyModelState& p_SkyModelState,
                              const glm::vec3& p_Theta, const glm::vec3& p_Gamma)
@@ -273,7 +289,9 @@ calculateSkyModelRadianceRGB(const ArHosekSkyModelState& p_SkyModelState,
 
 // <-
 
-/// Projects the current sky model setup to a third order SH
+/**
+ * Helper method to project the current sky model setup to a third order SH.
+ */
 _INTR_INLINE IBL::SH9 project(const ArHosekSkyModelState& p_SkyModelState,
                               const glm::vec3& p_LightDir,
                               uint32_t p_SampleCount)

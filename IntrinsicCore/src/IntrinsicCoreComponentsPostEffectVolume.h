@@ -127,9 +127,6 @@ struct PostEffectVolumeManager
 
   // <-
 
-  // Members refs.
-  // ->
-
   // Description
 
   _INTR_INLINE static Name& _descPostEffectName(PostEffectVolumeRef p_Ref)

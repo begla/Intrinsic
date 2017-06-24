@@ -15,6 +15,7 @@
 // Precompiled header file
 #include "stdafx.h"
 
+// TODO: Expose properties for swarms
 #define BOID_COUNT 64u
 
 namespace Intrinsic
@@ -61,13 +62,14 @@ void SwarmManager::init()
 
 // <-
 
-void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
+void SwarmManager::simulateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
 {
   for (uint32_t swarmIdx = 0u; swarmIdx < p_Swarms.size(); ++swarmIdx)
   {
     SwarmRef swarmRef = p_Swarms[swarmIdx];
 
-    _INTR_ARRAY(Boid)& boids = Components::SwarmManager::_boids(swarmRef);
+    _INTR_ARRAY(SwarmData::Boid)& boids =
+        Components::SwarmManager::_boids(swarmRef);
     const NodeRefArray& nodes = Components::SwarmManager::_nodes(swarmRef);
     const LightRefArray& lights = Components::SwarmManager::_lights(swarmRef);
     const MeshRefArray& meshes = Components::SwarmManager::_meshes(swarmRef);
@@ -98,7 +100,7 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
       for (uint32_t boidIdx = 0u; boidIdx < boids.size(); ++boidIdx)
       {
         NodeRef nodeRef = nodes[boidIdx];
-        Boid& boid = boids[boidIdx];
+        SwarmData::Boid& boid = boids[boidIdx];
 
         // TODO: Add properties for those
         static const float boidAcc = 10.0f;
@@ -132,7 +134,7 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
           if (boidToCompareIdx == boidIdx)
             continue;
 
-          const Boid& boidToCompare = boids[boidToCompareIdx];
+          const SwarmData::Boid& boidToCompare = boids[boidToCompareIdx];
           const float distSqr = glm::distance2(boidToCompare.pos, boid.pos);
 
           if (distSqr < boidMinDistSqr && distSqr > _INTR_EPSILON)
@@ -243,7 +245,7 @@ void SwarmManager::createResources(const SwarmRefArray& p_Swarms)
     for (uint32_t i = 0u; i < BOID_COUNT; ++i)
     {
       Entity::EntityRef entityRef =
-          Entity::EntityManager::createEntity(_N(Boid));
+          Entity::EntityManager::createEntity(_N(SwarmData::Boid));
       Components::NodeRef nodeRef =
           Components::NodeManager::createNode(entityRef);
       Components::NodeManager::attachChild(World::_rootNode, nodeRef);
@@ -295,7 +297,8 @@ void SwarmManager::destroyResources(const SwarmRefArray& p_Swarms)
   {
     SwarmRef swarmRef = p_Swarms[swarmIdx];
 
-    _INTR_ARRAY(Boid)& boids = Components::SwarmManager::_boids(swarmRef);
+    _INTR_ARRAY(SwarmData::Boid)& boids =
+        Components::SwarmManager::_boids(swarmRef);
     NodeRefArray& nodes = Components::SwarmManager::_nodes(swarmRef);
     Dod::RefArray& lights = Components::SwarmManager::_lights(swarmRef);
     Dod::RefArray& meshes = Components::SwarmManager::_meshes(swarmRef);

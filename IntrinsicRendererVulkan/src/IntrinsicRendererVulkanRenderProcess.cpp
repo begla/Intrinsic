@@ -414,7 +414,7 @@ void Default::renderFrame(float p_DeltaT)
         }
       }
 
-      Components::CameraManager::updateFrustums(
+      Components::CameraManager::updateFrustumsAndMatrices(
           Components::CameraManager::_activeRefs);
       FrustumManager::prepareForRendering(FrustumManager::_activeRefs);
 
