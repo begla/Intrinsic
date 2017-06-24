@@ -113,7 +113,6 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
         static uint32_t boidsToCheck = 10u;
 
         // Fly towards center of mass
-
         const glm::vec3 boidToCenter = currentCenterOfMass - boid.pos;
         const float boidToCenterDist = glm::length(boidToCenter);
         {
@@ -122,7 +121,7 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
                         centerOfMassWeight;
         }
 
-        // Keep a distance
+        // Keep a distance to other boids
         for (uint32_t boidIdx = 0u;
              boidIdx < std::min(32u, (uint32_t)boids.size()); ++boidIdx)
         {
@@ -152,13 +151,34 @@ void SwarmManager::updateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
         // Target the node of the component
         {
           const glm::vec3 boidToComponent =
-              Components::NodeManager::_worldPosition(swarmNodeRef) - boid.pos;
+              Math::calcAABBCenter(
+                  Components::NodeManager::_worldAABB(swarmNodeRef)) -
+              boid.pos;
           const float boidToComponentDist = glm::length(boidToComponent);
 
           if (boidToComponentDist > _INTR_EPSILON &&
               boidToComponentDist > minTargetDist)
             boid.vel += boidToComponent / boidToComponentDist * boidAcc *
                         p_DeltaT * targetRuleWeight;
+        }
+
+        // Fly towards characters
+        for (CharacterControllerRef cctRef :
+             CharacterControllerManager::_activeRefs)
+        {
+          const NodeRef cctNodeRef = NodeManager::getComponentForEntity(
+              CharacterControllerManager::_entity(cctRef));
+
+          const glm::vec3 targetPos =
+              Math::calcAABBCenter(NodeManager::_worldAABB(cctNodeRef));
+
+          const float distSqr = glm::distance2(targetPos, boid.pos);
+
+          if (distSqr < 15.0f * 15.0f && distSqr > _INTR_EPSILON)
+          {
+            boid.vel += boidAcc * glm::normalize(targetPos - boid.pos) *
+                        p_DeltaT * 5.0f;
+          }
         }
 
         // Avoid the ground plane
