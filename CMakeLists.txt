@@ -270,17 +270,18 @@ if (NOT COMPILE_ONLY)
     target_link_libraries(IntrinsicCore wsock32 ws2_32)
     target_link_libraries(IntrinsicCore Dbghelp)
   endif()
-  target_link_libraries(IntrinsicCore IntrinsicRenderer)
   target_link_libraries(IntrinsicCore ${INTR_EXTERNAL_LIBS})
 
   # Intrinsic standalone
   if (BUILD_STANDALONE)
+    target_link_libraries(Intrinsic IntrinsicRenderer)
     target_link_libraries(Intrinsic IntrinsicCore)
   endif()
 
   # IntrinsicEd
   if (BUILD_INTRINSICED)
     target_link_libraries(IntrinsicEd IntrinsicCore)
+    target_link_libraries(IntrinsicEd IntrinsicRenderer)
     target_link_libraries(IntrinsicEd IntrinsicAssetManagement)
     target_link_libraries(IntrinsicEd ${INTR_ED_EXTERNAL_LIBS})
   endif()

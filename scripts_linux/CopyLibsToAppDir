@@ -4,16 +4,7 @@ cd ..
 
 cp dependencies/lua/libluajit.so app/libluajit-5.1.so.2
 
-cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPxFoundationPROFILE_x64.so app/libPxFoundationPROFILE_x64.so
-cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPhysX3CharacterKinematicPROFILE_x64.so app/libPhysX3CharacterKinematicPROFILE_x64.so
-cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPhysX3PROFILE_x64.so app/libPhysX3PROFILE_x64.so
-cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPhysX3CookingPROFILE_x64.so app/libPhysX3CookingPROFILE_x64.so
-cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPhysX3CommonPROFILE_x64.so app/libPhysX3CommonPROFILE_x64.so
-
-cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPxFoundation_x64.so app/libPxFoundation_x64.so
-cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPhysX3CharacterKinematic_x64.so app/libPhysX3CharacterKinematic_x64.so
-cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPhysX3_x64.so app/libPhysX3_x64.so
-cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPhysX3Cooking_x64.so app/libPhysX3Cooking_x64.so
-cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPhysX3Common_x64.so app/libPhysX3Common_x64.so
+cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPx*PROFILE_x64.so app/.
+cp ../Intrinsic_Dependencies/dependencies/physx3.4/lib/libPhysX3*PROFILE_x64.so app/.
 
 cd scripts_linux

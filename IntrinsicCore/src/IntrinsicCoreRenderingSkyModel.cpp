@@ -19,10 +19,6 @@ namespace
 {
 #include "ArHosekSkyModelData_RGB.h"
 }
-
-// Static members
-double* Intrinsic::Core::Rendering::SkyModel::datasetsRGB[];
-double* Intrinsic::Core::Rendering::SkyModel::datasetsRGBRad[];
   
 namespace Intrinsic
 {
@@ -30,6 +26,13 @@ namespace Core
 {
 namespace Rendering
 {
+// Static members
+double* SkyModel::datasetsRGB[] = {datasetRGB1, datasetRGB2,
+                                              datasetRGB3};
+
+double* SkyModel::datasetsRGBRad[] = {datasetRGBRad1, datasetRGBRad2,
+                                                 datasetRGBRad3};
+    
 SkyModel::ArHosekSkyModelState
 SkyModel::createSkyModelStateRGB(double p_Turbidity, double p_Albedo,
                         double p_Elevation)
