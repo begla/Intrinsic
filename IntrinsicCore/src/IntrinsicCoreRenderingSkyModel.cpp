@@ -15,10 +15,13 @@
 // Precompiled header file
 #include "stdafx.h"
 
-namespace Intrinsic
-{
-namespace Core
+namespace
 {
 #include "ArHosekSkyModelData_RGB.h"
 }
-}
+
+double* Intrinsic::Core::Rendering::SkyModel::datasetsRGB[] = {datasetRGB1, datasetRGB2,
+                                              datasetRGB3};
+
+double* Intrinsic::Core::Rendering::SkyModel::datasetsRGBRad[] = {datasetRGBRad1, datasetRGBRad2,
+                                                 datasetRGBRad3};

@@ -81,7 +81,7 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
       const uint8_t format = (uint8_t)ImageManager::_descImageFormat(imageRef);
 
       AttachmentDescription colorAttachment = {
-          format, outputDesc.Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
+          format, (uint8_t)(outputDesc.Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u)};
       RenderPassManager::_descAttachments(_renderPassRef)
           .push_back(colorAttachment);
     }
@@ -89,7 +89,7 @@ void Base::init(const rapidjson::Value& p_RenderPassDesc)
     {
       AttachmentDescription sceneAttachment = {
           Format::kB8G8R8A8UNorm,
-          outputs[0].Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u};
+          (uint8_t)(outputs[0].Size() > 1u ? AttachmentFlags::kClearOnLoad : 0u)};
       RenderPassManager::_descAttachments(_renderPassRef)
           .push_back(sceneAttachment);
     }

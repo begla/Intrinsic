@@ -3,6 +3,7 @@
 x64
 *.TMP
 *.lastcodeanalysissucceeded
+*.directory
 
 // Binary data and settings
 app/IntrinsicEd.ini
@@ -12,6 +13,8 @@ app/*.lib
 app/*.pdb
 app/*.dll
 app/*.ilk
+app/*.so
+app/*.so.2
 !app/BsSndRpt64.exe
 app/platforms
 
@@ -22,6 +25,7 @@ distro/
 // Build and dependencies
 build
 dependencies/glslang/build
+dependencies/glslang/build_debug
 
 // Doxygen
 documentation/html

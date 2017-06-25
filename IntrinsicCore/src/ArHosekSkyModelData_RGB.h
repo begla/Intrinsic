@@ -47,7 +47,8 @@ and the 2013 IEEE CG&A paper
 
 
                         Version: 1.4a, February 22nd, 2013
-                        
+                        
+
 
 
 
@@ -84,7 +85,8 @@ Version history:
       the result of a simple conversion from spectral data via the CIE 2 degree
       standard observer matching functions. Therefore, after multiplication
       with 683 lm / W, the Y channel now corresponds to luminance in lm.
-     
+     
+
 
 
 
@@ -1099,8 +1101,3 @@ double datasetRGBRad3[] = {
     2.893432e+001,
 };
 
-double* Rendering::SkyModel::datasetsRGB[] = {datasetRGB1, datasetRGB2,
-                                              datasetRGB3};
-
-double* Rendering::SkyModel::datasetsRGBRad[] = {datasetRGBRad1, datasetRGBRad2,
-                                                 datasetRGBRad3};

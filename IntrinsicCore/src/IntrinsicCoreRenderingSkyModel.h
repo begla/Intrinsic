@@ -233,7 +233,7 @@ struct SkyModel
   /**
    * Creates the sky model state for the given parameters.
    */
-  _INTR_INLINE static ArHosekSkyModelState
+  static ArHosekSkyModelState
   createSkyModelStateRGB(double p_Turbidity, double p_Albedo,
                          double p_Elevation)
   {

@@ -21,7 +21,7 @@
 4. Get access to PhysX SDK 3.4 from NVIDIA: https://developer.nvidia.com/physx-sdk
 5. Follow the instructions from NVIDIA and compile the PhysX libraries for the configurations *Release*, *Profile* and *Debug*
 
-   **NOTE:** Make sure that PhysX links the Runtime Library dynamically as Intrinsic does (set `/MD` or `/MDd` for all PhysX project files)
+    **NOTE:** Make sure that PhysX links the Runtime Library dynamically as Intrinsic does (set `/MD` or `/MDd` for all PhysX project files)
 
 6. Download and install the Autodesk FBX SDK 2015.1
 
@@ -29,7 +29,7 @@
 8. Inside, create a new folder `dependencies` containing two folders `physx3.4` and `fbx`
 9. Copy the static/dynamic libraries and header files of both SDKs to folders named `bin` (DLLs), `lib` (LIBs) and `include` respectively
 
-   **NOTE:** Since PhysX 3.4 there is a new set of libraries gathered under the name `PxShared`. Make sure to copy the DLLs, header files and static libraries to the folders too! Especially `PxFoundation`!
+    **NOTE:** Since PhysX 3.4 there is a new set of libraries gathered under the name `PxShared`. Make sure to copy the DLLs, header files and static libraries to the folders too!
 
 10. Switch to the `scripts_win32` folder in the Intrinsic repository directory
 11. Execute `ConfigAndBuildDependenciesVS15.bat` to build some of the remaining dependencies automatically
@@ -43,7 +43,11 @@
 
 16. You're all set - yey!
 
-## Linux (tested with Ubuntu 16.10)
+## Linux (tested with Kubuntu 17.04 - x64)
+
+### Restrictions
+
+InstrinsicEd is currently only supported on Windows. Full Linux support is not far off and is certainly planned for the future.
 
 ### Prerequisites
 
@@ -53,39 +57,27 @@ sudo apt install git cmake ninja-build libsdl2-dev
 
 ### Setup Instructions
 
-1. Download and install the Qt (open-source) distribution
-
-   Add environment variables to your .zshrc or .bashrc:
-   ```
-   # Intrinsic  
-   export INTR_QTDIR="[...]/Qt/x.x/gcc_64"
-   ```
-
-2. Download and install the Vulkan SDK
+1. Download and install the latest Vulkan SDK
 
     Add environment variables to your .zshrc or .bashrc:
     ```
     # Vulkan SDK  
-    VULKAN_SDK=~/[...]/VulkanSDK/1.0.30.0/x86_64  
-    VK_LAYER_PATH=$VULKAN_SDK/etc/explicit_layer.d  
-
-    export VK_LAYER_PATH  
-    export PATH=$VULKAN_SDK/bin:$PATH
+    export VK_SDK_PATH=.../VulkanSDK/x.x.x.x/x86_64
     ```
 
-3. Get access to the latest PhysX SDK  
+2. Get access to the latest PhysX SDK
 
-   After cloning of the git repository apply patches from https://github.com/NVIDIAGameWorks/PhysX-3.3/pull/57
    ```
-   cd .../PhysX-3.3/PhysXSDK/Source/compiler/linux64  
-   make release profile debug  
-   ```
-   Add environment variables to your .zshrc or .bashrc:
-   ```
-   export PHYSX_HOME="$HOME/[...]/PhysX-3.3/PhysXSDK/"
+   cd .../PhysX-3.4/PhysXSDK/Source/compiler/linux64
+   make release profile debug
    ```
 
-4. Download and install Autodesk FBX SDK  
-5. Go to the `scripts_linux` folder in the Intrinsic repository dir
-6. Execute the following scripts: `ConfigAndBuildDependencies`, `Config_Release`, `Build` and last but not least `Run_Release`
-7. You're all set - yey!
+3. Create a new directory called `Intrinsic_Dependencies` on the _same level_ as the Intrinsic repository folder
+4. Inside, create a new folder `dependencies` containing two folders `physx3.4` and `fbx` 
+9. Copy the static/dynamic libraries and header files of both SDKs to folders named ``lib` (static and dynamic libraries) and `include` respectively
+
+    **NOTE:** Since PhysX 3.4 there is a new set of libraries gathered under the name `PxShared`. Make sure to copy the header files and static/dynamic libraries to the folders too!
+
+10. Go to the `scripts_linux` folder in the Intrinsic repository dir
+11. Execute the following scripts: `ConfigAndBuildDependencies`, `Config_Release`, `Build`, `CopyLibsToAppDir` and last but not least `Run_Release`
+12. You're all set - yey!

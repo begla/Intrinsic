@@ -16,10 +16,12 @@ endif()
 set(GLOBAL_PROPERTY USE_FOLDERS ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+if(BUILD_INTRINSICED)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOMOC_MOC_OPTIONS "-fstdafx_editor.h")
+endif()
 
 set(INTR_FINAL_BUILD OFF CACHE BOOL "Final build setting")
 set(COMPILE_ONLY OFF CACHE BOOL "Compile without linking")
@@ -55,10 +57,13 @@ else()
   if(USE_MICROPROFILE)
     add_definitions("-D_INTR_PROFILING_ENABLED")
   endif()
-  add_definitions("-D_INTR_LOGGING_ENABLED -D_INTR_ASSERTS_ENABLED")
+  add_definitions("-D_INTR_LOGGING_ENABLED")
+  add_definitions("-D_INTR_ASSERTS_ENABLED")
 endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+include(cotire)
 
 if (INTR_FINAL_BUILD)
 else()
@@ -68,6 +73,7 @@ endif()
 find_package(GLSLang REQUIRED)
 find_package(LuaJIT REQUIRED)
 find_package(PhysX REQUIRED Common Cooking CharacterKinematic Extensions PxFoundation)
+
 find_package(SDL2 REQUIRED)
 find_package(Vulkan REQUIRED)
 if (BUILD_INTRINSICED)
@@ -181,23 +187,6 @@ if (BUILD_STANDALONE AND NOT COMPILE_ONLY)
   set_target_properties(Intrinsic PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 endif()
 
-# Precompiled header files
-
-# Editor
-if(WIN32)
-  set_source_files_properties(IntrinsicEd ${INTR_ED_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "/Yustdafx_editor.h")
-  set_source_files_properties(IntrinsicEd IntrinsicEd/src/stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx_editor.h")
-# Core
-  set_source_files_properties(${INTR_CORE_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "/Yustdafx.h")
-  set_source_files_properties(IntrinsicCore/src/stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx.h")
-# Rend. Vulk.
-  set_source_files_properties(${INTR_RENDERER_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "/Yustdafx_renderer.h")
-  set_source_files_properties(IntrinsicRenderer/src/stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx_renderer.h")
-# Asset Management
-  set_source_files_properties(${INTASSET_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "/Yustdafx_assets.h")
-  set_source_files_properties(IntrinsicAssetManagement/src/stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx_assets.h")
-endif()
-
 # Library includes
 set(INTR_DEPENDENCIES
   "dependencies/gli"
@@ -295,4 +284,19 @@ if (NOT COMPILE_ONLY)
     target_link_libraries(IntrinsicEd IntrinsicAssetManagement)
     target_link_libraries(IntrinsicEd ${INTR_ED_EXTERNAL_LIBS})
   endif()
+endif()
+
+if (BUILD_INTRINSICED)
+  set_target_properties(IntrinsicEd PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT ${COTIRE_CXX_PREFIX_HEADER_INIT} "IntrinsicEd/src/stdafx_editor.h")
+  set_target_properties(IntrinsicAssetManagement PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT ${COTIRE_CXX_PREFIX_HEADER_INIT} "IntrinsicAssetManagement/src/stdafx_assets.h")
+endif()
+  set_target_properties(IntrinsicCore PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "IntrinsicCore/src/stdafx.h")
+  set_target_properties(IntrinsicRenderer PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "IntrinsicRenderer/src/stdafx_renderer.h")
+
+cotire(Intrinsic)
+cotire(IntrinsicCore)
+cotire(IntrinsicRenderer)
+if (BUILD_INTRINSICED)
+cotire(IntrinsicAssetManagement)
+cotire(IntrinsicEd)
 endif()

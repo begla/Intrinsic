@@ -14,7 +14,7 @@
 
 #pragma once
 
-// ->::Renderer related includes
+// Renderer related includes
 #include "IntrinsicRendererPrerequisites.h"
 
 // Vulkan related includes

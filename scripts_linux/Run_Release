@@ -2,4 +2,4 @@
 
 cd ../app
 
-LD_PRELOAD="`pwd`/../dependencies/lua/libluajit.so" ./Intrinsic
+LD_LIBRARY_PATH="`pwd`" ./Intrinsic
