@@ -50,7 +50,7 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
   initManagers();
 
   // Initializes renderer
-  RV::RenderSystem::init(p_PlatformHandle, p_PlatformWindow);
+  R::RenderSystem::init(p_PlatformHandle, p_PlatformWindow);
 
 // MicroProfile init.
 #if defined(_INTR_PROFILING_ENABLED)
@@ -64,9 +64,9 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
 
 #if defined(MICROPROFILE_GPU_TIMERS_VULKAN)
     MicroProfileGpuInitVulkan(
-        &RV::RenderSystem::_vkDevice, &RV::RenderSystem::_vkPhysicalDevice,
-        &RV::RenderSystem::_vkQueue,
-        &RV::RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex, 1u);
+        &R::RenderSystem::_vkDevice, &R::RenderSystem::_vkPhysicalDevice,
+        &R::RenderSystem::_vkQueue,
+        &R::RenderSystem::_vkGraphicsAndComputeQueueFamilyIndex, 1u);
 #endif // MICROPROFILE_GPU_TIMERS_VULKAN
   }
 #endif // _INTR_PROFILING_ENABLED
@@ -97,7 +97,7 @@ void Application::init(void* p_PlatformHandle, void* p_PlatformWindow)
   }
 
   {
-    RV::RenderSystem::onViewportChanged();
+    R::RenderSystem::onViewportChanged();
   }
 }
 

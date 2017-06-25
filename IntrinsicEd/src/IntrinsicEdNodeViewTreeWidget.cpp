@@ -16,7 +16,7 @@
 #include "stdafx_editor.h"
 #include "stdafx.h"
 
-using namespace RVResources;
+using namespace RResources;
 
 // Helpers
 void expandAllParents(QTreeWidgetItem* p_Item)
@@ -721,7 +721,7 @@ void IntrinsicEdNodeViewTreeWidget::onCurrentlySelectedEntityChanged(
 
 void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
 {
-  using namespace RV;
+  using namespace R;
 
   Components::IrradianceProbeRef irradProbeRef;
   Components::NodeRef probeNodeRef;
@@ -735,7 +735,7 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
     probeNodeRef = _itemToNodeMap[currIt];
 
     const glm::uvec2 cubeMapRes =
-        RV::RenderSystem::getAbsoluteRenderSize(RV::RenderSize::kCubemap);
+        R::RenderSystem::getAbsoluteRenderSize(R::RenderSize::kCubemap);
     RenderSystem::_customBackbufferDimensions = cubeMapRes;
     RenderSystem::resizeSwapChain(true);
 

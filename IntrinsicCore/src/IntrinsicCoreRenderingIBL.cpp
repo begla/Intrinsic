@@ -145,7 +145,7 @@ void preFilterGGX(const gli::texture_cube& p_Input, gli::texture_cube& p_Output,
 void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
                    float p_Time)
 {
-  using namespace RV;
+  using namespace R;
 
   static glm::uvec2 atlasIndices[6]{glm::uvec2(0u, 1u), glm::uvec2(1u, 1u),
                                     glm::uvec2(2u, 1u), glm::uvec2(3u, 1u),
@@ -160,7 +160,7 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
   static uint32_t atlasIndexToFaceIdx[6] = {0, 4, 1, 5, 2, 3};
 
   const glm::uvec2 cubeMapRes =
-      RV::RenderSystem::getAbsoluteRenderSize(RV::RenderSize::kCubemap);
+      R::RenderSystem::getAbsoluteRenderSize(R::RenderSize::kCubemap);
 
   const uint32_t faceSizeInBytes =
       cubeMapRes.x * cubeMapRes.y * 2u * sizeof(uint32_t);
@@ -188,10 +188,9 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
     BufferManager::addResourceFlags(
         readBackBufferRef, Dod::Resources::ResourceFlags::kResourceVolatile);
     BufferManager::_descMemoryPoolType(readBackBufferRef) =
-        RV::MemoryPoolType::kVolatileStagingBuffers;
+        R::MemoryPoolType::kVolatileStagingBuffers;
 
-    BufferManager::_descBufferType(readBackBufferRef) =
-        RV::BufferType::kStorage;
+    BufferManager::_descBufferType(readBackBufferRef) = R::BufferType::kStorage;
     BufferManager::_descSizeInBytes(readBackBufferRef) = faceSizeInBytes;
 
     BufferManager::createResources({readBackBufferRef});

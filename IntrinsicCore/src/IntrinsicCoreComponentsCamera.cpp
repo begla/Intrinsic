@@ -97,8 +97,8 @@ void CameraManager::updateFrustumsAndMatrices(const CameraRefArray& p_Cameras)
 glm::mat4 CameraManager::computeCustomProjMatrix(CameraRef p_Ref, float p_Near,
                                                  float p_Far)
 {
-  const float aspectRatio = RV::RenderSystem::_backbufferDimensions.x /
-                            (float)RV::RenderSystem::_backbufferDimensions.y;
+  const float aspectRatio = R::RenderSystem::_backbufferDimensions.x /
+                            (float)R::RenderSystem::_backbufferDimensions.y;
   return glm::scale(glm::vec3(1.0f, -1.0f, 1.0f)) *
          glm::perspective(_descFov(p_Ref), aspectRatio, p_Near, p_Far);
 }

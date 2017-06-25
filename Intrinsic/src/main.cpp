@@ -98,7 +98,7 @@ int _main(int argc, char* argv[])
   {
     TaskManager::executeTasks();
   }
-  RV::RenderSystem::shutdown();
+  R::RenderSystem::shutdown();
 
   return 0;
 }

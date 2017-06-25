@@ -15,7 +15,7 @@
 // Precompiled header file
 #include "stdafx.h"
 
-using namespace RVResources;
+using namespace RResources;
 
 namespace Intrinsic
 {
@@ -35,7 +35,7 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
     _INTR_PROFILE_CPU("General", "Mesh Inst. Data Updt. Job");
 
     Dod::Ref frustumRef =
-        RV::RenderProcess::Default::_activeFrustums[_frustumIdx];
+        R::RenderProcess::Default::_activeFrustums[_frustumIdx];
     glm::mat4& viewMatrix =
         Resources::FrustumManager::_descViewMatrix(frustumRef);
     glm::mat4& viewProjectionMatrix =
@@ -44,8 +44,8 @@ struct PerInstanceDataUpdateParallelTaskSet : enki::ITaskSet
     for (uint32_t meshIdx = p_Range.start; meshIdx < p_Range.end; ++meshIdx)
     {
       MeshRef meshCompRef =
-          RV::RenderProcess::Default::_visibleMeshComponents[_frustumIdx]
-                                                            [meshIdx];
+          R::RenderProcess::Default::_visibleMeshComponents[_frustumIdx]
+                                                           [meshIdx];
       Entity::EntityRef entityRef = MeshManager::_entity(meshCompRef);
       Components::NodeRef nodeRef =
           Components::NodeManager::getComponentForEntity(entityRef);
@@ -144,11 +144,11 @@ struct DrawCallCollectionParallelTaskSet : enki::ITaskSet
     auto& drawCallsPerMaterialPass =
         DrawCallManager::_drawCallsPerMaterialPass[_materialPassIdx];
     const uint32_t activeFrustumCount =
-        (uint32_t)RV::RenderProcess::Default::_activeFrustums.size();
+        (uint32_t)R::RenderProcess::Default::_activeFrustums.size();
 
     for (uint32_t frustIdx = 0u; frustIdx < activeFrustumCount; ++frustIdx)
     {
-      auto& visibleDrawCallsPerMaterialPass = RV::RenderProcess::Default::
+      auto& visibleDrawCallsPerMaterialPass = R::RenderProcess::Default::
           _visibleDrawCallsPerMaterialPass[frustIdx][_materialPassIdx];
 
       for (uint32_t drawCallIdx = p_Range.start; drawCallIdx < p_Range.end;
@@ -193,7 +193,7 @@ struct MeshCollectionParallelTaskSet : enki::ITaskSet
     _INTR_PROFILE_CPU("General", "Collect Visible Mesh Components Job");
 
     uint32_t activeFrustumsCount =
-        (uint32_t)RV::RenderProcess::Default::_activeFrustums.size();
+        (uint32_t)R::RenderProcess::Default::_activeFrustums.size();
 
     for (uint32_t meshCompId = p_Range.start; meshCompId < p_Range.end;
          ++meshCompId)
@@ -210,7 +210,7 @@ struct MeshCollectionParallelTaskSet : enki::ITaskSet
              (1u << frustIdx)) > 0u)
         {
           auto& visibleMeshComponents =
-              RV::RenderProcess::Default::_visibleMeshComponents[frustIdx];
+              R::RenderProcess::Default::_visibleMeshComponents[frustIdx];
           visibleMeshComponents.push_back(meshComponentRef);
         }
       }
@@ -395,10 +395,9 @@ void MeshManager::updatePerInstanceData(Dod::Ref p_CameraRef,
   _INTR_PROFILE_CPU("General", "Update Per Instance Data");
 
   const uint32_t frustumId =
-      RV::RenderProcess::Default::_cameraToIdMapping[p_CameraRef] +
-      p_FrustumIdx;
+      R::RenderProcess::Default::_cameraToIdMapping[p_CameraRef] + p_FrustumIdx;
   _perInstanceDataUpdateTaskSet.m_SetSize =
-      (uint32_t)RV::RenderProcess::Default::_visibleMeshComponents[frustumId]
+      (uint32_t)R::RenderProcess::Default::_visibleMeshComponents[frustumId]
           .size();
   _perInstanceDataUpdateTaskSet._frustumIdx = frustumId;
   _perInstanceDataUpdateTaskSet._camRef = p_CameraRef;
@@ -436,23 +435,22 @@ void MeshManager::collectDrawCallsAndMeshComponents()
   using namespace Renderer;
 
   drawCallCollectionTaskSets.resize(
-      Vulkan::Resources::MaterialManager::_materialPasses.size());
+      Renderer::Resources::MaterialManager::_materialPasses.size());
 
   for (uint32_t frustIdx = 0u;
-       frustIdx < Vulkan::RenderProcess::Default::_activeFrustums.size();
-       ++frustIdx)
+       frustIdx < RenderProcess::Default::_activeFrustums.size(); ++frustIdx)
   {
     for (uint32_t materialPassIdx = 0u;
          materialPassIdx <
-         Vulkan::Resources::MaterialManager::_materialPasses.size();
+         Renderer::Resources::MaterialManager::_materialPasses.size();
          ++materialPassIdx)
     {
-      Vulkan::RenderProcess::Default::_visibleDrawCallsPerMaterialPass
-          [frustIdx][materialPassIdx]
-              .clear();
+      RenderProcess::Default::_visibleDrawCallsPerMaterialPass[frustIdx]
+                                                              [materialPassIdx]
+                                                                  .clear();
     }
 
-    Vulkan::RenderProcess::Default::_visibleMeshComponents[frustIdx].clear();
+    RenderProcess::Default::_visibleMeshComponents[frustIdx].clear();
   }
 
   meshCollectionTaskSet.m_SetSize =
@@ -461,19 +459,21 @@ void MeshManager::collectDrawCallsAndMeshComponents()
 
   uint32_t currentJobIdx = 0u;
   for (uint32_t matPassIdx = 0u;
-       matPassIdx < Vulkan::Resources::MaterialManager::_materialPasses.size();
+       matPassIdx <
+       Renderer::Resources::MaterialManager::_materialPasses.size();
        ++matPassIdx)
   {
-    if (!Vulkan::Resources::DrawCallManager::_drawCallsPerMaterialPass
+    if (!Renderer::Resources::DrawCallManager::_drawCallsPerMaterialPass
              [matPassIdx]
                  .empty())
     {
       DrawCallCollectionParallelTaskSet& drawCallTaskSet =
           drawCallCollectionTaskSets[currentJobIdx];
       drawCallTaskSet._materialPassIdx = matPassIdx;
-      drawCallTaskSet.m_SetSize = (uint32_t)Vulkan::Resources::DrawCallManager::
-                                      _drawCallsPerMaterialPass[matPassIdx]
-                                          .size();
+      drawCallTaskSet.m_SetSize =
+          (uint32_t)Renderer::Resources::DrawCallManager::
+              _drawCallsPerMaterialPass[matPassIdx]
+                  .size();
 
       Application::_scheduler.AddTaskSetToPipe(&drawCallTaskSet);
     }

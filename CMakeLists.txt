@@ -78,12 +78,12 @@ if (WIN32)
   find_package(BugSplat REQUIRED)
 endif()
 
-file(GLOB INTR_RENDERER_VULKAN_SOURCE_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.cpp)
-file(GLOB INTR_RENDERER_VULKAN_HEADER_FILES IntrinsicRendererVulkan/src/IntrinsicRendererVulkan*.h)
+file(GLOB INTR_RENDERER_SOURCE_FILES IntrinsicRenderer/src/IntrinsicRenderer*.cpp)
+file(GLOB INTR_RENDERER_HEADER_FILES IntrinsicRenderer/src/IntrinsicRenderer*.h)
 
-set(INTR_RENDERER_VULKAN_SOURCE_FILES IntrinsicRendererVulkan/src/stdafx.cpp IntrinsicRendererVulkan/src/stdafx_vulkan.h ${INTR_RENDERER_VULKAN_SOURCE_FILES})
+set(INTR_RENDERER_SOURCE_FILES IntrinsicRenderer/src/stdafx.cpp IntrinsicRenderer/src/stdafx_renderer.h ${INTR_RENDERER_SOURCE_FILES})
 
-set(INTR_RENDERER_VULKAN_DEP_SOURCE_FILES 
+set(INTR_RENDERER_DEP_SOURCE_FILES 
   dependencies/spirvcross/spirv_glsl.cpp
   dependencies/spirvcross/spirv_cross.cpp
 )
@@ -159,13 +159,13 @@ endif()
 
 # Libs
 add_library(IntrinsicCore ${INTR_CORE_SOURCE_FILES} ${INTR_CORE_C_SOURCE_FILES} ${INTDEP_SOURCE_FILES} ${INTR_CORE_HEADER_FILES})
-add_library(IntrinsicRendererVulkan ${INTR_RENDERER_VULKAN_SOURCE_FILES} ${INTR_RENDERER_VULKAN_HEADER_FILES} ${INTR_RENDERER_VULKAN_DEP_SOURCE_FILES})
+add_library(IntrinsicRenderer ${INTR_RENDERER_SOURCE_FILES} ${INTR_RENDERER_HEADER_FILES} ${INTR_RENDERER_DEP_SOURCE_FILES})
 if (BUILD_INTRINSICED)
   add_library(IntrinsicAssetManagement ${INTASSET_SOURCE_FILES} ${INTASSET_HEADER_FILES})
 endif()
 
-set_target_properties(IntrinsicRendererVulkan PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
-set_target_properties(IntrinsicRendererVulkan PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
+set_target_properties(IntrinsicRenderer PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
+set_target_properties(IntrinsicRenderer PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 set_target_properties(IntrinsicCore PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
 set_target_properties(IntrinsicCore PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 if (BUILD_INTRINSICED)
@@ -191,8 +191,8 @@ if(WIN32)
   set_source_files_properties(${INTR_CORE_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "/Yustdafx.h")
   set_source_files_properties(IntrinsicCore/src/stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx.h")
 # Rend. Vulk.
-  set_source_files_properties(${INTR_RENDERER_VULKAN_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "/Yustdafx_vulkan.h")
-  set_source_files_properties(IntrinsicRendererVulkan/src/stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx_vulkan.h")
+  set_source_files_properties(${INTR_RENDERER_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "/Yustdafx_renderer.h")
+  set_source_files_properties(IntrinsicRenderer/src/stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx_renderer.h")
 # Asset Management
   set_source_files_properties(${INTASSET_SOURCE_FILES} PROPERTIES COMPILE_FLAGS "/Yustdafx_assets.h")
   set_source_files_properties(IntrinsicAssetManagement/src/stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx_assets.h")
@@ -228,7 +228,7 @@ include_directories(${INTR_DEPENDENCIES})
 set(INTR_INCLUDES
   "IntrinsicEd/src"
   "IntrinsicCore/src"
-  "IntrinsicRendererVulkan/src"
+  "IntrinsicRenderer/src"
   "IntrinsicAssetManagement/src"
 )
 include_directories(${INTR_INCLUDES})
@@ -281,7 +281,7 @@ if (NOT COMPILE_ONLY)
     target_link_libraries(IntrinsicCore wsock32 ws2_32)
     target_link_libraries(IntrinsicCore Dbghelp)
   endif()
-  target_link_libraries(IntrinsicCore IntrinsicRendererVulkan)
+  target_link_libraries(IntrinsicCore IntrinsicRenderer)
   target_link_libraries(IntrinsicCore ${INTR_EXTERNAL_LIBS})
 
   # Intrinsic standalone

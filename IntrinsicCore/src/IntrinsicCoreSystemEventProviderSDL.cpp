@@ -188,7 +188,7 @@ void SDL::pumpEvents()
       Input::MouseMoveEvent mouseEvent = {
           glm::vec2(sdlEvent.motion.x, sdlEvent.motion.y),
           glm::vec2(sdlEvent.motion.x, sdlEvent.motion.y) /
-              glm::vec2(RV::RenderSystem::_backbufferDimensions),
+              glm::vec2(R::RenderSystem::_backbufferDimensions),
           glm::vec2(sdlEvent.motion.xrel, sdlEvent.motion.yrel)};
 
       Input::System::processMouseMoveEvent(mouseEvent);
@@ -198,11 +198,10 @@ void SDL::pumpEvents()
       switch (sdlEvent.window.event)
       {
       case SDL_WINDOWEVENT_RESIZED:
-        if (sdlEvent.window.data1 !=
-                RV::RenderSystem::_backbufferDimensions.x ||
-            sdlEvent.window.data2 != RV::RenderSystem::_backbufferDimensions.y)
+        if (sdlEvent.window.data1 != R::RenderSystem::_backbufferDimensions.x ||
+            sdlEvent.window.data2 != R::RenderSystem::_backbufferDimensions.y)
         {
-          RV::RenderSystem::onViewportChanged();
+          R::RenderSystem::onViewportChanged();
         }
         break;
       case SDL_WINDOWEVENT_CLOSE:

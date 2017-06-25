@@ -22,7 +22,7 @@
 #include "PxScene.h"
 #include "extensions/PxJoint.h"
 
-using namespace RVResources;
+using namespace RResources;
 
 namespace Intrinsic
 {
@@ -716,9 +716,9 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
             planeRotation *= sign >= 0.0f ? 1.0f : -1.0f;
 
             // Visualize helper line
-            RV::RenderPass::Debug::renderLineDotted(
-                pointOnHelperPlane, planeIntersectionPoint,
-                glm::vec3(0.5f, 0.5f, 0.5f));
+            R::RenderPass::Debug::renderLineDotted(pointOnHelperPlane,
+                                                   planeIntersectionPoint,
+                                                   glm::vec3(0.5f, 0.5f, 0.5f));
           }
         }
 
@@ -1218,9 +1218,8 @@ void Editing::update(float p_DeltaT)
     if (Input::System::getKeyStates()[Input::Key::kMouseLeft] ==
         Input::KeyState::kPressed)
     {
-      Components::NodeRef pickedNode =
-          RV::RenderPass::PerPixelPicking::pickNode(
-              Input::System::getLastMousePosViewport());
+      Components::NodeRef pickedNode = R::RenderPass::PerPixelPicking::pickNode(
+          Input::System::getLastMousePosViewport());
 
       if (pickedNode.isValid())
       {

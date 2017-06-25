@@ -24,7 +24,7 @@
 #include "geometry/PxTriangleMesh.h"
 #include "geometry/PxConvexMesh.h"
 
-using namespace RVResources;
+using namespace RResources;
 
 namespace Intrinsic
 {
@@ -177,7 +177,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
         BufferManager::addResourceFlags(
             posVertexBuffer, Dod::Resources::ResourceFlags::kResourceVolatile);
         BufferManager::_descBufferType(posVertexBuffer) =
-            RV::BufferType::kVertex;
+            R::BufferType::kVertex;
         BufferManager::_descSizeInBytes(posVertexBuffer) =
             (uint32_t)positions[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
@@ -210,7 +210,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
         BufferManager::addResourceFlags(
             uv0VertexBuffer, Dod::Resources::ResourceFlags::kResourceVolatile);
         BufferManager::_descBufferType(uv0VertexBuffer) =
-            RV::BufferType::kVertex;
+            R::BufferType::kVertex;
         BufferManager::_descSizeInBytes(uv0VertexBuffer) =
             (uint32_t)uv0s[subMeshIdx].size() * sizeof(uint16_t) * 2u;
 
@@ -241,7 +241,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             normalVertexBuffer,
             Dod::Resources::ResourceFlags::kResourceVolatile);
         BufferManager::_descBufferType(normalVertexBuffer) =
-            RV::BufferType::kVertex;
+            R::BufferType::kVertex;
         BufferManager::_descSizeInBytes(normalVertexBuffer) =
             (uint32_t)normals[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
@@ -276,7 +276,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             tangentVertexBuffer,
             Dod::Resources::ResourceFlags::kResourceVolatile);
         BufferManager::_descBufferType(tangentVertexBuffer) =
-            RV::BufferType::kVertex;
+            R::BufferType::kVertex;
         BufferManager::_descSizeInBytes(tangentVertexBuffer) =
             (uint32_t)tangents[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
@@ -311,7 +311,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             binormalVertexBuffer,
             Dod::Resources::ResourceFlags::kResourceVolatile);
         BufferManager::_descBufferType(binormalVertexBuffer) =
-            RV::BufferType::kVertex;
+            R::BufferType::kVertex;
         BufferManager::_descSizeInBytes(binormalVertexBuffer) =
             (uint32_t)binormals[subMeshIdx].size() * sizeof(uint16_t) * 4u;
 
@@ -346,7 +346,7 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             vtxColorVertexBuffer,
             Dod::Resources::ResourceFlags::kResourceVolatile);
         BufferManager::_descBufferType(vtxColorVertexBuffer) =
-            RV::BufferType::kVertex;
+            R::BufferType::kVertex;
 
         BufferManager::_descSizeInBytes(vtxColorVertexBuffer) =
             (uint32_t)vtxColors[subMeshIdx].size() * sizeof(uint32_t);
@@ -387,15 +387,13 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
             tempIndexBuffer[i] = (uint16_t)indices[subMeshIdx][i];
           }
 
-          BufferManager::_descBufferType(indexBuffer) =
-              RV::BufferType::kIndex16;
+          BufferManager::_descBufferType(indexBuffer) = R::BufferType::kIndex16;
           BufferManager::_descSizeInBytes(indexBuffer) = indexBufferSizeInBytes;
           BufferManager::_descInitialData(indexBuffer) = tempIndexBuffer;
         }
         else
         {
-          BufferManager::_descBufferType(indexBuffer) =
-              RV::BufferType::kIndex32;
+          BufferManager::_descBufferType(indexBuffer) = R::BufferType::kIndex32;
           BufferManager::_descSizeInBytes(indexBuffer) =
               (uint32_t)indices[subMeshIdx].size() * sizeof(uint32_t);
           BufferManager::_descInitialData(indexBuffer) =

@@ -14,7 +14,7 @@
 
 // Precompiled header file
 #include "stdafx_assets.h"
-#include "stdafx_vulkan.h"
+#include "stdafx_renderer.h"
 
 // PhysX includes
 #include "PxPhysics.h"
@@ -25,7 +25,7 @@
 #include "geometry/PxTriangleMesh.h"
 #include "geometry/PxConvexMesh.h"
 
-using namespace RVResources;
+using namespace RResources;
 using namespace CResources;
 
 namespace Intrinsic

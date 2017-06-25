@@ -11,7 +11,7 @@
 // Ui
 #include "ui_IntrinsicEd.h"
 
-using namespace RVResources;
+using namespace RResources;
 
 IntrinsicEdNodeView* IntrinsicEd::_nodeView = nullptr;
 IntrinsicEdPropertyView* IntrinsicEd::_propertyView = nullptr;
@@ -492,7 +492,7 @@ void IntrinsicEd::onReloadWorld()
 void IntrinsicEd::onReloadSettingsAndRendererConfig()
 {
   Settings::Manager::loadSettings();
-  RV::RenderSystem::onViewportChanged();
+  R::RenderSystem::onViewportChanged();
 }
 
 void IntrinsicEd::onSaveWorld() { World::save(World::_filePath); }
@@ -846,35 +846,35 @@ void IntrinsicEd::onDebugGeometryChanged()
 
   if (_ui.actionShow_World_Bounding_Spheres->isChecked())
   {
-    RV::RenderPass::Debug::_activeDebugStageFlags |=
-        RV::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
+    R::RenderPass::Debug::_activeDebugStageFlags |=
+        R::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
   }
   else
   {
-    RV::RenderPass::Debug::_activeDebugStageFlags &=
-        ~RV::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
+    R::RenderPass::Debug::_activeDebugStageFlags &=
+        ~R::RenderPass::DebugStageFlags::kWorldBoundingSpheres;
   }
 
   if (_ui.actionShow_Benchmark_Paths->isChecked())
   {
-    RV::RenderPass::Debug::_activeDebugStageFlags |=
-        RV::RenderPass::DebugStageFlags::kBenchmarkPaths;
+    R::RenderPass::Debug::_activeDebugStageFlags |=
+        R::RenderPass::DebugStageFlags::kBenchmarkPaths;
   }
   else
   {
-    RV::RenderPass::Debug::_activeDebugStageFlags &=
-        ~RV::RenderPass::DebugStageFlags::kBenchmarkPaths;
+    R::RenderPass::Debug::_activeDebugStageFlags &=
+        ~R::RenderPass::DebugStageFlags::kBenchmarkPaths;
   }
 
   if (_ui.actionWireframe_Rendering->isChecked())
   {
-    RV::RenderPass::Debug::_activeDebugStageFlags |=
-        RV::RenderPass::DebugStageFlags::kWireframeRendering;
+    R::RenderPass::Debug::_activeDebugStageFlags |=
+        R::RenderPass::DebugStageFlags::kWireframeRendering;
   }
   else
   {
-    RV::RenderPass::Debug::_activeDebugStageFlags &=
-        ~RV::RenderPass::DebugStageFlags::kWireframeRendering;
+    R::RenderPass::Debug::_activeDebugStageFlags &=
+        ~R::RenderPass::DebugStageFlags::kWireframeRendering;
   }
 }
 
@@ -929,7 +929,7 @@ int IntrinsicEd::enterMainLoop()
     {
       Settings::Manager::loadSettings();
       updateSettingsChangeWatch();
-      RV::RenderSystem::onViewportChanged();
+      R::RenderSystem::onViewportChanged();
       _settingsUpdatePending = false;
     }
   }
@@ -941,7 +941,7 @@ void IntrinsicEd::tickMainLoop() { TaskManager::executeTasks(); }
 
 void IntrinsicEd::onCaptureAllProbes()
 {
-  using namespace RV;
+  using namespace R;
 
   static const uint32_t _probeTimeSamples = 8u;
 

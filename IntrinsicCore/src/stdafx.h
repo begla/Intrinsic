@@ -137,18 +137,15 @@ namespace Intrinsic
 {
 namespace Renderer
 {
-namespace Vulkan
-{
 namespace Resources
 {
 }
 }
 }
-}
 
 // Namespace aliases
-namespace RV = Intrinsic::Renderer::Vulkan;
-namespace RVResources = RV::Resources;
+namespace R = Intrinsic::Renderer;
+namespace RResources = R::Resources;
 
 namespace CResources = Intrinsic::Core::Resources;
 namespace CComponents = Intrinsic::Core::Components;
@@ -208,4 +205,4 @@ namespace CComponents = Intrinsic::Core::Components;
 #include "IntrinsicCorePhysxHelper.h"
 
 // Renderer includes
-#include "stdafx_vulkan.h"
+#include "stdafx_renderer.h"

@@ -18,7 +18,7 @@
 #include "stdafx_assets.h"
 
 using namespace AssetManagement::Resources;
-using namespace RVResources;
+using namespace RResources;
 
 IntrinsicEdManagerWindowAsset::IntrinsicEdManagerWindowAsset(QWidget* parent)
     : IntrinsicEdManagerWindowBase(parent)

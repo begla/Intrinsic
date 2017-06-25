@@ -14,7 +14,7 @@
 
 // Precompiled header file
 #include "stdafx_assets.h"
-#include "stdafx_vulkan.h"
+#include "stdafx_renderer.h"
 
 // FBX
 #define FBXSDK_NAMESPACE_USING 1
@@ -24,7 +24,7 @@
 // Helper
 #include "IntrinsicAssetManagementHelperFbx.h"
 
-using namespace RVResources;
+using namespace RResources;
 using namespace CResources;
 
 namespace Intrinsic

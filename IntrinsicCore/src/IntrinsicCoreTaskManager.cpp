@@ -155,7 +155,7 @@ void TaskManager::executeTasks()
     Application::_scheduler.AddTaskSetToPipe(&_physicsUpdateTaskSet);
 
     // Rendering
-    RV::RenderProcess::Default::renderFrame(modDeltaT);
+    R::RenderProcess::Default::renderFrame(modDeltaT);
 
     Application::_scheduler.WaitforTaskSet(&_physicsUpdateTaskSet);
   }

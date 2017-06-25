@@ -100,7 +100,7 @@ int _main(int argc, char* argv[])
   {
     w.enterMainLoop();
   }
-  RV::RenderSystem::shutdown();
+  R::RenderSystem::shutdown();
 
   return 0;
 }

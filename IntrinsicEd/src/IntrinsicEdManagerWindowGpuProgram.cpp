@@ -16,7 +16,7 @@
 #include "stdafx.h"
 #include "stdafx_editor.h"
 
-using namespace RVResources;
+using namespace RResources;
 
 IntrinsicEdManagerWindowGpuProgram::IntrinsicEdManagerWindowGpuProgram(
     QWidget* parent)
