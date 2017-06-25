@@ -24,11 +24,17 @@ namespace
 double* Intrinsic::Core::Rendering::SkyModel::datasetsRGB[];
 double* Intrinsic::Core::Rendering::SkyModel::datasetsRGBRad[];
   
-static ArHosekSkyModelState
-Intrinsic::Core::Rendering::SkyModel::createSkyModelStateRGB(double p_Turbidity, double p_Albedo,
+namespace Intrinsic
+{
+namespace Core
+{
+namespace Rendering
+{
+SkyModel::ArHosekSkyModelState
+SkyModel::createSkyModelStateRGB(double p_Turbidity, double p_Albedo,
                         double p_Elevation)
 {
-ArHosekSkyModelState state;
+SkyModel::ArHosekSkyModelState state;
 
 state.solarRadius = TERRESTRIAL_SOLAR_RADIUS;
 state.turbidity = p_Turbidity;
@@ -45,4 +51,7 @@ for (uint32_t channel = 0; channel < 3u; ++channel)
 }
 
 return state;
+}
+}
+}
 }
