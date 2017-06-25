@@ -10,7 +10,7 @@ addons:
       - cmake
       - cmake-data
       - ninja-build
-      - clang
+      - clang-4.0
 
 before_install:
 # Clone private dependencies which are not part of the main repository
@@ -40,7 +40,6 @@ script:
 
 # Config via CMake
   - cd scripts_linux
-  - chmod +x Config_Release_CompileOnly Build
   - ./Config_Release
   - ./Build
   - cd ..
