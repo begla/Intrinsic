@@ -235,26 +235,7 @@ struct SkyModel
    */
   static ArHosekSkyModelState
   createSkyModelStateRGB(double p_Turbidity, double p_Albedo,
-                         double p_Elevation)
-  {
-    ArHosekSkyModelState state;
-
-    state.solarRadius = TERRESTRIAL_SOLAR_RADIUS;
-    state.turbidity = p_Turbidity;
-    state.albedo = p_Albedo;
-    state.elevation = p_Elevation;
-
-    for (uint32_t channel = 0; channel < 3u; ++channel)
-    {
-      cookConfiguration(datasetsRGB[channel], state.configs[channel],
-                        p_Turbidity, p_Albedo, p_Elevation);
-
-      state.radiances[channel] = cookRadianceConfiguration(
-          datasetsRGBRad[channel], p_Turbidity, p_Albedo, p_Elevation);
-    }
-
-    return state;
-  }
+                         double p_Elevation);
 
   // <-
 

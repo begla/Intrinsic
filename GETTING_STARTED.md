@@ -68,7 +68,7 @@ sudo apt install git cmake ninja-build libsdl2-dev
 2. Get access to the latest PhysX SDK
 
    ```
-   cd .../PhysX-3.4/PhysXSDK/Source/compiler/linux64
+   cd .../PhysX-3.4/Source/compiler/linux64
    make release profile debug
    ```
 
