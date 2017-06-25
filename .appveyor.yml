@@ -10,7 +10,7 @@ environment:
   INTR_QTDIR: "C:\\Qt\\5.9\\msvc2017_64\\"
   INTR_GIT_TOKEN: 
     secure: 3K1IRVqC1dSplGBGvUMuykBbCMIH8INr3HUE4YNJDmtEYNy0kTJPzeW+pMSCae4y
-  VK_SDK_PATH: "C:\\VulkanSDK\\1.0.49.0\\"
+  VK_SDK_PATH: "C:\\VulkanSDK\\1.0.51.0\\"
   
 artifacts:
   - path: Intrinsic_Win32.7z
@@ -38,7 +38,7 @@ install:
   - cd ..
   
 # Download and install Vulkan SDK
-  - appveyor DownloadFile https://vulkan.lunarg.com/sdk/download/1.0.49.0/windows/VulkanSDK-1.0.49.0-Installer.exe -FileName vulkan.exe
+  - appveyor DownloadFile https://vulkan.lunarg.com/sdk/download/1.0.51.0/windows/VulkanSDK-1.0.51.0-Installer.exe -FileName vulkan.exe
   - vulkan.exe /S
 
 build_script:
