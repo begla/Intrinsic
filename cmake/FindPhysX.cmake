@@ -14,6 +14,7 @@ FIND_PATH(PhysX_INCLUDE_DIR PxPhysicsAPI.h
   PATHS
   ${PHYSX_HOME}
   $ENV{PHYSX_HOME}
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx3.4/
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
   ~/Library/Frameworks
   /Library/Frameworks
@@ -57,7 +58,7 @@ FIND_LIBRARY(PhysX_LIBRARY_RELEASE PhysX3${PHYSXPREFIX}
   ${PhysX_LIBRARY_DIR}/../../Bin/${LIBFOLDER}
   ${PHYSX_HOME}
   $ENV{PHYSX_HOME}
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx3.4/
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
   ~/Library/Frameworks
   /Library/Frameworks
@@ -75,7 +76,7 @@ FIND_LIBRARY(PhysX_LIBRARY_PROFILE PhysX3PROFILE${PHYSXPREFIX}
   ${PhysX_LIBRARY_DIR}/../../Bin/${LIBFOLDER}
   ${PHYSX_HOME}
   $ENV{PHYSX_HOME}
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx3.4/
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
   ~/Library/Frameworks
   /Library/Frameworks
@@ -93,7 +94,7 @@ FIND_LIBRARY(PhysX_LIBRARY_DEBUG PhysX3DEBUG${PHYSXPREFIX}
   ${PhysX_LIBRARY_DIR}/../../Bin/${LIBFOLDER}
   ${PHYSX_HOME}
   $ENV{PHYSX_HOME}
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx3.4/
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
   ~/Library/Frameworks
   /Library/Frameworks
@@ -116,14 +117,14 @@ ENDIF()
 
 SET(NECESSARY_COMPONENTS "")
 FOREACH(component ${PhysX_FIND_COMPONENTS})
-  FIND_LIBRARY(PhysX_LIBRARY_COMPONENT_${component}_DEBUG PhysX3${component}DEBUG${PHYSXPREFIX} PhysX3${component}DEBUG PhysX${component}DEBUG ${component}DEBUG
+  FIND_LIBRARY(PhysX_LIBRARY_COMPONENT_${component}_DEBUG PhysX3${component}DEBUG${PHYSXPREFIX} PhysX3${component}DEBUG PhysX${component}DEBUG ${component}DEBUG ${component}DEBUG${PHYSXPREFIX} 
     PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
     PATHS
     ${PhysX_LIBRARY_DIR}
     ${PhysX_LIBRARY_DIR}/../../Bin/${LIBFOLDER}
     ${PHYSX_HOME}
     $ENV{PHYSX_HOME}
-    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx3.4/
     ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
     ~/Library/Frameworks
     /Library/Frameworks
@@ -141,14 +142,14 @@ FOREACH(component ${PhysX_FIND_COMPONENTS})
     )
   ENDIF()
 
-  FIND_LIBRARY(PhysX_LIBRARY_COMPONENT_${component}_PROFILE PhysX3${component}PROFILE${PHYSXPREFIX} PhysX3${component}PROFILE PhysX${component}PROFILE ${component}PROFILE
+  FIND_LIBRARY(PhysX_LIBRARY_COMPONENT_${component}_PROFILE PhysX3${component}PROFILE${PHYSXPREFIX} PhysX3${component}PROFILE PhysX${component}PROFILE ${component}PROFILE ${component}PROFILE${PHYSXPREFIX} 
     PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
     PATHS
     ${PhysX_LIBRARY_DIR}
     ${PhysX_LIBRARY_DIR}/../../Bin/${LIBFOLDER}
     ${PHYSX_HOME}
     $ENV{PHYSX_HOME}
-    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx3.4/
     ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
     ~/Library/Frameworks
     /Library/Frameworks
@@ -160,13 +161,13 @@ FOREACH(component ${PhysX_FIND_COMPONENTS})
     /opt
   )
 
-  FIND_LIBRARY(PhysX_LIBRARY_COMPONENT_${component}_RELEASE PhysX3${component}${PHYSXPREFIX} PhysX3${component} PhysX${component} ${component}
+  FIND_LIBRARY(PhysX_LIBRARY_COMPONENT_${component}_RELEASE PhysX3${component}${PHYSXPREFIX} PhysX3${component} PhysX${component} ${component} ${component}${PHYSXPREFIX} 
     PATH_SUFFIXES lib lib64 Lib/${LIBFOLDERSUFFIX}
     PATHS
     ${PhysX_LIBRARY_DIR}
     ${PHYSX_HOME}
     $ENV{PHYSX_HOME}
-    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/physx/
+    ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx3.4/
     ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
     ~/Library/Frameworks
     /Library/Frameworks

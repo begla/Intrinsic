@@ -9,12 +9,12 @@ copy %INTR_QTDIR%\\bin\\Qt5Widgetsd.dll app\\Qt5Widgetsd.dll
 mkdir app\\platforms
 copy %INTR_QTDIR%\\plugins\\platforms\\qwindowsd.dll app\\platforms\\qwindowsd.dll
 
-copy ..\\Intrinsic_Dependencies\\dependencies\\physx\\bin\\PhysX3CharacterKinematicDEBUG_x64.dll app\\PhysX3CharacterKinematicDEBUG_x64.dll
-copy ..\\Intrinsic_Dependencies\\dependencies\\physx\\bin\\PhysX3DEBUG_x64.dll app\\PhysX3DEBUG_x64.dll
-copy ..\\Intrinsic_Dependencies\\dependencies\\physx\\bin\\PhysX3CookingDEBUG_x64.dll app\\PhysX3CookingDEBUG_x64.dll
-copy ..\\Intrinsic_Dependencies\\dependencies\\physx\\bin\\PhysX3CommonDEBUG_x64.dll app\\PhysX3CommonDEBUG_x64.dll
+copy ..\\Intrinsic_Dependencies\\dependencies\\physx3.4\\bin\\PxFoundationDEBUG_x64.dll app\\PxFoundationDEBUG_x64.dll
+copy ..\\Intrinsic_Dependencies\\dependencies\\physx3.4\\bin\\PhysX3CharacterKinematicDEBUG_x64.dll app\\PhysX3CharacterKinematicDEBUG_x64.dll
+copy ..\\Intrinsic_Dependencies\\dependencies\\physx3.4\\bin\\PhysX3DEBUG_x64.dll app\\PhysX3DEBUG_x64.dll
+copy ..\\Intrinsic_Dependencies\\dependencies\\physx3.4\\bin\\PhysX3CookingDEBUG_x64.dll app\\PhysX3CookingDEBUG_x64.dll
+copy ..\\Intrinsic_Dependencies\\dependencies\\physx3.4\\bin\\PhysX3CommonDEBUG_x64.dll app\\PhysX3CommonDEBUG_x64.dll
 
 copy ..\\Intrinsic_Dependencies\\dependencies\\fbx\\bin\\debug\\libfbxsdk.dll app\\libfbxsdk.dll
 
 cd scripts_win32
-

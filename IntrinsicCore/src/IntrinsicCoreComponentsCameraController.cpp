@@ -182,7 +182,7 @@ void updateThirdPersonCamera(CameraControllerRef p_Ref, float p_DeltaT)
     const Math::Ray rayForward = {rayStart, glm::normalize(rayEnd - rayStart)};
 
     physx::PxRaycastHit hit;
-    if (PhysxHelper::raycast(rayForward, hit, glm::length(rayEnd - rayStart)))
+    if (PhysicsHelper::raycast(rayForward, hit, glm::length(rayEnd - rayStart)))
     {
       minHitDistance = glm::min(hit.distance, minHitDistance);
     }

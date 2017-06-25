@@ -202,7 +202,7 @@ namespace CComponents = Intrinsic::Core::Components;
 #include "IntrinsicCoreGameStatesManager.h"
 #include "IntrinsicCoreResourcesScript.h"
 #include "IntrinsicCoreComponentsScript.h"
-#include "IntrinsicCorePhysxHelper.h"
+#include "IntrinsicCorePhysicsHelper.h"
 
 // Renderer includes
 #include "stdafx_renderer.h"

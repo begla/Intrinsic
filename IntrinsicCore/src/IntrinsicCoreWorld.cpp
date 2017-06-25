@@ -173,7 +173,7 @@ void World::alignNodeWithGround(Components::NodeRef p_NodeRef)
   }
   ray.o = Components::NodeManager::_worldPosition(p_NodeRef) - ray.d * 5.0f;
 
-  if (PhysxHelper::raycast(ray, hit, 1000.0f))
+  if (PhysicsHelper::raycast(ray, hit, 1000.0f))
   {
     if (!decalRef.isValid())
     {

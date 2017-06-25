@@ -346,7 +346,10 @@ void MeshManager::createResources(const MeshRefArray& p_Meshes)
       RigidBodyRef rigidBodyComp =
           RigidBodyManager::getComponentForEntity(_entity(meshCompRef));
 
-      if (rigidBodyComp.isValid())
+      if (rigidBodyComp.isValid() &&
+          RigidBodyManager::_pxRigidActor(rigidBodyComp) !=
+              nullptr) // TODO: Better to handle checking of available resources
+                       // in a general manner
       {
         RigidBodyManager::destroyResources(rigidBodyComp);
         RigidBodyManager::createResources(rigidBodyComp);

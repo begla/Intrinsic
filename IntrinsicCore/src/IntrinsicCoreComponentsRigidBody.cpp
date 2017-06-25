@@ -114,7 +114,7 @@ physx::PxRigidActor* createSphereDynamicKinematic(RigidBodyRef p_Ref,
   Math::AABB scaledLocalAABB = NodeManager::_localAABB(nodeCompRef);
   Math::scaleAABB(scaledLocalAABB, worldSize);
 
-  const physx::PxTransform transform = PhysxHelper::convert(
+  const physx::PxTransform transform = PhysicsHelper::convert(
       worldPos, NodeManager::_worldOrientation(nodeCompRef));
   const glm::vec3 halfExtent = Math::calcAABBHalfExtent(scaledLocalAABB);
 
@@ -122,8 +122,8 @@ physx::PxRigidActor* createSphereDynamicKinematic(RigidBodyRef p_Ref,
       Physics::System::_pxPhysics->createRigidDynamic(transform);
   _INTR_ASSERT(sphereActor);
 
-  sphereActor->setRigidDynamicFlag(physx::PxRigidDynamicFlag::eKINEMATIC,
-                                   p_Kinematic);
+  sphereActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC,
+                                p_Kinematic);
 
   physx::PxSphereGeometry sphereGeometry;
   sphereGeometry.radius = glm::compMin(halfExtent);
@@ -133,8 +133,8 @@ physx::PxRigidActor* createSphereDynamicKinematic(RigidBodyRef p_Ref,
   _INTR_ASSERT(shape);
 
   physx::PxTransform localTransform = physx::PxTransform(
-      PhysxHelper::convert(Math::calcAABBCenter(scaledLocalAABB)),
-      physx::PxQuat::createIdentity());
+      PhysicsHelper::convert(Math::calcAABBCenter(scaledLocalAABB)),
+      physx::PxQuat(physx::PxIdentity));
   shape->setLocalPose(localTransform);
 
   physx::PxRigidBodyExt::updateMassAndInertia(
@@ -159,7 +159,7 @@ physx::PxRigidActor* createBoxDynamicKinematic(RigidBodyRef p_Ref,
   Math::AABB scaledLocalAABB = NodeManager::_localAABB(nodeCompRef);
   Math::scaleAABB(scaledLocalAABB, worldSize);
 
-  const physx::PxTransform transform = PhysxHelper::convert(
+  const physx::PxTransform transform = PhysicsHelper::convert(
       worldPos, NodeManager::_worldOrientation(nodeCompRef));
   const glm::vec3 halfExtent = Math::calcAABBHalfExtent(scaledLocalAABB);
 
@@ -167,19 +167,18 @@ physx::PxRigidActor* createBoxDynamicKinematic(RigidBodyRef p_Ref,
       Physics::System::_pxPhysics->createRigidDynamic(transform);
   _INTR_ASSERT(boxActor);
 
-  boxActor->setRigidDynamicFlag(physx::PxRigidDynamicFlag::eKINEMATIC,
-                                p_Kinematic);
+  boxActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, p_Kinematic);
 
   physx::PxBoxGeometry boxGeometry;
-  boxGeometry.halfExtents = PhysxHelper::convert(halfExtent);
+  boxGeometry.halfExtents = PhysicsHelper::convert(halfExtent);
 
   physx::PxShape* shape =
       boxActor->createShape(boxGeometry, *RigidBodyManager::_defaultMaterial);
   _INTR_ASSERT(shape);
 
   physx::PxTransform localTransform = physx::PxTransform(
-      PhysxHelper::convert(Math::calcAABBCenter(scaledLocalAABB)),
-      physx::PxQuat::createIdentity());
+      PhysicsHelper::convert(Math::calcAABBCenter(scaledLocalAABB)),
+      physx::PxQuat(physx::PxIdentity));
   shape->setLocalPose(localTransform);
 
   physx::PxRigidBodyExt::updateMassAndInertia(
@@ -213,13 +212,13 @@ physx::PxRigidActor* createTriangleMeshStaticKinematic(RigidBodyRef p_Ref,
   }
 
   const physx::PxTransform transform =
-      PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
-                           NodeManager::_worldOrientation(nodeCompRef));
+      PhysicsHelper::convert(NodeManager::_worldPosition(nodeCompRef),
+                             NodeManager::_worldOrientation(nodeCompRef));
 
   physx::PxTriangleMeshGeometry triangleMeshGeometry;
   triangleMeshGeometry.scale = physx::PxMeshScale(
-      PhysxHelper::convert(NodeManager::_worldSize(nodeCompRef)),
-      physx::PxQuat::createIdentity());
+      PhysicsHelper::convert(NodeManager::_worldSize(nodeCompRef)),
+      physx::PxQuat(physx::PxIdentity));
   triangleMeshGeometry.triangleMesh =
       Resources::MeshManager::_pxTriangleMesh(meshRef);
 
@@ -232,8 +231,8 @@ physx::PxRigidActor* createTriangleMeshStaticKinematic(RigidBodyRef p_Ref,
     _INTR_ASSERT(kinematicTriMeshActor);
     actor = kinematicTriMeshActor;
 
-    kinematicTriMeshActor->setRigidDynamicFlag(
-        physx::PxRigidDynamicFlag::eKINEMATIC, true);
+    kinematicTriMeshActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC,
+                                            true);
 
     physx::PxShape* shape = kinematicTriMeshActor->createShape(
         triangleMeshGeometry, *RigidBodyManager::_defaultMaterial);
@@ -281,13 +280,13 @@ physx::PxRigidActor* createConvexMeshDynamicKinematic(RigidBodyRef p_Ref,
   }
 
   const physx::PxTransform transform =
-      PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
-                           NodeManager::_worldOrientation(nodeCompRef));
+      PhysicsHelper::convert(NodeManager::_worldPosition(nodeCompRef),
+                             NodeManager::_worldOrientation(nodeCompRef));
 
   physx::PxConvexMeshGeometry convexMeshGeometry;
   convexMeshGeometry.scale = physx::PxMeshScale(
-      PhysxHelper::convert(NodeManager::_worldSize(nodeCompRef)),
-      physx::PxQuat::createIdentity());
+      PhysicsHelper::convert(NodeManager::_worldSize(nodeCompRef)),
+      physx::PxQuat(physx::PxIdentity));
   convexMeshGeometry.convexMesh =
       Resources::MeshManager::_pxConvexMesh(meshRef);
 
@@ -299,8 +298,7 @@ physx::PxRigidActor* createConvexMeshDynamicKinematic(RigidBodyRef p_Ref,
   actor = convexMeshActor;
 
   if (p_Kinematic)
-    convexMeshActor->setRigidDynamicFlag(physx::PxRigidDynamicFlag::eKINEMATIC,
-                                         true);
+    convexMeshActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 
   physx::PxShape* shape = convexMeshActor->createShape(
       convexMeshGeometry, *RigidBodyManager::_defaultMaterial);
@@ -335,13 +333,13 @@ physx::PxRigidActor* createConvexMeshStatic(RigidBodyRef p_Ref)
   }
 
   const physx::PxTransform transform =
-      PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
-                           NodeManager::_worldOrientation(nodeCompRef));
+      PhysicsHelper::convert(NodeManager::_worldPosition(nodeCompRef),
+                             NodeManager::_worldOrientation(nodeCompRef));
 
   physx::PxConvexMeshGeometry convexMeshGeometry;
   convexMeshGeometry.scale = physx::PxMeshScale(
-      PhysxHelper::convert(NodeManager::_worldSize(nodeCompRef)),
-      physx::PxQuat::createIdentity());
+      PhysicsHelper::convert(NodeManager::_worldSize(nodeCompRef)),
+      physx::PxQuat(physx::PxIdentity));
   convexMeshGeometry.convexMesh =
       Resources::MeshManager::_pxConvexMesh(meshRef);
 
@@ -372,6 +370,8 @@ void RigidBodyManager::createResources(const RigidBodyRefArray& p_RigidBodies)
   {
     RigidBodyRef rigidBodyRef = p_RigidBodies[rigidBodyIdx];
     const RigidBodyType::Enum rigidBodyType = _descRigidBodyType(rigidBodyRef);
+    _INTR_ASSERT(_pxRigidActor(rigidBodyRef) == nullptr &&
+                 "Rigid Body resources already created");
 
     if (rigidBodyType == RigidBodyType::kBoxDynamic ||
         rigidBodyType == RigidBodyType::kBoxKinematic)
@@ -436,15 +436,15 @@ void RigidBodyManager::updateNodesFromActors(
         RigidBodyManager::_entity(rigidBodyRef));
     physx::PxRigidActor* actor = RigidBodyManager::_pxRigidActor(rigidBodyRef);
 
-    if (actor && actor->isRigidDynamic() &&
-        !actor->isRigidDynamic()->getRigidBodyFlags().isSet(
+    if (actor && actor->is<physx::PxRigidDynamic>() &&
+        !actor->is<physx::PxRigidDynamic>()->getRigidBodyFlags().isSet(
             physx::PxRigidBodyFlag::eKINEMATIC))
     {
       physx::PxTransform globalPose = actor->getGlobalPose();
 
       glm::vec3 worldPosition;
       glm::quat worldOrientation;
-      PhysxHelper::convert(globalPose, worldPosition, worldOrientation);
+      PhysicsHelper::convert(globalPose, worldPosition, worldOrientation);
 
       NodeManager::updateFromWorldPosition(nodeCompRef, worldPosition);
       NodeManager::updateFromWorldOrientation(nodeCompRef, worldOrientation);
@@ -471,23 +471,23 @@ void RigidBodyManager::updateActorsFromNodes(
 
     if (actor)
     {
-      physx::PxRigidDynamic* rigidDynamic = actor->isRigidDynamic();
-      physx::PxRigidStatic* rigidStatic = actor->isRigidStatic();
+      physx::PxRigidDynamic* rigidDynamic = actor->is<physx::PxRigidDynamic>();
+      physx::PxRigidStatic* rigidStatic = actor->is<physx::PxRigidStatic>();
 
       if (rigidDynamic && rigidDynamic->getRigidBodyFlags().isSet(
                               physx::PxRigidBodyFlag::eKINEMATIC))
       {
         // Update kinematic target
         const physx::PxTransform transform =
-            PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
-                                 NodeManager::_worldOrientation(nodeCompRef));
+            PhysicsHelper::convert(NodeManager::_worldPosition(nodeCompRef),
+                                   NodeManager::_worldOrientation(nodeCompRef));
         rigidDynamic->setKinematicTarget(transform);
       }
       else if (rigidStatic)
       {
         const physx::PxTransform transform =
-            PhysxHelper::convert(NodeManager::_worldPosition(nodeCompRef),
-                                 NodeManager::_worldOrientation(nodeCompRef));
+            PhysicsHelper::convert(NodeManager::_worldPosition(nodeCompRef),
+                                   NodeManager::_worldOrientation(nodeCompRef));
         rigidStatic->setGlobalPose(transform);
       }
     }

@@ -43,7 +43,6 @@ struct System
   static void init();
   static void dispatchSimulation(float p_DeltaT);
   static void syncSimulation();
-  static void updatePvdCamera();
   static void renderLineDebugGeometry();
 
   static void setDebugRenderingFlags(uint32_t p_DebugRenderingFlags);

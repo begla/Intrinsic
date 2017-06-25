@@ -95,12 +95,12 @@ void CharacterControllerManager::updateControllers(
 
     NodeRef nodeRef = NodeManager::getComponentForEntity(_entity(charCtrlRef));
     const glm::vec3 currentControllerPosition =
-        PhysxHelper::convertExt(pxController->getFootPosition());
+        PhysicsHelper::convertExt(pxController->getFootPosition());
     const glm::vec3& currentWorldPos = NodeManager::_worldPosition(nodeRef);
 
     if (currentControllerPosition != currentWorldPos)
     {
-      pxController->setPosition(PhysxHelper::convertExt(currentWorldPos));
+      pxController->setPosition(PhysicsHelper::convertExt(currentWorldPos));
     }
 
     // Apply gravity
@@ -136,10 +136,10 @@ void CharacterControllerManager::updateControllers(
     _currentMoveVector(charCtrlRef) = glm::vec3(0.0f);
 
     const physx::PxVec3 finalMoveVector =
-        PhysxHelper::convert(p_DeltaT * internalMoveVector);
+        PhysicsHelper::convert(p_DeltaT * internalMoveVector);
     physx::PxControllerFilters filters;
 
-    const physx::PxControllerFlags currentFlags =
+    const physx::PxControllerCollisionFlags currentFlags =
         pxController->move(finalMoveVector, 0.001f, p_DeltaT, filters);
 
     // Update collision flags
@@ -170,7 +170,7 @@ void CharacterControllerManager::updateControllers(
     }
 
     const glm::vec3 nodeWorldPosAfterSim =
-        PhysxHelper::convertExt(pxController->getFootPosition());
+        PhysicsHelper::convertExt(pxController->getFootPosition());
 
     // Update node position (and remove parent transform beforehand)
     NodeRef parentNodeRef = NodeManager::_parent(nodeRef);
@@ -230,7 +230,7 @@ void CharacterControllerManager::createResources(
       NodeRef nodeRef =
           NodeManager::getComponentForEntity(_entity(charCtrlRef));
       controllerDesc.position =
-          PhysxHelper::convertExt(NodeManager::_worldPosition(nodeRef));
+          PhysicsHelper::convertExt(NodeManager::_worldPosition(nodeRef));
 
       pxController = _pxControllerManager->createController(controllerDesc);
       _INTR_ASSERT(pxController);

@@ -160,10 +160,6 @@ void TaskManager::executeTasks()
     Application::_scheduler.WaitforTaskSet(&_physicsUpdateTaskSet);
   }
 
-  {
-    Physics::System::updatePvdCamera();
-  }
-
   ++_frameCounter;
 }
 }

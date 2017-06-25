@@ -23,7 +23,7 @@ namespace Intrinsic
 {
 namespace Core
 {
-namespace PhysxHelper
+namespace PhysicsHelper
 {
 _INTR_INLINE glm::vec3 convert(const physx::PxVec3& p_Value)
 {
@@ -89,15 +89,19 @@ _INTR_INLINE void convert(const physx::PxTransform& p_Transform,
 _INTR_INLINE bool
 raycast(const Math::Ray& p_Ray, physx::PxRaycastHit& p_Result,
         float p_Length = 1000.0f,
-        const physx::PxQueryFlags& p_QueryFlags = physx::PxQueryFlag::eSTATIC)
+        const physx::PxQueryFlags& p_QueryFlags = physx::PxQueryFlag::eSTATIC |
+                                                  physx::PxQueryFlag::eANY_HIT)
 {
   const physx::PxHitFlags hitsFlags = physx::PxHitFlag::eDEFAULT;
   physx::PxQueryFilterData filterData = physx::PxQueryFilterData(p_QueryFlags);
 
-  if (Physics::System::_pxScene->raycastSingle(
-          PhysxHelper::convert(p_Ray.o), PhysxHelper::convert(p_Ray.d),
-          p_Length, hitsFlags, p_Result, filterData))
+  physx::PxRaycastBuffer hit;
+  if (Physics::System::_pxScene->raycast(PhysicsHelper::convert(p_Ray.o),
+                                         PhysicsHelper::convert(p_Ray.d),
+                                         p_Length, hit, hitsFlags, filterData))
   {
+    _INTR_ASSERT(hit.hasBlock);
+    p_Result = hit.block;
     return true;
   }
 

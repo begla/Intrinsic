@@ -1157,8 +1157,8 @@ void Editing::update(float p_DeltaT)
             physx::PxTransform(physx::PxIdentity));
         _INTR_ASSERT(_pickingDummyActor);
 
-        _pickingDummyActor->setRigidDynamicFlag(
-            physx::PxRigidDynamicFlag::eKINEMATIC, true);
+        _pickingDummyActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC,
+                                             true);
 
         physx::PxSphereGeometry sphereGeometry;
         sphereGeometry.radius = 0.1f;
@@ -1171,13 +1171,13 @@ void Editing::update(float p_DeltaT)
         Physics::System::_pxScene->addActor(*_pickingDummyActor);
 
         physx::PxRaycastHit hit;
-        if (PhysxHelper::raycast(worldRay, hit, 1000.0f,
-                                 physx::PxQueryFlag::eDYNAMIC))
+        if (PhysicsHelper::raycast(worldRay, hit, 1000.0f,
+                                   physx::PxQueryFlag::eDYNAMIC))
         {
           _pickingInitialDistance = hit.distance;
 
           _pickingDummyActor->setGlobalPose(
-              physx::PxTransform(PhysxHelper::convert(
+              physx::PxTransform(PhysicsHelper::convert(
                   worldRay.o + worldRay.d * _pickingInitialDistance)));
 
           _pickingJoint = physx::PxDistanceJointCreate(
@@ -1193,7 +1193,7 @@ void Editing::update(float p_DeltaT)
       else
       {
         _pickingDummyActor->setKinematicTarget(
-            physx::PxTransform(PhysxHelper::convert(
+            physx::PxTransform(PhysicsHelper::convert(
                 worldRay.o + worldRay.d * _pickingInitialDistance)));
       }
     }

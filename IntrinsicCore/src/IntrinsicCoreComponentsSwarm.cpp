@@ -88,7 +88,7 @@ void SwarmManager::simulateSwarms(const SwarmRefArray& p_Swarms, float p_DeltaT)
 
     physx::PxRaycastHit hit;
     const Math::Ray ray = {currentCenterOfMass, glm::vec3(0.0f, -1.0f, 0.0f)};
-    if (PhysxHelper::raycast(ray, hit, 1000.0f))
+    if (PhysicsHelper::raycast(ray, hit, 1000.0f))
     {
       groundPlaneHeight = (ray.o + hit.distance * ray.d).y + 1.0f;
     }

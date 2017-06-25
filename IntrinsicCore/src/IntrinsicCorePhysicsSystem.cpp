@@ -16,6 +16,8 @@
 #include "stdafx.h"
 
 // PhysX includes
+#include "foundation/PxFoundationVersion.h"
+#include "PxPhysicsVersion.h"
 #include "PxPhysics.h"
 #include "PxScene.h"
 #include "cooking/PxCooking.h"
@@ -26,7 +28,6 @@
 #include "extensions/PxDefaultSimulationFilterShader.h"
 #include "extensions/PxDefaultAllocator.h"
 #include "common/PxTolerancesScale.h"
-#include "extensions/PxVisualDebuggerExt.h"
 #include "common/PxRenderBuffer.h"
 
 namespace Intrinsic
@@ -63,7 +64,7 @@ void System::init()
 
   physx::PxTolerancesScale toleranceScale;
 
-  _pxFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, defaultAllocator,
+  _pxFoundation = PxCreateFoundation(PX_FOUNDATION_VERSION, defaultAllocator,
                                      _physXErrorCallback);
   _INTR_ASSERT(_pxFoundation);
 
@@ -91,50 +92,8 @@ void System::init()
   _pxScene = _pxPhysics->createScene(sceneDesc);
   _INTR_ASSERT(_pxScene);
 
-  // Try to connect to the visual debugger
-  if (_pxPhysics->getPvdConnectionManager())
-  {
-    const char* hostIp = "127.0.0.1";
-    int port = 5425;
-    unsigned int timeout = 100;
-
-    physx::PxVisualDebuggerConnectionFlags connectionFlags =
-        physx::PxVisualDebuggerExt::getAllConnectionFlags();
-
-    physx::PxVisualDebuggerConnection* conn =
-        physx::PxVisualDebuggerExt::createConnection(
-            _pxPhysics->getPvdConnectionManager(), hostIp, port, timeout,
-            connectionFlags);
-  }
-
   // Updates internal PhysX parameters
   setDebugRenderingFlags(_debugRenderingFlags);
-}
-
-// <-
-
-void System::updatePvdCamera()
-{
-  _INTR_PROFILE_CPU("Physics", "Update PVD Camera");
-
-  Components::CameraRef activeCameraRef = World::_activeCamera;
-
-  if (activeCameraRef.isValid() && _pxPhysics->getVisualDebugger())
-  {
-    Components::NodeRef activeCameraNodeRef =
-        Components::NodeManager::getComponentForEntity(
-            Components::CameraManager::_entity(activeCameraRef));
-
-    physx::PxVec3 up =
-        PhysxHelper::convert(Components::CameraManager::_up(activeCameraRef));
-    physx::PxVec3 forward = PhysxHelper::convert(
-        Components::CameraManager::_forward(activeCameraRef));
-    physx::PxVec3 orig = PhysxHelper::convert(
-        Components::NodeManager::_worldPosition(activeCameraNodeRef));
-
-    _pxPhysics->getVisualDebugger()->updateCamera("MainCamera", orig, up,
-                                                  orig + forward);
-  }
 }
 
 // <-
@@ -151,8 +110,8 @@ void System::renderLineDebugGeometry()
     for (uint32_t i = 0; i < rb.getNbLines(); i++)
     {
       const physx::PxDebugLine& line = rb.getLines()[i];
-      R::RenderPass::Debug::renderLine(PhysxHelper::convert(line.pos0),
-                                       PhysxHelper::convert(line.pos1),
+      R::RenderPass::Debug::renderLine(PhysicsHelper::convert(line.pos0),
+                                       PhysicsHelper::convert(line.pos1),
                                        line.color0, line.color1);
     }
   }

@@ -133,8 +133,8 @@ _INTR_INLINE void IntrinsicEdViewport::positionNodeOnGround(Dod::Ref p_NodeRef)
 
   // Spawn the object close to the ground
   physx::PxRaycastHit hit;
-  if (PhysxHelper::raycast(worldRay, hit, 50000.0f,
-                           physx::PxQueryFlag::eSTATIC))
+  if (PhysicsHelper::raycast(worldRay, hit, 50000.0f,
+                             physx::PxQueryFlag::eSTATIC))
   {
     NodeManager::_position(p_NodeRef) = worldRay.o + worldRay.d * hit.distance;
   }
