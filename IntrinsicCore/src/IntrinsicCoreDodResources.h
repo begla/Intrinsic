@@ -347,7 +347,7 @@ protected:
 
     if (fp == nullptr)
     {
-      _INTR_LOG_WARNING("Failed to save resources to file '%s'...", fileName);
+      _INTR_LOG_WARNING("Failed to save resources to file '%s'...", fileName.c_str());
       return;
     }
 

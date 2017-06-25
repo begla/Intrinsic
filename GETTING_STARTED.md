@@ -52,7 +52,7 @@ InstrinsicEd is currently only supported on Windows. Full Linux support is not f
 ### Prerequisites
 
 ```
-sudo apt install git cmake ninja-build libsdl2-dev
+sudo apt install git cmake clang ninja-build libsdl2-dev
 ```
 
 ### Setup Instructions

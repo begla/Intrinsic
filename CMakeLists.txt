@@ -84,20 +84,13 @@ if (WIN32)
   find_package(BugSplat REQUIRED)
 endif()
 
-file(GLOB INTR_RENDERER_SOURCE_FILES IntrinsicRenderer/src/IntrinsicRenderer*.cpp)
-file(GLOB INTR_RENDERER_HEADER_FILES IntrinsicRenderer/src/IntrinsicRenderer*.h)
-
-set(INTR_RENDERER_SOURCE_FILES IntrinsicRenderer/src/stdafx.cpp IntrinsicRenderer/src/stdafx_renderer.h ${INTR_RENDERER_SOURCE_FILES})
-
-set(INTR_RENDERER_DEP_SOURCE_FILES 
+set(INTR_CORE_DEP_SOURCE_FILES 
   dependencies/spirvcross/spirv_glsl.cpp
   dependencies/spirvcross/spirv_cross.cpp
 )
 
-file(GLOB INTR_CORE_SOURCE_FILES IntrinsicCore/src/IntrinsicCore*.cpp)
-file(GLOB INTR_CORE_HEADER_FILES IntrinsicCore/src/IntrinsicCore*.h)
-
-set(INTR_CORE_SOURCE_FILES IntrinsicCore/src/stdafx.cpp IntrinsicCore/src/stdafx.h ${INTR_CORE_SOURCE_FILES})
+file(GLOB INTR_CORE_SOURCE_FILES IntrinsicCore/src/IntrinsicCore*.cpp IntrinsicCore/src/IntrinsicRenderer*.cpp )
+file(GLOB INTR_CORE_HEADER_FILES IntrinsicCore/src/IntrinsicCore*.h IntrinsicCore/src/IntrinsicRenderer*.h )
 
 set(INTR_CORE_C_SOURCE_FILES
   IntrinsicCore/src/tlsf.c
@@ -111,12 +104,14 @@ set(INTR_SOURCE_FILES Intrinsic/src/main.cpp ${INTR_SOURCE_FILES})
 file(GLOB INTR_ED_SOURCE_FILES IntrinsicEd/src/IntrinsicEd*.cpp)
 file(GLOB INTR_ED_HEADER_FILES IntrinsicEd/src/IntrinsicEd*.h)
 
-set(INTR_ED_SOURCE_FILES IntrinsicEd/src/stdafx.cpp IntrinsicEd/src/main.cpp IntrinsicEd/src/stdafx_editor.h ${INTR_ED_SOURCE_FILES})
+set(INTR_ED_SOURCE_FILES IntrinsicEd/src/main.cpp ${INTR_ED_SOURCE_FILES})
 
 file(GLOB INTASSET_SOURCE_FILES IntrinsicAssetManagement/src/IntrinsicAssetManagement*.cpp)
 file(GLOB INTASSET_HEADER_FILES IntrinsicAssetManagement/src/IntrinsicAssetManagement*.h)
 
-set(INTASSET_SOURCE_FILES IntrinsicAssetManagement/src/stdafx.cpp IntrinsicAssetManagement/src/stdafx_assets.h ${INTASSET_SOURCE_FILES})
+set(INTR_CORE_SOURCE_FILES IntrinsicCore/src/stdafx.cpp ${INTR_CORE_SOURCE_FILES})
+set(INTR_ED_SOURCE_FILES IntrinsicEd/src/stdafx.cpp ${INTR_ED_SOURCE_FILES})
+set(INTASSET_SOURCE_FILES IntrinsicAssetManagement/src/stdafx.cpp ${INTASSET_SOURCE_FILES})
 
 set(INTDEP_SOURCE_FILES
   "dependencies/enkits/TaskScheduler.cpp")
@@ -164,14 +159,11 @@ set_target_properties(Intrinsic PROPERTIES
 endif()
 
 # Libs
-add_library(IntrinsicCore ${INTR_CORE_SOURCE_FILES} ${INTR_CORE_C_SOURCE_FILES} ${INTDEP_SOURCE_FILES} ${INTR_CORE_HEADER_FILES})
-add_library(IntrinsicRenderer ${INTR_RENDERER_SOURCE_FILES} ${INTR_RENDERER_HEADER_FILES} ${INTR_RENDERER_DEP_SOURCE_FILES})
+add_library(IntrinsicCore ${INTR_CORE_SOURCE_FILES} ${INTR_CORE_C_SOURCE_FILES} ${INTDEP_SOURCE_FILES} ${INTR_CORE_HEADER_FILES} ${INTR_CORE_DEP_SOURCE_FILES})
 if (BUILD_INTRINSICED)
   add_library(IntrinsicAssetManagement ${INTASSET_SOURCE_FILES} ${INTASSET_HEADER_FILES})
 endif()
 
-set_target_properties(IntrinsicRenderer PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
-set_target_properties(IntrinsicRenderer PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 set_target_properties(IntrinsicCore PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
 set_target_properties(IntrinsicCore PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 if (BUILD_INTRINSICED)
@@ -217,7 +209,6 @@ include_directories(${INTR_DEPENDENCIES})
 set(INTR_INCLUDES
   "IntrinsicEd/src"
   "IntrinsicCore/src"
-  "IntrinsicRenderer/src"
   "IntrinsicAssetManagement/src"
 )
 include_directories(${INTR_INCLUDES})
@@ -274,14 +265,12 @@ if (NOT COMPILE_ONLY)
 
   # Intrinsic standalone
   if (BUILD_STANDALONE)
-    target_link_libraries(Intrinsic IntrinsicRenderer)
     target_link_libraries(Intrinsic IntrinsicCore)
   endif()
-
+  
   # IntrinsicEd
   if (BUILD_INTRINSICED)
     target_link_libraries(IntrinsicEd IntrinsicCore)
-    target_link_libraries(IntrinsicEd IntrinsicRenderer)
     target_link_libraries(IntrinsicEd IntrinsicAssetManagement)
     target_link_libraries(IntrinsicEd ${INTR_ED_EXTERNAL_LIBS})
   endif()
@@ -292,11 +281,8 @@ if (BUILD_INTRINSICED)
   set_target_properties(IntrinsicAssetManagement PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT ${COTIRE_CXX_PREFIX_HEADER_INIT} "IntrinsicAssetManagement/src/stdafx_assets.h")
 endif()
   set_target_properties(IntrinsicCore PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "IntrinsicCore/src/stdafx.h")
-  set_target_properties(IntrinsicRenderer PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "IntrinsicRenderer/src/stdafx_renderer.h")
 
-cotire(Intrinsic)
 cotire(IntrinsicCore)
-cotire(IntrinsicRenderer)
 if (BUILD_INTRINSICED)
 cotire(IntrinsicAssetManagement)
 cotire(IntrinsicEd)

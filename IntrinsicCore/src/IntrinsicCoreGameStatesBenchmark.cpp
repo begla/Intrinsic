@@ -213,7 +213,7 @@ void Benchmark::update(float p_DeltaT)
       _INTR_LOG_INFO("Score: %u", data.calcScore());
     }
 
-    _INTR_LOG_INFO("Benchmarking path '%s'...", _paths[_pathIdx].name);
+    _INTR_LOG_INFO("Benchmarking path '%s'...", _paths[_pathIdx].name.c_str());
     _pathPos = 0.0f;
   }
 }

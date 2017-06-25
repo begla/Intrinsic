@@ -14,7 +14,6 @@
 
 // Precompiled header file
 #include "stdafx_assets.h"
-#include "stdafx_renderer.h"
 
 // PhysX includes
 #include "PxPhysics.h"
