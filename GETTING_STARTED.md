@@ -73,7 +73,7 @@ sudo apt install git cmake clang ninja-build libsdl2-dev
    ```
 
 3. Create a new directory called `Intrinsic_Dependencies` on the _same level_ as the Intrinsic repository folder
-4. Inside, create a new folder `dependencies` containing two folders `physx3.4` and `fbx` 
+4. Inside, create a new folder `dependencies` containing another folder `physx3.4`
 9. Copy the static/dynamic libraries and header files of both SDKs to folders named ``lib` (static and dynamic libraries) and `include` respectively
 
     **NOTE:** Since PhysX 3.4 there is a new set of libraries gathered under the name `PxShared`. Make sure to copy the header files and static/dynamic libraries to the folders too!
