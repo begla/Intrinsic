@@ -2,7 +2,7 @@
 
 ## Windows
 
-<div style="text-align:center"><img src="media/windows.png" height="239" alt="Windows"/></div>
+<p align="center"><img src="media/windows.png" height="239" alt="Windows"/></p>
 
 ### Prerequisites
 
@@ -47,7 +47,7 @@
 
 ## Linux (tested with Kubuntu 17.04 - x64)
 
-<div style="text-align:center"><img src="media/ubuntu.png" height="239" alt="Ubuntu"/></div>
+<p align="center"><img src="media/ubuntu.png" height="239" alt="Ubuntu"/></p>
 
 ### Restrictions
 
