@@ -2,6 +2,8 @@
 
 ## Windows
 
+![Windows](media/windows.png)
+
 ### Prerequisites
 
 * Visual Studio 2017
@@ -44,6 +46,8 @@
 16. You're all set - yey!
 
 ## Linux (tested with Kubuntu 17.04 - x64)
+
+![Ubuntu](media/ubuntu.png)
 
 ### Restrictions
 
