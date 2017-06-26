@@ -4,7 +4,7 @@
 
 # Intrinsic
 
-[![Contribute!](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/begla/Intrinsic/issues) [![Join the Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Intrinsic-Engine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) <a href='https://ko-fi.com/A815CV2' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+[![Contribute!](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/begla/Intrinsic/issues) [![Join the Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Intrinsic-Engine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) <a href='https://ko-fi.com/A815CV2' target='_blank'><img height='20' style='border:0px;height:20px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 Intrinsic is a Vulkan based cross-platform game and rendering engine. The project is currently in an early stage of development.
 
@@ -23,7 +23,7 @@ Further details and the (heavily WIP) [API documentation](http://www.intrinsic-e
 
 | Platform | Build Status |
 |:--------:|:------------:|
-| Windows | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/eevcf6gfm77309ud?svg=true)](https://ci.appveyor.com/project/begla/intrinsic) |
+| Windows (Visual Studio 2017) | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/eevcf6gfm77309ud?svg=true)](https://ci.appveyor.com/project/begla/intrinsic) |
 | Linux (GCC 6.0 / Clang 4.0) | [![Linux Build Status](https://travis-ci.org/begla/Intrinsic.svg?branch=master)](https://travis-ci.org/begla/Intrinsic) |
 
 # License

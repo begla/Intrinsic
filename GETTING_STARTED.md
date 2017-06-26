@@ -27,7 +27,7 @@
 
 7. Create a new directory called `Intrinsic_Dependencies` on the _same level_ as the Intrinsic repository folder
 8. Inside, create a new folder `dependencies` containing two folders `physx3.4` and `fbx`
-9. Copy the static/dynamic libraries and header files of both SDKs to folders named `bin` (DLLs), `lib` (LIBs) and `include` respectively
+9. Copy the static/dynamic libraries as well as the header files of both SDKs to folders named `bin` (DLLs), `lib` (LIBs) and `include` respectively
 
     **NOTE:** Since PhysX 3.4 there is a new set of libraries gathered under the name `PxShared`. Make sure to copy the DLLs, header files and static libraries to the folders too!
 
@@ -37,9 +37,9 @@
 13. Execute `ConfigVS15` to create a Visual Studio 2017 solution and all project files
 14. If everything went well, you'll find the solution in the newly created `build` folder
 
-    **NOTE:** You can also use one of the many build scripts: `Build_Release.bat`, ... to get started
+    **NOTE:** You can also use one of the build scripts: `Build_Release.bat`, ... to get started
 
-15. Execute `Intrinsic.exe` or `IntrinsicEd.exe` in the `app` directory
+15. After compiling, execute `Intrinsic.exe` or `IntrinsicEd.exe` in the `app` directory
 
 16. You're all set - yey!
 
