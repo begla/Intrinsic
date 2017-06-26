@@ -5,15 +5,31 @@ dist: trusty
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-trusty-4.0
+        - ubuntu-toolchain-r-test
+        - llvm-toolchain-trusty-4.0
     packages:
-      - cmake
-      - cmake-data
-      - ninja-build
-      - clang-4.0
-      - gcc-6
-      - g++-6
+        - cmake
+        - cmake-data
+        - ninja-build
+        - clang-4.0
+        - gcc-6
+        - g++-6
+env:
+  matrix:
+    # GCC
+    - CC=/usr/bin/gcc-6
+      CXX=/usr/bin/g++-6
+      CMAKE_BUILD_TYPE=Debug
+    - CC=/usr/bin/gcc-6
+      CXX=/usr/bin/g++-6
+      CMAKE_BUILD_TYPE=Release
+    # Clang
+    - CC=/usr/bin/clang-4.0
+      CXX=/usr/bin/clang++-4.0
+      CMAKE_BUILD_TYPE=Debug
+    - CC=/usr/bin/clang-4.0
+      CXX=/usr/bin/clang++-4.0
+      CMAKE_BUILD_TYPE=Release
 
 before_install:
 # Clone private dependencies which are not part of the main repository
@@ -41,8 +57,8 @@ install:
 script:
   - export VK_SDK_PATH=$(pwd)/VulkanSDK/1.0.51.0/x86_64/
 
-# Config via CMake
-  - cd scripts_linux
-  - ./Config_Release
-  - ./Build
-  - cd ..
+# Build
+  - mkdir build
+  - cd build
+  - cmake -G Ninja ..
+  - cmake --build .
