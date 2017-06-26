@@ -2,7 +2,7 @@
 
 ## Windows
 
-![Windows](media/windows.png)
+<img align="center" src="media/windows.png" height="239" alt="Windows"/>
 
 ### Prerequisites
 
@@ -47,7 +47,7 @@
 
 ## Linux (tested with Kubuntu 17.04 - x64)
 
-![Ubuntu](media/ubuntu.png)
+<img align="center" src="media/ubuntu.png" height="239" alt="Ubuntu"/>
 
 ### Restrictions
 
