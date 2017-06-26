@@ -1,13 +1,4 @@
 # Locate the PhysX SDK
-#
-# This module defines
-#  PhysX_FOUND, if false, do not try to link to PhysX
-#  PhysX_LIBRARIES
-#  PhysX_INCLUDE_DIR
-#
-# To control the finding you can specify the following entries;
-#  PhysX_LIBRARY_DIR
-#  PhysX_PROFILE
 
 FIND_PATH(PhysX_INCLUDE_DIR PxPhysicsAPI.h
   PATH_SUFFIXES include Include
@@ -15,15 +6,6 @@ FIND_PATH(PhysX_INCLUDE_DIR PxPhysicsAPI.h
   ${PHYSX_HOME}
   $ENV{PHYSX_HOME}
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx3.4/
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/physx
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw # Fink
-  /opt/local # DarwinPorts
-  /opt/csw # Blastwave
-  /opt
 )
 
 IF (CMAKE_SIZEOF_VOID_P EQUAL 8)

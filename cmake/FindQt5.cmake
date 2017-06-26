@@ -1,29 +1,13 @@
-# Locate Qt5 to allow for using its configs
-# This module defines
-#  Qt5_FOUND, if false, do not try to link to Lua 
-#  Qt5_QMAKE_EXECUTABLE
-#  Qt5_ROOT_DIR, where to find Qt5
-#
-# Specifying either Qt5_ROOT_DIR or Qt5_QMAKE_EXECUTABLE is enough
-# to find the entire Qt5 install.
+# Locate Qt5
 
 IF(NOT Qt5_QMAKE_EXECUTABLE)
   FIND_PROGRAM(Qt5_QMAKE_EXECUTABLE
+    NO_DEFAULT_PATH
     NAMES qmake qmake5 qmake-qt5
     PATH_SUFFIXES bin
     PATHS
       ${INTR_QTDIR}
       $ENV{INTR_QTDIR}
-      ${QT_SEARCH_PATH}
-      $ENV{QTDIR}
-      ~/Library/Frameworks
-      /Library/Frameworks
-      /usr/local
-      /usr
-      /sw
-      /opt/local
-      /opt/csw
-      /opt
     )
 ENDIF()
 

@@ -1,21 +1,15 @@
 # Locate the FBX SDK
-# This module defines
-#  FBX_FOUND, if false, do not try to link to FBX
-#  FBX_LIBRARIES
-#  FBX_INCLUDE_DIR
+
+if(WIN32)
+  SET(FBX_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx)
+else()
+  SET(FBX_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx_linux)
+endif()
 
 FIND_PATH(FBX_INCLUDE_DIR fbxsdk.h
   PATH_SUFFIXES include
   PATHS
-  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw # Fink
-  /opt/local # DarwinPorts
-  /opt/csw # Blastwave
-  /opt
+  ${FBX_LIBRARY_PATH}
 )
 
 FIND_LIBRARY(FBX_LIBRARY_DEBUG 
@@ -23,14 +17,7 @@ FIND_LIBRARY(FBX_LIBRARY_DEBUG
   PATH_SUFFIXES lib64 lib
   PATHS
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx_linux
 )
 
 FIND_LIBRARY(FBX_LIBRARY_RELEASE 
@@ -38,14 +25,7 @@ FIND_LIBRARY(FBX_LIBRARY_RELEASE
   PATH_SUFFIXES lib64 lib
   PATHS
   ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
+  ${CMAKE_SOURCE_DIR}/../Intrinsic_Dependencies/dependencies/fbx_linux
 )
 
 SET(FBX_LIBRARIES

@@ -1,11 +1,4 @@
 # Locate the Vulkan SDK
-# This module defines
-#  Vulkan_FOUND
-#  Vulkan_INCLUDE_DIR
-#  Vulkan_LIBRARY
-#
-# Specifying either Qt5_ROOT_DIR or Qt5_QMAKE_EXECUTABLE is enough
-# to find the entire Qt5 install.
 
 FIND_LIBRARY(Vulkan_LIBRARY
   NAMES vulkan-1 vulkan
@@ -13,28 +6,12 @@ FIND_LIBRARY(Vulkan_LIBRARY
   PATHS
     ${VK_SDK_PATH}
     $ENV{VK_SDK_PATH}
-    ~/Library/Frameworks
-    /Library/Frameworks
-    /usr/local
-    /usr
-    /sw
-    /opt/local
-    /opt/csw
-    /opt
 )
 FIND_PATH(Vulkan_INCLUDE_DIR vulkan/vulkan.h
   PATH_SUFFIXES include Include
   PATHS
     ${VK_SDK_PATH}
     $ENV{VK_SDK_PATH}
-    ~/Library/Frameworks
-    /Library/Frameworks
-    /usr/local
-    /usr
-    /sw
-    /opt/local
-    /opt/csw
-    /opt
 )
 
 SET(Vulkan_LIBRARIES

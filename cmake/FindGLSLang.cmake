@@ -1,22 +1,8 @@
 # Locate the GLSLang library
-#
-# This module defines
-#  GLSLang_FOUND, if false, do not try to link to Lua 
-#  GLSLang_LIBRARIES
-#  GLSLang_ROOT_DIR
-#
 
 FIND_PATH(GLSLang_ROOT_DIR glslang/Include/Common.h
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
 
 FIND_LIBRARY(GLSLang_LIBRARY_DEBUG glslangd glslang
@@ -24,14 +10,6 @@ FIND_LIBRARY(GLSLang_LIBRARY_DEBUG glslangd glslang
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build_debug/install
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
 
 FIND_LIBRARY(GLSLang_LIBRARY_RELEASE glslang
@@ -39,14 +17,6 @@ FIND_LIBRARY(GLSLang_LIBRARY_RELEASE glslang
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/install
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
 
 FIND_LIBRARY(GLSLang_LIBRARY_HLSL_DEBUG HLSLd HLSL
@@ -54,14 +24,6 @@ FIND_LIBRARY(GLSLang_LIBRARY_HLSL_DEBUG HLSLd HLSL
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/hlsl
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build_debug/install
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
 
 FIND_LIBRARY(GLSLang_LIBRARY_HLSL_RELEASE HLSL
@@ -69,14 +31,6 @@ FIND_LIBRARY(GLSLang_LIBRARY_HLSL_RELEASE HLSL
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/hlsl
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/install
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
 
 FIND_LIBRARY(GLSLang_LIBRARY_OGL_DEBUG OGLCompilerd OGLCompiler
@@ -84,14 +38,6 @@ FIND_LIBRARY(GLSLang_LIBRARY_OGL_DEBUG OGLCompilerd OGLCompiler
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/OGLCompilersDLL
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build_debug/install
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
 
 FIND_LIBRARY(GLSLang_LIBRARY_OGL_RELEASE OGLCompiler
@@ -99,14 +45,6 @@ FIND_LIBRARY(GLSLang_LIBRARY_OGL_RELEASE OGLCompiler
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/OGLCompilersDLL
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/install
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
 
 FIND_LIBRARY(GLSLang_LIBRARY_OSDEP_DEBUG OSDependentd OSDependent
@@ -114,14 +52,6 @@ FIND_LIBRARY(GLSLang_LIBRARY_OSDEP_DEBUG OSDependentd OSDependent
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang/OSDependent/Windows
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build_debug/glslang/OSDependent/Unix
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
 
 FIND_LIBRARY(GLSLang_LIBRARY_OSDEP_RELEASE OSDependent
@@ -129,14 +59,6 @@ FIND_LIBRARY(GLSLang_LIBRARY_OSDEP_RELEASE OSDependent
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang/OSDependent/Windows
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang/OSDependent/Unix
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
 
 FIND_LIBRARY(GLSLang_LIBRARY_SPIRV_DEBUG SPIRVd SPIRV
@@ -144,14 +66,6 @@ FIND_LIBRARY(GLSLang_LIBRARY_SPIRV_DEBUG SPIRVd SPIRV
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/SPIRV
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build_debug/install
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
 
 FIND_LIBRARY(GLSLang_LIBRARY_SPIRV_RELEASE SPIRV
@@ -159,14 +73,6 @@ FIND_LIBRARY(GLSLang_LIBRARY_SPIRV_RELEASE SPIRV
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/SPIRV
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/install
-  ~/Library/Frameworks
-  /Library/Frameworks
-  /usr/local
-  /usr
-  /sw
-  /opt/local
-  /opt/csw
-  /opt
 )
 
 SET(GLSLang_LIBRARIES
