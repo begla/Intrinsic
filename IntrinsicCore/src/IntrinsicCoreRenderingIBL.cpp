@@ -36,8 +36,17 @@ struct PreFilterParallelTaskSet : enki::ITaskSet
   void ExecuteRange(enki::TaskSetPartition p_Range,
                     uint32_t p_ThreadNum) override
   {
-    _preFilterGGX(*_input, *_output, _faceIdx, _mipIdx, _rangeX, _rangeY,
-                  _sampleCounts, _minRoughness);
+
+    if (_mipIdx == 0u)
+    {
+      _preFilterGGX(*_input, *_output, _faceIdx, _mipIdx, _rangeX, _rangeY,
+                    _sampleCounts, _minRoughness);
+    }
+    else
+    {
+      _preFilterGGXOpt(*_input, *_output, _faceIdx, _mipIdx, _rangeX, _rangeY,
+                       _sampleCounts, _minRoughness);
+    }
   };
 
   const gli::texture_cube* _input;
@@ -242,8 +251,9 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
     }
 
     {
-      gli::texture_cube texCube =
-          gli::texture_cube(gli::FORMAT_RGBA16_SFLOAT_PACK16, cubeMapRes, 1u);
+      gli::texture_cube texCube = gli::texture_cube(
+          gli::FORMAT_RGBA16_SFLOAT_PACK16, cubeMapRes,
+          (uint32_t)glm::max((int32_t)gli::levels(cubeMapRes) - 3, 1));
 
       for (uint32_t atlasIdx = 0u; atlasIdx < 6; ++atlasIdx)
       {
@@ -301,13 +311,17 @@ void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
 
       if (specProbeRef.isValid())
       {
+        gli::fsamplerCube sourceSampler =
+            gli::fsamplerCube(texCube, gli::WRAP_CLAMP_TO_EDGE);
+        sourceSampler.generate_mipmaps(gli::FILTER_LINEAR);
+
         // Output texture
         gli::texture_cube filteredTexCube =
             gli::texture_cube(gli::FORMAT_RGBA16_SFLOAT_PACK16, cubeMapRes,
                               gli::levels(cubeMapRes));
 
-        const _INTR_ARRAY(uint32_t) sampleCounts = {
-            16u, 512u, 1024u, 1024u, 1024u, 1024u, 1024u, 1024u, 1024u};
+        _INTR_ARRAY(uint32_t)
+        sampleCounts = {16u, 128u, 256u, 256u, 256u, 256u, 256u, 256u, 256u};
         _INTR_ASSERT(sampleCounts.size() == filteredTexCube.levels());
 
         Rendering::IBL::preFilterGGX(texCube, filteredTexCube,

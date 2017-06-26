@@ -230,8 +230,84 @@ _INTR_INLINE glm::vec3 importanceSampleGGX(glm::vec2 p_Xi, float p_Roughness,
 
 // <-
 
+_INTR_INLINE float D_GGX(float p_NdH, float p_Roughness2)
+{
+  const float roughness4 = p_Roughness2 * p_Roughness2;
+  const float denom = p_NdH * p_NdH * (roughness4 - 1.0f) + 1.0f;
+  return roughness4 / (glm::pi<float>() * denom * denom);
+}
+
 void preFilterGGX(const gli::texture_cube& p_Input, gli::texture_cube& p_Output,
                   const uint32_t* p_SampleCounts, float p_MinRoughness = 0.05f);
+
+_INTR_INLINE void _preFilterGGXOpt(const gli::texture_cube& p_Input,
+                                   gli::texture_cube& p_Output,
+                                   uint32_t p_FaceIdx, uint32_t p_MipIdx,
+                                   glm::uvec2 p_RangeX, glm::uvec2 p_RangeY,
+                                   const uint32_t* p_SampleCounts,
+                                   float p_MinRoughness)
+{
+  gli::fsamplerCube sourceSamplerTrilinear = gli::fsamplerCube(
+      p_Input, gli::WRAP_CLAMP_TO_EDGE, gli::FILTER_LINEAR, gli::FILTER_LINEAR);
+  gli::fsamplerCube targetSampler =
+      gli::fsamplerCube(p_Output, gli::WRAP_CLAMP_TO_EDGE);
+
+  glm::uvec2 extent = p_Output.extent(p_MipIdx);
+  const float roughness = p_MinRoughness + float(p_MipIdx) /
+                                               p_Output.max_level() *
+                                               (1.0f - p_MinRoughness);
+  const float roughness2 = roughness * roughness;
+
+  const uint32_t sampleCount = p_SampleCounts[p_MipIdx];
+
+  for (uint32_t y = p_RangeY.x; y < p_RangeY.y; ++y)
+  {
+    for (uint32_t x = p_RangeX.x; x < p_RangeX.y; ++x)
+    {
+      const glm::uvec3 pixelPos = glm::uvec3(x, y, p_FaceIdx);
+      const glm::vec3 R = Rendering::IBL::mapXYSToDirection(pixelPos, extent);
+
+      glm::vec3 preFilteredColor = glm::vec3(0.0f);
+
+      float totalWeight = 0.0f;
+
+      for (uint32_t i = 0; i < sampleCount; ++i)
+      {
+        const glm::vec2 Xi = Math::hammersley(i, sampleCount);
+        const glm::vec3 H = importanceSampleGGX(Xi, roughness, R);
+        const glm::vec3 L = 2.0f * glm::dot(R, H) * H - R;
+        const float NdL = glm::clamp(glm::dot(R, L), 0.0f, 1.0f);
+        const float NdH = glm::clamp(glm::dot(R, H), 0.0f, 1.0f);
+
+        if (NdL > 0.0f)
+        {
+          const glm::vec3 uvs = mapDirectionToUVS(L);
+
+          const float D = D_GGX(NdH, roughness2);
+          const float pdf = D * 0.25f + 0.0001f;
+
+          const float resolution =
+              (float)(p_Input.extent(0u).x * p_Input.extent(0u).y);
+          const float saTexel = 4.0f * glm::pi<float>() / (6.0f * resolution);
+          const float saSample = 1.0f / (float(sampleCount) * pdf + 0.0001f);
+
+          const float mipLevel =
+              glm::clamp(1.0f + 0.5f * log2(saSample / saTexel), 0.0f,
+                         (float)p_Input.max_level());
+
+          preFilteredColor += glm::vec3(sourceSamplerTrilinear.texture_lod(
+                                  uvs, (size_t)uvs.z, mipLevel)) *
+                              NdL;
+          totalWeight += NdL;
+        }
+      }
+
+      targetSampler.texel_write(
+          pixelPos, p_FaceIdx, p_MipIdx,
+          glm::vec4(preFilteredColor / totalWeight, 1.0f));
+    }
+  }
+}
 
 _INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
                                 gli::texture_cube& p_Output, uint32_t p_FaceIdx,
@@ -246,9 +322,10 @@ _INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
       gli::fsamplerCube(p_Output, gli::WRAP_CLAMP_TO_EDGE);
 
   glm::uvec2 extent = p_Output.extent(p_MipIdx);
-  const float roughness =
-      p_MinRoughness +
-      float(p_MipIdx) / p_Output.max_level() * (1.0f - p_MinRoughness);
+  const float roughness = p_MinRoughness + float(p_MipIdx) /
+                                               p_Output.max_level() *
+                                               (1.0f - p_MinRoughness);
+
   const uint32_t sampleCount = p_SampleCounts[p_MipIdx];
 
   for (uint32_t y = p_RangeY.x; y < p_RangeY.y; ++y)
@@ -256,36 +333,33 @@ _INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
     for (uint32_t x = p_RangeX.x; x < p_RangeX.y; ++x)
     {
       const glm::uvec3 pixelPos = glm::uvec3(x, y, p_FaceIdx);
-      const glm::vec2 uv = (glm::vec2(pixelPos) + 0.5f) / glm::vec2(extent);
       const glm::vec3 R = Rendering::IBL::mapXYSToDirection(pixelPos, extent);
 
-      glm::vec3 prefilteredColor = glm::vec3(0.0f);
+      glm::vec3 preFilteredColor = glm::vec3(0.0f);
 
       float totalWeight = 0.0f;
 
-      for (uint32_t i = 0; i < sampleCount; i++)
+      for (uint32_t i = 0; i < sampleCount; ++i)
       {
-        glm::vec2 Xi = Math::hammersley(i, sampleCount);
-        glm::vec3 H = importanceSampleGGX(Xi, roughness, R);
-        glm::vec3 L = 2.0f * glm::dot(R, H) * H - R;
-        float NdL = glm::clamp(glm::dot(R, L), 0.0f, 1.0f);
+        const glm::vec2 Xi = Math::hammersley(i, sampleCount);
+        const glm::vec3 H = importanceSampleGGX(Xi, roughness, R);
+        const glm::vec3 L = 2.0f * glm::dot(R, H) * H - R;
+        const float NdL = glm::clamp(glm::dot(R, L), 0.0f, 1.0f);
 
         if (NdL > 0.0f)
         {
           const glm::vec3 uvs = mapDirectionToUVS(L);
-          const glm::vec2 pixelPosSource =
-              glm::vec2(uvs) * glm::vec2(p_Output.extent(0u)) - 0.5f;
 
-          prefilteredColor += glm::vec3(sourceSampler.texel_fetch(
-                                  pixelPosSource, (uint32_t)uvs.z, 0u)) *
-                              NdL;
+          preFilteredColor +=
+              glm::vec3(sourceSampler.texture_lod(uvs, (size_t)uvs.z, 0u)) *
+              NdL;
           totalWeight += NdL;
         }
       }
 
       targetSampler.texel_write(
           pixelPos, p_FaceIdx, p_MipIdx,
-          glm::vec4(prefilteredColor / totalWeight, 1.0f));
+          glm::vec4(preFilteredColor / totalWeight, 1.0f));
     }
   }
 }

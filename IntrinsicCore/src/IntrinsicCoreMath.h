@@ -753,7 +753,7 @@ _INTR_INLINE float radicalInverse(uint32_t p_Bits)
 
 _INTR_INLINE glm::vec2 hammersley(uint32_t p_I, uint32_t p_N)
 {
-  return glm::vec2(float(p_I) / float(p_N), radicalInverse(p_I));
+  return glm::vec2((float)p_I / p_N, radicalInverse(p_I));
 }
 }
 }
