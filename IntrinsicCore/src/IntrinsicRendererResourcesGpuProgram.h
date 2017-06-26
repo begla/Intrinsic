@@ -76,7 +76,7 @@ struct GpuProgramManager
     _descEntryPoint(p_Ref) = "";
     _descGpuProgramType(p_Ref) = GpuProgramType::kVertex;
     _spirvBuffer(p_Ref).clear();
-    _descPreprocessorDefines(p_Ref) == "";
+    _descPreprocessorDefines(p_Ref) = "";
   }
 
   // <-

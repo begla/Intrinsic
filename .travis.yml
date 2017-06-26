@@ -5,12 +5,15 @@ dist: trusty
 addons:
   apt:
     sources:
+      - ubuntu-toolchain-r-test
       - llvm-toolchain-trusty-4.0
     packages:
       - cmake
       - cmake-data
       - ninja-build
       - clang-4.0
+      - gcc-6
+      - g++-6
 
 before_install:
 # Clone private dependencies which are not part of the main repository

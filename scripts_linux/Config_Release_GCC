@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd ..
+
+mkdir build
+
+cd build
+
+export CC=/usr/bin/gcc-6
+export CXX=/usr/bin/g++-6
+
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..

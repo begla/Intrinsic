@@ -200,10 +200,10 @@ mapBindingTypeToVkDescriptorType(BindingType::Enum p_BindingType)
     return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
   case BindingType::kStorageImage:
     return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+  default:
+    _INTR_ASSERT(false && "Failed to map binding type");
+    return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
   }
-
-  _INTR_ASSERT(false && "Failed to map binding type");
-  return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 }
 
 // <-
@@ -268,10 +268,10 @@ _INTR_INLINE VkFormat mapFormatToVkFormat(Format::Enum p_Format)
 
   case Format::kR8UNorm:
     return VK_FORMAT_R8_UNORM;
+  default:
+    _INTR_ASSERT(false && "Failed to map format");
+    return VK_FORMAT_R32G32B32_SFLOAT;
   }
-
-  _INTR_ASSERT(false && "Failed to map format");
-  return VK_FORMAT_R32G32B32_SFLOAT;
 };
 
 // <-
@@ -286,6 +286,8 @@ _INTR_INLINE bool isFormatDepthStencilFormat(Format::Enum p_Format)
     return true;
   case Format::kD16UnormS8UInt:
     return true;
+  default:
+    return false;
   }
 
   return false;
@@ -305,9 +307,9 @@ _INTR_INLINE bool isFormatDepthFormat(Format::Enum p_Format)
     return true;
   case Format::kD16UNorm:
     return true;
+  default:
+    return false;
   }
-
-  return false;
 }
 
 // <-
