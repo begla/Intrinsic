@@ -23,8 +23,8 @@ Further details and the (heavily WIP) [API documentation](http://www.intrinsic-e
 
 | Platform | Build Status |
 |:--------:|:------------:|
-| Windows  | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/eevcf6gfm77309ud?svg=true)](https://ci.appveyor.com/project/begla/intrinsic) |
-| Linux    |  [![Linux Build Status](https://travis-ci.org/begla/Intrinsic.svg?branch=master)](https://travis-ci.org/begla/Intrinsic) |
+| Windows | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/eevcf6gfm77309ud?svg=true)](https://ci.appveyor.com/project/begla/intrinsic) |
+| Linux (GCC 6.0 / Clang 4.0) | [![Linux Build Status](https://travis-ci.org/begla/Intrinsic.svg?branch=master)](https://travis-ci.org/begla/Intrinsic) |
 
 # License
 

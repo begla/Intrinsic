@@ -17,21 +17,15 @@ addons:
 env:
   matrix:
     # GCC
-    - CC=/usr/bin/gcc-6
-      CXX=/usr/bin/g++-6
-      CMAKE_BUILD_TYPE=Debug
-    - CC=/usr/bin/gcc-6
-      CXX=/usr/bin/g++-6
-      CMAKE_BUILD_TYPE=Release
+    - MATRIX_EVAL="CC=/usr/bin/gcc-6 && CXX=/usr/bin/g++-6 && CMAKE_BUILD_TYPE=Debug"
+    - MATRIX_EVAL="CC=/usr/bin/gcc-6 && CXX=/usr/bin/g++-6 && CMAKE_BUILD_TYPE=Release"
     # Clang
-    - CC=/usr/bin/clang-4.0
-      CXX=/usr/bin/clang++-4.0
-      CMAKE_BUILD_TYPE=Debug
-    - CC=/usr/bin/clang-4.0
-      CXX=/usr/bin/clang++-4.0
-      CMAKE_BUILD_TYPE=Release
+    - MATRIX_EVAL="CC=/usr/bin/clang-4.0 && CXX=/usr/bin/clang++-4.0 && CMAKE_BUILD_TYPE=Debug"
+    - MATRIX_EVAL="CC=/usr/bin/clang-4.0 && CXX=/usr/bin/clang++-4.0 && CMAKE_BUILD_TYPE=Release"
 
 before_install:
+  - eval "${MATRIX_EVAL}"
+
 # Clone private dependencies which are not part of the main repository
   - cd ..
   - git clone https://$INTR_GIT_TOKEN@github.com/begla/Intrinsic_Dependencies.git
