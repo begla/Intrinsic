@@ -59,8 +59,7 @@ void main()
     outColor *= uboPerInstance.colorTintZ.xyz;
   }
 
-  if (inColor.z == inColor.x 
-    && inColor.z == inColor.y)
+  if (inColor.z == inColor.x && inColor.z == inColor.y)
   {
     outColor = vec3(0.1, 0.5, 1.0);
   }

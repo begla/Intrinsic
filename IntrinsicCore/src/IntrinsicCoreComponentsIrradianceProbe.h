@@ -195,7 +195,8 @@ struct IrradianceProbeManager
     return _data.descFalloffExponent[p_Ref._id];
   }
 
-  _INTR_INLINE static _INTR_ARRAY(Rendering::IBL::SH9) & _descSHs(IrradianceProbeRef p_Ref)
+  _INTR_INLINE static _INTR_ARRAY(Rendering::IBL::SH9) &
+      _descSHs(IrradianceProbeRef p_Ref)
   {
     return _data.descSHs[p_Ref._id];
   }

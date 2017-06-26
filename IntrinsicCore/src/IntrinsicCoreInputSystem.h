@@ -47,6 +47,8 @@ enum Enum
   kJump,
   kRun,
 
+  kInvalid,
+
   kCount
 };
 }
@@ -102,6 +104,8 @@ enum Enum
   kControllerButtonB,
   kControllerButtonX,
 
+  kInvalid,
+
   kCount
 };
 }
@@ -117,6 +121,8 @@ enum Enum
 
   kTriggerLeft,
   kTriggerRight,
+
+  kInvalid,
 
   kCount
 };

@@ -19,7 +19,7 @@ namespace
 {
 #include "ArHosekSkyModelData_RGB.h"
 }
-  
+
 namespace Intrinsic
 {
 namespace Core
@@ -27,33 +27,32 @@ namespace Core
 namespace Rendering
 {
 // Static members
-double* SkyModel::datasetsRGB[] = {datasetRGB1, datasetRGB2,
-                                              datasetRGB3};
+double* SkyModel::datasetsRGB[] = {datasetRGB1, datasetRGB2, datasetRGB3};
 
 double* SkyModel::datasetsRGBRad[] = {datasetRGBRad1, datasetRGBRad2,
-                                                 datasetRGBRad3};
-    
+                                      datasetRGBRad3};
+
 SkyModel::ArHosekSkyModelState
 SkyModel::createSkyModelStateRGB(double p_Turbidity, double p_Albedo,
-                        double p_Elevation)
+                                 double p_Elevation)
 {
-SkyModel::ArHosekSkyModelState state;
+  SkyModel::ArHosekSkyModelState state;
 
-state.solarRadius = TERRESTRIAL_SOLAR_RADIUS;
-state.turbidity = p_Turbidity;
-state.albedo = p_Albedo;
-state.elevation = p_Elevation;
+  state.solarRadius = TERRESTRIAL_SOLAR_RADIUS;
+  state.turbidity = p_Turbidity;
+  state.albedo = p_Albedo;
+  state.elevation = p_Elevation;
 
-for (uint32_t channel = 0; channel < 3u; ++channel)
-{
-    cookConfiguration(datasetsRGB[channel], state.configs[channel],
-                    p_Turbidity, p_Albedo, p_Elevation);
+  for (uint32_t channel = 0; channel < 3u; ++channel)
+  {
+    cookConfiguration(datasetsRGB[channel], state.configs[channel], p_Turbidity,
+                      p_Albedo, p_Elevation);
 
     state.radiances[channel] = cookRadianceConfiguration(
         datasetsRGBRad[channel], p_Turbidity, p_Albedo, p_Elevation);
-}
+  }
 
-return state;
+  return state;
 }
 }
 }

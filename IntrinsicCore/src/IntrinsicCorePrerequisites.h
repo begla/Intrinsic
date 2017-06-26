@@ -151,20 +151,22 @@
   {                                                                            \
     const int result =                                                         \
         MessageBox(NULL, _msg, "Error", MB_ICONERROR | MB_ABORTRETRYIGNORE);   \
-    \
-switch(result)                                                                 \
-    \
-{                                                                       \
-      \
-case IDABORT : exit(0);                                                        \
+                                                                               \
+    switch (result)                                                            \
+                                                                               \
+    {                                                                          \
+                                                                               \
+    case IDABORT:                                                              \
+      exit(0);                                                                 \
       break;                                                                   \
-      \
-case IDRETRY : _INTR_DBG_BREAK();                                              \
+                                                                               \
+    case IDRETRY:                                                              \
+      _INTR_DBG_BREAK();                                                       \
       break;                                                                   \
-      \
-case IDCONTINUE : break;                                                       \
-    \
-}                                                                       \
+                                                                               \
+    case IDCONTINUE:                                                           \
+      break;                                                                   \
+    }                                                                          \
   }
 #define _INTR_ERROR_DIALOG_SIMPLE(_msg)                                        \
   {                                                                            \

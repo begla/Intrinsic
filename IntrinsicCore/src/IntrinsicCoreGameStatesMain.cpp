@@ -111,9 +111,9 @@ void Main::update(float p_DeltaT)
     static const float jumpSpeed = 20.0f;
 
     const float actualMovedSpeed =
-        moveSpeed *
-        (1.0f + runMultiplier * Input::System::getVirtualKeyState(
-                                    Input::VirtualKey::kRun, playerId));
+        moveSpeed * (1.0f +
+                     runMultiplier * Input::System::getVirtualKeyState(
+                                         Input::VirtualKey::kRun, playerId));
 
     glm::vec3 moveVector = glm::vec3(0.0f);
     {

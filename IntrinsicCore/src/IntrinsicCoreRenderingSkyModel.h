@@ -233,9 +233,9 @@ struct SkyModel
   /**
    * Creates the sky model state for the given parameters.
    */
-  static ArHosekSkyModelState
-  createSkyModelStateRGB(double p_Turbidity, double p_Albedo,
-                         double p_Elevation);
+  static ArHosekSkyModelState createSkyModelStateRGB(double p_Turbidity,
+                                                     double p_Albedo,
+                                                     double p_Elevation);
 
   // <-
 
@@ -262,9 +262,10 @@ struct SkyModel
                  glm::vec3(1.5));
     const glm::vec3 zenith = glm::sqrt(glm::cos(p_Theta));
 
-    return (glm::vec3(1.0f) + configuration[0] * glm::exp(configuration[1] /
-                                                          (glm::cos(p_Theta) +
-                                                           glm::vec3(0.01f)))) *
+    return (glm::vec3(1.0f) +
+            configuration[0] *
+                glm::exp(configuration[1] /
+                         (glm::cos(p_Theta) + glm::vec3(0.01f)))) *
            (configuration[2] + configuration[3] * expM +
             configuration[5] * rayM + configuration[6] * mieM +
             configuration[7] * zenith);

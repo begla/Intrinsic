@@ -21,9 +21,4 @@ struct MaterialParameters
 };
 
 #define MATERIAL_BUFFER                                                        \
-  buffer MaterialBuffer                                                        \
-  \
-{                                                                         \
-    MaterialParameters materialParameters[];                                   \
-  \
-}
+  buffer MaterialBuffer { MaterialParameters materialParameters[]; }

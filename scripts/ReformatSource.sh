@@ -6,9 +6,9 @@ clang-format -style=file -i \
  ../IntrinsicCore/src/stdafx.h \
  ../IntrinsicCore/src/IntrinsicCore*.h \
  ../IntrinsicCore/src/IntrinsicCore*.cpp \
- ../IntrinsicRenderer/src/stdafx_vulkan.h \
- ../IntrinsicRenderer/src/IntrinsicRenderer*.h \
- ../IntrinsicRenderer/src/IntrinsicRenderer*.cpp \
+ ../IntrinsicCore/src/stdafx_renderer.h \
+ ../IntrinsicCore/src/IntrinsicRenderer*.h \
+ ../IntrinsicCore/src/IntrinsicRenderer*.cpp \
  ../IntrinsicEd/src/stdafx_editor.h \
  ../IntrinsicEd/src/IntrinsicEd*.h \
  ../IntrinsicEd/src/IntrinsicEd*.cpp \

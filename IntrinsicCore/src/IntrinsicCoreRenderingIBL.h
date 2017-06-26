@@ -246,9 +246,9 @@ _INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
       gli::fsamplerCube(p_Output, gli::WRAP_CLAMP_TO_EDGE);
 
   glm::uvec2 extent = p_Output.extent(p_MipIdx);
-  const float roughness = p_MinRoughness + float(p_MipIdx) /
-                                               p_Output.max_level() *
-                                               (1.0f - p_MinRoughness);
+  const float roughness =
+      p_MinRoughness +
+      float(p_MipIdx) / p_Output.max_level() * (1.0f - p_MinRoughness);
   const uint32_t sampleCount = p_SampleCounts[p_MipIdx];
 
   for (uint32_t y = p_RangeY.x; y < p_RangeY.y; ++y)

@@ -41,7 +41,7 @@ void SDL::pumpEvents()
     if (sdlEvent.type == SDL_KEYDOWN || sdlEvent.type == SDL_KEYUP)
     {
       Input::KeyEvent keyEvent;
-      keyEvent.key = (Input::Key::Enum)((uint32_t)-1);
+      keyEvent.key = Input::Key::kInvalid;
       keyEvent.playerId = 0u;
 
       // Keys
@@ -142,7 +142,7 @@ void SDL::pumpEvents()
         break;
       }
 
-      if (keyEvent.key != (uint32_t)-1)
+      if (keyEvent.key != Input::Key::kInvalid)
       {
         if (sdlEvent.type == SDL_KEYDOWN)
         {
@@ -158,7 +158,7 @@ void SDL::pumpEvents()
              sdlEvent.type == SDL_MOUSEBUTTONUP)
     {
       Input::KeyEvent keyEvent;
-      keyEvent.key = (Input::Key::Enum)((uint32_t)-1);
+      keyEvent.key = Input::Key::kInvalid;
       keyEvent.playerId = 0u;
 
       switch (sdlEvent.button.button)
@@ -171,7 +171,7 @@ void SDL::pumpEvents()
         break;
       }
 
-      if (keyEvent.key != (uint32_t)-1)
+      if (keyEvent.key != Input::Key::kInvalid)
       {
         if (sdlEvent.type == SDL_MOUSEBUTTONDOWN)
         {
@@ -230,7 +230,7 @@ void SDL::pumpEvents()
              sdlEvent.type == SDL_CONTROLLERBUTTONDOWN)
     {
       Input::KeyEvent keyEvent;
-      keyEvent.key = (Input::Key::Enum)(uint32_t)-1;
+      keyEvent.key = Input::Key::kInvalid;
       keyEvent.playerId = sdlEvent.cdevice.which;
 
       switch (sdlEvent.cbutton.button)
@@ -249,7 +249,7 @@ void SDL::pumpEvents()
         break;
       }
 
-      if (keyEvent.key != (uint32_t)-1)
+      if (keyEvent.key != Input::Key::kInvalid)
       {
         if (sdlEvent.type == SDL_CONTROLLERBUTTONDOWN)
         {
@@ -264,7 +264,7 @@ void SDL::pumpEvents()
     else if (sdlEvent.type == SDL_CONTROLLERAXISMOTION)
     {
       Input::AxisEvent axisEvent;
-      axisEvent.axis = (Input::Axis::Enum)(uint32_t)-1;
+      axisEvent.axis = Input::Axis::kInvalid;
       axisEvent.value = (float)sdlEvent.caxis.value / INT16_MAX;
       axisEvent.playerId = sdlEvent.cdevice.which;
 
@@ -290,7 +290,7 @@ void SDL::pumpEvents()
         break;
       }
 
-      if (axisEvent.axis != (uint32_t)-1)
+      if (axisEvent.axis != Input::Axis::kInvalid)
       {
         Input::System::processAxisEvent(axisEvent);
       }

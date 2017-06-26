@@ -81,15 +81,18 @@ void main()
 
   const vec4 parameter0Sample = textureLod(parameter0Tex, inUV0, 0.0);
   const MaterialParameters matParams =
-    materialParameters[uint(parameter0Sample.y)];
+      materialParameters[uint(parameter0Sample.y)];
   const vec4 normalSample = textureLod(normalTex, inUV0, 0.0);
 
   // Unlit materials
   if ((matParams.materialFlags & 1) > 0)
   {
     const vec3 N = normalize(decodeNormal(normalSample.rg));
-    const vec3 L = (uboPerFrame.viewMatrix * vec4(normalize(vec3(0.25, 0.5, 0.25)), 0.0)).xyz;
-    const float fakeShading = clamp(dot(L, N), 0.0, 1.0) + clamp(dot(-L, N), 0.0, 1.0) * 0.25;
+    const vec3 L =
+        (uboPerFrame.viewMatrix * vec4(normalize(vec3(0.25, 0.5, 0.25)), 0.0))
+            .xyz;
+    const float fakeShading =
+        clamp(dot(L, N), 0.0, 1.0) + clamp(dot(-L, N), 0.0, 1.0) * 0.25;
 
     outColor.rgba = albedoSample * clamp(fakeShading + 0.1, 0.0, 1.0);
     return;

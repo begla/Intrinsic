@@ -59,19 +59,23 @@ void main()
   vec4 bright = vec4(0.0);
   const ivec2 outPos = 2 * ivec2(gl_GlobalInvocationID.xy);
 
-  vec4 b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 0)));
+  vec4 b = brightClampAndLuminance(
+      textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 0)));
   imageStore(output0Tex, outPos, b);
   bright += b;
 
-  b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 2)));
+  b = brightClampAndLuminance(
+      textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(0, 2)));
   imageStore(output0Tex, outPos + ivec2(0, 1), b);
   bright += b;
-  
-  b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 0)));
+
+  b = brightClampAndLuminance(
+      textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 0)));
   imageStore(output0Tex, outPos + ivec2(1, 0), b);
   bright += b;
-  
-  b = brightClampAndLuminance(textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 2)));
+
+  b = brightClampAndLuminance(
+      textureLodOffset(input0Tex, samplePoint, 0.0, ivec2(2, 2)));
   imageStore(output0Tex, outPos + ivec2(1, 1), b);
   bright += b;
 

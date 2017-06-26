@@ -33,67 +33,65 @@
 
 #define PER_INSTANCE_UBO                                                       \
   layout(binding = 1) uniform PerInstance                                      \
-  \
-{                                                                         \
+                                                                               \
+  {                                                                            \
     vec4 colorTint;                                                            \
     vec4 camParams;                                                            \
     vec4 data0;                                                                \
     vec4 data1;                                                                \
-  \
-}                                                                         \
+  }                                                                            \
   uboPerInstance
 
 #define PER_MATERIAL_UBO                                                       \
   layout(binding = 2) uniform PerMaterial                                      \
-  \
-{                                                                         \
+                                                                               \
+  {                                                                            \
     vec4 uvOffsetScale;                                                        \
     vec4 uvAnimation;                                                          \
     vec4 pbrBias;                                                              \
     vec4 waterParams;                                                          \
     uvec4 data0;                                                               \
     vec4 data1;                                                                \
-  \
-}                                                                         \
+  }                                                                            \
   uboPerMaterial
 
 #define BINDINGS_GBUFFER                                                       \
   layout(binding = 3) uniform sampler2D albedoTex;                             \
-  \
-layout(binding = 4) uniform sampler2D normalTex;                               \
-  \
-layout(binding = 5) uniform sampler2D pbrTex
+                                                                               \
+  layout(binding = 4) uniform sampler2D normalTex;                             \
+                                                                               \
+  layout(binding = 5) uniform sampler2D pbrTex
 
 #define BINDINGS_TERRAIN                                                       \
   layout(binding = 3) uniform sampler2D albedoTex0;                            \
-  \
-layout(binding = 4) uniform sampler2D normalTex0;                              \
-  \
-layout(binding = 5) uniform sampler2D pbrTex0;                                 \
-  \
-layout(binding = 6) uniform sampler2D albedoTex1;                              \
-  \
-layout(binding = 7) uniform sampler2D normalTex1;                              \
-  \
-layout(binding = 8) uniform sampler2D pbrTex1;                                 \
-  \
-layout(binding = 9) uniform sampler2D albedoTex2;                              \
-  \
-layout(binding = 10) uniform sampler2D normalTex2;                             \
-  \
-layout(binding = 11) uniform sampler2D pbrTex2;                                \
-  \
-layout(binding = 12) uniform sampler2D blendMaskTex;                           \
-  \
-layout(binding = 13) uniform sampler2D noiseTex
+                                                                               \
+  layout(binding = 4) uniform sampler2D normalTex0;                            \
+                                                                               \
+  layout(binding = 5) uniform sampler2D pbrTex0;                               \
+                                                                               \
+  layout(binding = 6) uniform sampler2D albedoTex1;                            \
+                                                                               \
+  layout(binding = 7) uniform sampler2D normalTex1;                            \
+                                                                               \
+  layout(binding = 8) uniform sampler2D pbrTex1;                               \
+                                                                               \
+  layout(binding = 9) uniform sampler2D albedoTex2;                            \
+                                                                               \
+  layout(binding = 10) uniform sampler2D normalTex2;                           \
+                                                                               \
+  layout(binding = 11) uniform sampler2D pbrTex2;                              \
+                                                                               \
+  layout(binding = 12) uniform sampler2D blendMaskTex;                         \
+                                                                               \
+  layout(binding = 13) uniform sampler2D noiseTex
 
 #define OUTPUT                                                                 \
-  \
-layout(location = 0) out vec4 outAlbedo;                                       \
-  \
-layout(location = 1) out vec4 outNormal;                                       \
-  \
-layout(location = 2) out vec4 outParameter0;
+                                                                               \
+  layout(location = 0) out vec4 outAlbedo;                                     \
+                                                                               \
+  layout(location = 1) out vec4 outNormal;                                     \
+                                                                               \
+  layout(location = 2) out vec4 outParameter0;
 
 struct GBuffer
 {

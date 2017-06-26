@@ -1283,8 +1283,8 @@ void RenderSystem::initVkSynchronization()
 
 void RenderSystem::resizeSwapChain(bool p_Force)
 {
-  if (_swapChainUpdatePending &&
-          _timePassedSinceLastSwapChainUpdate >= _timeBetweenSwapChainUpdates ||
+  if ((_swapChainUpdatePending &&
+       _timePassedSinceLastSwapChainUpdate >= _timeBetweenSwapChainUpdates) ||
       p_Force)
   {
     vkDeviceWaitIdle(_vkDevice);
