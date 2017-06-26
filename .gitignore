@@ -17,6 +17,7 @@ app/*.so
 app/*.so.2
 !app/BsSndRpt64.exe
 app/platforms
+*.kate*
 
 // Distro directory
 distro/
