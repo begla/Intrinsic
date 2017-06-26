@@ -17,11 +17,15 @@ addons:
 env:
   matrix:
     # GCC
-    - MATRIX_EVAL="CC=/usr/bin/gcc-6 && CXX=/usr/bin/g++-6 && CMAKE_BUILD_TYPE=Debug"
-    - MATRIX_EVAL="CC=/usr/bin/gcc-6 && CXX=/usr/bin/g++-6 && CMAKE_BUILD_TYPE=Release"
+    - MATRIX_EVAL="CC=/usr/bin/gcc-6 && CXX=/usr/bin/g++-6"
+      CMAKE_BUILD_TYPE="Debug"
+    - MATRIX_EVAL="CC=/usr/bin/gcc-6 && CXX=/usr/bin/g++-6"
+      CMAKE_BUILD_TYPE="Release"
     # Clang
-    - MATRIX_EVAL="CC=/usr/bin/clang-4.0 && CXX=/usr/bin/clang++-4.0 && CMAKE_BUILD_TYPE=Debug"
-    - MATRIX_EVAL="CC=/usr/bin/clang-4.0 && CXX=/usr/bin/clang++-4.0 && CMAKE_BUILD_TYPE=Release"
+    - MATRIX_EVAL="CC=/usr/bin/clang-4.0 && CXX=/usr/bin/clang++-4.0"
+      CMAKE_BUILD_TYPE="Debug"
+    - MATRIX_EVAL="CC=/usr/bin/clang-4.0 && CXX=/usr/bin/clang++-4.0"
+      CMAKE_BUILD_TYPE="Release"
 
 before_install:
   - eval "${MATRIX_EVAL}"
@@ -54,5 +58,5 @@ script:
 # Build
   - mkdir build
   - cd build
-  - cmake -G Ninja ..
+  - cmake -G Ninja -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
   - cmake --build .
