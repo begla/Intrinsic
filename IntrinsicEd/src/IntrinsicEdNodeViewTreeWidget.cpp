@@ -725,8 +725,6 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
   Components::NodeRef probeNodeRef;
   Entity::EntityRef currentEntity;
 
-  static const uint32_t _probeTimeSamples = 8u;
-
   QTreeWidgetItem* currIt = currentItem();
   if (currIt)
   {
@@ -737,9 +735,12 @@ void IntrinsicEdNodeViewTreeWidget::onCaptureProbe()
     RenderSystem::_customBackbufferDimensions = cubeMapRes;
     RenderSystem::resizeSwapChain(true);
 
-    for (uint32_t i = 0u; i < _probeTimeSamples; ++i)
-      Rendering::IBL::captureProbes({probeNodeRef}, i == 0,
-                                    i / (float)_probeTimeSamples);
+    for (uint32_t timeSampleIdx = 0u;
+         timeSampleIdx < _INTR_PROBE_TIME_SAMPLE_COUNT; ++timeSampleIdx)
+      Rendering::IBL::captureProbes(
+          {probeNodeRef}, timeSampleIdx == 0,
+          timeSampleIdx == _INTR_PROBE_TIME_SAMPLE_COUNT - 1,
+          timeSampleIdx / (float)_INTR_PROBE_TIME_SAMPLE_COUNT);
 
     RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
     RenderSystem::resizeSwapChain(true);

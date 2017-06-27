@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#define _INTR_PROBE_TIME_SAMPLE_COUNT 8u
+
 #pragma once
 
 namespace Intrinsic
@@ -253,9 +255,9 @@ _INTR_INLINE void _preFilterGGXOpt(const gli::texture_cube& p_Input,
       gli::fsamplerCube(p_Output, gli::WRAP_CLAMP_TO_EDGE);
 
   glm::uvec2 extent = p_Output.extent(p_MipIdx);
-  const float roughness =
-      p_MinRoughness +
-      float(p_MipIdx) / p_Output.max_level() * (1.0f - p_MinRoughness);
+  const float roughness = p_MinRoughness + float(p_MipIdx) /
+                                               p_Output.max_level() *
+                                               (1.0f - p_MinRoughness);
   const float roughness2 = roughness * roughness;
 
   const uint32_t sampleCount = p_SampleCounts[p_MipIdx];
@@ -322,9 +324,9 @@ _INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
       gli::fsamplerCube(p_Output, gli::WRAP_CLAMP_TO_EDGE);
 
   glm::uvec2 extent = p_Output.extent(p_MipIdx);
-  const float roughness =
-      p_MinRoughness +
-      float(p_MipIdx) / p_Output.max_level() * (1.0f - p_MinRoughness);
+  const float roughness = p_MinRoughness + float(p_MipIdx) /
+                                               p_Output.max_level() *
+                                               (1.0f - p_MinRoughness);
 
   const uint32_t sampleCount = p_SampleCounts[p_MipIdx];
 
@@ -428,7 +430,8 @@ _INTR_INLINE SH9 project(const gli::texture_cube& p_CubeMap)
 
 // <-
 
-void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear, float p_Time);
+void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear,
+                   bool p_CreateResources, float p_Time);
 }
 }
 }

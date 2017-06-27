@@ -151,7 +151,8 @@ void preFilterGGX(const gli::texture_cube& p_Input, gli::texture_cube& p_Output,
   _preFilterParallelTaskSets.clear();
 }
 
-void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear, float p_Time)
+void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear,
+                   bool p_CreateResources, float p_Time)
 {
   using namespace R;
 
@@ -229,9 +230,7 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear, float p_Time)
       if (irradProbeRef.isValid())
         Components::IrradianceProbeManager::_descSHs(irradProbeRef).clear();
       if (specProbeRef.isValid())
-        Components::SpecularProbeManager::_descSpecularTextureNames(
-            specProbeRef)
-            .clear();
+        Components::SpecularProbeManager::destroyResources({specProbeRef});
     }
 
     Components::NodeManager::_position(camNodeRef) =
@@ -349,9 +348,6 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear, float p_Time)
         Components::SpecularProbeManager::_descSpecularTextureNames(
             specProbeRef)
             .push_back(fileName);
-
-        Components::SpecularProbeManager::destroyResources({specProbeRef});
-        Components::SpecularProbeManager::createResources({specProbeRef});
       }
 
       if (irradProbeRef.isValid())
@@ -360,6 +356,12 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear, float p_Time)
         Components::IrradianceProbeManager::_descSHs(irradProbeRef)
             .push_back(Rendering::IBL::project(texCube));
       }
+    }
+
+    if (p_CreateResources)
+    {
+      if (specProbeRef.isValid())
+        Components::SpecularProbeManager::createResources({specProbeRef});
     }
   }
 

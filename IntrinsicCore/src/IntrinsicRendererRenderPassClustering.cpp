@@ -529,7 +529,7 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
       {
         const uint32_t leftIdx =
             std::min((uint32_t)(World::_currentTime * shs.size()),
-                     (uint32_t)shs.size() - 2u);
+                     (uint32_t)shs.size() - 1u);
 
         const float leftPerc = leftIdx / (float)shs.size();
         const float rightPerc = (leftIdx + 1u) / (float)shs.size();
@@ -538,7 +538,7 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
             (World::_currentTime - leftPerc) / (rightPerc - leftPerc);
 
         const Rendering::IBL::SH9& left = shs[leftIdx];
-        const Rendering::IBL::SH9& right = shs[leftIdx + 1u];
+        const Rendering::IBL::SH9& right = shs[(leftIdx + 1u) % shs.size()];
 
         blendedSH = Rendering::IBL::blend(left, right, interp);
       }
@@ -609,6 +609,7 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
       taskSet._availableLights.clear();
       taskSet._availableIrradProbes.clear();
       taskSet._availableDecals.clear();
+      taskSet._availableSpecProbes.clear();
 
       const Math::AABB2 depthSliceAABB =
           calcAABBForDepthSlice(z, _lightingPerInstanceData.nearFarWidthHeight,

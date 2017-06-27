@@ -83,8 +83,9 @@ void calcLocalSpecular(in SpecProbe probe, in LightingData d, inout vec3 spec,
         pow(1.0 - max(distToProbe - fadeStart, 0.0) / fadeRange, probe.data0.y);
 
     const uint leftIdx =
-        min(uint(currentTime * probe.data0.z), uint(probe.data0.z) - 2u);
-    const uint rightIdx = leftIdx + 1u;
+        min(uint(currentTime * probe.data0.z), uint(probe.data0.z) - 1u);
+    const uint rightIdx = (leftIdx + 1u) % uint(probe.data0.z);
+
     const float leftPerc = leftIdx / probe.data0.z;
     const float rightPerc = (leftIdx + 1u) / probe.data0.z;
 
