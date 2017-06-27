@@ -503,6 +503,13 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
       Components::NodeRef irradNodeRef =
           Components::NodeManager::getComponentForEntity(
               Components::IrradianceProbeManager::_entity(irradProbeRef));
+      const _INTR_ARRAY(Rendering::IBL::SH9)& shs =
+          Components::IrradianceProbeManager::_descSHs(irradProbeRef);
+
+      if (shs.size() < 2)
+      {
+        continue;
+      }
 
       const glm::vec3 irradProbePosVS =
           Components::CameraManager::_viewMatrix(p_CameraRef) *
@@ -517,34 +524,23 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
           Components::IrradianceProbeManager::_descFalloffExp(irradProbeRef),
           0.0f, 0.0f);
 
-      const _INTR_ARRAY(Rendering::IBL::SH9)& shs =
-          Components::IrradianceProbeManager::_descSHs(irradProbeRef);
-
       // Blend SHs according to the time of day
       Rendering::IBL::SH9 blendedSH;
-      if (!shs.empty())
       {
-        if (shs.size() >= 2u)
-        {
-          const uint32_t leftIdx =
-              std::min((uint32_t)(World::_currentTime * shs.size()),
-                       (uint32_t)shs.size() - 2u);
+        const uint32_t leftIdx =
+            std::min((uint32_t)(World::_currentTime * shs.size()),
+                     (uint32_t)shs.size() - 2u);
 
-          const float leftPerc = leftIdx / (float)shs.size();
-          const float rightPerc = (leftIdx + 1u) / (float)shs.size();
+        const float leftPerc = leftIdx / (float)shs.size();
+        const float rightPerc = (leftIdx + 1u) / (float)shs.size();
 
-          const float interp =
-              (World::_currentTime - leftPerc) / (rightPerc - leftPerc);
+        const float interp =
+            (World::_currentTime - leftPerc) / (rightPerc - leftPerc);
 
-          const Rendering::IBL::SH9& left = shs[leftIdx];
-          const Rendering::IBL::SH9& right = shs[leftIdx + 1u];
+        const Rendering::IBL::SH9& left = shs[leftIdx];
+        const Rendering::IBL::SH9& right = shs[leftIdx + 1u];
 
-          blendedSH = Rendering::IBL::blend(left, right, interp);
-        }
-        else
-        {
-          blendedSH = shs[0];
-        }
+        blendedSH = Rendering::IBL::blend(left, right, interp);
       }
 
       memcpy(_irradProbeBufferMemory[_currentIrradProbeCount].shData,
@@ -557,6 +553,7 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
     {
       Components::SpecularProbeRef specProbeRef =
           Components::SpecularProbeManager::_activeRefs[i];
+
       Components::NodeRef specNodeRef =
           Components::NodeManager::getComponentForEntity(
               Components::SpecularProbeManager::_entity(specProbeRef));
@@ -566,6 +563,11 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
           Components::SpecularProbeManager::_descSpecularTextureNames(
               specProbeRef);
       _INTR_ASSERT(texNames.size() <= 8u);
+
+      if (texNames.size() < 2)
+      {
+        continue;
+      }
 
       const glm::vec3 specProbePosVS =
           Components::CameraManager::_viewMatrix(p_CameraRef) *
@@ -581,8 +583,10 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
       uint32_t texId = 0;
       for (Name texName : texNames)
       {
-        probe.textureIds[texId / 4u][texId % 4u] = ImageManager::getTextureId(
-            ImageManager::getResourceByName(texName));
+        ImageRef imageRef = ImageManager::_getResourceByName(texName);
+
+        probe.textureIds[texId / 4u][texId % 4u] =
+            imageRef.isValid() ? ImageManager::getTextureId(imageRef) : 0u;
         ++texId;
       }
 
@@ -1413,12 +1417,11 @@ void spawnAndSimulateTestLights(Components::CameraRef p_CameraRef)
   for (uint32_t i = 0u; i < _testLights.size(); ++i)
   {
     TestLight& light = _testLights[i];
-    const glm::vec3 worldPos =
-        glm::vec3(light.spawnPos.x,
-                  light.spawnPos.y +
-                      2000.0f * sin(light.spawnPos.x + light.spawnPos.y +
-                                    TaskManager::_totalTimePassed * 0.1f),
-                  light.spawnPos.z);
+    const glm::vec3 worldPos = glm::vec3(
+        light.spawnPos.x,
+        light.spawnPos.y + 2000.0f * sin(light.spawnPos.x + light.spawnPos.y +
+                                         TaskManager::_totalTimePassed * 0.1f),
+        light.spawnPos.z);
 
     light.light.posAndRadiusVS = glm::vec4(
         glm::vec3(Components::CameraManager::_viewMatrix(p_CameraRef) *

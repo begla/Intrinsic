@@ -41,7 +41,7 @@ _INTR_INLINE void updateGlobalDescriptorSetForSingleImage(ImageRef p_ImageRef)
   if (ImageManager::_imageTextureType(p_ImageRef) == ImageTextureType::k2D)
   {
     uint32_t textureId = ImageManager::getTextureId(p_ImageRef);
-    if (textureId == (uint32_t)-1)
+    if (textureId == 0u)
     {
       textureId = _globalTexture2DTextureId++;
       ImageManager::_globalTexture2DIdMapping[p_ImageRef] = textureId;
@@ -64,7 +64,7 @@ _INTR_INLINE void updateGlobalDescriptorSetForSingleImage(ImageRef p_ImageRef)
            ImageTextureType::kCube)
   {
     uint32_t textureId = ImageManager::getTextureId(p_ImageRef);
-    if (textureId == (uint32_t)-1)
+    if (textureId == 0u)
     {
       textureId = _globalTextureCubeTextureId++;
       ImageManager::_globalTextureCubeIdMapping[p_ImageRef] = textureId;
@@ -899,8 +899,8 @@ void ImageManager::updateGlobalDescriptorSets()
 
   _globalTexture2DIdMapping.clear();
   _globalTextureCubeIdMapping.clear();
-  _globalTexture2DTextureId = 0u;
-  _globalTextureCubeTextureId = 0u;
+  _globalTexture2DTextureId = 1u; // Default textures in slot 1
+  _globalTextureCubeTextureId = 1u;
 
   for (uint32_t i = 0u; i < _activeRefs.size(); ++i)
   {

@@ -349,6 +349,9 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear, float p_Time)
         Components::SpecularProbeManager::_descSpecularTextureNames(
             specProbeRef)
             .push_back(fileName);
+
+        Components::SpecularProbeManager::destroyResources({specProbeRef});
+        Components::SpecularProbeManager::createResources({specProbeRef});
       }
 
       if (irradProbeRef.isValid())

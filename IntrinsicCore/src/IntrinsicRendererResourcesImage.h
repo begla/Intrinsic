@@ -338,7 +338,7 @@ struct ImageManager
     {
       auto mapping = _globalTexture2DIdMapping.find(p_ImageRef);
       if (mapping == _globalTexture2DIdMapping.end())
-        return (uint32_t)-1;
+        return 0u; // Default texture
 
       return mapping->second;
     }
@@ -346,7 +346,7 @@ struct ImageManager
     {
       auto mapping = _globalTextureCubeIdMapping.find(p_ImageRef);
       if (mapping == _globalTextureCubeIdMapping.end())
-        return (uint32_t)-1;
+        return 0u; // Default cube
 
       return mapping->second;
     }
