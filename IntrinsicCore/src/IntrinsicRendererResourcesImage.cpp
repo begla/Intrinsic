@@ -25,10 +25,9 @@ namespace Resources
 {
 namespace
 {
-VkDescriptorSetLayout _globalDescriptorSetLayout;
-VkDescriptorPool _globalDescriptorPool;
-VkDescriptorSet _globalDescriptorSet;
-uint32_t _globalTextureId = 0u;
+VkDescriptorPool _globalTextureDescriptorPool;
+uint32_t _globalTexture2DTextureId = 0u;
+uint32_t _globalTextureCubeTextureId = 0u;
 
 _INTR_INLINE void updateGlobalDescriptorSetForSingleImage(ImageRef p_ImageRef)
 {
@@ -39,30 +38,59 @@ _INTR_INLINE void updateGlobalDescriptorSetForSingleImage(ImageRef p_ImageRef)
     imageInfo.sampler = Samplers::samplers[Samplers::kLinearRepeat];
   }
 
-  uint32_t textureId = ImageManager::getTextureId(p_ImageRef);
-  if (textureId == (uint32_t)-1)
+  if (ImageManager::_imageTextureType(p_ImageRef) == ImageTextureType::k2D)
   {
-    textureId = _globalTextureId++;
-    ImageManager::_globalTextureIdMapping[p_ImageRef] = textureId;
-  }
+    uint32_t textureId = ImageManager::getTextureId(p_ImageRef);
+    if (textureId == (uint32_t)-1)
+    {
+      textureId = _globalTexture2DTextureId++;
+      ImageManager::_globalTexture2DIdMapping[p_ImageRef] = textureId;
+    }
 
-  VkWriteDescriptorSet write;
-  {
-    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write.pNext = nullptr;
-    write.dstSet = _globalDescriptorSet;
-    write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    write.descriptorCount = 1u;
-    write.pImageInfo = &imageInfo;
-    write.dstBinding = 0u;
-    write.dstArrayElement = textureId;
+    VkWriteDescriptorSet write;
+    {
+      write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+      write.pNext = nullptr;
+      write.dstSet = ImageManager::_globalTextureDescriptorSet;
+      write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+      write.descriptorCount = 1u;
+      write.pImageInfo = &imageInfo;
+      write.dstBinding = 0u;
+      write.dstArrayElement = textureId;
+    }
+    vkUpdateDescriptorSets(RenderSystem::_vkDevice, 1u, &write, 0u, nullptr);
   }
-  vkUpdateDescriptorSets(RenderSystem::_vkDevice, 1u, &write, 0u, nullptr);
+  else if (ImageManager::_imageTextureType(p_ImageRef) ==
+           ImageTextureType::kCube)
+  {
+    uint32_t textureId = ImageManager::getTextureId(p_ImageRef);
+    if (textureId == (uint32_t)-1)
+    {
+      textureId = _globalTextureCubeTextureId++;
+      ImageManager::_globalTextureCubeIdMapping[p_ImageRef] = textureId;
+    }
+
+    VkWriteDescriptorSet write;
+    {
+      write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+      write.pNext = nullptr;
+      write.dstSet = ImageManager::_globalTextureDescriptorSet;
+      write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+      write.descriptorCount = 1u;
+      write.pImageInfo = &imageInfo;
+      write.dstBinding = 1u;
+      write.dstArrayElement = textureId;
+    }
+    vkUpdateDescriptorSets(RenderSystem::_vkDevice, 1u, &write, 0u, nullptr);
+  }
 }
 }
 
 // Static members
-_INTR_HASH_MAP(Dod::Ref, uint32_t) ImageManager::_globalTextureIdMapping;
+_INTR_HASH_MAP(Dod::Ref, uint32_t) ImageManager::_globalTexture2DIdMapping;
+_INTR_HASH_MAP(Dod::Ref, uint32_t) ImageManager::_globalTextureCubeIdMapping;
+VkDescriptorSet ImageManager::_globalTextureDescriptorSet = nullptr;
+VkDescriptorSetLayout ImageManager::_globalTextureDescriptorSetLayout = nullptr;
 
 void ImageManager::init()
 {
@@ -103,61 +131,64 @@ void ImageManager::init()
 
   // Initializes global descriptor sets
   {
-    VkDescriptorSetLayoutBinding globalImageBinding = {};
-    {
-      globalImageBinding.binding = 0u;
-      globalImageBinding.descriptorType =
-          VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-      globalImageBinding.descriptorCount = MAX_GLOBAL_DESCRIPTORS;
-      globalImageBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-      globalImageBinding.pImmutableSamplers = nullptr;
-    }
+    _INTR_ARRAY(VkDescriptorSetLayoutBinding) bindings;
 
-    VkDescriptorSetLayoutCreateInfo descGlobalLayout = {};
+    VkDescriptorSetLayoutBinding imageBinding = {};
     {
-      descGlobalLayout.sType =
+      imageBinding.binding = 0u;
+      imageBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+      imageBinding.descriptorCount = MAX_GLOBAL_DESCRIPTORS;
+      imageBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+      imageBinding.pImmutableSamplers = nullptr;
+    }
+    bindings.push_back(imageBinding);
+    imageBinding.binding = 1u;
+    bindings.push_back(imageBinding);
+
+    VkDescriptorSetLayoutCreateInfo descGlobalTextureLayout = {};
+    {
+      descGlobalTextureLayout.sType =
           VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-      descGlobalLayout.pNext = nullptr;
-      descGlobalLayout.bindingCount = 1u;
-      descGlobalLayout.pBindings = &globalImageBinding;
-
-      VkResult result = vkCreateDescriptorSetLayout(
-          RenderSystem::_vkDevice, &descGlobalLayout, nullptr,
-          &_globalDescriptorSetLayout);
-      _INTR_VK_CHECK_RESULT(result);
+      descGlobalTextureLayout.pNext = nullptr;
+      descGlobalTextureLayout.bindingCount = (uint32_t)bindings.size();
+      descGlobalTextureLayout.pBindings = bindings.data();
     }
+    VkResult result = vkCreateDescriptorSetLayout(
+        RenderSystem::_vkDevice, &descGlobalTextureLayout, nullptr,
+        &_globalTextureDescriptorSetLayout);
+    _INTR_VK_CHECK_RESULT(result);
 
-    VkDescriptorPoolSize poolSize;
+    VkDescriptorPoolSize globalPoolSize;
     {
-      poolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-      poolSize.descriptorCount = MAX_GLOBAL_DESCRIPTORS;
+      globalPoolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+      globalPoolSize.descriptorCount = MAX_GLOBAL_DESCRIPTORS * 2u;
     }
 
     VkDescriptorPoolCreateInfo descriptorPool = {};
-    descriptorPool.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    descriptorPool.pNext = nullptr;
-    descriptorPool.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-    descriptorPool.maxSets = 1u;
-    descriptorPool.poolSizeCount = 1u;
-    descriptorPool.pPoolSizes = &poolSize;
+    {
+      descriptorPool.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+      descriptorPool.pNext = nullptr;
+      descriptorPool.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+      descriptorPool.maxSets = 1u;
+      descriptorPool.poolSizeCount = 1u;
+      descriptorPool.pPoolSizes = &globalPoolSize;
+    }
 
-    VkResult result =
-        vkCreateDescriptorPool(RenderSystem::_vkDevice, &descriptorPool,
-                               nullptr, &_globalDescriptorPool);
+    result = vkCreateDescriptorPool(RenderSystem::_vkDevice, &descriptorPool,
+                                    nullptr, &_globalTextureDescriptorPool);
     _INTR_VK_CHECK_RESULT(result);
 
     VkDescriptorSetAllocateInfo allocInfo = {};
     {
       allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
       allocInfo.pNext = nullptr;
-      allocInfo.descriptorPool = _globalDescriptorPool;
+      allocInfo.descriptorPool = _globalTextureDescriptorPool;
       allocInfo.descriptorSetCount = 1u;
-      allocInfo.pSetLayouts = &_globalDescriptorSetLayout;
-
-      VkResult result = vkAllocateDescriptorSets(
-          RenderSystem::_vkDevice, &allocInfo, &_globalDescriptorSet);
-      _INTR_VK_CHECK_RESULT(result);
+      allocInfo.pSetLayouts = &_globalTextureDescriptorSetLayout;
     }
+    result = vkAllocateDescriptorSets(RenderSystem::_vkDevice, &allocInfo,
+                                      &_globalTextureDescriptorSet);
+    _INTR_VK_CHECK_RESULT(result);
   }
 }
 
@@ -603,6 +634,8 @@ void createTextureFromFileCubemap(ImageRef p_Ref, gli::texture& p_Texture)
 
   ImageManager::_vkImageView(p_Ref) = vkImageView;
   ImageManager::_imageTextureType(p_Ref) = ImageTextureType::kCube;
+
+  updateGlobalDescriptorSetForSingleImage(p_Ref);
 }
 
 // <-
@@ -782,16 +815,13 @@ void createTextureFromFile2D(ImageRef p_Ref, gli::texture& p_Texture)
 
 void createTextureFromFile(ImageRef p_Ref)
 {
-  _INTR_STRING texturePath =
-      "media/textures/" + ImageManager::_descFileName(p_Ref);
-
-  // Check if the texture exists - if not, use the checkerboard texture as a
-  // fallback instead
+  _INTR_STRING texturePath = ImageManager::getFilePath(p_Ref);
   if (!Util::fileExists(texturePath.c_str()))
   {
     _INTR_LOG_WARNING(
         "Texture '%s' not found, using checkerboard texture instead...",
         texturePath.c_str());
+
     texturePath = "media/textures/checkerboard.dds";
   }
 
@@ -835,42 +865,75 @@ void ImageManager::createResources(const ImageRefArray& p_Images)
   }
 }
 
-void ImageManager::updateGlobalDescriptorSet()
+void ImageManager::updateGlobalDescriptorSets()
 {
   // Write to global descriptor set
-  _INTR_ARRAY(VkDescriptorImageInfo) imageInfos;
-  imageInfos.resize(MAX_GLOBAL_DESCRIPTORS);
+  _INTR_ARRAY(VkDescriptorImageInfo) imageInfoTexture2D;
+  imageInfoTexture2D.resize(MAX_GLOBAL_DESCRIPTORS);
+  _INTR_ARRAY(VkDescriptorImageInfo) imageInfoTextureCube;
+  imageInfoTextureCube.resize(MAX_GLOBAL_DESCRIPTORS);
 
-  VkDescriptorImageInfo defaultImageInfo;
+  VkDescriptorImageInfo defaultImageInfoTexture2D;
   {
-    defaultImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    defaultImageInfo.imageView = ImageManager::_vkImageView(
+    defaultImageInfoTexture2D.imageLayout =
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    defaultImageInfoTexture2D.imageView = ImageManager::_vkImageView(
         ImageManager::getResourceByName(_N(checkerboard)));
-    defaultImageInfo.sampler = Samplers::samplers[Samplers::kLinearRepeat];
+    defaultImageInfoTexture2D.sampler =
+        Samplers::samplers[Samplers::kLinearRepeat];
   }
-  std::fill(imageInfos.begin(), imageInfos.end(), defaultImageInfo);
+  std::fill(imageInfoTexture2D.begin(), imageInfoTexture2D.end(),
+            defaultImageInfoTexture2D);
 
-  _globalTextureIdMapping.clear();
-  _globalTextureId = 0u;
+  VkDescriptorImageInfo defaultImageInfoTextureCube;
+  {
+    defaultImageInfoTextureCube.imageLayout =
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    defaultImageInfoTextureCube.imageView = ImageManager::_vkImageView(
+        ImageManager::getResourceByName(_N(default_ibl_cube_specular)));
+    defaultImageInfoTextureCube.sampler =
+        Samplers::samplers[Samplers::kLinearRepeat];
+  }
+  std::fill(imageInfoTextureCube.begin(), imageInfoTextureCube.end(),
+            defaultImageInfoTextureCube);
+
+  _globalTexture2DIdMapping.clear();
+  _globalTextureCubeIdMapping.clear();
+  _globalTexture2DTextureId = 0u;
+  _globalTextureCubeTextureId = 0u;
+
   for (uint32_t i = 0u; i < _activeRefs.size(); ++i)
   {
     ImageRef imgRef = _activeRefs[i];
 
-    if (_imageTextureType(imgRef) != ImageTextureType::k2D ||
-        _descImageType(imgRef) != ImageType::kTextureFromFile)
+    if (_descImageType(imgRef) != ImageType::kTextureFromFile)
     {
       continue;
     }
 
-    // Update mapping
-    const uint32_t id = _globalTextureId++;
-    _globalTextureIdMapping[imgRef] = id;
-
-    VkDescriptorImageInfo& imageInfo = imageInfos[id];
+    if (_imageTextureType(imgRef) == ImageTextureType::k2D)
     {
-      imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-      imageInfo.imageView = ImageManager::_vkImageView(imgRef);
-      imageInfo.sampler = Samplers::samplers[Samplers::kLinearRepeat];
+      const uint32_t id = _globalTexture2DTextureId++;
+      _globalTexture2DIdMapping[imgRef] = id;
+
+      VkDescriptorImageInfo& imageInfo = imageInfoTexture2D[id];
+      {
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = ImageManager::_vkImageView(imgRef);
+        imageInfo.sampler = Samplers::samplers[Samplers::kLinearRepeat];
+      }
+    }
+    else if (_imageTextureType(imgRef) == ImageTextureType::kCube)
+    {
+      const uint32_t id = _globalTextureCubeTextureId++;
+      _globalTextureCubeIdMapping[imgRef] = id;
+
+      VkDescriptorImageInfo& imageInfo = imageInfoTextureCube[id];
+      {
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = ImageManager::_vkImageView(imgRef);
+        imageInfo.sampler = Samplers::samplers[Samplers::kLinearRepeat];
+      }
     }
   }
 
@@ -878,24 +941,26 @@ void ImageManager::updateGlobalDescriptorSet()
   {
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     write.pNext = nullptr;
-    write.dstSet = _globalDescriptorSet;
+    write.dstSet = _globalTextureDescriptorSet;
     write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    write.descriptorCount = (uint32_t)imageInfos.size();
-    write.pImageInfo = imageInfos.data();
+    write.descriptorCount = (uint32_t)imageInfoTexture2D.size();
+    write.pImageInfo = imageInfoTexture2D.data();
     write.dstBinding = 0u;
     write.dstArrayElement = 0u;
   }
   vkUpdateDescriptorSets(RenderSystem::_vkDevice, 1u, &write, 0u, nullptr);
-}
 
-VkDescriptorSetLayout ImageManager::getGlobalDescriptorSetLayout()
-{
-  return _globalDescriptorSetLayout;
-}
-
-VkDescriptorSet ImageManager::getGlobalDescriptorSet()
-{
-  return _globalDescriptorSet;
+  {
+    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write.pNext = nullptr;
+    write.dstSet = _globalTextureDescriptorSet;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write.descriptorCount = (uint32_t)imageInfoTextureCube.size();
+    write.pImageInfo = imageInfoTextureCube.data();
+    write.dstBinding = 1u;
+    write.dstArrayElement = 0u;
+  }
+  vkUpdateDescriptorSets(RenderSystem::_vkDevice, 1u, &write, 0u, nullptr);
 }
 }
 }

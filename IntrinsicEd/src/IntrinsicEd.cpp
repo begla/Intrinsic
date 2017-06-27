@@ -944,7 +944,7 @@ void IntrinsicEd::onCaptureAllProbes()
 {
   using namespace R;
 
-  static const uint32_t _probeTimeSamples = 8u;
+  static const uint32_t probeTimeSamples = 8u;
 
   const glm::uvec2 cubeMapRes =
       RenderSystem::getAbsoluteRenderSize(RenderSize::kCubemap);
@@ -967,9 +967,9 @@ void IntrinsicEd::onCaptureAllProbes()
       probeNodes.push_back(nodeRef);
   }
 
-  for (uint32_t i = 0u; i < _probeTimeSamples; ++i)
+  for (uint32_t i = 0u; i < probeTimeSamples; ++i)
     Rendering::IBL::captureProbes(probeNodes, i == 0,
-                                  i / (float)_probeTimeSamples);
+                                  i / (float)probeTimeSamples);
 
   RenderSystem::_customBackbufferDimensions = glm::uvec2(0u);
   RenderSystem::resizeSwapChain(true);

@@ -141,14 +141,14 @@ void main()
   }
 
   // Film grain
-  const vec3 grain = texelFetch(
-                         filmGrainTex,
-                         (ivec2(inUV0 * framebufferSize.xy) +
-                          ivec2(uboPerInstance.haltonSamples.xy * 255.0)) &
-                             255,
-                         0).rgb *
-                         2.0 -
-                     1.0;
+  const vec3 grain =
+      texelFetch(
+          filmGrainTex, (ivec2(inUV0 * framebufferSize.xy) +
+                         ivec2(uboPerInstance.haltonSamples.xy * 255.0)) &
+                            255,
+          0).rgb *
+          2.0 -
+      1.0;
   outColor.rgb +=
       grain * min(outColor.rgb + filmGrainBlackLimit, filmGrainAmount);
 }

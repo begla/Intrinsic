@@ -36,6 +36,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
     descArrayLayerCount.resize(_INTR_MAX_IMAGE_COUNT);
     descMipLevelCount.resize(_INTR_MAX_IMAGE_COUNT);
     descFileName.resize(_INTR_MAX_IMAGE_COUNT);
+    descDirPath.resize(_INTR_MAX_IMAGE_COUNT);
     descMemoryPoolType.resize(_INTR_MAX_IMAGE_COUNT);
     descAvgNormLength.resize(_INTR_MAX_IMAGE_COUNT);
     imageTextureType.resize(_INTR_MAX_IMAGE_COUNT);
@@ -57,6 +58,7 @@ struct ImageData : Dod::Resources::ResourceDataBase
   _INTR_ARRAY(uint32_t) descArrayLayerCount;
   _INTR_ARRAY(uint32_t) descMipLevelCount;
   _INTR_ARRAY(_INTR_STRING) descFileName;
+  _INTR_ARRAY(_INTR_STRING) descDirPath;
   _INTR_ARRAY(float) descAvgNormLength;
 
   // Resources
@@ -93,6 +95,7 @@ struct ImageManager
     _descMipLevelCount(p_Ref) = 1u;
     _descFileName(p_Ref) = "";
     _descAvgNormLength(p_Ref) = 1.0f;
+    _descDirPath(p_Ref) = "media/textures/";
   }
 
   _INTR_INLINE static void destroyImage(ImageRef p_Ref)
@@ -267,12 +270,7 @@ struct ImageManager
 
   // <-
 
-  static VkDescriptorSetLayout getGlobalDescriptorSetLayout();
-  static VkDescriptorSet getGlobalDescriptorSet();
-
-  // <-
-
-  static _INTR_INLINE void insertImageMemoryBarrier(
+  _INTR_INLINE static void insertImageMemoryBarrier(
       ImageRef p_ImageRef, VkImageLayout p_SrcImageLayout,
       VkImageLayout p_DstImageLayout,
       VkPipelineStageFlags p_SrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
@@ -283,7 +281,7 @@ struct ImageManager
                              p_SrcStages, p_DstStages);
   }
 
-  static _INTR_INLINE void insertImageMemoryBarrier(
+  _INTR_INLINE static void insertImageMemoryBarrier(
       VkCommandBuffer p_CommandBuffer, ImageRef p_ImageRef,
       VkImageLayout p_SrcImageLayout, VkImageLayout p_DstImageLayout,
       VkPipelineStageFlags p_SrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
@@ -306,7 +304,7 @@ struct ImageManager
 
   // <-
 
-  static _INTR_INLINE void insertImageMemoryBarrierSubResource(
+  _INTR_INLINE static void insertImageMemoryBarrierSubResource(
       ImageRef p_ImageRef, VkImageLayout p_SrcImageLayout,
       VkImageLayout p_DstImageLayout, uint32_t p_MipLevel,
       uint32_t p_ArrayLayer,
@@ -330,17 +328,36 @@ struct ImageManager
 
   // <-
 
-  static void updateGlobalDescriptorSet();
+  static void updateGlobalDescriptorSets();
 
   // <-
 
-  static _INTR_INLINE uint32_t getTextureId(ImageRef p_ImageRef)
+  _INTR_INLINE static uint32_t getTextureId(ImageRef p_ImageRef)
   {
-    auto mapping = _globalTextureIdMapping.find(p_ImageRef);
-    if (mapping == _globalTextureIdMapping.end())
-      return (uint32_t)-1;
+    if (_imageTextureType(p_ImageRef) == ImageTextureType::k2D)
+    {
+      auto mapping = _globalTexture2DIdMapping.find(p_ImageRef);
+      if (mapping == _globalTexture2DIdMapping.end())
+        return (uint32_t)-1;
 
-    return mapping->second;
+      return mapping->second;
+    }
+    else if (_imageTextureType(p_ImageRef) == ImageTextureType::kCube)
+    {
+      auto mapping = _globalTextureCubeIdMapping.find(p_ImageRef);
+      if (mapping == _globalTextureCubeIdMapping.end())
+        return (uint32_t)-1;
+
+      return mapping->second;
+    }
+
+    _INTR_ASSERT(false && "Unsupported texture type");
+    return (uint32_t)-1;
+  }
+
+  _INTR_INLINE static _INTR_STRING getFilePath(ImageRef p_ImageRef)
+  {
+    return _descDirPath(p_ImageRef) + _descFileName(p_ImageRef);
   }
 
   // <-
@@ -391,6 +408,10 @@ struct ImageManager
   {
     return _data.descFileName[p_Ref._id];
   }
+  _INTR_INLINE static _INTR_STRING& _descDirPath(ImageRef p_Ref)
+  {
+    return _data.descDirPath[p_Ref._id];
+  }
   _INTR_INLINE static float& _descAvgNormLength(ImageRef p_Ref)
   {
     return _data.descAvgNormLength[p_Ref._id];
@@ -436,7 +457,10 @@ struct ImageManager
 
   // ->
 
-  static _INTR_HASH_MAP(Dod::Ref, uint32_t) _globalTextureIdMapping;
+  static _INTR_HASH_MAP(Dod::Ref, uint32_t) _globalTexture2DIdMapping;
+  static _INTR_HASH_MAP(Dod::Ref, uint32_t) _globalTextureCubeIdMapping;
+  static VkDescriptorSet _globalTextureDescriptorSet;
+  static VkDescriptorSetLayout _globalTextureDescriptorSetLayout;
 };
 }
 }

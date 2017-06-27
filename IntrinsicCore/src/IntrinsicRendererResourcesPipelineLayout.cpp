@@ -67,8 +67,8 @@ void PipelineLayoutManager::createResources(
       descSetLayouts.push_back(descriptorSetLayout);
     }
 
-    // Add global image descriptor set
-    descSetLayouts.push_back(ImageManager::getGlobalDescriptorSetLayout());
+    // Add global image descriptor set layouts
+    descSetLayouts.push_back(ImageManager::_globalTextureDescriptorSetLayout);
 
     {
       VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo = {};

@@ -165,6 +165,11 @@ struct SpecularProbeManager
 
   // <-
 
+  static void createResources(const SpecularProbeRefArray& p_Probes);
+  static void destroyResources(const SpecularProbeRefArray& p_Probes);
+
+  // <-
+
   _INTR_INLINE static void sortByPriority(SpecularProbeRefArray& p_Probes)
   {
     _INTR_PROFILE_CPU("General", "Sort Specular Probes");

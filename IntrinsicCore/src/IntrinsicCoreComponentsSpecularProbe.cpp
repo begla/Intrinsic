@@ -29,20 +29,24 @@ void SpecularProbeManager::init()
       SpecularProbeData,
       _INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT>::_initComponentManager();
 
-  Dod::Components::ComponentManagerEntry SpecularProbeEntry;
+  Dod::Components::ComponentManagerEntry specularProbeEntry;
   {
-    SpecularProbeEntry.createFunction =
-        Components::SpecularProbeManager::createSpecularProbe;
-    SpecularProbeEntry.destroyFunction =
-        Components::SpecularProbeManager::destroySpecularProbe;
-    SpecularProbeEntry.getComponentForEntityFunction =
-        Components::SpecularProbeManager::getComponentForEntity;
-    SpecularProbeEntry.resetToDefaultFunction =
-        Components::SpecularProbeManager::resetToDefault;
+    specularProbeEntry.createFunction =
+        SpecularProbeManager::createSpecularProbe;
+    specularProbeEntry.destroyFunction =
+        SpecularProbeManager::destroySpecularProbe;
+    specularProbeEntry.getComponentForEntityFunction =
+        SpecularProbeManager::getComponentForEntity;
+    specularProbeEntry.resetToDefaultFunction =
+        SpecularProbeManager::resetToDefault;
+    specularProbeEntry.createResourcesFunction =
+        SpecularProbeManager::createResources;
+    specularProbeEntry.destroyResourcesFunction =
+        SpecularProbeManager::destroyResources;
 
     Application::_componentManagerMapping[_N(SpecularProbe)] =
-        SpecularProbeEntry;
-    Application::_orderedComponentManagers.push_back(SpecularProbeEntry);
+        specularProbeEntry;
+    Application::_orderedComponentManagers.push_back(specularProbeEntry);
   }
 
   Dod::PropertyCompilerEntry propCompilerSpecularProbe;
@@ -55,6 +59,58 @@ void SpecularProbeManager::init()
     Application::_componentPropertyCompilerMapping[_N(SpecularProbe)] =
         propCompilerSpecularProbe;
   }
+}
+
+// <-
+
+void SpecularProbeManager::createResources(
+    const SpecularProbeRefArray& p_Probes)
+{
+  ImageRefArray imagesToCreate;
+
+  for (SpecularProbeRef probeRef : p_Probes)
+  {
+    for (uint32_t i = 0u; i < _descSpecularTextureNames(probeRef).size(); ++i)
+    {
+      Name specularTextureName = _descSpecularTextureNames(probeRef)[i];
+
+      ImageRef imageToCreate = ImageManager::createImage(specularTextureName);
+      {
+        ImageManager::_descFileName(imageToCreate) =
+            specularTextureName.getString();
+        ImageManager::_descDirPath(imageToCreate) = "media/specular_probes/";
+        ImageManager::_descImageType(imageToCreate) =
+            R::ImageType::kTextureFromFile;
+        ImageManager::_descImageFormat(imageToCreate) = R::Format::kBC6UFloat;
+      }
+      imagesToCreate.push_back(imageToCreate);
+    }
+  }
+
+  ImageManager::createResources(imagesToCreate);
+}
+
+// <-
+
+void SpecularProbeManager::destroyResources(
+    const SpecularProbeRefArray& p_Probes)
+{
+  ImageRefArray imagesToDestroy;
+
+  for (SpecularProbeRef probeRef : p_Probes)
+  {
+    for (uint32_t i = 0u; i < _descSpecularTextureNames(probeRef).size(); ++i)
+    {
+      Name specularTextureName = _descSpecularTextureNames(probeRef)[i];
+      ImageRef imageRef = ImageManager::_getResourceByName(specularTextureName);
+      if (imageRef.isValid())
+      {
+        imagesToDestroy.push_back(imageRef);
+      }
+    }
+  }
+
+  ImageManager::destroyImagesAndResources(imagesToDestroy);
 }
 }
 }

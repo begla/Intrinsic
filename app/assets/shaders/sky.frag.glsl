@@ -45,8 +45,8 @@ float getSkyModelConfig(uint channelIdx, uint configIdx)
   return uboPerFrame.skyModelConfigs[packedDataOffset.x][packedDataOffset.y];
 }
 
-/// Based on 'An Analytic Model for Full Spectral Sky-Dome Radiance'
-/// ACM Transactions on Graphics (Proceedings of ACM SIGGRAPH 2012)
+// Based on 'An Analytic Model for Full Spectral Sky-Dome Radiance'
+// ACM Transactions on Graphics (Proceedings of ACM SIGGRAPH 2012)
 vec3 calculateSkyModelRadiance(vec3 theta, vec3 gamma)
 {
   vec3 configuration[9];

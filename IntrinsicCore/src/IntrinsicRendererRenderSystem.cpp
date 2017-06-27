@@ -144,7 +144,7 @@ void RenderSystem::init(void* p_PlatformHandle, void* p_PlatformWindow)
       _INTR_PROFILE_AUTO("Create Image Resources");
 
       ImageManager::createAllResources();
-      ImageManager::updateGlobalDescriptorSet();
+      ImageManager::updateGlobalDescriptorSets();
     }
 
     VertexLayoutManager::createAllResources();
@@ -344,7 +344,7 @@ void RenderSystem::dispatchDrawCall(Dod::Ref p_DrawCall,
                     newPipeline);
 
   VkDescriptorSet descSets[2] = {DrawCallManager::_vkDescriptorSet(p_DrawCall),
-                                 ImageManager::getGlobalDescriptorSet()};
+                                 ImageManager::_globalTextureDescriptorSet};
 
   if (DrawCallManager::_vkDescriptorSet(p_DrawCall))
   {

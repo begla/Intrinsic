@@ -96,11 +96,7 @@ GpuMemoryManager::allocateOffset(MemoryPoolType::Enum p_MemoryPoolType,
         page._allocator.fits(p_Size, p_Alignment))
     {
       const uint32_t offset = page._allocator.allocate(p_Size, p_Alignment);
-      return {p_MemoryPoolType,
-              pageIdx,
-              offset,
-              page._vkDeviceMemory,
-              p_Size,
+      return {p_MemoryPoolType, pageIdx, offset, page._vkDeviceMemory, p_Size,
               p_Alignment,
               page._mappedMemory != nullptr ? &page._mappedMemory[offset]
                                             : nullptr};
@@ -159,12 +155,8 @@ GpuMemoryManager::allocateOffset(MemoryPoolType::Enum p_MemoryPoolType,
                    "Allocation does not fit in a single page");
 
       const uint32_t offset = page._allocator.allocate(p_Size, p_Alignment);
-      return {p_MemoryPoolType,
-              (uint32_t)poolPages.size() - 1u,
-              offset,
-              page._vkDeviceMemory,
-              p_Size,
-              p_Alignment,
+      return {p_MemoryPoolType, (uint32_t)poolPages.size() - 1u, offset,
+              page._vkDeviceMemory, p_Size, p_Alignment,
               page._mappedMemory != nullptr ? &page._mappedMemory[offset]
                                             : nullptr};
     }

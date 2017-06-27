@@ -167,10 +167,9 @@ struct DrawCallCollectionParallelTaskSet : enki::ITaskSet
                (1u << frustIdx)) > 0u)
           {
             DrawCallManager::updateSortingHash(
-                drawCallRef,
-                Components::MeshManager::_perInstanceDataVertex(
-                    meshComponentRef)
-                    .data0.y);
+                drawCallRef, Components::MeshManager::_perInstanceDataVertex(
+                                 meshComponentRef)
+                                 .data0.y);
 
             visibleDrawCallsPerMaterialPass.push_back(drawCallRef);
           }

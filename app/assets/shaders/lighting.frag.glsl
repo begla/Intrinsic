@@ -38,29 +38,38 @@ uboPerInstance;
 
 PER_FRAME_DATA(1);
 
+layout(set = 1, binding = 1) uniform samplerCube globalCubeTextures[4095];
+
 layout(binding = 2) uniform sampler2D albedoTex;
 layout(binding = 3) uniform sampler2D normalTex;
 layout(binding = 4) uniform sampler2D parameter0Tex;
 layout(binding = 5) uniform sampler2D depthTex;
 layout(binding = 6) uniform sampler2D ssaoTex;
-layout(binding = 7) uniform samplerCube specularTex;
-layout(binding = 8) uniform sampler2DArrayShadow shadowBufferTex;
-layout(binding = 9) MATERIAL_BUFFER;
-layout(std430, binding = 10) buffer readonly LightBuffer { Light lights[]; };
-layout(std430, binding = 11) buffer readonly LightIndexBuffer
+layout(binding = 7) uniform sampler2DArrayShadow shadowBufferTex;
+layout(binding = 8) MATERIAL_BUFFER;
+layout(std430, binding = 9) buffer readonly LightBuffer { Light lights[]; };
+layout(std430, binding = 10) buffer readonly LightIndexBuffer
 {
   uint lightIndices[];
 };
-layout(std430, binding = 12) buffer readonly IrradProbeBuffer
+layout(std430, binding = 11) buffer readonly IrradProbeBuffer
 {
   IrradProbe irradProbes[];
 };
-layout(std430, binding = 13) buffer readonly IrradProbeIndexBuffer
+layout(std430, binding = 12) buffer readonly IrradProbeIndexBuffer
 {
   uint irradProbeIndices[];
 };
-layout(binding = 14) uniform sampler2D kelvinLutTex;
-layout(binding = 15) uniform sampler2D noiseTex;
+layout(std430, binding = 13) buffer readonly SpecProbeBuffer
+{
+  SpecProbe specProbes[];
+};
+layout(std430, binding = 14) buffer readonly SpecProbeIndexBuffer
+{
+  uint specProbeIndices[];
+};
+layout(binding = 15) uniform sampler2D kelvinLutTex;
+layout(binding = 16) uniform sampler2D noiseTex;
 
 layout(location = 0) in vec2 inUV0;
 layout(location = 0) out vec4 outColor;
@@ -165,10 +174,36 @@ void main()
 
   // Specular
   {
+    vec3 spec = vec3(0.0f);
+
+    const uint clusterIdx =
+        calcClusterIndex(gridPos, maxSpecProbeCountPerCluster) / 2;
+    const uint specProbeCount = specProbeIndices[clusterIdx];
     const float specMipIdx = roughnessToMipIdx(d.roughness);
-    const vec3 spec =
-        d.specularColor * textureLod(specularTex, R, specMipIdx).rgb;
-    outColor.rgb += uboPerInstance.data0.y * uboPerInstance.data0.z * spec;
+
+//#define DEBUG_VIS_CLUSTERS
+#if defined(DEBUG_VIS_CLUSTERS)
+    if (specProbeCount > 0)
+    {
+      outColor = vec4(gridPos / vec3(gridRes) * specProbeCount / 64.0, 0.0);
+      return;
+    }
+#endif // DEBUG_VIS_CLUSTERS
+
+    for (uint pi = 0; pi < specProbeCount; pi += 2)
+    {
+      const uint packedProbeIndices = specProbeIndices[clusterIdx + pi / 2 + 1];
+
+      SpecProbe probe = specProbes[packedProbeIndices & 0xFFFF];
+      calcLocalSpecular(probe, d, spec, R, specMipIdx, uboPerInstance.data0.z,
+                        1.0);
+
+      probe = specProbes[packedProbeIndices >> 16];
+      calcLocalSpecular(probe, d, spec, R, specMipIdx, uboPerInstance.data0.z,
+                        float(pi + 1 < specProbeCount));
+    }
+
+    outColor.rgb += d.specularColor * uboPerInstance.data0.y * spec;
   }
 
   // Emissive
@@ -199,7 +234,8 @@ void main()
 
     calcTransl(d, matParams, clamp(uboPerFrame.sunLightDirWS.y - 0.3, 0.0,
                                    1.0), // Dim for low sun
-               sunLightColorAndIntensity, outColor);
+               sunLightColorAndIntensity,
+               outColor);
   }
 
   // Point lights
@@ -207,15 +243,6 @@ void main()
     const uint clusterIdx =
         calcClusterIndex(gridPos, maxLightCountPerCluster) / 2;
     const uint lightCount = lightIndices[clusterIdx];
-
-//#define DEBUG_VIS_CLUSTERS
-#if defined(DEBUG_VIS_CLUSTERS)
-    if (lightCount > 0)
-    {
-      outColor = vec4(gridPos / vec3(gridRes) * lightCount / 64.0, 0.0);
-      return;
-    }
-#endif // DEBUG_VIS_CLUSTERS
 
     for (uint li = 0; li < lightCount; li += 2)
     {

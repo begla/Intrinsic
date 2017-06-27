@@ -30,7 +30,7 @@ _INTR_INLINE void initResource(TBuiltInResource& p_Resource)
   p_Resource.maxVertexUniformComponents = 4096;
   p_Resource.maxVaryingFloats = 64;
   p_Resource.maxVertexTextureImageUnits = 32;
-  p_Resource.maxCombinedTextureImageUnits = 4096;
+  p_Resource.maxCombinedTextureImageUnits = 4096 * 4;
   p_Resource.maxTextureImageUnits = 32;
   p_Resource.maxFragmentUniformComponents = 4096;
   p_Resource.maxDrawBuffers = 32;

@@ -58,7 +58,7 @@ struct DrawCallParallelTaskSet : enki::ITaskSet
 
       VkDescriptorSet descSets[2] = {
           Resources::DrawCallManager::_vkDescriptorSet(drawCallRef),
-          Resources::ImageManager::getGlobalDescriptorSet()};
+          Resources::ImageManager::_globalTextureDescriptorSet};
 
       _INTR_ASSERT(Resources::DrawCallManager::_vkDescriptorSet(drawCallRef));
       vkCmdBindDescriptorSets(

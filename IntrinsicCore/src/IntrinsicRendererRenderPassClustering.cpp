@@ -22,6 +22,7 @@
 // +2 for the 16-bit aligned count in front of the list
 #define MAX_LIGHT_COUNT_PER_CLUSTER (256u + 2u)
 #define MAX_IRRAD_PROBES_PER_CLUSTER (8u + 2u)
+#define MAX_SPEC_PROBES_PER_CLUSTER (8u + 2u)
 #define MAX_DECALS_PER_CLUSTER (64u + 2u)
 
 #define GRID_DEPTH_SLICE_COUNT 24u
@@ -60,6 +61,8 @@ BufferRef _lightBuffer;
 BufferRef _lightIndexBuffer;
 BufferRef _irradProbeBuffer;
 BufferRef _irradProbeIndexBuffer;
+BufferRef _specProbeBuffer;
+BufferRef _specProbeIndexBuffer;
 BufferRef _decalBuffer;
 BufferRef _decalIndexBuffer;
 
@@ -83,6 +86,14 @@ struct IrradProbe
   glm::vec4 shData[7]; // Packed SH coefficients
 };
 
+struct SpecProbe
+{
+  glm::vec4 posAndRadiusVS;
+  glm::vec4 data0;
+
+  glm::uvec4 textureIds[2];
+};
+
 struct Decal
 {
   glm::mat4 viewProjMatrix;
@@ -100,11 +111,16 @@ _INTR_ARRAY(TestLight) _testLights;
 
 uint32_t _currentLightCount = 0u;
 uint32_t _currentIrradProbeCount = 0u;
+uint32_t _currentSpecProbeCount = 0u;
 uint32_t _currentDecalCount = 0u;
 
 uint16_t* _lightIndexBufferGpuMemory = nullptr;
 Light* _lightBufferGpuMemory = nullptr;
 Light* _lightBufferMemory = nullptr;
+
+uint16_t* _specProbeIndexBufferGpuMemory = nullptr;
+SpecProbe* _specProbeBufferGpuMemory = nullptr;
+SpecProbe* _specProbeBufferMemory = nullptr;
 
 uint16_t* _irradProbeIndexBufferGpuMemory = nullptr;
 IrradProbe* _irradProbeBufferGpuMemory = nullptr;
@@ -150,6 +166,8 @@ const uint32_t _totalLightGridSize =
     _totalClusterCount * MAX_LIGHT_COUNT_PER_CLUSTER;
 const uint32_t _totalIrradGridSize =
     _totalClusterCount * MAX_IRRAD_PROBES_PER_CLUSTER;
+const uint32_t _totalSpecGridSize =
+    _totalClusterCount * MAX_SPEC_PROBES_PER_CLUSTER;
 const uint32_t _totalDecalGridSize =
     _totalClusterCount * MAX_DECALS_PER_CLUSTER;
 
@@ -239,6 +257,7 @@ struct CullingParallelTaskSet : enki::ITaskSet
     _INTR_PROFILE_CPU("Lighting", "Cull Lights And Probes For Depth Slice");
 
     uint16_t tempIrradIdxBuffer[MAX_IRRAD_PROBES_PER_CLUSTER];
+    uint16_t tempSpecIdxBuffer[MAX_SPEC_PROBES_PER_CLUSTER];
     uint16_t tempLightIdxBuffer[MAX_LIGHT_COUNT_PER_CLUSTER];
     uint16_t tempDecalIdxBuffer[MAX_DECALS_PER_CLUSTER];
 
@@ -254,8 +273,10 @@ struct CullingParallelTaskSet : enki::ITaskSet
 
         const uint32_t lightClusterIndex =
             calcClusterIndex(gridPos, MAX_LIGHT_COUNT_PER_CLUSTER);
-        const uint32_t probeClusterIndex =
+        const uint32_t irradProbeClusterIdx =
             calcClusterIndex(gridPos, MAX_IRRAD_PROBES_PER_CLUSTER);
+        const uint32_t specProbeClusterIdx =
+            calcClusterIndex(gridPos, MAX_SPEC_PROBES_PER_CLUSTER);
         const uint32_t decalClusterIdx =
             calcClusterIndex(gridPos, MAX_DECALS_PER_CLUSTER);
 
@@ -286,15 +307,34 @@ struct CullingParallelTaskSet : enki::ITaskSet
              irradProbeCount < MAX_IRRAD_PROBES_PER_CLUSTER - 2u;
              ++i)
         {
-          uint32_t lidx = _availableIrradProbes[i];
-          const IrradProbe& probe = _irradProbeBufferMemory[lidx];
+          uint32_t iidx = _availableIrradProbes[i];
+          const IrradProbe& probe = _irradProbeBufferMemory[iidx];
           if (Math::calcIntersectSphereAABB(
                   {glm::vec3(probe.posAndRadiusVS), probe.posAndRadiusVS.w},
                   clusterAABB))
           {
             const uint32_t idx = irradProbeCount + 2u;
-            tempIrradIdxBuffer[idx] = lidx;
+            tempIrradIdxBuffer[idx] = iidx;
             ++irradProbeCount;
+          }
+        }
+
+        uint32_t& specProbeCount = (uint32_t&)tempSpecIdxBuffer[0];
+        specProbeCount = 0u;
+
+        for (uint32_t i = 0u; i < _availableSpecProbes.size() &&
+                              specProbeCount < MAX_SPEC_PROBES_PER_CLUSTER - 2u;
+             ++i)
+        {
+          uint32_t sidx = _availableSpecProbes[i];
+          const SpecProbe& probe = _specProbeBufferMemory[sidx];
+          if (Math::calcIntersectSphereAABB(
+                  {glm::vec3(probe.posAndRadiusVS), probe.posAndRadiusVS.w},
+                  clusterAABB))
+          {
+            const uint32_t idx = specProbeCount + 2u;
+            tempSpecIdxBuffer[idx] = sidx;
+            ++specProbeCount;
           }
         }
 
@@ -318,8 +358,10 @@ struct CullingParallelTaskSet : enki::ITaskSet
           }
         }
 
-        memcpy(&_irradProbeIndexBufferGpuMemory[probeClusterIndex],
+        memcpy(&_irradProbeIndexBufferGpuMemory[irradProbeClusterIdx],
                tempIrradIdxBuffer, sizeof(uint16_t) * (irradProbeCount + 2u));
+        memcpy(&_specProbeIndexBufferGpuMemory[specProbeClusterIdx],
+               tempSpecIdxBuffer, sizeof(uint16_t) * (specProbeCount + 2u));
         memcpy(&_lightIndexBufferGpuMemory[lightClusterIndex],
                tempLightIdxBuffer, sizeof(uint16_t) * (lightCount + 2u));
         memcpy(&_decalIndexBufferGpuMemory[decalClusterIdx], tempDecalIdxBuffer,
@@ -332,6 +374,7 @@ struct CullingParallelTaskSet : enki::ITaskSet
   _INTR_ARRAY(uint16_t) _availableLights;
   _INTR_ARRAY(uint16_t) _availableIrradProbes;
   _INTR_ARRAY(uint16_t) _availableDecals;
+  _INTR_ARRAY(uint16_t) _availableSpecProbes;
 } _cullingTaskSets[GRID_DEPTH_SLICE_COUNT];
 
 _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
@@ -445,8 +488,12 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
     // Sort probes by priority
     // TODO: Could be done once if a priority changes
     _currentIrradProbeCount = 0u;
+    _currentSpecProbeCount = 0u;
+
     Components::IrradianceProbeManager::sortByPriority(
         Components::IrradianceProbeManager::_activeRefs);
+    Components::SpecularProbeManager::sortByPriority(
+        Components::SpecularProbeManager::_activeRefs);
 
     for (uint32_t i = 0u;
          i < Components::IrradianceProbeManager::_activeRefs.size(); ++i)
@@ -504,6 +551,43 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
              &blendedSH, sizeof(Rendering::IBL::SH9));
       ++_currentIrradProbeCount;
     }
+
+    for (uint32_t i = 0u;
+         i < Components::SpecularProbeManager::_activeRefs.size(); ++i)
+    {
+      Components::SpecularProbeRef specProbeRef =
+          Components::SpecularProbeManager::_activeRefs[i];
+      Components::NodeRef specNodeRef =
+          Components::NodeManager::getComponentForEntity(
+              Components::SpecularProbeManager::_entity(specProbeRef));
+
+      SpecProbe& probe = _specProbeBufferMemory[_currentSpecProbeCount];
+      _INTR_ARRAY(Name)& texNames =
+          Components::SpecularProbeManager::_descSpecularTextureNames(
+              specProbeRef);
+      _INTR_ASSERT(texNames.size() <= 8u);
+
+      const glm::vec3 specProbePosVS =
+          Components::CameraManager::_viewMatrix(p_CameraRef) *
+          glm::vec4(Components::NodeManager::_worldPosition(specNodeRef), 1.0);
+      probe.posAndRadiusVS = glm::vec4(
+          specProbePosVS,
+          Components::SpecularProbeManager::_descRadius(specProbeRef));
+      probe.data0 = glm::vec4(
+          Components::SpecularProbeManager::_descFalloffRangePerc(specProbeRef),
+          Components::SpecularProbeManager::_descFalloffExp(specProbeRef),
+          (float)texNames.size(), 0.0f);
+
+      uint32_t texId = 0;
+      for (Name texName : texNames)
+      {
+        probe.textureIds[texId / 4u][texId % 4u] = ImageManager::getTextureId(
+            ImageManager::getResourceByName(texName));
+        ++texId;
+      }
+
+      ++_currentSpecProbeCount;
+    }
   }
 
   // Find objects intersecting the depth slices and kick jobs for populated
@@ -548,6 +632,17 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
         }
       }
 
+      for (uint32_t i = 0u; i < _currentSpecProbeCount; ++i)
+      {
+        const SpecProbe& specProbe = _specProbeBufferMemory[i];
+        if (Math::calcIntersectSphereAABB({glm::vec3(specProbe.posAndRadiusVS),
+                                           specProbe.posAndRadiusVS.w},
+                                          depthSliceAABB))
+        {
+          taskSet._availableSpecProbes.push_back(i);
+        }
+      }
+
       for (uint32_t i = 0u; i < _currentDecalCount; ++i)
       {
         const Decal& decal = _decalBufferMemory[i];
@@ -561,6 +656,7 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
       }
 
       if (!taskSet._availableLights.empty() ||
+          !taskSet._availableSpecProbes.empty() ||
           !taskSet._availableIrradProbes.empty() ||
           !taskSet._availableDecals.empty())
       {
@@ -579,13 +675,17 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
 
             const glm::uint32_t lightClusterIdx =
                 calcClusterIndex(cluster, MAX_LIGHT_COUNT_PER_CLUSTER);
-            const glm::uint32_t probeClusterIdx =
+            const glm::uint32_t specProbeClusterIdx =
+                calcClusterIndex(cluster, MAX_SPEC_PROBES_PER_CLUSTER);
+            const glm::uint32_t irradProbeClusterIdx =
                 calcClusterIndex(cluster, MAX_IRRAD_PROBES_PER_CLUSTER);
             const glm::uint32_t decalClusterIdx =
                 calcClusterIndex(cluster, MAX_DECALS_PER_CLUSTER);
 
             (uint32_t&)_lightIndexBufferGpuMemory[lightClusterIdx] = 0u;
-            (uint32_t&)_irradProbeIndexBufferGpuMemory[probeClusterIdx] = 0u;
+            (uint32_t&)_irradProbeIndexBufferGpuMemory[irradProbeClusterIdx] =
+                0u;
+            (uint32_t&)_specProbeIndexBufferGpuMemory[specProbeClusterIdx] = 0u;
             (uint32_t&)_decalIndexBufferGpuMemory[decalClusterIdx] = 0u;
           }
         }
@@ -597,6 +697,8 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
 
   memcpy(_lightBufferGpuMemory, _lightBufferMemory,
          _currentLightCount * sizeof(Light));
+  memcpy(_specProbeBufferGpuMemory, _specProbeBufferMemory,
+         _currentSpecProbeCount * sizeof(SpecProbe));
   memcpy(_irradProbeBufferGpuMemory, _irradProbeBufferMemory,
          _currentIrradProbeCount * sizeof(IrradProbe));
   memcpy(_decalBufferGpuMemory, _decalBufferMemory,
@@ -625,7 +727,7 @@ _INTR_INLINE void renderLighting(FramebufferRef p_FramebufferRef,
     // Post effect data
     _lightingPerInstanceData.data0.x = TaskManager::_totalTimePassed;
     _lightingPerInstanceData.data0.y = Clustering::_globalAmbientFactor;
-    _lightingPerInstanceData.data0.z = World::_currentDayNightFactor;
+    _lightingPerInstanceData.data0.z = World::_currentTime;
 
     const _INTR_ARRAY(FrustumRef)& shadowFrustums =
         RenderProcess::Default::_shadowFrustums[p_CameraRef];
@@ -884,6 +986,38 @@ void Clustering::init()
       buffersToCreate.push_back(_irradProbeIndexBuffer);
     }
 
+    _specProbeBuffer = BufferManager::createBuffer(_N(SpecProbeBuffer));
+    {
+      BufferManager::resetToDefault(_specProbeBuffer);
+      BufferManager::addResourceFlags(
+          _specProbeBuffer, Dod::Resources::ResourceFlags::kResourceVolatile);
+
+      BufferManager::_descBufferType(_specProbeBuffer) = BufferType::kStorage;
+      BufferManager::_descMemoryPoolType(_specProbeBuffer) =
+          MemoryPoolType::kStaticStagingBuffers;
+      BufferManager::_descSizeInBytes(_specProbeBuffer) =
+          MAX_SPEC_PROBES_PER_CLUSTER * _gridRes.x * _gridRes.y * _gridRes.z *
+          sizeof(SpecProbe);
+      buffersToCreate.push_back(_specProbeBuffer);
+    }
+
+    _specProbeIndexBuffer =
+        BufferManager::createBuffer(_N(SpecProbeIndexBuffer));
+    {
+      BufferManager::resetToDefault(_specProbeIndexBuffer);
+      BufferManager::addResourceFlags(
+          _specProbeIndexBuffer,
+          Dod::Resources::ResourceFlags::kResourceVolatile);
+
+      BufferManager::_descBufferType(_specProbeIndexBuffer) =
+          BufferType::kStorage;
+      BufferManager::_descMemoryPoolType(_specProbeIndexBuffer) =
+          MemoryPoolType::kStaticStagingBuffers;
+      BufferManager::_descSizeInBytes(_specProbeIndexBuffer) =
+          _totalSpecGridSize * sizeof(uint16_t);
+      buffersToCreate.push_back(_specProbeIndexBuffer);
+    }
+
     _decalBuffer = BufferManager::createBuffer(_N(DecalBuffer));
     {
       BufferManager::resetToDefault(_decalBuffer);
@@ -934,6 +1068,18 @@ void Clustering::init()
 
       _irradProbeBufferMemory =
           (IrradProbe*)malloc(_totalIrradGridSize * sizeof(IrradProbe));
+    }
+
+    {
+      _specProbeBufferGpuMemory =
+          (SpecProbe*)BufferManager::getGpuMemory(_specProbeBuffer);
+      _specProbeIndexBufferGpuMemory =
+          (uint16_t*)BufferManager::getGpuMemory(_specProbeIndexBuffer);
+      memset(_specProbeIndexBufferGpuMemory, 0x00,
+             sizeof(uint16_t) * _totalSpecGridSize);
+
+      _specProbeBufferMemory =
+          (SpecProbe*)malloc(_totalSpecGridSize * sizeof(SpecProbe));
     }
 
     {
@@ -994,10 +1140,6 @@ _INTR_INLINE void setupLightingDrawCall(DrawCallRef p_DrawCallRef,
       ImageManager::getResourceByName(_N(kelvin_rgb_LUT)),
       Samplers::kLinearClamp);
   DrawCallManager::bindImage(
-      p_DrawCallRef, _N(specularTex), GpuProgramType::kFragment,
-      ImageManager::getResourceByName(_N(default_ibl_cube_specular)),
-      Samplers::kLinearClamp);
-  DrawCallManager::bindImage(
       p_DrawCallRef, _N(noiseTex), GpuProgramType::kFragment,
       ImageManager::getResourceByName(_N(noise)), Samplers::kLinearRepeat);
   DrawCallManager::bindImage(
@@ -1022,6 +1164,14 @@ _INTR_INLINE void setupLightingDrawCall(DrawCallRef p_DrawCallRef,
       p_DrawCallRef, _N(IrradProbeIndexBuffer), GpuProgramType::kFragment,
       _irradProbeIndexBuffer, UboType::kInvalidUbo,
       BufferManager::_descSizeInBytes(_irradProbeIndexBuffer));
+  DrawCallManager::bindBuffer(
+      p_DrawCallRef, _N(SpecProbeBuffer), GpuProgramType::kFragment,
+      _specProbeBuffer, UboType::kInvalidUbo,
+      BufferManager::_descSizeInBytes(_specProbeBuffer));
+  DrawCallManager::bindBuffer(
+      p_DrawCallRef, _N(SpecProbeIndexBuffer), GpuProgramType::kFragment,
+      _specProbeIndexBuffer, UboType::kInvalidUbo,
+      BufferManager::_descSizeInBytes(_specProbeIndexBuffer));
 }
 
 _INTR_INLINE void setupDecalsDrawCall(DrawCallRef p_DrawCallRef)

@@ -25,6 +25,13 @@ struct IrradProbe
 
   vec4 shData[7];
 };
+struct SpecProbe
+{
+  vec4 posAndRadius;
+  vec4 data0;
+
+  uvec4 textureIds[2];
+};
 struct Decal
 {
   mat4 viewProjMatrix;
@@ -41,6 +48,7 @@ struct Decal
 // Have to match the values on C++ side
 const uint maxLightCountPerCluster = 256 + 2;
 const uint maxIrradProbeCountPerCluster = 8 + 2;
+const uint maxSpecProbeCountPerCluster = 8 + 2;
 const uint maxDecalCountPerCluster = 64 + 2;
 
 const float gridDepth = 10000.0f;

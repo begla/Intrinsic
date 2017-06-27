@@ -57,12 +57,11 @@ void main()
       out0 +=
           temp[gl_LocalInvocationIndex + i] * blurWeights[i + HALF_BLUR_WIDTH];
 
-    imageStore(
-        outTex,
-        ivec2(gl_LocalInvocationIndex - HALF_BLUR_WIDTH +
-                  (BLUR_THREADS - HALF_BLUR_WIDTH * 2) * gl_WorkGroupID.x,
-              gl_GlobalInvocationID.y)
-            .yx,
-        out0);
+    imageStore(outTex, ivec2(gl_LocalInvocationIndex - HALF_BLUR_WIDTH +
+                                 (BLUR_THREADS - HALF_BLUR_WIDTH * 2) *
+                                     gl_WorkGroupID.x,
+                             gl_GlobalInvocationID.y)
+                           .yx,
+               out0);
   }
 }

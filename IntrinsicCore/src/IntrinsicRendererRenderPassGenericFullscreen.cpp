@@ -63,9 +63,8 @@ void GenericFullscreen::init(const rapidjson::Value& p_RenderPassDesc)
     PipelineLayoutManager::resetToDefault(pipelineLayout);
 
     GpuProgramManager::reflectPipelineLayout(
-        8u,
-        {GpuProgramManager::getResourceByName(vertGpuProgramName),
-         GpuProgramManager::getResourceByName(fragGpuProgramName)},
+        8u, {GpuProgramManager::getResourceByName(vertGpuProgramName),
+             GpuProgramManager::getResourceByName(fragGpuProgramName)},
         pipelineLayout);
   }
   pipelineLayoutsToCreate.push_back(pipelineLayout);

@@ -151,8 +151,7 @@ void preFilterGGX(const gli::texture_cube& p_Input, gli::texture_cube& p_Output,
   _preFilterParallelTaskSets.clear();
 }
 
-void captureProbes(const Components::NodeRefArray& p_NodeRefs, bool p_Clear,
-                   float p_Time)
+void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear, float p_Time)
 {
   using namespace R;
 

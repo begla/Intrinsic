@@ -69,3 +69,38 @@ void calcLocalIrradiance(in IrradProbe probe, in LightingData d, vec3 normalWS,
             fade * fadeFactor);
   }
 }
+
+void calcLocalSpecular(in SpecProbe probe, in LightingData d, inout vec3 spec,
+                       vec3 R, float specMipIdx, float currentTime,
+                       float fadeFactor)
+{
+  const float distToProbe = distance(d.posVS, probe.posAndRadius.xyz);
+  if (distToProbe < probe.posAndRadius.w)
+  {
+    const float fadeRange = probe.posAndRadius.w * probe.data0.x;
+    const float fadeStart = probe.posAndRadius.w - fadeRange;
+    const float fade =
+        pow(1.0 - max(distToProbe - fadeStart, 0.0) / fadeRange, probe.data0.y);
+
+    const uint leftIdx =
+        min(uint(currentTime * probe.data0.z), uint(probe.data0.z) - 2u);
+    const uint rightIdx = leftIdx + 1u;
+    const float leftPerc = leftIdx / probe.data0.z;
+    const float rightPerc = (leftIdx + 1u) / probe.data0.z;
+
+    const float interp = (currentTime - leftPerc) / (rightPerc - leftPerc);
+
+    const vec3 s = mix(
+        textureLod(
+            globalCubeTextures[probe.textureIds[leftIdx / 4][leftIdx % 4]], R,
+            specMipIdx)
+            .rgb,
+        textureLod(
+            globalCubeTextures[probe.textureIds[rightIdx / 4][rightIdx % 4]], R,
+            specMipIdx)
+            .rgb,
+        interp);
+
+    spec = mix(spec, s, fade * fadeFactor);
+  }
+}
