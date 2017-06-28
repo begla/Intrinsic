@@ -45,7 +45,7 @@ uboPerInstance;
 #define GRID_FADE_RANGE 40.0
 
 #define BIG_GRID_COLOR vec3(0.1, 0.5, 0.75)
-#define TINY_GRID_COLOR BIG_GRID_COLOR * 0.75
+#define TINY_GRID_COLOR vec3(0.25, 0.25, 0.25)
 
 bool isGridVisible(vec2 localPos, float lineWidth, float cellSize)
 {
