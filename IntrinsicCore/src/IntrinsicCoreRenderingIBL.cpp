@@ -27,6 +27,130 @@ namespace IBL
 {
 namespace
 {
+_INTR_INLINE void _preFilterGGXOpt(const gli::texture_cube& p_Input,
+                                   gli::texture_cube& p_Output,
+                                   uint32_t p_FaceIdx, uint32_t p_MipIdx,
+                                   glm::uvec2 p_RangeX, glm::uvec2 p_RangeY,
+                                   const uint32_t* p_SampleCounts,
+                                   float p_MinRoughness)
+{
+  using namespace Renderer::RenderProcess;
+
+  gli::fsamplerCube sourceSamplerTrilinear = gli::fsamplerCube(
+      p_Input, gli::WRAP_CLAMP_TO_EDGE, gli::FILTER_LINEAR, gli::FILTER_LINEAR);
+  gli::fsamplerCube targetSampler =
+      gli::fsamplerCube(p_Output, gli::WRAP_CLAMP_TO_EDGE);
+
+  glm::uvec2 extent = p_Output.extent(p_MipIdx);
+  const float roughness = p_MinRoughness + float(p_MipIdx) /
+                                               p_Output.max_level() *
+                                               (1.0f - p_MinRoughness);
+  const float roughness2 = roughness * roughness;
+  const float resolution = (float)(p_Input.extent(0u).x * p_Input.extent(0u).y);
+  const float saTexel = 4.0f * glm::pi<float>() / (6.0f * resolution);
+
+  const uint32_t sampleCount = p_SampleCounts[p_MipIdx];
+
+  for (uint32_t y = p_RangeY.x; y < p_RangeY.y; ++y)
+  {
+    for (uint32_t x = p_RangeX.x; x < p_RangeX.y; ++x)
+    {
+      const glm::uvec3 pixelPos = glm::uvec3(x, y, p_FaceIdx);
+      const glm::vec3 R = Rendering::IBL::mapXYSToDirection(pixelPos, extent);
+
+      glm::vec3 preFilteredColor = glm::vec3(0.0f);
+
+      float totalWeight = 0.0f;
+
+      for (uint32_t i = 0; i < sampleCount; ++i)
+      {
+        const glm::vec2 Xi = Math::hammersley(i, sampleCount);
+        const glm::vec3 H = importanceSampleGGX(Xi, roughness, R);
+        const glm::vec3 L = 2.0f * glm::dot(R, H) * H - R;
+        const float NdL = glm::clamp(glm::dot(R, L), 0.0f, 1.0f);
+        const float NdH = glm::clamp(glm::dot(R, H), 0.0f, 1.0f);
+
+        if (NdL > 0.0f)
+        {
+          const glm::vec3 uvs = mapDirectionToUVS(L);
+
+          const float D = D_GGX(NdH, roughness2);
+          const float pdf = D * 0.25f + 0.0001f;
+
+          const float saSample = 1.0f / (float(sampleCount) * pdf + 0.0001f);
+          const float mipLevel =
+              glm::clamp(1.0f /* Bias*/ + 0.5f * log2(saSample / saTexel), 0.0f,
+                         (float)p_Input.max_level());
+
+          preFilteredColor += glm::vec3(sourceSamplerTrilinear.texture_lod(
+                                  uvs, (size_t)uvs.z, mipLevel)) *
+                              NdL;
+          totalWeight += NdL;
+        }
+      }
+
+      targetSampler.texel_write(
+          pixelPos, p_FaceIdx, p_MipIdx,
+          glm::vec4(preFilteredColor / totalWeight, 1.0f));
+    }
+  }
+}
+
+_INTR_INLINE void _preFilterGGX(const gli::texture_cube& p_Input,
+                                gli::texture_cube& p_Output, uint32_t p_FaceIdx,
+                                uint32_t p_MipIdx, glm::uvec2 p_RangeX,
+                                glm::uvec2 p_RangeY,
+                                const uint32_t* p_SampleCounts,
+                                float p_MinRoughness)
+{
+  gli::fsamplerCube sourceSampler =
+      gli::fsamplerCube(p_Input, gli::WRAP_CLAMP_TO_EDGE);
+  gli::fsamplerCube targetSampler =
+      gli::fsamplerCube(p_Output, gli::WRAP_CLAMP_TO_EDGE);
+
+  glm::uvec2 extent = p_Output.extent(p_MipIdx);
+  const float roughness = p_MinRoughness + float(p_MipIdx) /
+                                               p_Output.max_level() *
+                                               (1.0f - p_MinRoughness);
+
+  const uint32_t sampleCount = p_SampleCounts[p_MipIdx];
+
+  for (uint32_t y = p_RangeY.x; y < p_RangeY.y; ++y)
+  {
+    for (uint32_t x = p_RangeX.x; x < p_RangeX.y; ++x)
+    {
+      const glm::uvec3 pixelPos = glm::uvec3(x, y, p_FaceIdx);
+      const glm::vec3 R = Rendering::IBL::mapXYSToDirection(pixelPos, extent);
+
+      glm::vec3 preFilteredColor = glm::vec3(0.0f);
+
+      float totalWeight = 0.0f;
+
+      for (uint32_t i = 0; i < sampleCount; ++i)
+      {
+        const glm::vec2 Xi = Math::hammersley(i, sampleCount);
+        const glm::vec3 H = importanceSampleGGX(Xi, roughness, R);
+        const glm::vec3 L = 2.0f * glm::dot(R, H) * H - R;
+        const float NdL = glm::clamp(glm::dot(R, L), 0.0f, 1.0f);
+
+        if (NdL > 0.0f)
+        {
+          const glm::vec3 uvs = mapDirectionToUVS(L);
+
+          preFilteredColor +=
+              glm::vec3(sourceSampler.texture_lod(uvs, (size_t)uvs.z, 0u)) *
+              NdL;
+          totalWeight += NdL;
+        }
+      }
+
+      targetSampler.texel_write(
+          pixelPos, p_FaceIdx, p_MipIdx,
+          glm::vec4(preFilteredColor / totalWeight, 1.0f));
+    }
+  }
+}
+
 enki::TaskScheduler _scheduler;
 
 struct PreFilterParallelTaskSet : enki::ITaskSet
@@ -68,8 +192,6 @@ void initCubemapProcessing()
   _scheduler.Initialize();
   _preFilterParallelTaskSets = _INTR_ARRAY(PreFilterParallelTaskSet)();
 }
-
-// <-
 
 void preFilterGGX(const gli::texture_cube& p_Input, gli::texture_cube& p_Output,
                   const uint32_t* p_SampleCounts, float p_MinRoughness)
@@ -249,89 +371,109 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear,
     }
 
     {
-      gli::texture_cube texCube = gli::texture_cube(
-          gli::FORMAT_RGBA16_SFLOAT_PACK16, cubeMapRes,
-          (uint32_t)glm::max((int32_t)gli::levels(cubeMapRes) - 3, 1));
+      gli::texture_cube texCube;
 
-      for (uint32_t atlasIdx = 0u; atlasIdx < 6; ++atlasIdx)
       {
-        Components::NodeManager::_orientation(camNodeRef) =
-            rotationsPerAtlasIdx[atlasIdx];
-        Components::NodeManager::updateTransforms(nodesToUpdate);
+        gli::texture_cube packedTexCube =
+            gli::texture_cube(gli::FORMAT_RGBA16_SFLOAT_PACK16, cubeMapRes, 1u);
 
-        // Render face
-        Components::PostEffectVolumeManager::blendPostEffects(
-            Components::PostEffectVolumeManager::_activeRefs);
-        RenderProcess::Default::renderFrame(0.0f);
-
-        // Wait for the rendering to finish
-        RenderSystem::waitForAllFrames();
-
-        // Copy image to host visible memory
-        VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
-
-        ImageRef sceneImageRef = ImageManager::getResourceByName(_N(Scene));
-
-        ImageManager::insertImageMemoryBarrier(
-            copyCmd, sceneImageRef, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-
-        VkBufferImageCopy bufferImageCopy = {};
+        for (uint32_t atlasIdx = 0u; atlasIdx < 6; ++atlasIdx)
         {
-          bufferImageCopy.bufferOffset = 0u;
-          bufferImageCopy.imageOffset = {};
-          bufferImageCopy.bufferRowLength = cubeMapRes.x;
-          bufferImageCopy.bufferImageHeight = cubeMapRes.y;
-          bufferImageCopy.imageExtent.width = cubeMapRes.x;
-          bufferImageCopy.imageExtent.height = cubeMapRes.y;
-          bufferImageCopy.imageExtent.depth = 1u;
-          bufferImageCopy.imageSubresource.aspectMask =
-              VK_IMAGE_ASPECT_COLOR_BIT;
-          bufferImageCopy.imageSubresource.baseArrayLayer = 0u;
-          bufferImageCopy.imageSubresource.layerCount = 1u;
-          bufferImageCopy.imageSubresource.mipLevel = 0u;
+          Components::NodeManager::_orientation(camNodeRef) =
+              rotationsPerAtlasIdx[atlasIdx];
+          Components::NodeManager::updateTransforms(nodesToUpdate);
+
+          // Render face
+          Components::PostEffectVolumeManager::blendPostEffects(
+              Components::PostEffectVolumeManager::_activeRefs);
+          RenderProcess::Default::renderFrame(0.0f);
+
+          // Wait for the rendering to finish
+          RenderSystem::waitForAllFrames();
+
+          // Copy image to host visible memory
+          VkCommandBuffer copyCmd = RenderSystem::beginTemporaryCommandBuffer();
+
+          ImageRef sceneImageRef = ImageManager::getResourceByName(_N(Scene));
+
+          ImageManager::insertImageMemoryBarrier(
+              copyCmd, sceneImageRef, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+              VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+          VkBufferImageCopy bufferImageCopy = {};
+          {
+            bufferImageCopy.bufferOffset = 0u;
+            bufferImageCopy.imageOffset = {};
+            bufferImageCopy.bufferRowLength = cubeMapRes.x;
+            bufferImageCopy.bufferImageHeight = cubeMapRes.y;
+            bufferImageCopy.imageExtent.width = cubeMapRes.x;
+            bufferImageCopy.imageExtent.height = cubeMapRes.y;
+            bufferImageCopy.imageExtent.depth = 1u;
+            bufferImageCopy.imageSubresource.aspectMask =
+                VK_IMAGE_ASPECT_COLOR_BIT;
+            bufferImageCopy.imageSubresource.baseArrayLayer = 0u;
+            bufferImageCopy.imageSubresource.layerCount = 1u;
+            bufferImageCopy.imageSubresource.mipLevel = 0u;
+          }
+
+          // Read back face
+          vkCmdCopyImageToBuffer(copyCmd, ImageManager::_vkImage(sceneImageRef),
+                                 VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                                 BufferManager::_vkBuffer(readBackBufferRef),
+                                 1u, &bufferImageCopy);
+
+          RenderSystem::flushTemporaryCommandBuffer();
+
+          const uint8_t* sceneMemory =
+              BufferManager::getGpuMemory(readBackBufferRef);
+
+          memcpy(packedTexCube.data(0u, atlasIndexToFaceIdx[atlasIdx], 0u),
+                 sceneMemory, faceSizeInBytes);
         }
 
-        // Read back face
-        vkCmdCopyImageToBuffer(copyCmd, ImageManager::_vkImage(sceneImageRef),
-                               VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                               BufferManager::_vkBuffer(readBackBufferRef), 1u,
-                               &bufferImageCopy);
-
-        RenderSystem::flushTemporaryCommandBuffer();
-
-        const uint8_t* sceneMemory =
-            BufferManager::getGpuMemory(readBackBufferRef);
-
-        memcpy(texCube.data(0u, atlasIndexToFaceIdx[atlasIdx], 0u), sceneMemory,
-               faceSizeInBytes);
+        texCube = gli::convert(packedTexCube, gli::FORMAT_RGBA32_SFLOAT_PACK32);
       }
 
       if (specProbeRef.isValid())
       {
-        gli::fsamplerCube sourceSampler =
-            gli::fsamplerCube(texCube, gli::WRAP_CLAMP_TO_EDGE);
-        sourceSampler.generate_mipmaps(gli::FILTER_LINEAR);
+        _INTR_STRING timeString = StringUtil::toString(p_Time);
+        StringUtil::replace(timeString, ".", "-");
+        const _INTR_STRING fileName =
+            Entity::EntityManager::_name(currentEntity).getString() +
+            timeString + ".dds";
+        const _INTR_STRING filePath = "media/specular_probes/" + fileName;
+        const _INTR_STRING tempFilePath = "media/specular_probes/_" + fileName;
+
+        gli::save_dds(texCube, tempFilePath.c_str());
+
+        // Generate blurred mip maps
+        {
+          _INTR_STRING adjustedArgs =
+              "-f R32G32B32A32_FLOAT -if BOX_DITHER_DIFFUSION"
+              " -o media/specular_probes " +
+              tempFilePath;
+          StringUtil::replace(adjustedArgs, "/", "\\\\");
+
+          const _INTR_STRING cmd =
+              "tools\\dxtexconv\\texconv.exe -y " + adjustedArgs;
+          std::system(cmd.c_str());
+
+          texCube = (gli::texture_cube)gli::load(tempFilePath.c_str());
+          std::remove(tempFilePath.c_str());
+        }
 
         // Output texture
         gli::texture_cube filteredTexCube =
-            gli::texture_cube(gli::FORMAT_RGBA16_SFLOAT_PACK16, cubeMapRes,
+            gli::texture_cube(gli::FORMAT_RGBA32_SFLOAT_PACK32, cubeMapRes,
                               gli::levels(cubeMapRes));
 
         _INTR_ARRAY(uint32_t)
-        sampleCounts = {16u, 128u, 256u, 256u, 256u, 256u, 256u, 256u, 256u};
+        sampleCounts = {16u, 64u, 128u, 256u, 256u, 256u, 256u, 256u, 256u};
         _INTR_ASSERT(sampleCounts.size() == filteredTexCube.levels());
 
         Rendering::IBL::preFilterGGX(texCube, filteredTexCube,
                                      sampleCounts.data());
 
-        _INTR_STRING timeString = StringUtil::toString(p_Time);
-        StringUtil::replace(timeString, ".", "-");
-
-        const _INTR_STRING fileName =
-            Entity::EntityManager::_name(currentEntity).getString() +
-            timeString + ".dds";
-        const _INTR_STRING filePath = "media/specular_probes/" + fileName;
         gli::save_dds(filteredTexCube, filePath.c_str());
 
         // Compress to BCH6
