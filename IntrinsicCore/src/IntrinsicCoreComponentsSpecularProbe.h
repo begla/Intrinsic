@@ -93,13 +93,13 @@ struct SpecularProbeManager
         "radius",
         _INTR_CREATE_PROP_MIN_MAX(p_Document, p_GenerateDesc, _N(SpecularProbe),
                                   _N(float), _descRadius(p_Ref), false, false,
-                                  1.0f, 50.0f),
+                                  1.0f, 500.0f),
         p_Document.GetAllocator());
     p_Properties.AddMember(
         "falloffRangePerc",
         _INTR_CREATE_PROP_MIN_MAX(p_Document, p_GenerateDesc, _N(SpecularProbe),
                                   _N(float), _descFalloffRangePerc(p_Ref),
-                                  false, false, 0.0f, 1.0f),
+                                  false, false, 0.01f, 1.0f),
         p_Document.GetAllocator());
     p_Properties.AddMember(
         "falloffExp",

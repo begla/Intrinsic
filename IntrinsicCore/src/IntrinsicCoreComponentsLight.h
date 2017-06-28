@@ -86,7 +86,7 @@ struct LightManager
     p_Properties.AddMember("radius",
                            _INTR_CREATE_PROP_MIN_MAX(
                                p_Document, p_GenerateDesc, _N(Light), _N(float),
-                               _descRadius(p_Ref), false, false, 1.0f, 50.0f),
+                               _descRadius(p_Ref), false, false, 1.0f, 500.0f),
                            p_Document.GetAllocator());
     p_Properties.AddMember("color",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
