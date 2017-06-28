@@ -43,39 +43,21 @@
        <height>25</height>
       </size>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QGridLayout" name="gridLayout">
       <property name="topMargin">
        <number>3</number>
       </property>
       <property name="bottomMargin">
        <number>3</number>
       </property>
-      <item>
-       <widget class="QLabel" name="propertyTitle">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>Property</string>
+      <item row="0" column="3">
+       <widget class="QSlider" name="valueSlider">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="2">
        <widget class="QDoubleSpinBox" name="value">
         <property name="keyboardTracking">
          <bool>false</bool>
@@ -94,10 +76,28 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QSlider" name="valueSlider">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="0" column="1">
+       <widget class="QLabel" name="propertyTitle">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Property</string>
         </property>
        </widget>
       </item>
