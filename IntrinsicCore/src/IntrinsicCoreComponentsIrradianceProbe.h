@@ -90,25 +90,27 @@ struct IrradianceProbeManager
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember("radius",
-                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(IrradianceProbe), _N(float),
-                                             _descRadius(p_Ref), false, false),
+                           _INTR_CREATE_PROP_MIN_MAX(
+                               p_Document, p_GenerateDesc, _N(IrradianceProbe),
+                               _N(float), _descRadius(p_Ref), false, false,
+                               1.0f, 50.0f),
                            p_Document.GetAllocator());
     p_Properties.AddMember("falloffRangePerc",
-                           _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(IrradianceProbe), _N(float),
-                                             _descFalloffRangePerc(p_Ref),
-                                             false, false),
+                           _INTR_CREATE_PROP_MIN_MAX(
+                               p_Document, p_GenerateDesc, _N(IrradianceProbe),
+                               _N(float), _descFalloffRangePerc(p_Ref), false,
+                               false, 0.0f, 1.0f),
                            p_Document.GetAllocator());
-    p_Properties.AddMember(
-        "falloffExp",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(float), _descFalloffExp(p_Ref), false, false),
-        p_Document.GetAllocator());
+    p_Properties.AddMember("falloffExp",
+                           _INTR_CREATE_PROP_MIN_MAX(
+                               p_Document, p_GenerateDesc, _N(IrradianceProbe),
+                               _N(float), _descFalloffExp(p_Ref), false, false,
+                               0.1f, 10.0f),
+                           p_Document.GetAllocator());
     p_Properties.AddMember(
         "priority",
         _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(IrradianceProbe),
-                          _N(float), _descPriority(p_Ref), false, false),
+                          _N(uint), _descPriority(p_Ref), false, false),
         p_Document.GetAllocator());
 
     if (!p_GenerateDesc)
@@ -142,7 +144,7 @@ struct IrradianceProbeManager
           JsonHelper::readPropertyFloat(p_Properties["falloffExp"]);
     if (p_Properties.HasMember("priority"))
       _descPriority(p_Ref) =
-          (uint32_t)JsonHelper::readPropertyFloat(p_Properties["priority"]);
+          JsonHelper::readPropertyUint(p_Properties["priority"]);
 
     if (!p_GenerateDesc)
     {

@@ -84,23 +84,26 @@ struct LightManager
                                              rapidjson::Document& p_Document)
   {
     p_Properties.AddMember("radius",
+                           _INTR_CREATE_PROP_MIN_MAX(
+                               p_Document, p_GenerateDesc, _N(Light), _N(float),
+                               _descRadius(p_Ref), false, false, 1.0f, 50.0f),
+                           p_Document.GetAllocator());
+    p_Properties.AddMember("color",
                            _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                             _N(Light), _N(float),
-                                             _descRadius(p_Ref), false, false),
+                                             _N(Light), _N(color),
+                                             _descColor(p_Ref), false, false),
                            p_Document.GetAllocator());
     p_Properties.AddMember(
-        "color", _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Light),
-                                   _N(color), _descColor(p_Ref), false, false),
-        p_Document.GetAllocator());
-    p_Properties.AddMember(
         "intensity",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Light), _N(float),
-                          _descIntensity(p_Ref), false, false),
+        _INTR_CREATE_PROP_MIN_MAX(p_Document, p_GenerateDesc, _N(Light),
+                                  _N(float), _descIntensity(p_Ref), false,
+                                  false, 0.1f, 1000.0f),
         p_Document.GetAllocator());
     p_Properties.AddMember(
         "temperature",
-        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Light), _N(float),
-                          _descTemperature(p_Ref), false, false),
+        _INTR_CREATE_PROP_MIN_MAX(p_Document, p_GenerateDesc, _N(Light),
+                                  _N(float), _descTemperature(p_Ref), false,
+                                  false, 1000.0f, 40000.0f),
         p_Document.GetAllocator());
   }
 

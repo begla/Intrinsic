@@ -243,16 +243,17 @@ struct MaterialManager
           _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(UV), "vec2",
                             _descUvAnimation(p_Ref), false, false),
           p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "translucencyThickness",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Translucency),
-                            "float", _descTranslucencyThickness(p_Ref), false,
-                            false),
-          p_Document.GetAllocator());
+      p_Properties.AddMember("translucencyThickness",
+                             _INTR_CREATE_PROP_MIN_MAX(
+                                 p_Document, p_GenerateDesc, _N(Translucency),
+                                 "float", _descTranslucencyThickness(p_Ref),
+                                 false, false, 0.0f, 10.0f),
+                             p_Document.GetAllocator());
       p_Properties.AddMember(
           "emissiveIntensity",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Emissive), "float",
-                            _descEmissiveIntensity(p_Ref), false, false),
+          _INTR_CREATE_PROP_MIN_MAX(p_Document, p_GenerateDesc, _N(Emissive),
+                                    "float", _descEmissiveIntensity(p_Ref),
+                                    false, false, 0.0f, 1000.0f),
           p_Document.GetAllocator());
     }
 
@@ -358,19 +359,21 @@ struct MaterialManager
           p_Document.GetAllocator());
       p_Properties.AddMember(
           "foamFadeDistance",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Water), "float",
-                            _descWaterParams(p_Ref).x, false, false),
+          _INTR_CREATE_PROP_MIN_MAX(p_Document, p_GenerateDesc, _N(Water),
+                                    "float", _descWaterParams(p_Ref).x, false,
+                                    false, 0.0f, 500.0f),
           p_Document.GetAllocator());
       p_Properties.AddMember(
           "waterFadeDistance",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Water), "float",
-                            _descWaterParams(p_Ref).y, false, false),
+          _INTR_CREATE_PROP_MIN_MAX(p_Document, p_GenerateDesc, _N(Water),
+                                    "float", _descWaterParams(p_Ref).y, false,
+                                    false, 0.0f, 500.0f),
           p_Document.GetAllocator());
       p_Properties.AddMember("refractionFactor",
-                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
-                                               _N(Transparency), "float",
-                                               _descRefractionFactor(p_Ref),
-                                               false, false),
+                             _INTR_CREATE_PROP_MIN_MAX(
+                                 p_Document, p_GenerateDesc, _N(Transparency),
+                                 "float", _descRefractionFactor(p_Ref), false,
+                                 false, 0.0f, 1.0f),
                              p_Document.GetAllocator());
     }
   }
