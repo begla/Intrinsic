@@ -587,6 +587,7 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
             Editing::_currentlySelectedEntity);
     const glm::vec3& entityWorldPos =
         Components::NodeManager::_worldPosition(currentEntityNodeRef);
+    const glm::vec3 dirToCam = glm::normalize(camPosition - entityWorldPos);
 
     const Math::Ray worldRay = Math::calcMouseRay(
         camPosition, Input::System::getLastMousePosViewport(),
@@ -624,8 +625,6 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
           {
             const glm::vec3 axisVector =
                 getAxisVector(_XAxisSelected, _YAxisSelected, _ZAxisSelected);
-            const glm::vec3 dirToCam =
-                glm::normalize(camPosition - entityWorldPos);
             _selectedPlaneNormal = findBestPlaneNormal(axisVector, dirToCam);
           }
           else if (_anyPlaneSelected)
@@ -642,6 +641,9 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
             {
               _selectedPlaneNormal = glm::vec3(1.0f, 0.0f, 0.0f);
             }
+
+            _selectedPlaneNormal *=
+                glm::dot(_selectedPlaneNormal, dirToCam) > 0.0f ? 1.0f : -1.0f;
           }
         }
         else
@@ -656,6 +658,9 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
           _selectedPlaneNormal = glm::vec3(_XAxisSelected ? 1.0f : 0.0f,
                                            _YAxisSelected ? 1.0f : 0.0f,
                                            _ZAxisSelected ? 1.0f : 0.0f);
+
+          _selectedPlaneNormal *=
+              glm::dot(_selectedPlaneNormal, dirToCam) > 0.0f ? 1.0f : -1.0f;
         }
 
         glm::vec3 planeIntersectionPoint;
@@ -714,11 +719,6 @@ _INTR_INLINE void handleGizmo(float p_DeltaT)
             const float sign =
                 glm::dot(v0, Components::CameraManager::_forward(camRef));
             planeRotation *= sign >= 0.0f ? 1.0f : -1.0f;
-            planeRotation *=
-                glm::dot(_selectedPlaneNormal,
-                         -Components::CameraManager::_forward(camRef)) >= 0.0f
-                    ? 1.0f
-                    : -1.0f;
 
             // Visualize helper line
             R::RenderPass::Debug::renderLineDotted(pointOnHelperPlane,
