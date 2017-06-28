@@ -14,6 +14,8 @@
 
 #pragma once
 
+#define _INTR_HALTON_SAMPLE_COUNT 1024u
+
 namespace Intrinsic
 {
 namespace Renderer
@@ -95,6 +97,8 @@ struct UniformManager
     glm::vec4 postParams0;
     glm::vec4 backbufferSize;
   } _uniformDataSource;
+
+  static glm::vec3* _haltonSamples;
 };
 }
 }

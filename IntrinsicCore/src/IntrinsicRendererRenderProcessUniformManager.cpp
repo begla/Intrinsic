@@ -15,8 +15,6 @@
 // Precompiled header file
 #include "stdafx.h"
 
-#define HALTON_SAMPLE_COUNT 1024
-
 using namespace CResources;
 
 namespace Intrinsic
@@ -26,19 +24,19 @@ namespace Renderer
 namespace RenderProcess
 {
 // Static members
-UniformManager::UniformDataSource
-    UniformManager::UniformManager::_uniformDataSource;
+UniformManager::UniformDataSource UniformManager::_uniformDataSource;
+glm::vec3* UniformManager::_haltonSamples = nullptr;
 
 // Uniform data decl.
 namespace
 {
-glm::vec3 _haltonSamples[HALTON_SAMPLE_COUNT];
+glm::vec3 _haltonSamples[_INTR_HALTON_SAMPLE_COUNT];
 
 _INTR_INLINE void initStaticUniformData()
 {
   // Generate Halton Samples
   {
-    for (uint32_t i = 0u; i < HALTON_SAMPLE_COUNT; ++i)
+    for (uint32_t i = 0u; i < _INTR_HALTON_SAMPLE_COUNT; ++i)
     {
       _haltonSamples[i] = glm::vec3(Math::calcHaltonSequence(i, 2u),
                                     Math::calcHaltonSequence(i, 3u),
@@ -58,6 +56,8 @@ _INTR_INLINE void initStaticUniformData()
       glm::vec4(1.0f, 0.0f, 1.0f, 0.0f);
   UniformManager::_uniformDataSource.blurParamsYLow =
       glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+  UniformManager::_haltonSamples = _haltonSamples;
 }
 }
 
@@ -235,9 +235,12 @@ void UniformManager::updatePerFrameUniformBufferData(Dod::Ref p_Camera)
         glm::vec4(Components::NodeManager::_worldPosition(cameraNode), 0.0f);
 
     UniformManager::_uniformDataSource.haltonSamples = glm::vec4(
-        _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].x,
-        _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].y,
-        _haltonSamples[TaskManager::_frameCounter % HALTON_SAMPLE_COUNT].z,
+        _haltonSamples[TaskManager::_frameCounter % _INTR_HALTON_SAMPLE_COUNT]
+            .x,
+        _haltonSamples[TaskManager::_frameCounter % _INTR_HALTON_SAMPLE_COUNT]
+            .y,
+        _haltonSamples[TaskManager::_frameCounter % _INTR_HALTON_SAMPLE_COUNT]
+            .z,
         0.0f);
     UniformManager::_uniformDataSource.haltonSamples32 =
         glm::vec4(_haltonSamples[TaskManager::_frameCounter % 32].x,
