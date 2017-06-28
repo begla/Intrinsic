@@ -45,8 +45,7 @@ layout(local_size_x = 8u, local_size_y = 8u, local_size_z = 1u) in;
 void main()
 {
   vec4 currentValue =
-      texelFetch(volLightBufferTex, ivec3(gl_GlobalInvocationID.xy, 0), 0) *
-      0.0001;
+      texelFetch(volLightBufferTex, ivec3(gl_GlobalInvocationID.xy, 0), 0);
   write(ivec3(gl_GlobalInvocationID.xy, 0), currentValue);
 
   for (int z = 1; z < VOLUME_DEPTH; ++z)
