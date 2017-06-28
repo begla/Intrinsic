@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>173</width>
+    <width>345</width>
     <height>31</height>
    </rect>
   </property>
@@ -84,13 +84,20 @@
          <number>6</number>
         </property>
         <property name="minimum">
-         <double>-1000000.0000000000000</double>
+         <double>-1000000.000000000000000</double>
         </property>
         <property name="maximum">
-         <double>1000000.0000000000000</double>
+         <double>1000000.000000000000000</double>
         </property>
         <property name="singleStep">
          <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="valueSlider">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>

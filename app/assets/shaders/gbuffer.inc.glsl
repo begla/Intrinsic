@@ -121,6 +121,7 @@ void writeGBuffer(in GBuffer gbuffer, inout vec4 outAlbedo,
 // http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
 float adjustRoughness(float inputRoughness, float avgNormalLength)
 {
+  inputRoughness = clamp(inputRoughness, 0.0, 1.0);
   if (avgNormalLength < 1.0)
   {
     float avgNormLen2 = avgNormalLength * avgNormalLength;

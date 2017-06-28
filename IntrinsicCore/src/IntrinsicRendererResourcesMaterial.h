@@ -277,18 +277,21 @@ struct MaterialManager
 
       p_Properties.AddMember(
           "metalMaskBias",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(PBR), "float",
-                            _descPbrBias(p_Ref).x, false, false),
+          _INTR_CREATE_PROP_MIN_MAX(p_Document, p_GenerateDesc, _N(PBR),
+                                    "float", _descPbrBias(p_Ref).x, false,
+                                    false, -1.0f, 1.0f),
           p_Document.GetAllocator());
       p_Properties.AddMember(
           "roughnessBias",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(PBR), "float",
-                            _descPbrBias(p_Ref).z, false, false),
+          _INTR_CREATE_PROP_MIN_MAX(p_Document, p_GenerateDesc, _N(PBR),
+                                    "float", _descPbrBias(p_Ref).z, false,
+                                    false, -1.0f, 1.0f),
           p_Document.GetAllocator());
       p_Properties.AddMember(
           "specularBias",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(PBR), "float",
-                            _descPbrBias(p_Ref).y, false, false),
+          _INTR_CREATE_PROP_MIN_MAX(p_Document, p_GenerateDesc, _N(PBR),
+                                    "float", _descPbrBias(p_Ref).y, false,
+                                    false, -1.0f, 1.0f),
           p_Document.GetAllocator());
     }
 

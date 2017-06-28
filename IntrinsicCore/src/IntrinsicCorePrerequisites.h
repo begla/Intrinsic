@@ -207,6 +207,10 @@
 #define _INTR_CREATE_PROP(_doc, _gd, _cat, _ed, _val, _ro, _int)               \
   Intrinsic::Core::JsonHelper::createProperty(_doc, _gd, _cat, _ed, _val, _ro, \
                                               _int)
+#define _INTR_CREATE_PROP_MIN_MAX(_doc, _gd, _cat, _ed, _val, _ro, _int, _min, \
+                                  _max)                                        \
+  Intrinsic::Core::JsonHelper::createProperty(_doc, _gd, _cat, _ed, _val, _ro, \
+                                              _int, _min, _max)
 #define _INTR_CREATE_PROP_ENUM(_doc, _gd, _cat, _ed, _val, _enum, _ro, _int)   \
   Intrinsic::Core::JsonHelper::createPropertyEnum(_doc, _gd, _cat, _ed, _val,  \
                                                   _enum, _ro, _int)

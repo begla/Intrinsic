@@ -31,6 +31,7 @@ public:
 
 public slots:
   void onValueChanged();
+  void onSliderValueChanged();
 
 signals:
   void valueChanged(rapidjson::Value& p_Properties);

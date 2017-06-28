@@ -27,10 +27,32 @@ IntrinsicEdPropertyEditorFloat::IntrinsicEdPropertyEditorFloat(
                                     p_CurrentProperty, p_PropertyName, parent)
 {
   _ui.setupUi(this);
-  updateFromProperty();
 
   QObject::connect(_ui.value, SIGNAL(valueChanged(double)), this,
                    SLOT(onValueChanged()));
+
+  const rapidjson::Value& prop = *_property;
+  if (!prop.HasMember("min") || prop["min"].GetFloat() == -FLT_MAX)
+  {
+    delete _ui.valueSlider;
+    _ui.valueSlider = nullptr;
+  }
+  else
+  {
+    const float min = prop["min"].GetFloat();
+    const float max = prop["max"].GetFloat();
+
+    _ui.value->setMinimum(min);
+    _ui.value->setMaximum(max);
+
+    _ui.valueSlider->setMinimum(0);
+    _ui.valueSlider->setMaximum(1000);
+
+    QObject::connect(_ui.valueSlider, SIGNAL(valueChanged(int)), this,
+                     SLOT(onSliderValueChanged()));
+  }
+
+  updateFromProperty();
 }
 
 IntrinsicEdPropertyEditorFloat::~IntrinsicEdPropertyEditorFloat() {}
@@ -50,6 +72,14 @@ void IntrinsicEdPropertyEditorFloat::updateFromProperty()
     _ui.value->blockSignals(true);
     _ui.value->setValue(prop["value"].GetFloat());
     _ui.value->blockSignals(false);
+
+    if (_ui.valueSlider)
+    {
+      const int sliderPos =
+          (int)((_ui.value->value() - _ui.value->minimum()) /
+                (_ui.value->maximum() - _ui.value->minimum()) * 1000.0f);
+      _ui.valueSlider->setValue(sliderPos);
+    }
   }
 
   _ui.propertyTitle->setText(_propertyName.c_str());
@@ -64,6 +94,22 @@ void IntrinsicEdPropertyEditorFloat::onValueChanged()
   {
     prop["value"].SetFloat((float)_ui.value->value());
 
+    if (_ui.valueSlider)
+    {
+      const int sliderPos =
+          (int)((_ui.value->value() - _ui.value->minimum()) /
+                (_ui.value->maximum() - _ui.value->minimum()) * 1000.0f);
+      _ui.valueSlider->setValue(sliderPos);
+    }
+
     emit valueChanged(*_properties);
   }
+}
+
+void IntrinsicEdPropertyEditorFloat::onSliderValueChanged()
+{
+  const float value =
+      _ui.value->minimum() + (_ui.valueSlider->value() / 1000.0f) *
+                                 (_ui.value->maximum() - _ui.value->minimum());
+  _ui.value->setValue(value);
 }

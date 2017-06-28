@@ -260,7 +260,8 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
 _INTR_INLINE rapidjson::Value
 createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
                const Name& p_Category, const Name& p_Editor, float p_Value,
-               bool p_ReadOnly, bool p_Internal)
+               bool p_ReadOnly, bool p_Internal, float p_Min = -FLT_MAX,
+               float p_Max = FLT_MAX)
 {
   rapidjson::Value property = rapidjson::Value(rapidjson::kObjectType);
   rapidjson::Value propertyCat =
@@ -276,6 +277,8 @@ createProperty(rapidjson::Document& p_Doc, bool p_GenerateDesc,
     property.AddMember("readOnly", p_ReadOnly, p_Doc.GetAllocator());
     property.AddMember("internal", p_Internal, p_Doc.GetAllocator());
     property.AddMember("value", p_Value, p_Doc.GetAllocator());
+    property.AddMember("min", p_Min, p_Doc.GetAllocator());
+    property.AddMember("max", p_Max, p_Doc.GetAllocator());
   }
   else
   {
