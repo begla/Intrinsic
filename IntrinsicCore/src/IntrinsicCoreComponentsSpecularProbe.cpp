@@ -108,7 +108,6 @@ void SpecularProbeManager::destroyResources(
         imagesToDestroy.push_back(imageRef);
       }
     }
-    _descSpecularTextureNames(probeRef).clear();
   }
 
   ImageManager::destroyImagesAndResources(imagesToDestroy);

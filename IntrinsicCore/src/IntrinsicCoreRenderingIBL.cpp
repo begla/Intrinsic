@@ -352,7 +352,12 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear,
       if (irradProbeRef.isValid())
         Components::IrradianceProbeManager::_descSHs(irradProbeRef).clear();
       if (specProbeRef.isValid())
+      {
+        Components::SpecularProbeManager::_descSpecularTextureNames(
+            specProbeRef)
+            .clear();
         Components::SpecularProbeManager::destroyResources({specProbeRef});
+      }
     }
 
     Components::NodeManager::_position(camNodeRef) =
