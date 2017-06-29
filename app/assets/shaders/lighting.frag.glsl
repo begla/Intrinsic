@@ -143,8 +143,14 @@ void main()
   const vec3 normalWS = (uboPerFrame.invViewMatrix * vec4(d.N, 0.0)).xyz;
   const vec3 vWS = (uboPerFrame.invViewMatrix * vec4(d.V, 0.0)).xyz;
 
+  const vec3 posWS = (uboPerFrame.invViewMatrix * vec4(d.posVS, 1.0)).xyz;
+  const vec3 camPosWS = (uboPerFrame.invViewMatrix * vec4(vec3(0.0), 1.0)).xyz;
+
+  const vec3 camDirUnorm = posWS - camPosWS;
+  const vec3 reflectDirUnormWS = reflect(camDirUnorm, normalWS);
+
   const vec3 R0 = 2.0 * dot(vWS, normalWS) * normalWS - vWS;
-  const vec3 R =
+  vec3 R =
       mix(normalWS, R0,
           (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
 
@@ -195,22 +201,37 @@ void main()
       const uint packedProbeIndices = specProbeIndices[clusterIdx + pi / 2 + 1];
 
       SpecProbe probe = specProbes[packedProbeIndices & 0xFFFF];
-      calcLocalSpecular(probe, d, spec, R, specMipIdx, uboPerInstance.data0.z,
+
+      // Parallax correction
+      /*{
+        const vec3 boxMaxWS = vec3(10.0, 10000.0, 20.0);
+        const vec3 boxMinWS = vec3(-10.0, 0.0, -20.0);
+        const vec3 i0 = (boxMaxWS - posWS) / reflectDirUnormWS;
+        const vec3 i1 = (boxMinWS - posWS) / reflectDirUnormWS;
+        const vec3 iMax = max(i0, i1);
+        const float dist = min(iMax.x, min(iMax.y, iMax.z));
+        const vec3 iWS = posWS + reflectDirUnormWS * dist;
+
+        const vec3 R0 = iWS - (uboPerFrame.invViewMatrix * vec4(probe.posAndRadius.xyz, 1.0)).xyz;
+        R = mix(normalWS, R0,
+          (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
+      }*/
+
+      calcLocalSpecular(probe, d, spec, R, specMipIdx, uboPerInstance.data0.w,
                         1.0);
 
       probe = specProbes[packedProbeIndices >> 16];
-      calcLocalSpecular(probe, d, spec, R, specMipIdx, uboPerInstance.data0.z,
+      calcLocalSpecular(probe, d, spec, R, specMipIdx, uboPerInstance.data0.w,
                         float(pi + 1 < specProbeCount));
     }
 
-    outColor.rgb += d.specularColor * uboPerInstance.data0.y * spec;
+    outColor.rgb += d.specularColor * uboPerInstance.data0.z * spec;
   }
 
   // Emissive
   outColor.rgb += emissive * matParams.emissiveIntensity * d.baseColor;
 
   // Cloud shadows
-  const vec4 posWS = uboPerFrame.invViewMatrix * vec4(d.posVS, 1.0);
   const float cloudShadows = mix(
       1.0, clamp(texture(noiseTex,
                          clamp(posWS.xz / 5000.0 * 0.5 + 0.5, 0.0, 1.0) * 5.0 +
