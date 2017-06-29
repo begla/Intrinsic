@@ -78,9 +78,8 @@ void main()
   const float gamma = acos(max(dot(V, uboPerFrame.sunLightDirVS.xyz), 0.0001));
 
   // Apply sky model
-  albedo.rgb += clamp(calculateSkyModelRadiance(vec3(theta), vec3(gamma)) *
-                          uboPerFrame.skyModelRadiances.rgb,
-                      0.0, 100.0);
+  albedo.rgb += max(calculateSkyModelRadiance(vec3(theta), vec3(gamma)), 0.0) *
+                          uboPerFrame.skyModelRadiances.rgb;
   // albedo.rgb = sampleSH(uboPerFrame.skyLightSH, inNormal) / MATH_PI;
 
   // Sun/Moon
