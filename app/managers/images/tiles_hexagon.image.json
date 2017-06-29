@@ -1,0 +1,10 @@
+{
+    "name": "tiles_hexagon",
+    "properties": {
+        "name": "tiles_hexagon",
+        "imageType": 1,
+        "imageFormat": 8,
+        "fileName": "tiles_hexagon.dds",
+        "avgNormLength": 1.0
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "name": "tiles_hexagon_PBR",
+    "properties": {
+        "name": "tiles_hexagon_PBR",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "tiles_hexagon_PBR.dds",
+        "avgNormLength": 1.0
+    }
+}

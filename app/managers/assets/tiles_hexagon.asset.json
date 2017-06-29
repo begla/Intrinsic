@@ -1,0 +1,8 @@
+{
+    "name": "tiles_hexagon",
+    "properties": {
+        "name": "tiles_hexagon",
+        "assetFileName": "tiles_hexagon.tga",
+        "assetType": 2
+    }
+}

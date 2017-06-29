@@ -1,0 +1,10 @@
+{
+    "name": "tiles_hexagon_NRM",
+    "properties": {
+        "name": "tiles_hexagon_NRM",
+        "imageType": 1,
+        "imageFormat": 7,
+        "fileName": "tiles_hexagon_NRM.dds",
+        "avgNormLength": 0.9892934560775757
+    }
+}

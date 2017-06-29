@@ -1,0 +1,23 @@
+{
+    "name": "SpecularTest",
+    "properties": {
+        "name": "SpecularTest",
+        "scatteringDayNight": [
+            0.0,
+            0.0
+        ],
+        "sunOrientation": [
+            -0.8937008380889893,
+            -0.10569002479314804,
+            -0.32528048753738406,
+            0.29038095474243166
+        ],
+        "dayNightFactor": 0.0,
+        "skyLightIntensity": 0.05000000074505806,
+        "skyTurbidity": 2.0,
+        "skyAlbedo": 0.0,
+        "sunIntensity": 10.0,
+        "cloudShadowsIntensity": 0.0,
+        "dofStartDistance": 10000.0
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "name": "st_floor",
+    "properties": {
+        "name": "st_floor",
+        "materialPassMask": [
+            "GBufferDefault",
+            "Shadow",
+            "PerPixelPicking"
+        ],
+        "albedoTextureName": "tiles_hexagon",
+        "emissiveTextureName": "white",
+        "uvOffsetScale": [
+            0.0,
+            0.0,
+            10.0,
+            5.0
+        ],
+        "uvAnimation": [
+            0.0,
+            0.0
+        ],
+        "translucencyThickness": 0.0,
+        "emissiveIntensity": 0.0,
+        "normalTextureName": "tiles_hexagon_NRM",
+        "pbrTextureName": "tiles_hexagon_PBR",
+        "metalMaskBias": 0.0,
+        "roughnessBias": 0.12800000607967378,
+        "specularBias": 0.0
+    }
+}
