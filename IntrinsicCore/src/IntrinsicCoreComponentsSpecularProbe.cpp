@@ -76,6 +76,9 @@ void SpecularProbeManager::createResources(
 
       ImageRef imageToCreate = ImageManager::createImage(specularTextureName);
       {
+        ImageManager::addResourceFlags(
+            imageToCreate, Dod::Resources::ResourceFlags::kResourceVolatile);
+
         ImageManager::_descFileName(imageToCreate) =
             specularTextureName.getString();
         ImageManager::_descDirPath(imageToCreate) = "media/specular_probes/";
