@@ -44,6 +44,7 @@ IntrinsicEdPropertyEditorFloat::IntrinsicEdPropertyEditorFloat(
 
     _ui.value->setMinimum(min);
     _ui.value->setMaximum(max);
+    _ui.valueSlider->setValue(500);
 
     _ui.valueSlider->setMinimum(0);
     _ui.valueSlider->setMaximum(1000);
