@@ -329,7 +329,6 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear,
 
   uint32_t prevDebugStageFlags = RenderPass::Debug::_activeDebugStageFlags;
   RenderPass::Debug::_activeDebugStageFlags = 0u;
-  RenderPass::Clustering::_globalAmbientFactor = 0.0f;
   RenderPass::VolumetricLighting::_globalScatteringFactor = 0.0f;
   float prevTime = World::_currentTime;
   World::_currentTime = p_Time;
@@ -375,7 +374,27 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear,
       ++TaskManager::_frameCounter;
     }
 
+    enum ProbeType
     {
+      kIrrad,
+      kSpec
+    };
+
+    // Render irradiance and specular in different passes since specular needs
+    // the irradiance information
+    for (uint32_t probeIdx = 0u; probeIdx < 2u; ++probeIdx)
+    {
+      if (probeIdx == kIrrad)
+      {
+        RenderPass::Clustering::_globalIrradianceFactor = 0.0f;
+        RenderPass::Clustering::_globalSpecularFactor = 0.0f;
+      }
+      else if (probeIdx == kSpec)
+      {
+        RenderPass::Clustering::_globalIrradianceFactor = 1.0f;
+        RenderPass::Clustering::_globalSpecularFactor = 0.0f;
+      }
+
       gli::texture_cube texCube;
 
       {
@@ -439,7 +458,14 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear,
         texCube = gli::convert(packedTexCube, gli::FORMAT_RGBA32_SFLOAT_PACK32);
       }
 
-      if (specProbeRef.isValid())
+      if (irradProbeRef.isValid() && probeIdx == kIrrad)
+      {
+        // Generate and store SH irrad.
+        Components::IrradianceProbeManager::_descSHs(irradProbeRef)
+            .push_back(Rendering::IBL::project(texCube));
+      }
+
+      if (specProbeRef.isValid() && probeIdx == kSpec)
       {
         _INTR_STRING timeString = StringUtil::toString(p_Time);
         StringUtil::replace(timeString, ".", "-");
@@ -473,7 +499,7 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear,
                               gli::levels(cubeMapRes));
 
         _INTR_ARRAY(uint32_t)
-        sampleCounts = {16u, 64u, 128u, 256u, 256u, 256u, 256u, 256u, 256u};
+        sampleCounts = {16u, 256u, 256u, 256u, 256u, 256u, 256u, 256u, 256u};
         _INTR_ASSERT(sampleCounts.size() == filteredTexCube.levels());
 
         Rendering::IBL::preFilterGGX(texCube, filteredTexCube,
@@ -496,13 +522,6 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear,
             specProbeRef)
             .push_back(fileName);
       }
-
-      if (irradProbeRef.isValid())
-      {
-        // Generate and store SH irrad.
-        Components::IrradianceProbeManager::_descSHs(irradProbeRef)
-            .push_back(Rendering::IBL::project(texCube));
-      }
     }
 
     if (p_CreateResources)
@@ -519,7 +538,8 @@ void captureProbes(const Dod::RefArray& p_NodeRefs, bool p_Clear,
 
   Settings::Manager::_targetFrameRate = prevMaxFps;
   World::_currentTime = prevTime;
-  RenderPass::Clustering::_globalAmbientFactor = 1.0f;
+  RenderPass::Clustering::_globalSpecularFactor = 1.0f;
+  RenderPass::Clustering::_globalIrradianceFactor = 1.0f;
   RenderPass::VolumetricLighting::_globalScatteringFactor = 1.0f;
   RenderPass::Debug::_activeDebugStageFlags = prevDebugStageFlags;
   World::setActiveCamera(prevCamera);

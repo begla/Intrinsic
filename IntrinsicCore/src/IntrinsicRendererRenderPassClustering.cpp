@@ -731,8 +731,9 @@ _INTR_INLINE void renderLighting(FramebufferRef p_FramebufferRef,
   {
     // Post effect data
     _lightingPerInstanceData.data0.x = TaskManager::_totalTimePassed;
-    _lightingPerInstanceData.data0.y = Clustering::_globalAmbientFactor;
-    _lightingPerInstanceData.data0.z = World::_currentTime;
+    _lightingPerInstanceData.data0.y = Clustering::_globalIrradianceFactor;
+    _lightingPerInstanceData.data0.z = Clustering::_globalSpecularFactor;
+    _lightingPerInstanceData.data0.w = World::_currentTime;
 
     const _INTR_ARRAY(FrustumRef)& shadowFrustums =
         RenderProcess::Default::_shadowFrustums[p_CameraRef];
@@ -827,7 +828,8 @@ _INTR_INLINE void renderDecals(Components::CameraRef p_CameraRef)
 // <-
 
 // Static variables
-float Clustering::_globalAmbientFactor = 1.0f;
+float Clustering::_globalIrradianceFactor = 1.0f;
+float Clustering::_globalSpecularFactor = 1.0f;
 
 // <-
 

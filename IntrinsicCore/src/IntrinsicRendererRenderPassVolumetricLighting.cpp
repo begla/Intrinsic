@@ -103,7 +103,7 @@ updatePerInstanceData(CameraRef p_CameraRef,
     _perInstanceData.data0.x =
         glm::mix(scattering.y, scattering.x, World::_currentDayNightFactor) *
         VolumetricLighting::_globalScatteringFactor;
-    _perInstanceData.data0.z = Clustering::_globalAmbientFactor;
+    _perInstanceData.data0.z = Clustering::_globalIrradianceFactor;
   }
 
   _perInstanceData.haltonSamples =
@@ -386,8 +386,9 @@ void VolumetricLighting::init()
       PipelineLayoutManager::resetToDefault(pipelineLayoutScattering);
 
       GpuProgramManager::reflectPipelineLayout(
-          8u, {GpuProgramManager::getResourceByName(
-                  "volumetric_lighting_scattering.comp")},
+          8u,
+          {GpuProgramManager::getResourceByName(
+              "volumetric_lighting_scattering.comp")},
           pipelineLayoutScattering);
     }
     pipelineLayoutsToCreate.push_back(pipelineLayoutScattering);

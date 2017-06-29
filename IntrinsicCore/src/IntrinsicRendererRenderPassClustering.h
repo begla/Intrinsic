@@ -29,7 +29,8 @@ struct Clustering
 
   static void render(float p_DeltaT, Components::CameraRef p_CameraRef);
 
-  static float _globalAmbientFactor;
+  static float _globalIrradianceFactor;
+  static float _globalSpecularFactor;
 };
 }
 }
