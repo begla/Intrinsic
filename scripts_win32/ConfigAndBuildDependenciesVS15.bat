@@ -1,4 +1,7 @@
-cd ../dependencies/glslang
+cd ..
+git submodule update --init --recursive
+
+cd dependencies/glslang
 mkdir build
 cd build
 
