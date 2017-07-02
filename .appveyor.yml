@@ -24,6 +24,7 @@ deploy:
   artifact: Intrinsic_Win32
   draft: true
   prerelease: false
+  force_update: true
   on:
     configuration: Release
     branch: master
@@ -53,7 +54,7 @@ build_script:
       {
         cd scripts_win32
         & appveyor DownloadFile http://www.intrinsic-engine.com/downloads/media.7z -FileName media.7z
-        & 7z x media.7z -o../app/media -y
+        & 7z x media.7z -o"..\app\media" -y
         & .\CopyDllsToAppDir_Release.bat
         & .\DistroCreateAndZip.bat
       }
