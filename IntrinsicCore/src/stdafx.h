@@ -55,7 +55,7 @@
 #include "rapidjson/prettywriter.h"
 
 // Sparsepp
-#include "sparsepp/sparsepp.h"
+#include "sparsepp/spp.h"
 
 // STL related includes
 #include "stdint.h"

@@ -107,7 +107,8 @@ const GameStateEntry& Manager::getGameStateEntry(GameState::Enum p_GameState)
     }
   }
 
-  return {};
+  static GameStateEntry defaultEntry = {};
+  return defaultEntry;
 }
 
 // <-

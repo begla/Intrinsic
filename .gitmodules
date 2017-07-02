@@ -16,3 +16,15 @@
 [submodule "dependencies/rapidjson"]
 	path = dependencies/rapidjson
 	url = https://github.com/miloyip/rapidjson
+[submodule "dependencies/sparsepp"]
+	path = dependencies/sparsepp
+	url = https://github.com/greg7mdp/sparsepp
+[submodule "dependencies/sol"]
+	path = dependencies/sol
+	url = https://github.com/ThePhD/sol2.git
+[submodule "dependencies/tinydir"]
+	path = dependencies/tinydir
+	url = https://github.com/cxong/tinydir
+[submodule "dependencies/rlutil"]
+	path = dependencies/rlutil
+	url = https://github.com/tapio/rlutil

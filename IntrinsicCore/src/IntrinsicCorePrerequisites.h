@@ -108,9 +108,7 @@
 #define _INTR_ARRAY(a) std::vector<a, Intrinsic::Core::Memory::StlAllocator<a>>
 #define _INTR_STACK_ARRAY(a, b) std::array<a, b>
 #define _INTR_HASH_MAP(a, b)                                                   \
-  spp::sparse_hash_map<                                                        \
-      a, b, spp::spp_hash<a>, std::equal_to<a>,                                \
-      Intrinsic::Core::Memory::StlAllocator<std::pair<const a, b>>>
+  spp::sparse_hash_map<a, b, spp::spp_hash<a>, std::equal_to<a>>
 #define _INTR_FSTREAM std::fstream
 #define _INTR_IFSTREAM std::ifstream
 #define _INTR_OFSTREAM std::ofstream
