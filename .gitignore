@@ -45,6 +45,10 @@ app/assets/*
 app/media/pipeline_caches/*.pc
 app/media/shaders/*
 !app/media/shaders/KEEP_ME
+app/media/textures/*
+!app/media/textures/KEEP_ME
+app/media/specular_probes/*
+!app/media/specular_probes/KEEP_ME
 
 // Crash dumps and log
 app/crash_dumps
