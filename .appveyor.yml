@@ -31,7 +31,7 @@ deploy:
 
 install:
   - cd ..
-  - git clone -qf https://%INTR_GIT_TOKEN%@github.com/begla/Intrinsic_Dependencies.git
+  - git clone -q https://%INTR_GIT_TOKEN%@github.com/begla/Intrinsic_Dependencies.git
   - cd Intrinsic
   - cd scripts_win32
   - call ConfigAndBuildDependenciesVS15.bat
