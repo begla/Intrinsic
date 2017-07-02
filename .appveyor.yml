@@ -22,7 +22,7 @@ deploy:
   provider: GitHub
   auth_token: $(INTR_GIT_TOKEN)
   artifact: Intrinsic_Win32
-  draft: false
+  draft: true
   prerelease: false
   on:
     configuration: Release
@@ -31,7 +31,7 @@ deploy:
 
 install:
   - cd ..
-  - git clone https://%INTR_GIT_TOKEN%@github.com/begla/Intrinsic_Dependencies.git
+  - git clone -qf https://%INTR_GIT_TOKEN%@github.com/begla/Intrinsic_Dependencies.git
   - cd Intrinsic
   - cd scripts_win32
   - call ConfigAndBuildDependenciesVS15.bat
@@ -42,7 +42,6 @@ install:
   - vulkan.exe /S
 
 build_script:
-  - dir
   - cd scripts_win32
   - call ConfigVS15.bat
   - cd ../build

@@ -28,7 +28,7 @@ before_install:
 
 # Clone private dependencies which are not part of the main repository
   - cd ..
-  - git clone https://$INTR_GIT_TOKEN@github.com/begla/Intrinsic_Dependencies.git
+  - git clone -qf https://$INTR_GIT_TOKEN@github.com/begla/Intrinsic_Dependencies.git
   - cd Intrinsic
   
 install:
