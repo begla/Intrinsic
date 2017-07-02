@@ -53,6 +53,8 @@ build_script:
       if ($env:APPVEYOR_REPO_TAG -eq $true -And $env:CONFIGURATION -eq "Release")
       {
         cd scripts_win32
+        & appveyor DownloadFile http://www.intrinsic-engine.com/downloads/media.7z -FileName media.7z
+        & 7z x media.7z -o../app/media -y
         & .\CopyDllsToAppDir_Release.bat
         & .\DistroCreateAndZip.bat
       }
