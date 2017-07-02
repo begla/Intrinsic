@@ -85,7 +85,7 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
   Rendering::IBL::initCubemapProcessing();
 
   // Activate editing game state
-  GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
+  GameStates::Manager::activate(GameStates::GameState::kEditing);
 
   // Initializes resources
   {
@@ -477,7 +477,7 @@ void IntrinsicEd::onLoadWorld()
   if (fileName.size() > 0u)
   {
     World::load(fileName.toStdString().c_str());
-    GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
+    GameStates::Manager::activate(GameStates::GameState::kEditing);
     _nodeView->populateNodeTree();
   }
 }
@@ -485,7 +485,7 @@ void IntrinsicEd::onLoadWorld()
 void IntrinsicEd::onReloadWorld()
 {
   World::load(World::_filePath);
-  GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
+  GameStates::Manager::activate(GameStates::GameState::kEditing);
   _nodeView->populateNodeTree();
 }
 
@@ -581,7 +581,7 @@ void IntrinsicEd::onMainGameState()
   _ui.actionMainGameState->setChecked(true);
   _ui.actionBenchmarkGameState->setChecked(false);
 
-  GameStates::Manager::activateGameState(GameStates::GameState::kMain);
+  GameStates::Manager::activate(GameStates::GameState::kMain);
   SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
@@ -591,7 +591,7 @@ void IntrinsicEd::onEditingGameState()
   _ui.actionMainGameState->setChecked(false);
   _ui.actionBenchmarkGameState->setChecked(false);
 
-  GameStates::Manager::activateGameState(GameStates::GameState::kEditing);
+  GameStates::Manager::activate(GameStates::GameState::kEditing);
 
   SDL_SetRelativeMouseMode(SDL_FALSE);
 }
@@ -602,7 +602,7 @@ void IntrinsicEd::onBenchmarkGameState()
   _ui.actionEditingGameState->setChecked(false);
   _ui.actionMainGameState->setChecked(false);
 
-  GameStates::Manager::activateGameState(GameStates::GameState::kBenchmark);
+  GameStates::Manager::activate(GameStates::GameState::kBenchmark);
 
   SDL_SetRelativeMouseMode(SDL_FALSE);
 }

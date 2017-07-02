@@ -86,7 +86,7 @@ int _main(int argc, char* argv[])
 #endif // _WIN32
 
   // Activate main game state
-  GameStates::Manager::activateGameState(
+  GameStates::Manager::activate(
       (GameStates::GameState::Enum)Settings::Manager::_initialGameState);
 
   SDL_ShowWindow(sdlWindow);

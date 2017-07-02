@@ -20,6 +20,7 @@ namespace Core
 {
 namespace GameStates
 {
+
 namespace GameState
 {
 enum Enum
@@ -31,12 +32,31 @@ enum Enum
 };
 }
 
+typedef void (*GameStateActivateFunction)();
+typedef void (*GameStateDeactivateFunction)();
+typedef void (*GameStateUpdateFunction)(float);
+
+/**
+ * Struct describing a single Game State and its available functions.
+ */
+struct GameStateEntry
+{
+  uint8_t _type;
+
+  GameStateActivateFunction _activateFunction;
+  GameStateDeactivateFunction _deactivateFunction;
+  GameStateUpdateFunction _updateFunction;
+};
+
 struct Manager
 {
-  static void activateGameState(GameState::Enum p_GameState);
-  static void deactivateGameState();
+  static void init();
+
+  static void activate(GameState::Enum p_GameState);
+  static void deactivate();
   static void update(float p_DeltaT);
 
+  static const GameStateEntry& getGameStateEntry(GameState::Enum p_GameState);
   static GameState::Enum getActiveGameState() { return _activeGameState; }
 
 private:

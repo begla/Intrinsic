@@ -105,6 +105,7 @@ void Application::initManagers()
 {
   // Initializes component managers
   {
+    GameStates::Manager::init();
     Entity::EntityManager::init();
     Components::NodeManager::init();
     Components::MeshManager::init();
@@ -122,7 +123,7 @@ void Application::initManagers()
     Components::DecalManager::init();
   }
 
-  // Init resource managers
+  // Initialize resource managers
   {
     Resources::FrustumManager::init();
     Resources::MeshManager::init();

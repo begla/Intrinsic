@@ -21,31 +21,55 @@ namespace Core
 {
 namespace GameStates
 {
+namespace
+{
+_INTR_ARRAY(GameStateEntry) _gameStates;
+}
 // Static members
 GameState::Enum Manager::_activeGameState = GameState::kNone;
 
 // <-
 
-void Manager::activateGameState(GameState::Enum p_GameState)
+void Manager::init()
 {
-  deactivateGameState();
+  // Register all available Game States
+  {
+    GameStateEntry entry = {};
+    entry._type = GameState::kEditing;
+    entry._activateFunction = Editing::activate;
+    entry._deactivateFunction = Editing::deativate;
+    entry._updateFunction = Editing::update;
+    _gameStates.push_back(entry);
+  }
+
+  {
+    GameStateEntry entry = {};
+    entry._type = GameState::kBenchmark;
+    entry._activateFunction = Benchmark::activate;
+    entry._deactivateFunction = Benchmark::deativate;
+    entry._updateFunction = Benchmark::update;
+    _gameStates.push_back(entry);
+  }
+
+  {
+    GameStateEntry entry = {};
+    entry._type = GameState::kMain;
+    entry._activateFunction = Main::activate;
+    entry._deactivateFunction = Main::deativate;
+    entry._updateFunction = Main::update;
+    _gameStates.push_back(entry);
+  }
+}
+
+void Manager::activate(GameState::Enum p_GameState)
+{
+  deactivate();
 
   if (_activeGameState != p_GameState)
   {
-    switch (p_GameState)
-    {
-    case GameState::kEditing:
-      Editing::activate();
-      break;
-    case GameState::kMain:
-      Main::activate();
-      break;
-    case GameState::kBenchmark:
-      Benchmark::activate();
-      break;
-    case GameState::kNone:
-      break;
-    }
+    const GameStateEntry& entry = getGameStateEntry(p_GameState);
+    if (entry._activateFunction)
+      entry._activateFunction();
 
     _activeGameState = p_GameState;
   }
@@ -53,22 +77,11 @@ void Manager::activateGameState(GameState::Enum p_GameState)
 
 // <-
 
-void Manager::deactivateGameState()
+void Manager::deactivate()
 {
-  switch (_activeGameState)
-  {
-  case GameState::kEditing:
-    Editing::deativate();
-    break;
-  case GameState::kMain:
-    Main::deativate();
-    break;
-  case GameState::kBenchmark:
-    Benchmark::deativate();
-    break;
-  case GameState::kNone:
-    break;
-  }
+  const GameStateEntry& entry = getGameStateEntry(_activeGameState);
+  if (entry._deactivateFunction)
+    entry._deactivateFunction();
 
   _activeGameState = GameState::kNone;
 }
@@ -79,20 +92,22 @@ void Manager::update(float p_DeltaT)
 {
   _INTR_PROFILE_CPU("General", "Game State Manager");
 
-  switch (_activeGameState)
+  const GameStateEntry& entry = getGameStateEntry(_activeGameState);
+  if (entry._updateFunction)
+    entry._updateFunction(p_DeltaT);
+}
+
+const GameStateEntry& Manager::getGameStateEntry(GameState::Enum p_GameState)
+{
+  for (const GameStateEntry& entry : _gameStates)
   {
-  case GameState::kEditing:
-    Editing::update(p_DeltaT);
-    break;
-  case GameState::kMain:
-    Main::update(p_DeltaT);
-    break;
-  case GameState::kBenchmark:
-    Benchmark::update(p_DeltaT);
-    break;
-  case GameState::kNone:
-    break;
+    if (entry._type == p_GameState)
+    {
+      return entry;
+    }
   }
+
+  return {};
 }
 
 // <-
