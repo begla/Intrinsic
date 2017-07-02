@@ -3,8 +3,8 @@
     "properties": {
         "name": "barrel_01_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "barrel_01_NRM.dds",
-        "avgNormLength": 0.9426562786102295
+        "avgNormLength": 0.9390961527824402
     }
 }

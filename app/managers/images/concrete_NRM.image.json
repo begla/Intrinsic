@@ -3,8 +3,8 @@
     "properties": {
         "name": "concrete_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "concrete_NRM.dds",
-        "avgNormLength": 0.9955108165740967
+        "avgNormLength": 0.9929234981536865
     }
 }

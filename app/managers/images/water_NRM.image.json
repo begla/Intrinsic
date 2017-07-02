@@ -3,8 +3,8 @@
     "properties": {
         "name": "water_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "water_NRM.dds",
-        "avgNormLength": 0.9965211749076843
+        "avgNormLength": 0.9971088171005249
     }
 }

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 void calcDecal(in Decal decal, in vec3 posVS, in sampler2D[4095] globalTextures,
-               inout vec4 albedo, inout vec3 normal, inout vec4 pbr,
+               inout vec4 albedo, inout vec3 normal, inout vec2 pbr,
                float alphaFactor)
 {
   vec4 posDecalSS = decal.viewProjMatrix * vec4(posVS, 1.0);
@@ -33,12 +33,14 @@ void calcDecal(in Decal decal, in vec3 posVS, in sampler2D[4095] globalTextures,
 
     if (albedoSample.a >= alphaThreshold)
     {
+      const vec2 normalSample = 
+        texture(globalTextures[decal.textureIds.y], decalUV).xy;
+      const vec3 decalNormal = 
+        decompBC5Normal(normalSample);
+
       albedo = albedoSample;
-      normal = normalize(
-          TBN *
-          (texture(globalTextures[decal.textureIds.y], decalUV).xyz * 2.0 -
-           1.0));
-      pbr = texture(globalTextures[decal.textureIds.z], decalUV);
+      normal = normalize(TBN * decalNormal);
+      pbr = texture(globalTextures[decal.textureIds.z], decalUV).rg;
     }
   }
 }

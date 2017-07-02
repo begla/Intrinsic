@@ -3,8 +3,8 @@
     "properties": {
         "name": "props_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "props_NRM.dds",
-        "avgNormLength": 0.9503380656242371
+        "avgNormLength": 0.9118008613586426
     }
 }

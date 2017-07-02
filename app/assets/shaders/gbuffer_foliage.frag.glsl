@@ -68,8 +68,8 @@ void main()
   vec4 albedo = texture(albedoTex, uv0);
   albedo.rgb *= blendMask.rgb;
 
-  const vec3 normal = texture(normalTex, uv0).rgb;
-  const vec3 pbr = texture(pbrTex, uv0).rgb;
+  const vec3 normal = textureNormal(normalTex, uv0).rgb;
+  const vec2 pbr = texture(pbrTex, uv0).rg;
 
   if (albedo.a < 0.3)
   {
@@ -80,10 +80,10 @@ void main()
   GBuffer gbuffer;
   {
     gbuffer.albedo = albedo * uboPerInstance.colorTint;
-    gbuffer.normal = normalize(TBN * (normal * 2.0 - 1.0));
+    gbuffer.normal = normalize(TBN * normal);
     gbuffer.metalMask = pbr.r + uboPerMaterial.pbrBias.r;
-    gbuffer.specular = pbr.g + uboPerMaterial.pbrBias.g;
-    gbuffer.roughness = adjustRoughness(pbr.b + uboPerMaterial.pbrBias.b,
+    gbuffer.specular = 0.5 + uboPerMaterial.pbrBias.g;
+    gbuffer.roughness = adjustRoughness(pbr.g + uboPerMaterial.pbrBias.b,
                                         uboPerMaterial.data1.x);
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
     gbuffer.occlusion = 1.0;

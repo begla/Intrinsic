@@ -3,8 +3,8 @@
     "properties": {
         "name": "gravel_01_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "gravel_01_NRM.dds",
-        "avgNormLength": 0.6825070381164551
+        "avgNormLength": 0.6612694263458252
     }
 }

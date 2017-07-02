@@ -3,8 +3,8 @@
     "properties": {
         "name": "grassleaves_01_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "grassleaves_01_NRM.dds",
-        "avgNormLength": 0.9919838905334473
+        "avgNormLength": 0.9937442541122437
     }
 }

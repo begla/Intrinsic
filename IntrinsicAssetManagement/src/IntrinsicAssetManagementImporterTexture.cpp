@@ -88,13 +88,22 @@ ImageRef createTexture(const _INTR_STRING& p_TextureName,
 
 // <-
 
-void Texture::importColorTextureFromFile(const _INTR_STRING& p_FilePath)
+void Texture::importLinearColorTextureFromFile(const _INTR_STRING& p_FilePath)
 {
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
   compressTexture("-f BC1_UNORM -o " + mediaPath + " " + p_FilePath);
   ImageRef imgRef = createTexture(fileName, R::Format::kBC1RGBUNorm);
+}
+
+void Texture::importPbrTextureFromFile(const _INTR_STRING& p_FilePath)
+{
+  _INTR_STRING fileName, extension;
+  StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
+
+  compressTexture("-f BC5_UNORM -o " + mediaPath + " " + p_FilePath);
+  ImageRef imgRef = createTexture(fileName, R::Format::kBC5UNorm);
 }
 
 // <-
@@ -128,8 +137,8 @@ void Texture::importNormalMapTextureFromFile(const _INTR_STRING& p_FilePath)
   _INTR_STRING fileName, extension;
   StringUtil::extractFileNameAndExtension(p_FilePath, fileName, extension);
 
-  compressTexture("-f BC1_UNORM -o " + mediaPath + " " + p_FilePath);
-  ImageRef imgRef = createTexture(fileName, R::Format::kBC1RGBUNorm);
+  compressTexture("-f BC5_UNORM -o " + mediaPath + " " + p_FilePath);
+  ImageRef imgRef = createTexture(fileName, R::Format::kBC5UNorm);
 
   // Calc. avg. normal length for specular AA
   float avgNormalLength = 1.0f;
@@ -146,9 +155,13 @@ void Texture::importNormalMapTextureFromFile(const _INTR_STRING& p_FilePath)
     {
       for (int32_t x = 0u; x < normalTexDec.extent().x; ++x)
       {
-        const gli::vec3 normal = gli::normalize(
-            normalTexDec.load<gli::vec3>(gli::extent2d(x, y), 0u) * 2.0f -
-            1.0f);
+        gli::vec2 packedNormal =
+            normalTexDec.load<gli::vec3>(gli::extent2d(x, y), 0u);
+        packedNormal = packedNormal * 2.0f - 1.0f;
+        gli::vec3 normal = glm::vec3(packedNormal, 0.0f);
+        normal.z = std::sqrt(
+            std::max(1.0f - glm::dot(packedNormal, packedNormal), 0.0f));
+        _INTR_ASSERT(!glm::isnan(normal.z));
 
         avgNormal += normal;
       }

@@ -3,8 +3,8 @@
     "properties": {
         "name": "terrain_rock_N",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "terrain_rock_N.dds",
-        "avgNormLength": 0.9276384115219116
+        "avgNormLength": 0.8417839407920837
     }
 }

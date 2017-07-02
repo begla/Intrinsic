@@ -3,7 +3,7 @@
     "properties": {
         "name": "decal_blood_PBR",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "decal_blood_PBR.dds",
         "avgNormLength": 1.0
     }

@@ -62,23 +62,23 @@ void main()
   const vec2 uv0Raw = UV0(inUV0);
 
   const vec4 albedo0 = texture(albedoTex0, uv0);
-  const vec4 normal0 = texture(normalTex0, uv0);
-  const vec4 pbr0 = texture(pbrTex0, uv0);
+  const vec3 normal0 = textureNormal(normalTex0, uv0);
+  const vec3 pbr0 = texture(pbrTex0, uv0).rgg;
 
   const vec4 albedo1 = texture(albedoTex1, uv0 * 0.5);
-  const vec4 normal1 = texture(normalTex1, uv0 * 0.5);
-  const vec4 pbr1 = texture(pbrTex1, uv0 * 0.1);
+  const vec3 normal1 = textureNormal(normalTex1, uv0 * 0.5);
+  const vec3 pbr1 = texture(pbrTex1, uv0 * 0.1).rgg;
 
   const vec4 albedo2 = texture(albedoTex2, uv0 * 0.25);
-  const vec4 normal2 = texture(normalTex2, uv0 * 0.25);
-  const vec4 pbr2 = texture(pbrTex2, uv0 * 0.1);
+  const vec3 normal2 = textureNormal(normalTex2, uv0 * 0.25);
+  const vec3 pbr2 = texture(pbrTex2, uv0 * 0.1).rgg;
 
   float noise = clamp(texture(noiseTex, uv0Raw * 10.0).r, 0.0, 1.0);
   vec3 blendMask = texture(blendMaskTex, uv0Raw).rgb;
 
   vec3 albedo = blend(albedo0.rgb, albedo1.rgb, albedo2.rgb, blendMask, noise);
   vec3 normal = blend(normal0.rgb, normal1.rgb, normal2.rgb, blendMask, noise);
-  vec3 pbr = blend(pbr0.rgb, pbr1.rgb, pbr2.rgb, blendMask, noise);
+  vec2 pbr = blend(pbr0.rgb, pbr1.rgb, pbr2.rgb, blendMask, noise).rg;
 
   float occlusion =
       clamp(mix(clamp(noise * 5.0, 0.0, 1.0) * blendMask.b, 1.0 - blendMask.r,
@@ -91,10 +91,10 @@ void main()
   GBuffer gbuffer;
   {
     gbuffer.albedo = vec4(albedo, 1.0) * uboPerInstance.colorTint;
-    gbuffer.normal = normalize(TBN * (normal * 2.0 - 1.0));
+    gbuffer.normal = normalize(TBN * normal);
     gbuffer.metalMask = pbr.r + uboPerMaterial.pbrBias.r;
-    gbuffer.specular = pbr.g + uboPerMaterial.pbrBias.g;
-    gbuffer.roughness = pbr.b + uboPerMaterial.pbrBias.b;
+    gbuffer.specular = 0.5 + uboPerMaterial.pbrBias.g;
+    gbuffer.roughness = pbr.g + uboPerMaterial.pbrBias.b;
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
     gbuffer.occlusion = 1.0;
     gbuffer.emissive = 0.0;

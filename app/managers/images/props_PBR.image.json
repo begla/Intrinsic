@@ -3,7 +3,7 @@
     "properties": {
         "name": "props_PBR",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "props_PBR.dds",
         "avgNormLength": 1.0
     }

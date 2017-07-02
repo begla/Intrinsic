@@ -3,7 +3,7 @@
     "properties": {
         "name": "water_PBR",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "water_PBR.dds",
         "avgNormLength": 1.0
     }

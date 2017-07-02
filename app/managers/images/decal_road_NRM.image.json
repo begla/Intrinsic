@@ -3,8 +3,8 @@
     "properties": {
         "name": "decal_road_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "decal_road_NRM.dds",
-        "avgNormLength": 0.9621173739433289
+        "avgNormLength": 0.9774926900863648
     }
 }

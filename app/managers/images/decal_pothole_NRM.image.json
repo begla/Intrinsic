@@ -3,8 +3,8 @@
     "properties": {
         "name": "decal_pothole_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "decal_pothole_NRM.dds",
-        "avgNormLength": 0.9796892404556274
+        "avgNormLength": 0.9740570187568665
     }
 }

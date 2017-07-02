@@ -3,8 +3,8 @@
     "properties": {
         "name": "terrain_grass_stone_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "terrain_grass_stone_NRM.dds",
-        "avgNormLength": 0.977061927318573
+        "avgNormLength": 0.9651867747306824
     }
 }

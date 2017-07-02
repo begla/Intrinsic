@@ -138,7 +138,17 @@ void AssetManager::compileAssets(AssetRefArray& p_Refs)
     else if (_descAssetType(assetRef) == AssetType::kLinearColorTexture)
     {
       Importers::Texture::init();
-      Importers::Texture::importColorTextureFromFile(
+      Importers::Texture::importLinearColorTextureFromFile(
+          Settings::Manager::_assetTexturePath + "/" +
+          _descAssetFileName(assetRef));
+      Importers::Texture::destroy();
+
+      ImageManager::saveToMultipleFiles("managers/images/", ".image.json");
+    }
+    else if (_descAssetType(assetRef) == AssetType::kPbrTexture)
+    {
+      Importers::Texture::init();
+      Importers::Texture::importPbrTextureFromFile(
           Settings::Manager::_assetTexturePath + "/" +
           _descAssetFileName(assetRef));
       Importers::Texture::destroy();

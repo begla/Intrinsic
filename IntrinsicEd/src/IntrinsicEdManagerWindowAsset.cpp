@@ -100,10 +100,11 @@ void IntrinsicEdManagerWindowAsset::onPopulateResourceTree()
     {
       meshes->addChild(item);
     }
-    else if (AssetManager::_descAssetType(assetEntry) >=
-                 AssetType::kTexturesBegin &&
-             AssetManager::_descAssetType(assetEntry) <=
-                 AssetType::kTexturesEnd)
+    else if ((AssetManager::_descAssetType(assetEntry) >=
+                  AssetType::kTexturesBegin &&
+              AssetManager::_descAssetType(assetEntry) <=
+                  AssetType::kTexturesEnd) ||
+             AssetManager::_descAssetType(assetEntry) == AssetType::kPbrTexture)
     {
       textures->addChild(item);
     }
@@ -180,8 +181,9 @@ void IntrinsicEdManagerWindowAsset::onCompileAllTextures()
   {
     AssetRef ref = AssetManager::getActiveResourceAtIndex(i);
 
-    if (AssetManager::_descAssetType(ref) >= AssetType::kTexturesBegin &&
-        AssetManager::_descAssetType(ref) <= AssetType::kTexturesEnd)
+    if ((AssetManager::_descAssetType(ref) >= AssetType::kTexturesBegin &&
+         AssetManager::_descAssetType(ref) <= AssetType::kTexturesEnd) ||
+        AssetManager::_descAssetType(ref) == AssetType::kPbrTexture)
     {
       if (std::find(_assetsToRecompile.begin(), _assetsToRecompile.end(),
                     ref) == _assetsToRecompile.end())
@@ -248,8 +250,9 @@ void IntrinsicEdManagerWindowAsset::onResourceTreePopulated()
           QString(Settings::Manager::_assetMeshPath.c_str()) + "/" +
           AssetManager::_descAssetFileName(ref).c_str());
     }
-    else if (AssetManager::_descAssetType(ref) >= AssetType::kTexturesBegin &&
-             AssetManager::_descAssetType(ref) <= AssetType::kTexturesEnd)
+    else if ((AssetManager::_descAssetType(ref) >= AssetType::kTexturesBegin &&
+              AssetManager::_descAssetType(ref) <= AssetType::kTexturesEnd) ||
+             AssetManager::_descAssetType(ref) == AssetType::kPbrTexture)
     {
       _assetChangeWatch->addPath(
           QString(Settings::Manager::_assetTexturePath.c_str()) + "/" +

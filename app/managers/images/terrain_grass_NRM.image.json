@@ -3,8 +3,8 @@
     "properties": {
         "name": "terrain_grass_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "terrain_grass_NRM.dds",
-        "avgNormLength": 0.9656846523284912
+        "avgNormLength": 0.956055760383606
     }
 }

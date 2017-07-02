@@ -3,8 +3,8 @@
     "properties": {
         "name": "decal_blood_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "decal_blood_NRM.dds",
-        "avgNormLength": 0.9998948574066162
+        "avgNormLength": 0.9997230172157288
     }
 }

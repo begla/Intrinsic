@@ -3,7 +3,7 @@
     "properties": {
         "name": "barrel_01_PBR",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "barrel_01_PBR.dds",
         "avgNormLength": 1.0
     }

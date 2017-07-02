@@ -3,8 +3,8 @@
     "properties": {
         "name": "house_01_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "house_01_NRM.dds",
-        "avgNormLength": 0.9400883913040161
+        "avgNormLength": 0.9012975096702576
     }
 }

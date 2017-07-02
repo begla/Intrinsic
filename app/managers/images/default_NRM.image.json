@@ -3,8 +3,8 @@
     "properties": {
         "name": "default_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "default_NRM.dds",
-        "avgNormLength": 0.9999999403953552
+        "avgNormLength": 1.0
     }
 }

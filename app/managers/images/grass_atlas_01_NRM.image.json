@@ -3,8 +3,8 @@
     "properties": {
         "name": "grass_atlas_01_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "grass_atlas_01_NRM.dds",
-        "avgNormLength": 1.0032159090042115
+        "avgNormLength": 0.9922590255737305
     }
 }

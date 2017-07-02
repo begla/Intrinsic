@@ -47,11 +47,11 @@ void main()
   GBuffer gbuffer;
   {
     gbuffer.albedo = texture(albedoTex, uv0) * uboPerInstance.colorTint;
-    gbuffer.normal = normalize(TBN * (texture(normalTex, uv0).xyz * 2.0 - 1.0));
-    const vec4 pbr = texture(pbrTex, uv0);
+    gbuffer.normal = normalize(TBN * textureNormal(normalTex, uv0));
+    const vec2 pbr = texture(pbrTex, uv0).rg;
     gbuffer.metalMask = pbr.r + uboPerMaterial.pbrBias.r;
-    gbuffer.specular = pbr.g + uboPerMaterial.pbrBias.g;
-    gbuffer.roughness = adjustRoughness(pbr.b + uboPerMaterial.pbrBias.b,
+    gbuffer.specular = 0.5 + uboPerMaterial.pbrBias.g;
+    gbuffer.roughness = adjustRoughness(pbr.g + uboPerMaterial.pbrBias.b,
                                         uboPerMaterial.data1.x);
     gbuffer.materialBufferIdx = uboPerMaterial.data0.x;
     gbuffer.emissive = texture(emissiveTex, uv0).r;

@@ -70,14 +70,14 @@ void main()
   vec4 albedo = texture(albedoTex, uv0);
   albedo.a = waterBaseAlpha;
 
-  const vec4 normal0 = texture(normalTex, uv0);
-  const vec4 normal1 = texture(normalTex, uv0InverseAnim * 0.2);
+  const vec3 normal0 = textureNormal(normalTex, uv0);
+  const vec3 normal1 = textureNormal(normalTex, uv0InverseAnim * 0.2);
   const vec4 noise = texture(noiseTex, uv0 * 2.0);
   const vec4 noise1 = texture(noiseTex, uv0);
   const vec4 noise2 = texture(noiseTex, uv0 * 4.0);
 
   const float blend = 0.5;
-  const vec4 normal = mix(normal0, normal1, blend);
+  const vec3 normal = mix(normal0, normal1, blend);
 
   const vec4 foam = texture(foamTex, uv0 * 15.0);
 
@@ -117,7 +117,7 @@ void main()
   GBuffer gbuffer;
   {
     gbuffer.albedo = albedo;
-    gbuffer.normal = normalize(TBN * (normal.xyz * 2.0 - 1.0));
+    gbuffer.normal = normalize(TBN * normal.xyz);
     gbuffer.metalMask = metalRoughness.x;
     gbuffer.specular = 0.5;
     gbuffer.roughness =

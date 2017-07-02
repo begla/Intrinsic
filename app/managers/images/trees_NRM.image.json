@@ -3,8 +3,8 @@
     "properties": {
         "name": "trees_NRM",
         "imageType": 1,
-        "imageFormat": 7,
+        "imageFormat": 11,
         "fileName": "trees_NRM.dds",
-        "avgNormLength": 0.9088003635406494
+        "avgNormLength": 0.87553870677948
     }
 }

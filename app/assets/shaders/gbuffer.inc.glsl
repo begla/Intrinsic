@@ -105,6 +105,20 @@ struct GBuffer
   float occlusion;
 };
 
+vec3 decompBC5Normal(in vec2 normalSample)
+{
+  vec3 normal = vec3(normalSample, 0.0);
+  normal.xy = normal.xy * 2.0 - 1.0;
+  normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
+  return normalize(normal);  
+}
+
+vec3 textureNormal(in sampler2D normalTex, in vec2 uv0)
+{
+  const vec2 normalSample = texture(normalTex, uv0).xy;
+  return decompBC5Normal(normalSample);
+}
+
 void writeGBuffer(in GBuffer gbuffer, inout vec4 outAlbedo,
                   inout vec4 outNormal, inout vec4 outParameter0)
 {

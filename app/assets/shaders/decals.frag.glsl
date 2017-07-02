@@ -64,7 +64,7 @@ void main()
 
   vec4 albedo = vec4(0.0);
   vec3 normal = vec3(0.0);
-  vec4 pbr = vec4(0.0);
+  vec2 pbr = vec2(0.0);
 
   const uvec3 gridPos = calcGridPosForViewPos(
       posVS, uboPerInstance.nearFar, uboPerInstance.nearFarWidthHeight);
@@ -94,8 +94,8 @@ void main()
     gbuffer.albedo = albedo;
     gbuffer.normal = normal;
     gbuffer.metalMask = pbr.r;
-    gbuffer.specular = pbr.g;
-    gbuffer.roughness = pbr.b;
+    gbuffer.specular = 0.5;
+    gbuffer.roughness = pbr.g;
     gbuffer.materialBufferIdx = 1u;
     gbuffer.emissive = 0.0;
     gbuffer.occlusion = 1.0;

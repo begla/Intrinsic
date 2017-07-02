@@ -25,9 +25,10 @@ struct Texture
   static void init();
   static void destroy();
 
-  static void importColorTextureFromFile(const _INTR_STRING& p_FilePath);
+  static void importLinearColorTextureFromFile(const _INTR_STRING& p_FilePath);
   static void importAlbedoTextureFromFile(const _INTR_STRING& p_FilePath);
   static void importAlbedoAlphaTextureFromFile(const _INTR_STRING& p_FilePath);
+  static void importPbrTextureFromFile(const _INTR_STRING& p_FilePath);
   static void importNormalMapTextureFromFile(const _INTR_STRING& p_FilePath);
   static void importHdrCubemapFromFile(const _INTR_STRING& p_FilePath);
 };
