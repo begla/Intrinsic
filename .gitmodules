@@ -1,0 +1,18 @@
+[submodule "dependencies/glslang"]
+	path = dependencies/glslang
+	url = https://github.com/KhronosGroup/glslang
+[submodule "dependencies/spirvcross"]
+	path = dependencies/spirvcross
+	url = https://github.com/KhronosGroup/SPIRV-Cross
+[submodule "dependencies/gli"]
+	path = dependencies/gli
+	url = https://github.com/g-truc/gli
+[submodule "dependencies/glm"]
+	path = dependencies/glm
+	url = https://github.com/g-truc/glm
+[submodule "dependencies/enkits"]
+	path = dependencies/enkits
+	url = https://github.com/dougbinks/enkiTS
+[submodule "dependencies/rapidjson"]
+	path = dependencies/rapidjson
+	url = https://github.com/miloyip/rapidjson

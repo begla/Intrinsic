@@ -87,6 +87,7 @@ endif()
 set(INTR_CORE_DEP_SOURCE_FILES 
   dependencies/spirvcross/spirv_glsl.cpp
   dependencies/spirvcross/spirv_cross.cpp
+  dependencies/spirvcross/spirv_cfg.cpp
 )
 
 file(GLOB INTR_CORE_SOURCE_FILES IntrinsicCore/src/IntrinsicCore*.cpp IntrinsicCore/src/IntrinsicRenderer*.cpp )
@@ -114,7 +115,7 @@ set(INTR_ED_SOURCE_FILES IntrinsicEd/src/stdafx.cpp ${INTR_ED_SOURCE_FILES})
 set(INTASSET_SOURCE_FILES IntrinsicAssetManagement/src/stdafx.cpp ${INTASSET_SOURCE_FILES})
 
 set(INTDEP_SOURCE_FILES
-  "dependencies/enkits/TaskScheduler.cpp")
+  "dependencies/enkits/src/TaskScheduler.cpp")
 
 if(USE_MICROPROFILE)
   set(INTDEP_SOURCE_FILES
@@ -185,9 +186,9 @@ set(INTR_DEPENDENCIES
   "${FBX_INCLUDE_DIR}"
   "dependencies/glm"
   "${GLSLang_INCLUDE_DIR}"
-  "dependencies/rapidjson"
+  "dependencies/rapidjson/include"
   "dependencies/"
-  "dependencies/enkits"
+  "dependencies/enkits/src"
   "${LuaJIT_INCLUDE_DIR}"
   "dependencies/sol"
   "${PhysX_INCLUDE_DIR}"
