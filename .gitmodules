@@ -30,7 +30,7 @@
 	url = https://github.com/tapio/rlutil
 [submodule "dependencies/microprofile"]
 	path = dependencies/microprofile
-	url = https://github.com/jonasmr/microprofile
+	url = https://github.com/begla/microprofile
 [submodule "dependencies/tlsf"]
 	path = dependencies/tlsf
 	url = https://github.com/mattconte/tlsf
