@@ -28,3 +28,9 @@
 [submodule "dependencies/rlutil"]
 	path = dependencies/rlutil
 	url = https://github.com/tapio/rlutil
+[submodule "dependencies/microprofile"]
+	path = dependencies/microprofile
+	url = https://github.com/jonasmr/microprofile
+[submodule "dependencies/tlsf"]
+	path = dependencies/tlsf
+	url = https://github.com/mattconte/tlsf

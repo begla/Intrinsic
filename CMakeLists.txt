@@ -94,7 +94,7 @@ file(GLOB INTR_CORE_SOURCE_FILES IntrinsicCore/src/IntrinsicCore*.cpp IntrinsicC
 file(GLOB INTR_CORE_HEADER_FILES IntrinsicCore/src/IntrinsicCore*.h IntrinsicCore/src/IntrinsicRenderer*.h )
 
 set(INTR_CORE_C_SOURCE_FILES
-  IntrinsicCore/src/tlsf.c
+  dependencies/tlsf/tlsf.c
 )
 
 file(GLOB INTR_HEADER_FILES Intrinsic/src/Intrinsic*.h)
@@ -120,7 +120,7 @@ set(INTDEP_SOURCE_FILES
 if(USE_MICROPROFILE)
   set(INTDEP_SOURCE_FILES
     ${INTDEP_SOURCE_FILES} 
-    IntrinsicCore/src/microprofile.cpp
+    dependencies/microprofile/microprofile.cpp
   )
 endif()
 
@@ -197,6 +197,8 @@ set(INTR_DEPENDENCIES
   "dependencies/spirvcross/"
   "${Vulkan_INCLUDE_DIR}"
   "${BUGSPLAT_INCLUDE_DIR}"
+  "dependencies/microprofile"
+  "dependencies/tlsf"
 )
 
 if(WIN32)
