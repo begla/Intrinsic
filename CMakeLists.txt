@@ -1,26 +1,39 @@
 cmake_minimum_required(VERSION 3.1)
 
+# Setup modules
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(cotire)
+
 project(Intrinsic)
 
-set(BUILD_STANDALONE ON)
-# TODO: Microprofile and IntrinsicEd are currently disabled for Linux builds
+set(INTR_BUILD_STANDALONE_APP ON CACHE BOOL "Sets whether the standalone app should be build - or not")
+set(INTR_BUILD_INTRINSICED ON CACHE BOOL "Sets whether the editor app should be build - or not")
+set(INTR_USE_MICROPROFILE ON CACHE BOOL "Sets whether Microprofile support is enabled - or not")
+
 if(WIN32)
-  set(BUILD_INTRINSICED ON)
-  set(USE_MICROPROFILE ON)
+  message("Setting up build process for WINDOWS...")
+  set(INTR_PLATFORM_WINDOWS ON)
+elseif(UNIX AND NOT APPLE)
+  message("Setting up build process for LINUX...")
+  set(INTR_PLATFORM_LINUX ON)
+else()
+  message(FATAL_ERROR "Platform not supported")
 endif()
 
-if(!CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE RELEASE)
+# TODO: Microprofile and IntrinsicEd are currently only support on Windows
+if(NOT INTR_PLATFORM_WINDOWS)
+  set(INTR_BUILD_INTRINSICED OFF)
+  set(INTR_USE_MICROPROFILE OFF)
 endif()
 
 set(GLOBAL_PROPERTY USE_FOLDERS ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-if(BUILD_INTRINSICED)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOMOC_MOC_OPTIONS "-fstdafx_editor.h")
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+if(INTR_BUILD_INTRINSICED)
+  set(CMAKE_AUTOUIC ON)
+  set(CMAKE_AUTORCC ON)
+  set(CMAKE_AUTOMOC ON)
+  set(CMAKE_AUTOMOC_MOC_OPTIONS "-fstdafx_editor.h")
 endif()
 
 set(INTR_FINAL_BUILD OFF CACHE BOOL "Final build setting")
@@ -31,7 +44,7 @@ set(INTR_GENERAL_COMPILE_FLAGS " ")
 
 add_definitions("-DMICROPROFILE_GPU_TIMERS_VULKAN")
 
-if(WIN32)
+if(MSVC)
   set(INTR_GENERAL_COMPILE_FLAGS "/EHa /W3")
   add_definitions("-D_SCL_SECURE_NO_WARNINGS")
   add_definitions("-D_CRT_SECURE_NO_WARNINGS")
@@ -43,7 +56,8 @@ if(WIN32)
     set(INTR_GENERAL_COMPILE_FLAGS "${INTR_GENERAL_COMPILE_FLAGS} /GL")
     set(INTR_GENERAL_LINK_FLAGS "${INTR_GENERAL_LINK_FLAGS} /LTCG")
   endif()
-else()
+else("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" 
+  OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Gnu")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG")
   set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG")
@@ -54,19 +68,14 @@ endif()
 if(INTR_FINAL_BUILD)
   add_definitions("-D_INTR_FINAL_BUILD")
 else()
-  if(USE_MICROPROFILE)
+  if(INTR_USE_MICROPROFILE)
     add_definitions("-D_INTR_PROFILING_ENABLED")
   endif()
   add_definitions("-D_INTR_LOGGING_ENABLED")
   add_definitions("-D_INTR_ASSERTS_ENABLED")
 endif()
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-
-include(cotire)
-
-if (INTR_FINAL_BUILD)
-else()
+if (NOT INTR_FINAL_BUILD)
   set(PhysX_PROFILE ON)
 endif()
 
@@ -76,11 +85,13 @@ find_package(PhysX REQUIRED Common Cooking CharacterKinematic Extensions PxFound
 
 find_package(SDL2 REQUIRED)
 find_package(Vulkan REQUIRED)
-if (BUILD_INTRINSICED)
+
+if (INTR_BUILD_INTRINSICED)
   find_package(Qt5 REQUIRED)
   find_package(FBX REQUIRED)
 endif()
-if (WIN32)
+
+if (INTR_PLATFORM_WINDOWS)
   find_package(BugSplat REQUIRED)
 endif()
 
@@ -117,7 +128,7 @@ set(INTASSET_SOURCE_FILES IntrinsicAssetManagement/src/stdafx.cpp ${INTASSET_SOU
 set(INTDEP_SOURCE_FILES
   "dependencies/enkits/src/TaskScheduler.cpp")
 
-if(USE_MICROPROFILE)
+if(INTR_USE_MICROPROFILE)
   set(INTDEP_SOURCE_FILES
     ${INTDEP_SOURCE_FILES} 
     dependencies/microprofile/microprofile.cpp
@@ -125,7 +136,7 @@ if(USE_MICROPROFILE)
 endif()
 
 # Qt5
-if(BUILD_INTRINSICED)
+if(INTR_BUILD_INTRINSICED)
   set(CMAKE_PREFIX_PATH ${Qt5_ROOT_DIR})
   find_package(Qt5Widgets REQUIRED)
   include_directories(${Qt5Widgets_INCLUDES})
@@ -139,35 +150,38 @@ if(BUILD_INTRINSICED)
 endif()
 
 # Executables
-if (BUILD_INTRINSICED AND NOT COMPILE_ONLY)
-add_executable(IntrinsicEd ${INTR_ED_SOURCE_FILES} ${MOC_SOURCES} ${INTR_ED_HEADER_FILES} IntrinsicEd/IntrinsicEd.qrc IntrinsicEd/IntrinsicEd.rc)
-set_target_properties(IntrinsicEd PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/app
-  RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/app
-  RUNTIME_OUTPUT_NAME_RELEASE "IntrinsicEd"
-  RUNTIME_OUTPUT_NAME_DEBUG "IntrinsicEdDebug"
-)
+if (INTR_BUILD_INTRINSICED AND NOT COMPILE_ONLY)
+  add_executable(IntrinsicEd ${INTR_ED_SOURCE_FILES} ${MOC_SOURCES} ${INTR_ED_HEADER_FILES} IntrinsicEd/IntrinsicEd.qrc IntrinsicEd/IntrinsicEd.rc)
+  set_target_properties(IntrinsicEd PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/app
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/app
+    RUNTIME_OUTPUT_NAME_RELEASE "IntrinsicEd"
+    RUNTIME_OUTPUT_NAME_DEBUG "IntrinsicEdDebug"
+  )
 endif()
 
-if (BUILD_STANDALONE AND NOT COMPILE_ONLY)
-add_executable(Intrinsic ${INTR_SOURCE_FILES} ${INTR_HEADER_FILES} Intrinsic/Intrinsic.rc)
-set_target_properties(Intrinsic PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/app
-  RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/app
-  RUNTIME_OUTPUT_NAME_RELEASE "Intrinsic"
-  RUNTIME_OUTPUT_NAME_DEBUG "IntrinsicDebug"
-)
+if (INTR_BUILD_STANDALONE_APP AND NOT COMPILE_ONLY)
+  add_executable(Intrinsic ${INTR_SOURCE_FILES} ${INTR_HEADER_FILES} Intrinsic/Intrinsic.rc)
+  set_target_properties(Intrinsic PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/app
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/app
+    RUNTIME_OUTPUT_NAME_RELEASE "Intrinsic"
+    RUNTIME_OUTPUT_NAME_DEBUG "IntrinsicDebug"
+  )
 endif()
 
 # Libs
-add_library(IntrinsicCore ${INTR_CORE_SOURCE_FILES} ${INTR_CORE_C_SOURCE_FILES} ${INTDEP_SOURCE_FILES} ${INTR_CORE_HEADER_FILES} ${INTR_CORE_DEP_SOURCE_FILES})
-if (BUILD_INTRINSICED)
+add_library(IntrinsicCore ${INTR_CORE_SOURCE_FILES} ${INTR_CORE_C_SOURCE_FILES} 
+  ${INTDEP_SOURCE_FILES} ${INTR_CORE_HEADER_FILES} ${INTR_CORE_DEP_SOURCE_FILES})
+
+if (INTR_BUILD_INTRINSICED)
   add_library(IntrinsicAssetManagement ${INTASSET_SOURCE_FILES} ${INTASSET_HEADER_FILES})
 endif()
 
 set_target_properties(IntrinsicCore PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
 set_target_properties(IntrinsicCore PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
-if (BUILD_INTRINSICED)
+
+if (INTR_BUILD_INTRINSICED)
   if (NOT COMPILE_ONLY)
     set_target_properties(IntrinsicEd PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
     set_target_properties(IntrinsicEd PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
@@ -175,7 +189,7 @@ if (BUILD_INTRINSICED)
   set_target_properties(IntrinsicAssetManagement PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
   set_target_properties(IntrinsicAssetManagement PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 endif()
-if (BUILD_STANDALONE AND NOT COMPILE_ONLY)
+if (INTR_BUILD_STANDALONE_APP AND NOT COMPILE_ONLY)
   set_target_properties(Intrinsic PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
   set_target_properties(Intrinsic PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 endif()
@@ -201,9 +215,9 @@ set(INTR_DEPENDENCIES
   "dependencies/tlsf"
 )
 
-if(WIN32)
+if(INTR_PLATFORM_WINDOWS)
   add_definitions("-DVK_USE_PLATFORM_WIN32_KHR")
-elseif(UNIX)
+elseif(INTR_PLATFORM_LINUX)
   add_definitions("-DVK_USE_PLATFORM_XLIB_KHR")
 endif()
 
@@ -218,7 +232,7 @@ set(INTR_INCLUDES
 include_directories(${INTR_INCLUDES})
 
 # Libraries
-if(BUILD_INTRINSICED)
+if(INTR_BUILD_INTRINSICED)
   set(INTR_ED_EXTERNAL_LIBS
     Qt5::Widgets
     ${FBX_LIBRARIES}
@@ -226,68 +240,52 @@ if(BUILD_INTRINSICED)
 endif()
 
 set(INTR_EXTERNAL_LIBS
-  # Vulkan
   ${Vulkan_LIBRARIES}
-
-  # Lua
   ${LuaJIT_LIBRARIES}
-
-  # SDL2
   ${SDL2_LIBRARIES}
-
-  # PhysX
   ${PhysX_LIBRARIES}
-
-  # BugSplat
   ${BUGSPLAT_LIBRARIES}
+  ${GLSLang_LIBRARIES}
 )
 
 if(UNIX)
   set(THREADS_PREFER_PTHREAD_FLAG ON)
   find_package(Threads REQUIRED)
   set(INTR_EXTERNAL_LIBS "${INTR_EXTERNAL_LIBS}" 
-    Threads::Threads
-
-    # GLSLang
-    ${GLSLang_LIBRARIES}
-  )
-else()
-  set(INTR_EXTERNAL_LIBS "${INTR_EXTERNAL_LIBS}" 
-    # GLSLang
-    ${GLSLang_LIBRARIES}
-  )
+    Threads::Threads)
 endif()
 
 # Link libraries
 if (NOT COMPILE_ONLY)
   # Core
-  if (WIN32)
+  if (INTR_PLATFORM_WINDOWS)
     target_link_libraries(IntrinsicCore wsock32 ws2_32)
     target_link_libraries(IntrinsicCore Dbghelp)
   endif()
+
   target_link_libraries(IntrinsicCore ${INTR_EXTERNAL_LIBS})
 
   # Intrinsic standalone
-  if (BUILD_STANDALONE)
+  if (INTR_BUILD_STANDALONE_APP)
     target_link_libraries(Intrinsic IntrinsicCore)
   endif()
   
   # IntrinsicEd
-  if (BUILD_INTRINSICED)
+  if (INTR_BUILD_INTRINSICED)
     target_link_libraries(IntrinsicEd IntrinsicCore)
     target_link_libraries(IntrinsicEd IntrinsicAssetManagement)
     target_link_libraries(IntrinsicEd ${INTR_ED_EXTERNAL_LIBS})
   endif()
 endif()
 
-if (BUILD_INTRINSICED)
+if (INTR_BUILD_INTRINSICED)
   set_target_properties(IntrinsicEd PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT ${COTIRE_CXX_PREFIX_HEADER_INIT} "IntrinsicEd/src/stdafx_editor.h")
   set_target_properties(IntrinsicAssetManagement PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT ${COTIRE_CXX_PREFIX_HEADER_INIT} "IntrinsicAssetManagement/src/stdafx_assets.h")
 endif()
-  set_target_properties(IntrinsicCore PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "IntrinsicCore/src/stdafx.h")
+set_target_properties(IntrinsicCore PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "IntrinsicCore/src/stdafx.h")
 
 cotire(IntrinsicCore)
-if (BUILD_INTRINSICED)
-cotire(IntrinsicAssetManagement)
-cotire(IntrinsicEd)
+if (INTR_BUILD_INTRINSICED)
+  cotire(IntrinsicAssetManagement)
+  cotire(IntrinsicEd)
 endif()
