@@ -12,7 +12,7 @@ You can find some simple build and setup instructions in `GETTING_STARTED.md`.
 
 Further details and the (heavily WIP) [API documentation](http://www.intrinsic-engine.com/api-doc) are available on the [project homepage](http://www.intrinsic-engine.com). The Intrinsic repository is hosted on [GitHub](http://www.github.com/begla/Intrinsic).
 
-Contributions and general support are welcome at any time. If you like to join the Intrinsic Slack team, just drop me a message: begla@intrinsic-engine.com.
+Contributions and general support are welcome at any time. If you would like to join the Intrinsic Slack team, just drop me a message: begla@intrinsic-engine.com.
 
 # Build Status
 
