@@ -35,7 +35,7 @@ Please extract the archive using 7z to the `app/media` directory.
 
 7. Create a new directory called `Intrinsic_Dependencies` on the _same level_ as the Intrinsic repository folder
 8. Inside, create a new folder `dependencies` containing two folders `physx3.4` and `fbx`
-9. Copy the static/dynamic libraries as well as the header files of both SDKs to folders named `bin` (DLLs), `lib` (LIBs) and `include` respectively
+9. Copy the static/dynamic libraries as well as the header files of both SDKs to folders named `bin` (DLLs), `lib` (LIBs) and `include` respectively. Since the FBX SDK DLLs are named equally for all configurations, they have to be put into separate folders: `bin/release` and `bin/debug`.
 
     **NOTE:** Since PhysX 3.4 there is a new set of libraries gathered under the name `PxShared`. Make sure to copy the DLLs, header files and static libraries to the folders too!
 
