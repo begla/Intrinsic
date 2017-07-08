@@ -14,19 +14,19 @@ Further details and the (heavily WIP) [API documentation](http://www.intrinsic-e
 
 Contributions and general support are welcome at any time. If you like to join the Intrinsic Slack team, just drop me a message: begla@intrinsic-engine.com.
 
-# Screenshots
-
-![Intrinsic](media/screenshot_0.jpg)
-![IntrinsicEd](media/screenshot_1.jpg)
-![IntrinsicEd](media/screenshot_3.jpg)
-![IntrinsicEd](media/screenshot_2.jpg)
-
 # Build Status
 
 | Platform | Build Status |
 |:--------:|:------------:|
 | Windows (Visual Studio 2017) | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/eevcf6gfm77309ud?svg=true)](https://ci.appveyor.com/project/begla/intrinsic) |
 | Linux (GCC 6.0 / Clang 4.0) | [![Linux Build Status](https://travis-ci.org/begla/Intrinsic.svg?branch=master)](https://travis-ci.org/begla/Intrinsic) |
+
+# Screenshots
+
+![Intrinsic](media/screenshot_0.jpg)
+![IntrinsicEd](media/screenshot_1.jpg)
+![IntrinsicEd](media/screenshot_3.jpg)
+![IntrinsicEd](media/screenshot_2.jpg)
 
 # License
 
