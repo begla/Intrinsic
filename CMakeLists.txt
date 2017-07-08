@@ -37,7 +37,6 @@ if(INTR_BUILD_INTRINSICED)
 endif()
 
 set(INTR_FINAL_BUILD OFF CACHE BOOL "Final build setting")
-set(COMPILE_ONLY OFF CACHE BOOL "Compile without linking")
 
 set(INTR_GENERAL_LINK_FLAGS " ")
 set(INTR_GENERAL_COMPILE_FLAGS " ")
@@ -150,7 +149,7 @@ if(INTR_BUILD_INTRINSICED)
 endif()
 
 # Executables
-if (INTR_BUILD_INTRINSICED AND NOT COMPILE_ONLY)
+if (INTR_BUILD_INTRINSICED)
   add_executable(IntrinsicEd ${INTR_ED_SOURCE_FILES} ${MOC_SOURCES} ${INTR_ED_HEADER_FILES} IntrinsicEd/IntrinsicEd.qrc IntrinsicEd/IntrinsicEd.rc)
   set_target_properties(IntrinsicEd PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/app
@@ -160,7 +159,7 @@ if (INTR_BUILD_INTRINSICED AND NOT COMPILE_ONLY)
   )
 endif()
 
-if (INTR_BUILD_STANDALONE_APP AND NOT COMPILE_ONLY)
+if (INTR_BUILD_STANDALONE_APP)
   add_executable(Intrinsic ${INTR_SOURCE_FILES} ${INTR_HEADER_FILES} Intrinsic/Intrinsic.rc)
   set_target_properties(Intrinsic PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/app
@@ -182,14 +181,12 @@ set_target_properties(IntrinsicCore PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMP
 set_target_properties(IntrinsicCore PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 
 if (INTR_BUILD_INTRINSICED)
-  if (NOT COMPILE_ONLY)
-    set_target_properties(IntrinsicEd PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
-    set_target_properties(IntrinsicEd PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
-  endif()
+  set_target_properties(IntrinsicEd PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
+  set_target_properties(IntrinsicEd PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
   set_target_properties(IntrinsicAssetManagement PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
   set_target_properties(IntrinsicAssetManagement PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 endif()
-if (INTR_BUILD_STANDALONE_APP AND NOT COMPILE_ONLY)
+if (INTR_BUILD_STANDALONE_APP)
   set_target_properties(Intrinsic PROPERTIES COMPILE_FLAGS ${INTR_GENERAL_COMPILE_FLAGS})
   set_target_properties(Intrinsic PROPERTIES LINK_FLAGS ${INTR_GENERAL_LINK_FLAGS})
 endif()
@@ -256,26 +253,21 @@ if(UNIX)
 endif()
 
 # Link libraries
-if (NOT COMPILE_ONLY)
-  # Core
-  if (INTR_PLATFORM_WINDOWS)
-    target_link_libraries(IntrinsicCore wsock32 ws2_32)
-    target_link_libraries(IntrinsicCore Dbghelp)
-  endif()
+if (INTR_PLATFORM_WINDOWS)
+  target_link_libraries(IntrinsicCore wsock32 ws2_32)
+  target_link_libraries(IntrinsicCore Dbghelp)
+endif()
 
-  target_link_libraries(IntrinsicCore ${INTR_EXTERNAL_LIBS})
+target_link_libraries(IntrinsicCore ${INTR_EXTERNAL_LIBS})
 
-  # Intrinsic standalone
-  if (INTR_BUILD_STANDALONE_APP)
-    target_link_libraries(Intrinsic IntrinsicCore)
-  endif()
-  
-  # IntrinsicEd
-  if (INTR_BUILD_INTRINSICED)
-    target_link_libraries(IntrinsicEd IntrinsicCore)
-    target_link_libraries(IntrinsicEd IntrinsicAssetManagement)
-    target_link_libraries(IntrinsicEd ${INTR_ED_EXTERNAL_LIBS})
-  endif()
+if (INTR_BUILD_STANDALONE_APP)
+  target_link_libraries(Intrinsic IntrinsicCore)
+endif()
+
+if (INTR_BUILD_INTRINSICED)
+  target_link_libraries(IntrinsicEd IntrinsicCore)
+  target_link_libraries(IntrinsicEd IntrinsicAssetManagement)
+  target_link_libraries(IntrinsicEd ${INTR_ED_EXTERNAL_LIBS})
 endif()
 
 if (INTR_BUILD_INTRINSICED)
