@@ -4,7 +4,7 @@
 
 # Intrinsic
 
-[![Contribute!](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/begla/Intrinsic/issues) [![Join the Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Intrinsic-Engine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) <a href='https://ko-fi.com/A815CV2' target='_blank'><img height='20' style='border:0px;height:20px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+[![Contribute!](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/begla/Intrinsic/issues) <a href='https://ko-fi.com/A815CV2' target='_blank'><img height='20' style='border:0px;height:20px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a> <a href="https://slackin-eexzwpyjqk.now.sh"><img src="https://slackin-eexzwpyjqk.now.sh/badge.svg"/></a>
 
 Intrinsic is a Vulkan based cross-platform game and rendering engine. The project is currently in an early stage of development.
 
@@ -12,12 +12,7 @@ You can find some simple build and setup instructions in `GETTING_STARTED.md`.
 
 Further details and the (heavily WIP) [API documentation](http://www.intrinsic-engine.com/api-doc) are available on the [project homepage](http://www.intrinsic-engine.com). The Intrinsic repository is hosted on [GitHub](http://www.github.com/begla/Intrinsic).
 
-# Screenshots
-
-![Intrinsic](media/screenshot_0.jpg)
-![IntrinsicEd](media/screenshot_1.jpg)
-![IntrinsicEd](media/screenshot_3.jpg)
-![IntrinsicEd](media/screenshot_2.jpg)
+Contributions and general support are welcome at any time. If you would like to join the Intrinsic Slack team, go ahead and request an invitation via [Slackin](https://slackin-eexzwpyjqk.now.sh).
 
 # Build Status
 
@@ -25,6 +20,13 @@ Further details and the (heavily WIP) [API documentation](http://www.intrinsic-e
 |:--------:|:------------:|
 | Windows (Visual Studio 2017) | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/eevcf6gfm77309ud?svg=true)](https://ci.appveyor.com/project/begla/intrinsic) |
 | Linux (GCC 6.0 / Clang 4.0) | [![Linux Build Status](https://travis-ci.org/begla/Intrinsic.svg?branch=master)](https://travis-ci.org/begla/Intrinsic) |
+
+# Screenshots
+
+![Intrinsic](media/screenshot_0.jpg)
+![IntrinsicEd](media/screenshot_1.jpg)
+![IntrinsicEd](media/screenshot_3.jpg)
+![IntrinsicEd](media/screenshot_2.jpg)
 
 # License
 
@@ -43,43 +45,3 @@ Further details and the (heavily WIP) [API documentation](http://www.intrinsic-e
 // See the License for the specific language governing permissions and
 // limitations under the License.
 ```
-
-# Credits
-
-Intrinsic uses the following open-source libraries:
-
-* Qt (IntrinsicEd only, see https://www.qt.io/download)
-* SDL 2.0 (see https://www.libsdl.org/download-2.0.php)
-* Vulkan SDK (see https://lunarg.com/vulkan-sdk/)
-* tlsf (see https://github.com/mattconte/tlsf)
-* microprofile (https://github.com/jonasmr/microprofile)
-* enkiTS (see https://github.com/dougbinks/enkiTS)
-* gli (see http://gli.g-truc.net/0.8.1/index.html)
-* glm (see http://glm.g-truc.net/0.9.8/index.html)
-* glslang (see https://github.com/KhronosGroup/glslang)
-* SPIRV-Cross (see https://github.com/KhronosGroup/SPIRV-Cross)
-* LuaJIT (see http://luajit.org/)
-* rapidjson (see https://github.com/miloyip/rapidjson)
-* rlutil (see https://github.com/tapio/rlutil)
-* SOL 2 (see https://github.com/ThePhD/sol2)
-* sparsepp (see https://github.com/greg7mdp/sparsepp)
-* tinydir (see https://github.com/cxong/tinydir)
-
-Intrinsic uses the following proprietary libraries:
-
-* PhysX 3 (see https://developer.nvidia.com/physx-sdk)
-* FBX SDK (IntrinsicEd only, see http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775847)
-* BugSplat (see http://www.bugsplat.com/)
-
-... and the following tools in binary format:
-
-* DirectXTex (see https://github.com/Microsoft/DirectXTex)
-* Cloc (see http://cloc.sourceforge.net)
-* 7za (see http://www.7-zip.org/download.html)
-
-Assets and icons sourced from:
-
-* https://cloud.blender.org/
-* https://www.artstation.com/artwork/xKkaW
-* http://www.flaticon.com
-* http://www.gametextures.com
