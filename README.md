@@ -4,7 +4,7 @@
 
 # Intrinsic
 
-[![Contribute!](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/begla/Intrinsic/issues) <a href='https://ko-fi.com/A815CV2' target='_blank'><img height='20' style='border:0px;height:20px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+[![Contribute!](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/begla/Intrinsic/issues) <a href='https://ko-fi.com/A815CV2' target='_blank'><img height='20' style='border:0px;height:20px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a> <img src="https://slackin-eexzwpyjqk.now.sh/badge.svg"/>
 
 Intrinsic is a Vulkan based cross-platform game and rendering engine. The project is currently in an early stage of development.
 
@@ -12,7 +12,7 @@ You can find some simple build and setup instructions in `GETTING_STARTED.md`.
 
 Further details and the (heavily WIP) [API documentation](http://www.intrinsic-engine.com/api-doc) are available on the [project homepage](http://www.intrinsic-engine.com). The Intrinsic repository is hosted on [GitHub](http://www.github.com/begla/Intrinsic).
 
-Contributions and general support are welcome at any time. If you would like to join the Intrinsic Slack team, just drop me a message: begla@intrinsic-engine.com.
+Contributions and general support are welcome at any time. If you would like to join the Intrinsic Slack team, you can request an invitation via [Slackin](https://slackin-eexzwpyjqk.now.sh).
 
 # Build Status
 
