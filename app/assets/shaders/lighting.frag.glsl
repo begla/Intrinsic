@@ -201,27 +201,13 @@ void main()
       const uint packedProbeIndices = specProbeIndices[clusterIdx + pi / 2 + 1];
 
       SpecProbe probe = specProbes[packedProbeIndices & 0xFFFF];
-
-      // Parallax correction
-      /*{
-        const vec3 boxMaxWS = vec3(10.0, 10000.0, 20.0);
-        const vec3 boxMinWS = vec3(-10.0, 0.0, -20.0);
-        const vec3 i0 = (boxMaxWS - posWS) / reflectDirUnormWS;
-        const vec3 i1 = (boxMinWS - posWS) / reflectDirUnormWS;
-        const vec3 iMax = max(i0, i1);
-        const float dist = min(iMax.x, min(iMax.y, iMax.z));
-        const vec3 iWS = posWS + reflectDirUnormWS * dist;
-
-        const vec3 R0 = iWS - (uboPerFrame.invViewMatrix * vec4(probe.posAndRadius.xyz, 1.0)).xyz;
-        R = mix(normalWS, R0,
-          (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
-      }*/
-
-      calcLocalSpecular(probe, d, spec, R, specMipIdx, uboPerInstance.data0.w,
+      calcLocalSpecular(probe, d, spec, R, posWS, normalWS, 
+        reflectDirUnormWS, specMipIdx, uboPerInstance.data0.w,
                         1.0);
 
       probe = specProbes[packedProbeIndices >> 16];
-      calcLocalSpecular(probe, d, spec, R, specMipIdx, uboPerInstance.data0.w,
+      calcLocalSpecular(probe, d, spec, R, posWS, normalWS,
+        reflectDirUnormWS, specMipIdx, uboPerInstance.data0.w,
                         float(pi + 1 < specProbeCount));
     }
 

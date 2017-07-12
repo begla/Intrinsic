@@ -159,6 +159,8 @@ IntrinsicEd::IntrinsicEd(QWidget* parent) : QMainWindow(parent)
     stringToIconPathMapping["Emissive"] = ":Icons/icons/various/idea.png";
     stringToIconPathMapping["Textures"] = ":/Icons/icons/essential/picture.png";
     stringToIconPathMapping["Texture"] = ":/Icons/icons/essential/picture.png";
+    stringToIconPathMapping["TerrainTextures"] =
+        ":/Icons/icons/essential/picture.png";
     stringToIconPathMapping["Image"] = ":/Icons/icons/essential/picture.png";
     stringToIconPathMapping["Translucency"] = ":Icons/icons/various/idea.png";
     stringToIconPathMapping["UV"] = ":/Icons/icons/essential/picture.png";

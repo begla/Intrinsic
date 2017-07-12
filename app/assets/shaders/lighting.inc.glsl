@@ -71,12 +71,28 @@ void calcLocalIrradiance(in IrradProbe probe, in LightingData d, vec3 normalWS,
 }
 
 void calcLocalSpecular(in SpecProbe probe, in LightingData d, inout vec3 spec,
-                       vec3 R, float specMipIdx, float currentTime,
+                       vec3 R, vec3 posWS, vec3 normalWS, vec3 reflectDirUnormWS, float specMipIdx, float currentTime,
                        float fadeFactor)
 {
+  const uint probeFlags = floatBitsToInt(probe.data0.w);
+
   const float distToProbe = distance(d.posVS, probe.posAndRadius.xyz);
   if (distToProbe < probe.posAndRadius.w)
   {
+    // Parallax correction
+    if ((probeFlags & SPECULAR_PROBE_FLAGS_PARALLAX_CORRECTED) > 0u)
+    {
+      const vec3 i0 = (probe.maxExtentWS.xyz - posWS) / reflectDirUnormWS;
+      const vec3 i1 = (probe.minExtentWS.xyz - posWS) / reflectDirUnormWS;
+      const vec3 iMax = max(i0, i1);
+      const float dist = min(iMax.x, min(iMax.y, iMax.z));
+      const vec3 iWS = posWS + reflectDirUnormWS * dist;
+
+      const vec3 R0 = iWS - (uboPerFrame.invViewMatrix * vec4(probe.posAndRadius.xyz, 1.0)).xyz;
+      R = mix(normalWS, R0,
+        (1.0 - d.roughness2) * (sqrt(1.0 - d.roughness2) + d.roughness2));
+    }
+
     const float fadeRange = probe.posAndRadius.w * probe.data0.x;
     const float fadeStart = probe.posAndRadius.w - fadeRange;
     const float fade =

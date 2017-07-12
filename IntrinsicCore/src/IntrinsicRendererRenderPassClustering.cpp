@@ -91,6 +91,9 @@ struct SpecProbe
   glm::vec4 posAndRadiusVS;
   glm::vec4 data0;
 
+  glm::vec4 minExtentWS;
+  glm::vec4 maxExtentWS;
+
   glm::uvec4 textureIds[2];
 };
 
@@ -578,7 +581,16 @@ _INTR_INLINE void cullAndWriteBuffers(Components::CameraRef p_CameraRef)
       probe.data0 = glm::vec4(
           Components::SpecularProbeManager::_descFalloffRangePerc(specProbeRef),
           Components::SpecularProbeManager::_descFalloffExp(specProbeRef),
-          (float)texNames.size(), 0.0f);
+          (float)texNames.size(),
+          *((float*)&Components::SpecularProbeManager::_flags(specProbeRef)));
+      probe.minExtentWS = glm::vec4(
+          Components::NodeManager::_worldPosition(specNodeRef) +
+              Components::SpecularProbeManager::_descMinExtent(specProbeRef),
+          0.0f);
+      probe.maxExtentWS = glm::vec4(
+          Components::NodeManager::_worldPosition(specNodeRef) +
+              Components::SpecularProbeManager::_descMaxExtent(specProbeRef),
+          0.0f);
 
       uint32_t texId = 0;
       for (Name texName : texNames)

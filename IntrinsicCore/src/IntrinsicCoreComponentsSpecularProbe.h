@@ -20,6 +20,15 @@ namespace Core
 {
 namespace Components
 {
+// Enums/Flags
+namespace SpecularProbeFlags
+{
+enum Flags
+{
+  kParallaxCorrected = 0x01
+};
+}
+
 // Typedefs
 typedef Dod::Ref SpecularProbeRef;
 typedef _INTR_ARRAY(SpecularProbeRef) SpecularProbeRefArray;
@@ -34,16 +43,24 @@ struct SpecularProbeData : Dod::Components::ComponentDataBase
     descPriority.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
     descFalloffRangePerc.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
     descFalloffExponent.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
-
+    descMinExtent.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+    descMaxExtent.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+    descFlags.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
     descSpecularTextureNames.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
+
+    flags.resize(_INTR_MAX_IRRADIANCE_PROBE_COMPONENT_COUNT);
   }
 
   _INTR_ARRAY(float) descRadius;
   _INTR_ARRAY(float) descFalloffRangePerc;
   _INTR_ARRAY(float) descFalloffExponent;
+  _INTR_ARRAY(glm::vec3) descMinExtent;
+  _INTR_ARRAY(glm::vec3) descMaxExtent;
+  _INTR_ARRAY(_INTR_ARRAY(Name)) descFlags;
   _INTR_ARRAY(uint32_t) descPriority;
-
   _INTR_ARRAY(_INTR_ARRAY(Name)) descSpecularTextureNames;
+
+  _INTR_ARRAY(uint32_t) flags;
 };
 
 struct SpecularProbeManager
@@ -70,6 +87,9 @@ struct SpecularProbeManager
     _descRadius(p_Ref) = 20.0f;
     _descFalloffRangePerc(p_Ref) = 0.2f;
     _descFalloffExp(p_Ref) = 1.0f;
+    _descMinExtent(p_Ref) = glm::vec3(10.0f, 10.0f, 10.0f);
+    _descMaxExtent(p_Ref) = glm::vec3(-10.0f, 0.0f, -10.0f);
+    _descFlags(p_Ref).clear();
   }
 
   // <-
@@ -113,6 +133,24 @@ struct SpecularProbeManager
                           _N(uint), _descPriority(p_Ref), false, false),
         p_Document.GetAllocator());
 
+    p_Properties.AddMember(
+        "flags",
+        _INTR_CREATE_PROP_FLAGS(p_Document, p_GenerateDesc, _N(SpecularProbe),
+                                "flags", _descFlags(p_Ref), "ParallaxCorrected",
+                                false, false),
+        p_Document.GetAllocator());
+
+    p_Properties.AddMember(
+        "minExtent",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(SpecularProbe),
+                          _N(vec3), _descMinExtent(p_Ref), false, false),
+        p_Document.GetAllocator());
+    p_Properties.AddMember(
+        "maxExtent",
+        _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(SpecularProbe),
+                          _N(vec3), _descMaxExtent(p_Ref), false, false),
+        p_Document.GetAllocator());
+
     if (!p_GenerateDesc)
     {
       rapidjson::Value specularTextureNames =
@@ -148,6 +186,19 @@ struct SpecularProbeManager
     if (p_Properties.HasMember("priority"))
       _descPriority(p_Ref) =
           JsonHelper::readPropertyUint(p_Properties["priority"]);
+    if (p_Properties.HasMember("minExtent"))
+      _descMinExtent(p_Ref) =
+          JsonHelper::readPropertyVec3(p_Properties["minExtent"]);
+    if (p_Properties.HasMember("maxExtent"))
+      _descMaxExtent(p_Ref) =
+          JsonHelper::readPropertyVec3(p_Properties["maxExtent"]);
+
+    if (p_Properties.HasMember("flags"))
+    {
+      _descFlags(p_Ref).clear();
+      JsonHelper::readPropertyFlagsNameArray(p_Properties["flags"],
+                                             _descFlags(p_Ref));
+    }
 
     if (!p_GenerateDesc)
     {
@@ -206,11 +257,28 @@ struct SpecularProbeManager
   {
     return _data.descFalloffExponent[p_Ref._id];
   }
-
+  _INTR_INLINE static glm::vec3& _descMinExtent(SpecularProbeRef p_Ref)
+  {
+    return _data.descMinExtent[p_Ref._id];
+  }
+  _INTR_INLINE static glm::vec3& _descMaxExtent(SpecularProbeRef p_Ref)
+  {
+    return _data.descMaxExtent[p_Ref._id];
+  }
+  _INTR_INLINE static _INTR_ARRAY(Name) & _descFlags(SpecularProbeRef p_Ref)
+  {
+    return _data.descFlags[p_Ref._id];
+  }
   _INTR_INLINE static _INTR_ARRAY(Name) &
       _descSpecularTextureNames(SpecularProbeRef p_Ref)
   {
     return _data.descSpecularTextureNames[p_Ref._id];
+  }
+
+  // Resources
+  _INTR_INLINE static uint32_t& _flags(SpecularProbeRef p_Ref)
+  {
+    return _data.flags[p_Ref._id];
   }
 };
 }

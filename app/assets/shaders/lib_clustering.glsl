@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#define SPECULAR_PROBE_FLAGS_PARALLAX_CORRECTED 0x01
+
 struct Light
 {
   vec4 posAndRadius;
@@ -29,6 +31,9 @@ struct SpecProbe
 {
   vec4 posAndRadius;
   vec4 data0;
+
+  vec4 minExtentWS;
+  vec4 maxExtentWS;
 
   uvec4 textureIds[2];
 };

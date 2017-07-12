@@ -258,12 +258,12 @@ struct MaterialManager
     }
 
     // General GBuffer
-    if ((_materialPassMask(p_Ref) &
-         (getMaterialPassFlag(_N(GBufferDefault)) |
-          getMaterialPassFlag(_N(GBufferFoliage)) |
-          getMaterialPassFlag(_N(GBufferGrass)) |
-          getMaterialPassFlag(_N(GBufferWater)) |
-          getMaterialPassFlag(_N(GBufferTerrain)))) != 0u)
+    // if ((_materialPassMask(p_Ref) &
+    //     (getMaterialPassFlag(_N(GBufferDefault)) |
+    //      getMaterialPassFlag(_N(GBufferFoliage)) |
+    //      getMaterialPassFlag(_N(GBufferGrass)) |
+    //      getMaterialPassFlag(_N(GBufferWater)) |
+    //      getMaterialPassFlag(_N(GBufferTerrain)))) != 0u)
     {
       p_Properties.AddMember(
           "normalTextureName",
@@ -296,9 +296,11 @@ struct MaterialManager
           p_Document.GetAllocator());
     }
 
-    if ((_materialPassMask(p_Ref) & (getMaterialPassFlag(_N(GBufferFoliage)) |
-                                     getMaterialPassFlag(_N(GBufferGrass)))) !=
-        0u)
+    // if ((_materialPassMask(p_Ref) & (getMaterialPassFlag(_N(GBufferFoliage))
+    // |
+    //                                 getMaterialPassFlag(_N(GBufferGrass))))
+    //                                 !=
+    //    0u)
     {
       p_Properties.AddMember(
           "blendMaskTextureName",
@@ -308,49 +310,57 @@ struct MaterialManager
     }
 
     // Terrain
-    if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferTerrain))) !=
-        0u)
+    // if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferTerrain)))
+    // !=
+    //  0u)
     {
-      p_Properties.AddMember(
-          "albedo1TextureName",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
-                            _descAlbedo1TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "normal1TextureName",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
-                            _descNormal1TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "pbr1TextureName",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
-                            _descPbr1TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "albedo2TextureName",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
-                            _descAlbedo2TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "normal2TextureName",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
-                            _descNormal2TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "pbr2TextureName",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
-                            _descPbr2TextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
-      p_Properties.AddMember(
-          "blendMaskTextureName",
-          _INTR_CREATE_PROP(p_Document, p_GenerateDesc, _N(Textures), "string",
-                            _descBlendMaskTextureName(p_Ref), false, false),
-          p_Document.GetAllocator());
+      p_Properties.AddMember("albedo1TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(TerrainTextures), "string",
+                                               _descAlbedo1TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("normal1TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(TerrainTextures), "string",
+                                               _descNormal1TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("pbr1TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(TerrainTextures), "string",
+                                               _descPbr1TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("albedo2TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(TerrainTextures), "string",
+                                               _descAlbedo2TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("normal2TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(TerrainTextures), "string",
+                                               _descNormal2TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("pbr2TextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(TerrainTextures), "string",
+                                               _descPbr2TextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
+      p_Properties.AddMember("blendMaskTextureName",
+                             _INTR_CREATE_PROP(p_Document, p_GenerateDesc,
+                                               _N(TerrainTextures), "string",
+                                               _descBlendMaskTextureName(p_Ref),
+                                               false, false),
+                             p_Document.GetAllocator());
     }
 
     // Water
-    if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferWater))) !=
-        0u)
+    // if ((_materialPassMask(p_Ref) & getMaterialPassFlag(_N(GBufferWater))) !=
+    //    0u)
     {
       p_Properties.AddMember(
           "foamTextureName",

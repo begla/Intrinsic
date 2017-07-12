@@ -70,6 +70,13 @@ void SpecularProbeManager::createResources(
 
   for (SpecularProbeRef probeRef : p_Probes)
   {
+    _flags(probeRef) = 0u;
+    for (Name& flag : _descFlags(probeRef))
+    {
+      if (flag == _N(ParallaxCorrected))
+        _flags(probeRef) |= SpecularProbeFlags::kParallaxCorrected;
+    }
+
     for (uint32_t i = 0u; i < _descSpecularTextureNames(probeRef).size(); ++i)
     {
       Name specularTextureName = _descSpecularTextureNames(probeRef)[i];

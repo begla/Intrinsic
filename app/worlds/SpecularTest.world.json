@@ -84,6 +84,14 @@
                 }
             },
             {
+                "type": "PostEffectVolume",
+                "properties": {
+                    "postEffectName": "SpecularTest",
+                    "radius": 500.0,
+                    "blendRange": 2.0
+                }
+            },
+            {
                 "type": "Mesh",
                 "properties": {
                     "meshName": "sky",
@@ -93,14 +101,6 @@
                         1.0,
                         1.0
                     ]
-                }
-            },
-            {
-                "type": "PostEffectVolume",
-                "properties": {
-                    "postEffectName": "SpecularTest",
-                    "radius": 500.0,
-                    "blendRange": 2.0
                 }
             }
         ]
@@ -147,6 +147,14 @@
                 }
             },
             {
+                "type": "Camera",
+                "properties": {
+                    "fov": 80.0,
+                    "nearPlane": 1.0,
+                    "farPlane": 10000.0
+                }
+            },
+            {
                 "type": "CameraController",
                 "properties": {
                     "cameraControllerType": 0,
@@ -156,14 +164,6 @@
                         -1.542762041091919,
                         0.0
                     ]
-                }
-            },
-            {
-                "type": "Camera",
-                "properties": {
-                    "fov": 80.0,
-                    "nearPlane": 1.0,
-                    "farPlane": 10000.0
                 }
             }
         ]
@@ -176,15 +176,15 @@
                 "type": "Node",
                 "properties": {
                     "localPos": [
-                        4.865007400512695,
-                        3.0383477210998537,
-                        -17.03157615661621
+                        -6.530771732330322,
+                        4.328758239746094,
+                        20.826404571533204
                     ],
                     "localOrient": [
-                        0.03297555819153786,
-                        -0.17775365710258485,
-                        0.005959837697446346,
-                        0.9835042953491211
+                        0.009819078259170056,
+                        0.9729248881340027,
+                        -0.04207597300410271,
+                        0.22704705595970155
                     ],
                     "localSize": [
                         0.0,
@@ -192,15 +192,15 @@
                         0.0
                     ],
                     "worldPos": [
-                        4.865007400512695,
-                        3.0383477210998537,
-                        -17.03157615661621
+                        -6.530771732330322,
+                        4.328758239746094,
+                        20.826404571533204
                     ],
                     "worldOrient": [
-                        0.03297555819153786,
-                        -0.17775365710258485,
-                        0.005959837697446346,
-                        0.9835042953491211
+                        0.009819078259170056,
+                        0.9729248881340027,
+                        -0.04207597300410271,
+                        0.22704705595970155
                     ],
                     "worldSize": [
                         0.0,
@@ -261,13 +261,6 @@
                 }
             },
             {
-                "type": "RigidBody",
-                "properties": {
-                    "rigidBodyType": 2,
-                    "density": 1.0
-                }
-            },
-            {
                 "type": "Mesh",
                 "properties": {
                     "meshName": "st_room",
@@ -277,6 +270,13 @@
                         1.0,
                         1.0
                     ]
+                }
+            },
+            {
+                "type": "RigidBody",
+                "properties": {
+                    "rigidBodyType": 2,
+                    "density": 1.0
                 }
             }
         ]
@@ -505,6 +505,43 @@
         "name": "SpecularTestProbe",
         "offsetToParent": -9,
         "propertyEntries": [
+            {
+                "type": "Node",
+                "properties": {
+                    "localPos": [
+                        0.0,
+                        2.0,
+                        0.0
+                    ],
+                    "localOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "localSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "worldPos": [
+                        0.0,
+                        2.0,
+                        0.0
+                    ],
+                    "worldOrient": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "worldSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
             {
                 "type": "IrradianceProbe",
                 "properties": {
@@ -749,49 +786,25 @@
                 }
             },
             {
-                "type": "Node",
-                "properties": {
-                    "localPos": [
-                        0.0,
-                        2.0,
-                        0.0
-                    ],
-                    "localOrient": [
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
-                    ],
-                    "localSize": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "worldPos": [
-                        0.0,
-                        2.0,
-                        0.0
-                    ],
-                    "worldOrient": [
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
-                    ],
-                    "worldSize": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ]
-                }
-            },
-            {
                 "type": "SpecularProbe",
                 "properties": {
                     "radius": 29.44300079345703,
                     "falloffRangePerc": 0.1981000006198883,
                     "falloffExp": 0.9909999966621399,
                     "priority": 1,
+                    "flags": [
+                        "ParallaxCorrected"
+                    ],
+                    "minExtent": [
+                        -10.0,
+                        -2.0,
+                        -20.0
+                    ],
+                    "maxExtent": [
+                        10.0,
+                        10000.0,
+                        20.0
+                    ],
                     "specularTextureNames": [
                         "SpecularTestProbe0.dds",
                         "SpecularTestProbe0-125.dds",
