@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.8)
 
 # Setup modules
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
@@ -26,10 +26,8 @@ if(NOT INTR_PLATFORM_WINDOWS)
   set(INTR_USE_MICROPROFILE OFF)
 endif()
 
-set(GLOBAL_PROPERTY USE_FOLDERS ON)
-
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 if(INTR_BUILD_INTRINSICED)
+  set(CMAKE_INCLUDE_CURRENT_DIR ON)
   set(CMAKE_AUTOUIC ON)
   set(CMAKE_AUTORCC ON)
   set(CMAKE_AUTOMOC ON)
@@ -37,9 +35,6 @@ if(INTR_BUILD_INTRINSICED)
 endif()
 
 set(INTR_FINAL_BUILD OFF CACHE BOOL "Final build setting")
-
-set(INTR_GENERAL_LINK_FLAGS " ")
-set(INTR_GENERAL_COMPILE_FLAGS " ")
 
 add_definitions("-DMICROPROFILE_GPU_TIMERS_VULKAN")
 
@@ -58,6 +53,7 @@ if(MSVC)
 else("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" 
   OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
+  
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG")
   set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
@@ -85,12 +81,13 @@ find_package(PhysX REQUIRED Common Cooking CharacterKinematic Extensions PxFound
 find_package(SDL2 REQUIRED)
 find_package(Vulkan REQUIRED)
 
-if (INTR_BUILD_INTRINSICED)
-  find_package(Qt5 REQUIRED)
+if(INTR_BUILD_INTRINSICED)
+  include(Qt5)
+  find_package(Qt5 COMPONENTS Widgets REQUIRED)
   find_package(FBX REQUIRED)
 endif()
 
-if (INTR_PLATFORM_WINDOWS)
+if(INTR_PLATFORM_WINDOWS)
   find_package(BugSplat REQUIRED)
 endif()
 
@@ -100,8 +97,8 @@ set(INTR_CORE_DEP_SOURCE_FILES
   dependencies/spirvcross/spirv_cfg.cpp
 )
 
-file(GLOB INTR_CORE_SOURCE_FILES IntrinsicCore/src/IntrinsicCore*.cpp IntrinsicCore/src/IntrinsicRenderer*.cpp )
-file(GLOB INTR_CORE_HEADER_FILES IntrinsicCore/src/IntrinsicCore*.h IntrinsicCore/src/IntrinsicRenderer*.h )
+file(GLOB INTR_CORE_SOURCE_FILES IntrinsicCore/src/IntrinsicCore*.cpp IntrinsicRenderer/src/IntrinsicRenderer*.cpp )
+file(GLOB INTR_CORE_HEADER_FILES IntrinsicCore/src/IntrinsicCore*.h IntrinsicRenderer/src/IntrinsicRenderer*.h )
 
 set(INTR_CORE_C_SOURCE_FILES
   dependencies/tlsf/tlsf.c
@@ -134,13 +131,7 @@ if(INTR_USE_MICROPROFILE)
   )
 endif()
 
-# Qt5
 if(INTR_BUILD_INTRINSICED)
-  set(CMAKE_PREFIX_PATH ${Qt5_ROOT_DIR})
-  find_package(Qt5Widgets REQUIRED)
-  include_directories(${Qt5Widgets_INCLUDES})
-  add_definitions(${Qt5Widgets_DEFINITIONS})
-
   foreach (srcFile ${MOC_SOURCES})
     set_source_files_properties (${srcFile} 
     PROPERTIES COMPILE_FLAGS "/Yustdafx_editor.h /FIstdafx_editor.h"
@@ -224,6 +215,7 @@ include_directories(${INTR_DEPENDENCIES})
 set(INTR_INCLUDES
   "IntrinsicEd/src"
   "IntrinsicCore/src"
+  "IntrinsicRenderer/src"
   "IntrinsicAssetManagement/src"
 )
 include_directories(${INTR_INCLUDES})
