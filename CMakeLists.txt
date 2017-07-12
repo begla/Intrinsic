@@ -281,3 +281,8 @@ if (INTR_BUILD_INTRINSICED)
   cotire(IntrinsicAssetManagement)
   cotire(IntrinsicEd)
 endif()
+
+if(MSVC)
+  set_target_properties(Intrinsic PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ../app)
+  set_target_properties(IntrinsicEd PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ../app)
+endif()
