@@ -9,7 +9,7 @@ FIND_LIBRARY(GLSLang_LIBRARY_DEBUG glslangd glslang
   PATH_SUFFIXES lib64 lib Debug
   PATHS
   ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/glslang
-  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build_debug/install
+  ${CMAKE_SOURCE_DIR}/dependencies/glslang/build/install
 )
 
 FIND_LIBRARY(GLSLang_LIBRARY_RELEASE glslang
