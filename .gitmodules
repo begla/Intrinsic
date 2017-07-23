@@ -34,3 +34,6 @@
 [submodule "dependencies/tlsf"]
 	path = dependencies/tlsf
 	url = https://github.com/mattconte/tlsf
+[submodule "dependencies/SDL2"]
+	path = dependencies/SDL2
+	url = git@github.com:davidsiaw/SDL2.git
