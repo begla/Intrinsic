@@ -77,10 +77,10 @@ if (NOT INTR_FINAL_BUILD)
   set(PhysX_PROFILE ON)
 endif()
 
+find_package(GoogleTest REQUIRED)
 find_package(GLSLang REQUIRED)
 find_package(LuaJIT REQUIRED)
 find_package(PhysX REQUIRED Common Cooking CharacterKinematic Extensions PxFoundation)
-
 find_package(SDL2 REQUIRED)
 find_package(Vulkan REQUIRED)
 

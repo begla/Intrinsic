@@ -79,7 +79,7 @@ _INTR_INLINE void _preFilterGGXOpt(const gli::texture_cube& p_Input,
 
           const float saSample = 1.0f / (float(sampleCount) * pdf + 0.0001f);
           const float mipLevel =
-              glm::clamp(1.0f /* Bias*/ + 0.5f * log2(saSample / saTexel), 0.0f,
+              glm::clamp(1.0f /* Bias*/ + 0.5f * static_cast<float>(log2(saSample / saTexel)), 0.0f,
                          (float)p_Input.max_level());
 
           preFilteredColor += glm::vec3(sourceSamplerTrilinear.texture_lod(

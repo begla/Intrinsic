@@ -37,3 +37,6 @@
 [submodule "dependencies/SDL2"]
 	path = dependencies/SDL2
 	url = git@github.com:davidsiaw/SDL2.git
+[submodule "dependencies/googletest"]
+	path = dependencies/googletest
+	url = git@github.com:google/googletest.git

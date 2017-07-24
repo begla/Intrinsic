@@ -81,8 +81,8 @@ int _main(int argc, char* argv[])
 #if (_WIN32)
   Application::init(GetModuleHandle(NULL), (void*)wmInfo.info.win.window);
 #else
-  Application::init((void*)wmInfo.info.x11.display,
-                    (void*)wmInfo.info.x11.window);
+//  Application::init((void*)wmInfo.info.x11.display,
+//                    (void*)wmInfo.info.x11.window);
 #endif // _WIN32
 
   // Activate main game state
