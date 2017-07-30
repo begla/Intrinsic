@@ -11,9 +11,12 @@ ELSE()
 #setup everything else
   ADD_SUBDIRECTORY(${SDL2_ROOT_DIR})
 
-# Binary directory needs to come first
-#  because SDL fallsback to a different SDL_config.h,
-#  which will not work with the CMAKE system correctly
+# Binary directory needs to be included first
+#   because SDL includes a default SDL_config.h used with
+#   the old auto-tools system.  That older SDL_config.h does not work with CMAKE
+#   correctly.
+#   Including the Binary directory first ensures the correct SDL_config.h is #define(d)
+#   first.
   SET(SDL2_INCLUDE_DIR
     ${SDL2_BINARY_DIR}/include #for SDL_config.h
     ${SDL2_ROOT_DIR}/include

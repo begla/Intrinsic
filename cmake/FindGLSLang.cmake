@@ -1,6 +1,6 @@
 # Locate the GLSLang library
 
-FIND_PATH(GLSLang_ROOT_DIR glslang/MachineIndependent/glslang_tab.cpp.h
+FIND_PATH(GLSLang_ROOT_DIR glslang/CMakeLists.txt
   PATHS
   ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glslang
 )
