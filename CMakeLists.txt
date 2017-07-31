@@ -286,3 +286,23 @@ if(MSVC)
   set_target_properties(Intrinsic PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ../app)
   set_target_properties(IntrinsicEd PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ../app)
 endif()
+
+## Installation Rules
+install(
+  FILES ${INTR_CORE_HEADER_FILES}
+  DESTINATION include
+)
+
+install(
+  TARGETS IntrinsicCore LIBRARY
+  ARCHIVE DESTINATION lib
+)
+
+install(
+  DIRECTORY app
+  DESTINATION bin
+)
+install(
+  TARGETS Intrinsic
+  RUNTIME DESTINATION bin/app
+)
