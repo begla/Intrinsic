@@ -81,7 +81,7 @@ find_package(GoogleTest REQUIRED)
 find_package(GLSLang REQUIRED)
 find_package(LuaJIT REQUIRED)
 find_package(PhysX REQUIRED Common Cooking CharacterKinematic Extensions PxFoundation)
-find_package(SDL2 REQUIRED)
+find_package(SDL2 REQUIRED QUIET) # SDL2 is pretty noisy. most people won't care.
 find_package(Vulkan REQUIRED)
 
 if(INTR_BUILD_INTRINSICED)

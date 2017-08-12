@@ -6,7 +6,7 @@ FIND_PATH(SDL2_ROOT_DIR CMakeLists.txt
 )
 
 IF(NOT SDL2_ROOT_DIR)
-  MESSAGE(FATAL_ERROR "cannot find SDL2 package; forgot submodule update --init?") 
+  MESSAGE(FATAL_ERROR "cannot find SDL2 package; forgot submodule update --init?")
 ELSE()
 #setup everything else
   ADD_SUBDIRECTORY(${SDL2_ROOT_DIR})

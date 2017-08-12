@@ -10,8 +10,6 @@ IF(NOT LuaJIT_ROOT_DIR)
 ELSE()
   ADD_SUBDIRECTORY(${LuaJIT_ROOT_DIR})
 
-
-  message(STATUS "@@@ ${CMAKE_CURRENT_BINARY_DIR}")
   SET(LuaJIT_INCLUDE_DIR
     ${CMAKE_CURRENT_BINARY_DIR}/dependencies/luajit ##for luaconf.h
     ${LuaJIT_ROOT_DIR}/src
