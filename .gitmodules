@@ -36,13 +36,10 @@
 	url = https://github.com/mattconte/tlsf
 [submodule "dependencies/SDL2"]
 	path = dependencies/SDL2
-	url = git@github.com:spurious/SDL-mirror.git
+	url = https://github.com/spurious/SDL-mirror.git
 [submodule "dependencies/googletest"]
 	path = dependencies/googletest
-	url = git@github.com:google/googletest.git
-[submodule "dependencies/luajit-2.0"]
-	path = dependencies/luajit-2.0
-	url = http://luajit.org/git/luajit-2.0.git
+	url = https://github.com/google/googletest.git
 [submodule "dependencies/luajit"]
 	path = dependencies/luajit
-	url = git@github.com:LuaDist/luajit.git
+	url = https://github.com/LuaDist/luajit.git
