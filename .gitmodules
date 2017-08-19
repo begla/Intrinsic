@@ -34,3 +34,12 @@
 [submodule "dependencies/tlsf"]
 	path = dependencies/tlsf
 	url = https://github.com/mattconte/tlsf
+[submodule "dependencies/SDL2"]
+	path = dependencies/SDL2
+	url = https://github.com/spurious/SDL-mirror.git
+[submodule "dependencies/googletest"]
+	path = dependencies/googletest
+	url = https://github.com/google/googletest.git
+[submodule "dependencies/luajit"]
+	path = dependencies/luajit
+	url = https://github.com/LuaDist/luajit.git
