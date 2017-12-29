@@ -6,7 +6,7 @@
 
 [![Contribute!](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/begla/Intrinsic/issues) <a href='https://ko-fi.com/A815CV2' target='_blank'><img height='20' style='border:0px;height:20px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
-**NOTE:** I'm working on this project in my sparetime and thus the development activity might vary from time to time. This project is not abandoned and I'm certainly planning to continue working on it in the future.
+**NOTE:** *I'm working on this project in my sparetime and thus the development activity might vary from time to time. This project is not abandoned and I'm certainly planning to continue working on it in the future.*
 
 Intrinsic is a Vulkan based cross-platform game and rendering engine. The project is currently in an early stage of development.
 
