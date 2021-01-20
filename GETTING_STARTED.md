@@ -2,7 +2,7 @@
 
 ## Downloading Media Files
 
-I'm trying to keep the size of the repository small. All large media files are available as a package and can be downloaded using the follwing link: http://www.intrinsic-engine.com/downloads/media.7z
+I'm trying to keep the size of the repository small. All large media files are available as a package and can be downloaded using the follwing link: https://www.dropbox.com/s/oklrrv37z2r77m1/media.7z?dl=0
 
 Please extract the archive using 7z to the `app/media` directory.
 
