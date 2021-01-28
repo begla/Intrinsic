@@ -35,6 +35,8 @@
 #include "tinydir/tinydir.h"
 
 // SDL
+#include "SDL_config.h"
+#undef HAVE_LIBUDEV_H
 #include "SDL.h"
 #include "SDL_syswm.h"
 #undef Bool
@@ -73,6 +75,7 @@
 #include <cmath>
 #include <thread>
 #include <mutex>
+#include "stdafx_stl.h"
 
 // Core related includes
 #include "IntrinsicCoreVersion.h"

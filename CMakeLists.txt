@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 
 # Setup modules
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(cotire)
 
 project(Intrinsic)
@@ -77,11 +77,11 @@ if (NOT INTR_FINAL_BUILD)
   set(PhysX_PROFILE ON)
 endif()
 
+find_package(GoogleTest REQUIRED)
 find_package(GLSLang REQUIRED)
 find_package(LuaJIT REQUIRED)
 find_package(PhysX REQUIRED Common Cooking CharacterKinematic Extensions PxFoundation)
-
-find_package(SDL2 REQUIRED)
+find_package(SDL2 REQUIRED QUIET) # SDL2 is pretty noisy. most people won't care.
 find_package(Vulkan REQUIRED)
 
 if(INTR_BUILD_INTRINSICED)
@@ -164,8 +164,13 @@ if (INTR_BUILD_STANDALONE_APP)
 endif()
 
 # Libs
-add_library(IntrinsicCore ${INTR_CORE_SOURCE_FILES} ${INTR_CORE_C_SOURCE_FILES} 
-  ${INTDEP_SOURCE_FILES} ${INTR_CORE_HEADER_FILES} ${INTR_CORE_DEP_SOURCE_FILES})
+add_library(IntrinsicCore
+  ${INTR_CORE_SOURCE_FILES}
+  ${INTR_CORE_C_SOURCE_FILES} 
+  ${INTDEP_SOURCE_FILES}
+  ${INTR_CORE_HEADER_FILES}
+  ${INTR_CORE_DEP_SOURCE_FILES}
+)
 
 if (INTR_BUILD_INTRINSICED)
   add_library(IntrinsicAssetManagement ${INTASSET_SOURCE_FILES} ${INTASSET_HEADER_FILES})
@@ -281,3 +286,23 @@ if(MSVC)
   set_target_properties(Intrinsic PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ../app)
   set_target_properties(IntrinsicEd PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ../app)
 endif()
+
+## Installation Rules
+install(
+  FILES ${INTR_CORE_HEADER_FILES}
+  DESTINATION include
+)
+
+install(
+  TARGETS IntrinsicCore LIBRARY
+  ARCHIVE DESTINATION lib
+)
+
+install(
+  DIRECTORY app
+  DESTINATION bin
+)
+install(
+  TARGETS Intrinsic
+  RUNTIME DESTINATION bin/app
+)

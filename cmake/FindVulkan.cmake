@@ -4,8 +4,8 @@ FIND_LIBRARY(Vulkan_LIBRARY
   NAMES vulkan-1 vulkan
   PATH_SUFFIXES lib64 lib Bin
   PATHS
-    ${VK_SDK_PATH}
-    $ENV{VK_SDK_PATH}
+  ${VK_SDK_PATH}
+  $ENV{VK_SDK_PATH}
 )
 FIND_PATH(Vulkan_INCLUDE_DIR vulkan/vulkan.h
   PATH_SUFFIXES include Include
